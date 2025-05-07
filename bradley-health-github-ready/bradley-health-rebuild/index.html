@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bradley Health Dashboard</title>
+  <link rel="manifest" href="manifest.json" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('Service worker registered'))
+        .catch(err => console.error('Service worker error:', err));
+    }
+  </script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f4f8; margin: 0; }
+    header { background-color: #2c7a7b; color: white; padding: 1em; text-align: center; }
+    main { padding: 2em; max-width: 600px; margin: auto; text-align: center; }
+    a.tool-link {
+      display: block;
+      background: #3182ce;
+      color: white;
+      padding: 1em;
+      margin: 1em 0;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Bradley Health Dashboard</h1>
+  </header>
+  <main>
+    <a class="tool-link" href="bp-tracker.html">Blood Pressure Tracker</a>
+    <a class="tool-link" href="roll-tracker.html">Wheelchair Roll Tracker</a>
+  </main>
+</body>
+</html>

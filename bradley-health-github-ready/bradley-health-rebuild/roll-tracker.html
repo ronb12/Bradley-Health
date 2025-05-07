@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bradley Health - Roll Tracker</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header><h1>Bradley Health</h1><p>Roll Distance Tracker</p></header>
+  <main>
+    <button onclick="startTracking()">Start Tracking</button>
+    <button onclick="stopTracking()">Stop Tracking</button>
+    <p id="status">Status: Not tracking</p>
+    <p id="distance">Distance: 0.00 meters</p>
+    <p id="calories">Calories: 0.0</p>
+    <input type="number" id="manualDistance" placeholder="Manual Distance (m)" />
+    <button onclick="addManualEntry()">Add Manual Entry</button>
+    <table><thead><tr><th>Date</th><th>Distance (m)</th></tr></thead><tbody id="distanceLog"></tbody></table>
+  </main>
+  <script src="js/roll.js"></script>
+</body>
+</html>
