@@ -3,6 +3,7 @@ const historyTable = document.querySelector('#historyTable tbody');
 const feedbackBox = document.getElementById('feedbackBox');
 
 let readings = [];
+let currentUser = null;
 
 // Load readings for this user
 async function loadBP() {
@@ -67,8 +68,8 @@ form.addEventListener('submit', async (e) => {
   }
 
   const now = new Date();
-  const date = now.toISOString().split('T')[0]; // YYYY-MM-DD
-  const timestamp = now.toISOString();          // Full ISO datetime
+  const date = now.toISOString().split('T')[0];
+  const timestamp = now.toISOString();
 
   const status = getStatus(systolic, diastolic);
   const tip = getTips(status);
@@ -95,7 +96,9 @@ function updateChart() {
   const systolics = readings.map(r => r.systolic).reverse();
   const diastolics = readings.map(r => r.diastolic).reverse();
 
-  if (window.bpChart) window.bpChart.destroy();
+  if (window.bpChart && typeof window.bpChart.destroy === "function") {
+    window.bpChart.destroy();
+  }
 
   const ctx = document.getElementById('bpChart').getContext('2d');
   window.bpChart = new Chart(ctx, {
