@@ -4,7 +4,6 @@ const feedbackBox = document.getElementById('feedbackBox');
 
 let readings = [];
 
-
 // Load readings for this user
 async function loadBP() {
   if (!currentUser) return;
@@ -33,11 +32,14 @@ function getTips(status) {
     Stage2: ["Consult a doctor about treatment options."],
     Crisis: ["Seek emergency medical care now!"]
   };
-  return tips[status][0];
+  return tips[status]?.[0] || "";
 }
 
 function renderTable() {
-  historyTable.innerHTML = "";
+  historyTable.innerHTML = readings.length === 0 
+    ? "<tr><td colspan='5'>No readings yet.</td></tr>"
+    : "";
+
   readings.forEach(r => {
     const status = getStatus(r.systolic, r.diastolic);
     const displayTime = new Date(r.timestamp).toLocaleString();
@@ -50,6 +52,7 @@ function renderTable() {
     </tr>`;
     historyTable.innerHTML += row;
   });
+
   updateChart();
 }
 
@@ -88,6 +91,10 @@ form.addEventListener('submit', async (e) => {
   });
 
   form.reset();
+  setTimeout(() => {
+    feedbackBox.style.display = "none";
+  }, 6000);
+
   loadBP();
 });
 
