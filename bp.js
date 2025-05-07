@@ -3,7 +3,7 @@ const historyTable = document.querySelector('#historyTable tbody');
 const feedbackBox = document.getElementById('feedbackBox');
 
 let readings = [];
-let currentUser = null;
+
 
 // Load readings for this user
 async function loadBP() {
