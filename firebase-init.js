@@ -5,11 +5,14 @@ const firebaseConfig = {
   projectId: "bradley-health",
   storageBucket: "bradley-health.appspot.com",
   messagingSenderId: "294249919277",
-  appId: "1:294249919277:web:exampleappid" // Replace with your real appId if needed
+  appId: "1:294249919277:web:exampleappid"
 };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+// Initialize Firebase only once
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
 const db = firebase.firestore();
 let currentUser = null;
 
