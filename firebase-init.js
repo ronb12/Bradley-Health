@@ -8,7 +8,7 @@ const firebaseConfig = {
   appId: "1:294249919277:web:exampleappid"
 };
 
-// Initialize Firebase only once
+// ✅ Only initialize once (prevents duplicate error)
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
