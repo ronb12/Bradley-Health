@@ -1,14 +1,32 @@
-let totalDistance = 0, lastPosition = null, watchId = null;
-let autoSaveInterval = null;
-let distanceLog = [];
+let totalDistance = 0,
+    lastPosition = null,
+    watchId = null,
+    autoSaveInterval = null,
+    distanceLog = [],
+    currentUser = null;
 
-function toRad(x) { return x * Math.PI / 180; }
+// Wait for Firebase Auth
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    currentUser = user;
+    loadLog();
+  } else {
+    firebase.auth().signInAnonymously().catch(console.error);
+  }
+});
+
+function toRad(x) {
+  return x * Math.PI / 180;
+}
 
 function computeDistance(lat1, lon1, lat2, lon2) {
   const R = 6371e3;
-  const dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1);
-  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const dLat = toRad(lat2 - lat1),
+        dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 async function startTracking() {
@@ -16,14 +34,22 @@ async function startTracking() {
   if (navigator.geolocation) {
     watchId = navigator.geolocation.watchPosition(pos => {
       if (lastPosition) {
-        const dist = computeDistance(lastPosition.coords.latitude, lastPosition.coords.longitude, pos.coords.latitude, pos.coords.longitude);
+        const dist = computeDistance(
+          lastPosition.coords.latitude,
+          lastPosition.coords.longitude,
+          pos.coords.latitude,
+          pos.coords.longitude
+        );
         totalDistance += dist;
         document.getElementById('distance').innerText = "Distance: " + totalDistance.toFixed(2) + " meters";
         updateCalories();
       }
       lastPosition = pos;
-    });
+    }, err => {
+      alert("Location error: " + err.message);
+    }, { enableHighAccuracy: true });
   }
+
   autoSaveInterval = setInterval(() => {
     if (totalDistance > 0) {
       logDistance(totalDistance, false);
@@ -52,22 +78,32 @@ function addManualEntry() {
 }
 
 function updateCalories() {
-  const weight = 80, MET = 2.5;
+  const weight = 80;      // Assumed weight in kg
+  const MET = 2.5;        // Light wheelchair movement
   const hours = (totalDistance / 1000) / 3.2;
   const cals = MET * weight * hours;
   document.getElementById('calories').innerText = "Calories: " + cals.toFixed(1);
 }
 
 async function logDistance(dist, show = true) {
+  if (!currentUser) return;
   const date = new Date().toISOString().split('T')[0];
-  await db.collection("rollDistances").add({ date, distance: dist.toFixed(2) });
+  await db.collection("rollDistances").add({
+    uid: currentUser.uid,
+    date,
+    distance: dist.toFixed(2)
+  });
   if (show) loadLog();
 }
 
 async function loadLog() {
-  const snapshot = await db.collection("rollDistances").orderBy("date", "desc").get();
-  distanceLog = [];
-  snapshot.forEach(doc => distanceLog.push(doc.data()));
+  if (!currentUser) return;
+  const snapshot = await db.collection("rollDistances")
+    .where("uid", "==", currentUser.uid)
+    .orderBy("date", "desc")
+    .get();
+
+  distanceLog = snapshot.docs.map(doc => doc.data());
   renderLog();
 }
 
@@ -78,5 +114,3 @@ function renderLog() {
     tbody.innerHTML += `<tr><td>${entry.date}</td><td>${entry.distance}</td></tr>`;
   });
 }
-
-loadLog();
