@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wheelchair Pedometer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 2em;
+      color: #222;
+    }
+    .tracker {
+      background: white;
+      padding: 1.5em;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h1 {
+      color: #2c7a7b;
+    }
+    #startBtn {
+      margin-top: 1.5em;
+      padding: 0.8em 1.5em;
+      font-size: 1.1em;
+      background: #2c7a7b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="tracker">
+    <h1>🧑‍🦽 Wheelchair Pedometer</h1>
+    <div id="pushCount">Pushes: 0</div>
+    <div id="distance">Distance: 0.00 meters</div>
+    <div id="calories">Calories Burned: 0.0</div>
+    <button id="startBtn">Start Tracking</button>
+  </div>
+
+  <script>
+    let pushCount = 0;
+    let lastPushTime = 0;
+    const PUSH_THRESHOLD = 1.8; // Adjust based on test feedback
+    const MIN_PUSH_INTERVAL = 500; // ms
+    const METERS_PER_PUSH = 1.2;
+    const WEIGHT_KG = 80;
+    const MET = 2.5;
+
+    function initPedometer() {
+      if (window.DeviceMotionEvent) {
+        window.addEventListener("devicemotion", event => {
+          const acc = event.accelerationIncludingGravity;
+          const net = Math.sqrt(acc.x**2 + acc.y**2 + acc.z**2);
+
+          if (net > PUSH_THRESHOLD && Date.now() - lastPushTime > MIN_PUSH_INTERVAL) {
+            pushCount++;
+            lastPushTime = Date.now();
+            updateStats();
+          }
+        });
+      } else {
+        alert("Your device does not support motion detection.");
+      }
+    }
+
+    function updateStats() {
+      const distance = pushCount * METERS_PER_PUSH;
+      const hours = distance / 1000 / 3.2;
+      const calories = MET * WEIGHT_KG * hours;
+
+      document.getElementById("pushCount").innerText = "Pushes: " + pushCount;
+      document.getElementById("distance").innerText = "Distance: " + distance.toFixed(2) + " meters";
+      document.getElementById("calories").innerText = "Calories Burned: " + calories.toFixed(1);
+    }
+
+    document.getElementById("startBtn").addEventListener("click", () => {
+      initPedometer();
+      document.getElementById("startBtn").innerText = "Tracking...";
+      document.getElementById("startBtn").disabled = true;
+    });
+  </script>
+</body>
+</html>
