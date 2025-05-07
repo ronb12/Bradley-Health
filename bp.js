@@ -9,7 +9,7 @@ async function loadBP() {
   if (!currentUser) return;
   const snapshot = await db.collection("bpReadings")
     .where("uid", "==", currentUser.uid)
-    .orderBy("date", "desc")
+    .orderBy("timestamp", "desc")
     .get();
 
   readings = snapshot.docs.map(doc => doc.data());
@@ -27,10 +27,10 @@ function getStatus(s, d) {
 function getTips(status) {
   const tips = {
     Normal: ["Keep up the healthy lifestyle!"],
-    Elevated: ["Consider reducing salt intake and increasing activity."],
-    Stage1: ["Monitor regularly and consider seeing a provider."],
-    Stage2: ["High BP detected — consult a doctor."],
-    Crisis: ["Immediate medical attention is needed!"]
+    Elevated: ["Cut down on sodium and reduce stress."],
+    Stage1: ["Monitor regularly and improve your routine."],
+    Stage2: ["Consult a doctor about treatment options."],
+    Crisis: ["Seek emergency medical care now!"]
   };
   return tips[status][0];
 }
@@ -39,12 +39,13 @@ function renderTable() {
   historyTable.innerHTML = "";
   readings.forEach(r => {
     const status = getStatus(r.systolic, r.diastolic);
+    const displayTime = new Date(r.timestamp).toLocaleString();
     const row = `<tr>
-      <td>${r.date}</td>
+      <td>${displayTime}</td>
       <td>${r.systolic}/${r.diastolic}</td>
-      <td>${r.pulse}</td>
+      <td>${r.pulse || "-"}</td>
       <td>${status}</td>
-      <td>${r.mood}</td>
+      <td>${r.mood || ""}</td>
     </tr>`;
     historyTable.innerHTML += row;
   });
@@ -58,13 +59,16 @@ form.addEventListener('submit', async (e) => {
   const diastolic = +document.getElementById('diastolic').value;
   const pulse = +document.getElementById('pulse').value;
   const mood = document.getElementById('mood').value;
-  const date = new Date().toISOString().split('T')[0];
   const uid = currentUser?.uid;
 
-  if (!uid) {
-    alert("User not authenticated. Please refresh.");
+  if (!uid || isNaN(systolic) || isNaN(diastolic)) {
+    alert("Please enter valid readings and ensure you are signed in.");
     return;
   }
+
+  const now = new Date();
+  const date = now.toISOString().split('T')[0]; // YYYY-MM-DD
+  const timestamp = now.toISOString();          // Full ISO datetime
 
   const status = getStatus(systolic, diastolic);
   const tip = getTips(status);
@@ -73,7 +77,13 @@ form.addEventListener('submit', async (e) => {
   feedbackBox.style.display = "block";
 
   await db.collection("bpReadings").add({
-    date, systolic, diastolic, pulse, mood, uid
+    date,
+    timestamp,
+    systolic,
+    diastolic,
+    pulse,
+    mood,
+    uid
   });
 
   form.reset();
@@ -81,7 +91,7 @@ form.addEventListener('submit', async (e) => {
 });
 
 function updateChart() {
-  const labels = readings.map(r => r.date).reverse();
+  const labels = readings.map(r => new Date(r.timestamp).toLocaleDateString()).reverse();
   const systolics = readings.map(r => r.systolic).reverse();
   const diastolics = readings.map(r => r.diastolic).reverse();
 
@@ -97,11 +107,16 @@ function updateChart() {
         { label: 'Diastolic', data: diastolics, borderColor: 'blue', fill: false }
       ]
     },
-    options: { responsive: true }
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
   });
 }
 
-// Wait for auth before loading data
+// Firebase auth state listener
 firebase.auth().onAuthStateChanged(user => {
   if (user) {
     currentUser = user;
