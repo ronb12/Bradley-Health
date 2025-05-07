@@ -3,7 +3,6 @@ let totalDistance = 0,
     watchId = null,
     autoSaveInterval = null,
     distanceLog = [],
-    currentUser = null,
     startTime = null,
     eightHourCheck = null;
 
