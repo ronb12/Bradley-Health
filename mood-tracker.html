@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mood Tracker</title>
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase & Chart.js -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="firebase-init.js"></script> <!-- ✅ Root-level init -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="firebase-init.js"></script>
 
   <style>
     body {
@@ -41,6 +42,18 @@
       border-radius: 10px;
       padding: 1em;
     }
+    table {
+      width: 100%;
+      margin-top: 2em;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+    }
+    th, td {
+      padding: 0.8em;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
   </style>
 </head>
 <body>
@@ -57,11 +70,19 @@
 
   <textarea id="moodNote" placeholder="Optional note about today..."></textarea>
   <button onclick="addMood()">Log Mood</button>
+  <button onclick="downloadPDF()">📄 Export Mood Log</button>
 
   <canvas id="moodChart"></canvas>
 
+  <table>
+    <thead>
+      <tr><th>Date</th><th>Mood</th><th>Note</th></tr>
+    </thead>
+    <tbody id="moodTable"></tbody>
+  </table>
+
   <script>
-    let currentUser;
+    const db = firebase.firestore();
 
     firebase.auth().onAuthStateChanged(user => {
       if (!user) {
@@ -77,10 +98,7 @@
       const note = document.getElementById("moodNote").value.trim();
       const today = new Date().toISOString().split("T")[0];
 
-      if (!rating) {
-        alert("Please select a mood.");
-        return;
-      }
+      if (!rating) return alert("Please select a mood.");
 
       db.collection("moods").add({
         uid: currentUser.uid,
@@ -95,6 +113,8 @@
       });
     }
 
+    let moodData = [];
+
     function loadMoods() {
       db.collection("moods")
         .where("uid", "==", currentUser.uid)
@@ -102,29 +122,24 @@
         .limit(7)
         .get()
         .then(snapshot => {
-          const labels = [];
-          const values = [];
+          const labels = [], values = [];
+          moodData = [];
 
           snapshot.forEach(doc => {
             const mood = doc.data();
             labels.unshift(mood.date);
             values.unshift(mood.rating);
+            moodData.unshift(mood);
           });
 
-          // Delay rendering slightly for canvas readiness
-          setTimeout(() => drawChart(labels, values), 100);
-        })
-        .catch(error => {
-          console.error("❌ Failed to load moods:", error);
+          drawChart(labels, values);
+          renderTable();
         });
     }
 
     function drawChart(labels, values) {
       const ctx = document.getElementById("moodChart").getContext("2d");
-
-      if (window.moodChart) {
-        window.moodChart.destroy();
-      }
+      if (window.moodChart) window.moodChart.destroy();
 
       window.moodChart = new Chart(ctx, {
         type: 'line',
@@ -133,24 +148,50 @@
           datasets: [{
             label: 'Mood (1–5)',
             data: values,
-            tension: 0.3,
-            borderWidth: 2,
+            borderColor: '#2c7a7b',
             fill: false,
-            borderColor: '#2c7a7b'
+            tension: 0.3,
+            borderWidth: 2
           }]
         },
         options: {
-          responsive: true,
           scales: {
             y: {
               beginAtZero: true,
               min: 1,
               max: 5,
-              ticks: { stepSize: 1 }
+              ticks: {
+                stepSize: 1,
+                callback: value => ['😟','😕','😐','🙂','😃'][value-1]
+              }
             }
           }
         }
       });
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("moodTable");
+      tbody.innerHTML = "";
+      moodData.forEach(m => {
+        tbody.innerHTML += `<tr><td>${m.date}</td><td>${['😟','😕','😐','🙂','😃'][m.rating-1]}</td><td>${m.note || ''}</td></tr>`;
+      });
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(16);
+      doc.text("Mood Tracker Log", 20, 20);
+
+      let y = 30;
+      moodData.forEach((m, i) => {
+        doc.setFontSize(12);
+        doc.text(`${m.date} - ${['😟','😕','😐','🙂','😃'][m.rating-1]} - ${m.note || ''}`, 20, y);
+        y += 10;
+      });
+
+      doc.save("mood_log.pdf");
     }
   </script>
 </body>
