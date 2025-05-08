@@ -11,7 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="firebase-init.js"></script>
+  <script src="js/firebase-init.js"></script>
 
   <style>
     body { font-family: Arial; background: #f0f4f8; padding: 2em; }
@@ -34,16 +34,10 @@
       margin-top: 0.5em; margin-right: 0.5em;
       background: #555;
     }
-    .back-btn {
-      background-color: #3b4754;
+    .home-button {
+      background-color: #3d4852;
       color: white;
-      padding: 0.75em;
-      width: 100%;
-      border-radius: 8px;
       text-align: center;
-      margin-top: 1em;
-      text-decoration: none;
-      display: inline-block;
     }
   </style>
 </head>
@@ -64,18 +58,20 @@
   <input type="file" id="docFile" />
   <button onclick="addVisit()">Add Visit</button>
   <button onclick="exportVisitsToPDF()">Export Visits as PDF</button>
-  <a href="index.html" class="back-btn">← Back to Home</a>
+  <button class="home-button" onclick="window.location.href='index.html'">← Back to Home</button>
 
   <div id="visitList">Loading visits...</div>
 
   <script>
-    let currentUser;
     const db = firebase.firestore();
     const storage = firebase.storage();
 
     firebase.auth().onAuthStateChanged(user => {
       if (!user) window.location.href = "login.html";
-      else { currentUser = user; loadVisits(); }
+      else {
+        currentUser = user;
+        loadVisits();
+      }
     });
 
     async function addVisit() {
