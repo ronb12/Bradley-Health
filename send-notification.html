@@ -1,0 +1,94 @@
+<!-- send-notification.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send Notification - Admin</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-functions-compat.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <style>
+    body { font-family: Arial; background: #f0f4f8; padding: 2em; }
+    h1 { color: #2c7a7b; }
+    input, textarea, button {
+      display: block; width: 100%; margin: 1em 0; padding: 0.8em;
+      border-radius: 8px; border: 1px solid #ccc;
+    }
+    button { background: #2c7a7b; color: white; border: none; cursor: pointer; }
+    .log { background: white; padding: 1em; border-radius: 10px; margin-top: 2em; }
+  </style>
+</head>
+<body>
+  <h1>📣 Send Push Notification (Admin Only)</h1>
+  <input type="text" id="notiTitle" placeholder="Notification Title" />
+  <textarea id="notiBody" placeholder="Notification Body"></textarea>
+  <input type="text" id="notiIcon" placeholder="Icon URL (optional)" />
+  <button onclick="sendNotification()">Send Notification to All Tokens</button>
+
+  <div class="log">
+    <h3>📜 Log</h3>
+    <pre id="logOutput">Initializing...</pre>
+  </div>
+
+  <script>
+    let currentUser;
+    const db = firebase.firestore();
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+      currentUser = user;
+      user.getIdTokenResult().then(token => {
+        if (!token.claims.admin) {
+          alert("Access denied. Admins only.");
+          window.location.href = "index.html";
+        } else {
+          log("Admin authenticated ✔");
+        }
+      });
+    });
+
+    function log(msg) {
+      document.getElementById("logOutput").textContent += `\n${msg}`;
+    }
+
+    async function sendNotification() {
+      const title = document.getElementById("notiTitle").value;
+      const body = document.getElementById("notiBody").value;
+      const icon = document.getElementById("notiIcon").value || "/icon-192-final.png";
+
+      log("Fetching push tokens...");
+      const snapshot = await db.collection("users").where("pushToken", ">", "").get();
+      if (snapshot.empty) return log("❌ No tokens found.");
+
+      for (const doc of snapshot.docs) {
+        const token = doc.data().pushToken;
+        const payload = {
+          to: token,
+          notification: {
+            title,
+            body,
+            icon
+          }
+        };
+
+        const response = await fetch("https://fcm.googleapis.com/fcm/send", {
+          method: "POST",
+          headers: {
+            "Authorization": "key=YOUR_SERVER_KEY_HERE",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        log(`✔ Sent to ${doc.id}: ${response.status}`);
+      }
+    }
+  </script>
+</body>
+</html>
