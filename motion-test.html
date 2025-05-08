@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>iPhone Motion Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body style="font-family: sans-serif; padding: 2em;">
+  <h1>📱 Motion Test</h1>
+  <p id="status">Waiting...</p>
+  <p><button onclick="startMotion()">Start Motion Test</button></p>
+  <pre id="output"></pre>
+
+  <script>
+    function startMotion() {
+      if (typeof DeviceMotionEvent !== "undefined" &&
+          typeof DeviceMotionEvent.requestPermission === "function") {
+        // iOS 13+ requires user permission
+        DeviceMotionEvent.requestPermission().then(response => {
+          if (response === "granted") {
+            document.getElementById("status").innerText = "✅ Permission granted!";
+            window.addEventListener("devicemotion", handleMotion);
+          } else {
+            document.getElementById("status").innerText = "❌ Permission denied.";
+          }
+        }).catch(err => {
+          document.getElementById("status").innerText = "❌ Error: " + err;
+        });
+      } else {
+        document.getElementById("status").innerText = "Legacy device, starting...";
+        window.addEventListener("devicemotion", handleMotion);
+      }
+    }
+
+    function handleMotion(event) {
+      const acc = event.accelerationIncludingGravity;
+      document.getElementById("output").innerText =
+        `X: ${acc.x?.toFixed(2)}\nY: ${acc.y?.toFixed(2)}\nZ: ${acc.z?.toFixed(2)}`;
+    }
+  </script>
+</body>
+</html>
