@@ -11,6 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="js/firebase-init.js"></script>
 
   <style>
     body { font-family: Arial; background: #f0f4f8; padding: 2em; }
@@ -30,13 +31,12 @@
       font-size: 0.8em;
     }
     .visit-entry button {
-      margin-top: 0.5em; margin-right: 0.5em;
-      background: #555;
+      margin-top: 0.5em; margin-right: 0.5em; background: #555;
     }
   </style>
 </head>
 <body>
-  <h1>📅 Doctor Visit Log</h1>
+  <h1>🗓️ Doctor Visit Log</h1>
 
   <input type="date" id="visitDate" />
   <input type="text" id="provider" placeholder="Doctor or Clinic Name" />
@@ -52,35 +52,20 @@
   <input type="file" id="docFile" />
   <button onclick="addVisit()">Add Visit</button>
   <button onclick="exportVisitsToPDF()">Export Visits as PDF</button>
+  <button onclick="window.location.href='index.html'" style="background-color:#3c4e5a; color:white; border:none; padding:0.75em; width:100%; margin-top:1em; border-radius:8px; font-size:1em;">
+    ← Back to Home
+  </button>
 
   <div id="visitList">Loading visits...</div>
 
   <script>
-    // ✅ Initialize Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyC--9xnMW4s8UPOJUnQbKjMpXgJvoh6ITw",
-      authDomain: "bradley-health.firebaseapp.com",
-      projectId: "bradley-health",
-      storageBucket: "bradley-health.appspot.com",
-      messagingSenderId: "294249919277",
-      appId: "1:294249919277:web:exampleappid"
-    };
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-
+    let currentUser;
     const db = firebase.firestore();
     const storage = firebase.storage();
-    const auth = firebase.auth();
-    let currentUser = null;
 
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = "login.html";
-      } else {
-        currentUser = user;
-        loadVisits();
-      }
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) window.location.href = "login.html";
+      else { currentUser = user; loadVisits(); }
     });
 
     async function addVisit() {
