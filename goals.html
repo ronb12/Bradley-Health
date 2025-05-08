@@ -3,102 +3,153 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🎯 Health Goals</title>
+  <title>🏂 Health Goals</title>
 
-  <!-- Firebase -->
+  <!-- Firebase + jsPDF -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="firebase-init.js"></script>
 
   <style>
-    body { font-family: Arial, sans-serif; background: #f0f4f8; padding: 2em; }
-    h1 { color: #2c7a7b; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 2em;
+    }
+    h1 {
+      color: #2c7a7b;
+    }
     input, button {
-      display: block; margin: 0.8em 0; padding: 0.7em; width: 100%;
-      border-radius: 8px; border: 1px solid #ccc;
+      display: block;
+      margin: 1em 0;
+      padding: 0.7em;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
     }
     button {
-      background-color: #2c7a7b; color: white; cursor: pointer;
+      background-color: #2c7a7b;
+      color: white;
+      cursor: pointer;
+      border: none;
     }
     .goal-item {
-      background: white; padding: 1em; border-radius: 10px;
+      background: white;
+      padding: 1em;
+      border-radius: 10px;
       margin-bottom: 1em;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
     }
-    .goal-item.completed { opacity: 0.6; text-decoration: line-through; }
-    canvas { background: white; border-radius: 10px; padding: 1em; margin-top: 2em; }
+    .goal-item textarea {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .goal-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.5em;
+    }
+    .goal-meta small {
+      color: #666;
+    }
   </style>
 </head>
 <body>
-  <h1>🎯 My Health Goals</h1>
+  <h1>🏂 My Health Goals</h1>
 
   <input type="text" id="goalDesc" placeholder="Enter a goal (e.g. Walk 30 minutes)">
-  <input type="date" id="goalDueDate">
+  <input type="date" id="goalDate" />
   <button onclick="addGoal()">Add Goal</button>
   <button onclick="exportGoals()">📄 Export Goals as PDF</button>
-  <button onclick="location.href='index.html'">← Back to Home</button>
+  <button onclick="window.location.href='index.html'">← Back to Home</button>
 
   <div id="goalList">Loading...</div>
-  <canvas id="weeklyChart" height="100"></canvas>
 
   <script>
-    const db = firebase.firestore();
-    let user;
+    let currentUser;
 
-    firebase.auth().onAuthStateChanged(u => {
-      if (!u) return window.location.href = "login.html";
-      user = u;
-      loadGoals();
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        currentUser = user;
+        loadGoals();
+      }
     });
 
     function addGoal() {
       const desc = document.getElementById("goalDesc").value.trim();
-      const due = document.getElementById("goalDueDate").value;
-      if (!desc) return alert("Please enter a goal.");
+      const dueDate = document.getElementById("goalDate").value;
+      if (!desc || !dueDate) return alert("Please enter goal and due date.");
+
       db.collection("goals").add({
-        uid: user.uid, description: desc, dueDate: due,
-        completed: false, timestamp: new Date()
+        uid: currentUser.uid,
+        description: desc,
+        dueDate,
+        completed: false,
+        timestamp: new Date()
       }).then(() => {
         document.getElementById("goalDesc").value = "";
-        document.getElementById("goalDueDate").value = "";
+        document.getElementById("goalDate").value = "";
         loadGoals();
       });
     }
 
     function loadGoals() {
       db.collection("goals")
-        .where("uid", "==", user.uid)
-        .orderBy("timestamp", "desc")
+        .where("uid", "==", currentUser.uid)
+        .orderBy("dueDate", "asc")
         .onSnapshot(snapshot => {
           const list = document.getElementById("goalList");
           list.innerHTML = "";
-          const weeklyCounts = Array(7).fill(0);
-          const labels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+          if (snapshot.empty) {
+            list.innerHTML = "<p>No goals yet. Add one above!</p>";
+            return;
+          }
 
           snapshot.forEach(doc => {
             const goal = doc.data();
             const id = doc.id;
-            const div = document.createElement("div");
-            div.className = "goal-item" + (goal.completed ? " completed" : "");
-            div.innerHTML = `
-              <input type="text" value="${goal.description}" onchange="editGoal('${id}', 'description', this.value)" />
-              <input type="date" value="${goal.dueDate || ''}" onchange="editGoal('${id}', 'dueDate', this.value)" />
-              <label><input type="checkbox" ${goal.completed ? "checked" : ""} onchange="editGoal('${id}', 'completed', this.checked)"> Complete</label>
-              <button onclick="deleteGoal('${id}')">❌ Delete</button>
-            `;
-            list.appendChild(div);
 
-            const day = new Date(goal.timestamp.toDate()).getDay();
-            if (goal.completed) weeklyCounts[day]++;
+            const div = document.createElement("div");
+            div.className = "goal-item";
+
+            const textarea = document.createElement("textarea");
+            textarea.value = goal.description;
+            textarea.onchange = () => updateGoal(id, textarea.value);
+
+            const meta = document.createElement("div");
+            meta.className = "goal-meta";
+            meta.innerHTML = `
+              <small>Due: ${goal.dueDate}</small>
+              <div>
+                <input type="checkbox" ${goal.completed ? "checked" : ""} onchange="toggleGoal('${id}', this.checked)" />
+                <button onclick="deleteGoal('${id}')">❌</button>
+              </div>
+            `;
+
+            div.appendChild(textarea);
+            div.appendChild(meta);
+            list.appendChild(div);
           });
-          drawWeeklyChart(labels, weeklyCounts);
         });
     }
 
-    function editGoal(id, field, value) {
-      db.collection("goals").doc(id).update({ [field]: value });
+    function updateGoal(id, newText) {
+      db.collection("goals").doc(id).update({ description: newText });
+    }
+
+    function toggleGoal(id, state) {
+      db.collection("goals").doc(id).update({ completed: state });
     }
 
     function deleteGoal(id) {
@@ -109,46 +160,25 @@
 
     function exportGoals() {
       db.collection("goals")
-        .where("uid", "==", user.uid)
-        .orderBy("timestamp", "desc")
-        .get().then(snapshot => {
+        .where("uid", "==", currentUser.uid)
+        .orderBy("dueDate", "asc")
+        .get()
+        .then(snapshot => {
           const { jsPDF } = window.jspdf;
           const doc = new jsPDF();
           doc.setFontSize(16);
-          doc.text("Health Goals", 10, 10);
-          let y = 20;
+          doc.text("My Health Goals", 20, 20);
+          doc.setFontSize(12);
+
+          let y = 30;
           snapshot.forEach(docSnap => {
             const g = docSnap.data();
-            doc.setFontSize(12);
-            doc.text(`• ${g.description} (Due: ${g.dueDate || "N/A"}) - ${g.completed ? "✅" : "❌"}`, 10, y);
+            doc.text(`• ${g.description} (Due: ${g.dueDate})`, 20, y);
             y += 10;
           });
-          doc.save("health_goals.pdf");
-        });
-    }
 
-    function drawWeeklyChart(labels, values) {
-      const ctx = document.getElementById("weeklyChart").getContext("2d");
-      if (window.goalChart) window.goalChart.destroy();
-      window.goalChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Completed Goals',
-            data: values,
-            backgroundColor: '#2c7a7b'
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true,
-              stepSize: 1
-            }
-          }
-        }
-      });
+          doc.save("Health_Goals.pdf");
+        });
     }
   </script>
 </body>
