@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mood Tracker</title>
 
-  <!-- Firebase -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="js/firebase-init.js"></script>
+  <script src="firebase-init.js"></script> <!-- ✅ Root-level init -->
 
   <style>
     body {
@@ -62,7 +62,6 @@
 
   <script>
     let currentUser;
-    const db = firebase.firestore();
 
     firebase.auth().onAuthStateChanged(user => {
       if (!user) {
@@ -112,7 +111,11 @@
             values.unshift(mood.rating);
           });
 
-          drawChart(labels, values);
+          // Delay rendering slightly for canvas readiness
+          setTimeout(() => drawChart(labels, values), 100);
+        })
+        .catch(error => {
+          console.error("❌ Failed to load moods:", error);
         });
     }
 
@@ -132,16 +135,18 @@
             data: values,
             tension: 0.3,
             borderWidth: 2,
-            fill: false
+            fill: false,
+            borderColor: '#2c7a7b'
           }]
         },
         options: {
+          responsive: true,
           scales: {
             y: {
               beginAtZero: true,
               min: 1,
               max: 5,
-              stepSize: 1
+              ticks: { stepSize: 1 }
             }
           }
         }
