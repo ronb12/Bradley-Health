@@ -41,16 +41,16 @@
       padding: 1em;
       border-radius: 10px;
       margin-bottom: 1em;
+      display: flex;
+      flex-direction: column;
     }
-    .entry-actions {
+    .med-actions {
       margin-top: 0.5em;
-    }
-    .entry-actions button {
-      margin-right: 0.5em;
+      display: flex;
+      gap: 0.5em;
     }
     .back-button {
-      background: #4a5568;
-      margin-top: 1em;
+      background-color: #4a5568;
     }
   </style>
 </head>
@@ -66,23 +66,19 @@
     <option value="Weekly">Weekly</option>
     <option value="As Needed">As Needed</option>
   </select>
+
   <button onclick="addMedication()">Add Medication</button>
   <button onclick="exportToPDF()">📄 Export to PDF</button>
-  <button class="back-button" onclick="window.location.href='index.html'">← Back to Home</button>
+  <button class="back-button" onclick="location.href='index.html'">← Back to Home</button>
 
   <div id="medicationsList">Loading...</div>
 
   <script>
+    const db = firebase.firestore();
     const messaging = firebase.messaging();
+    let currentUser = null;
 
-    try {
-      messaging.getToken({ vapidKey: 'YOUR_PUBLIC_VAPID_KEY' })
-        .then(token => console.log("📲 Push token:", token))
-        .catch(err => console.error("❌ Push permission error:", err.message));
-    } catch (e) {
-      console.warn("Push not supported:", e.message);
-    }
-
+    // Firebase auth
     firebase.auth().onAuthStateChanged(user => {
       if (!user) {
         window.location.href = "login.html";
@@ -91,6 +87,20 @@
         loadMedications();
       }
     });
+
+    // Push Notifications
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        .then(registration => {
+          messaging.useServiceWorker(registration);
+          return messaging.requestPermission();
+        })
+        .then(() => messaging.getToken())
+        .then(token => {
+          console.log("🔔 Push token:", token);
+        })
+        .catch(err => console.warn("❌ Push error:", err));
+    }
 
     function addMedication() {
       const name = document.getElementById("medName").value.trim();
@@ -111,12 +121,16 @@
         frequency,
         timestamp: new Date()
       }).then(() => {
-        document.getElementById("medName").value = "";
-        document.getElementById("medDose").value = "";
-        document.getElementById("medTime").value = "";
-        document.getElementById("medFrequency").value = "";
+        clearForm();
         loadMedications();
       });
+    }
+
+    function clearForm() {
+      document.getElementById("medName").value = "";
+      document.getElementById("medDose").value = "";
+      document.getElementById("medTime").value = "";
+      document.getElementById("medFrequency").value = "";
     }
 
     function loadMedications() {
@@ -134,71 +148,62 @@
 
           snapshot.forEach(doc => {
             const m = doc.data();
-            const id = doc.id;
-            list.innerHTML += `
-              <div class="med-entry">
-                <strong>${m.name}</strong><br>
-                Dosage: ${m.dose}<br>
-                Time: ${m.time}<br>
-                Frequency: ${m.frequency}
-                <div class="entry-actions">
-                  <button onclick="editMedication('${id}', '${m.name}', '${m.dose}', '${m.time}', '${m.frequency}')">✏️ Edit</button>
-                  <button onclick="deleteMedication('${id}')">🗑️ Delete</button>
-                </div>
+            const div = document.createElement("div");
+            div.className = "med-entry";
+            div.innerHTML = `
+              <strong>${m.name}</strong><br>
+              Dosage: ${m.dose}<br>
+              Time: ${m.time}<br>
+              Frequency: ${m.frequency}
+              <div class="med-actions">
+                <button onclick="editMedication('${doc.id}', '${m.name}', '${m.dose}', '${m.time}', '${m.frequency}')">✏️ Edit</button>
+                <button onclick="deleteMedication('${doc.id}')">🗑️ Delete</button>
               </div>
             `;
+            list.appendChild(div);
           });
         });
     }
 
     function deleteMedication(id) {
-      if (confirm("Delete this medication entry?")) {
+      if (confirm("Delete this medication?")) {
         db.collection("medications").doc(id).delete();
       }
     }
 
-    function editMedication(id, name, dose, time, frequency) {
+    function editMedication(id, name, dose, time, freq) {
       document.getElementById("medName").value = name;
       document.getElementById("medDose").value = dose;
       document.getElementById("medTime").value = time;
-      document.getElementById("medFrequency").value = frequency;
+      document.getElementById("medFrequency").value = freq;
 
       document.querySelector("button[onclick='addMedication()']").innerText = "Update Medication";
-      document.querySelector("button[onclick='addMedication()']").onclick = function() {
+      document.querySelector("button[onclick='addMedication()']").onclick = function () {
         const updated = {
-          name: document.getElementById("medName").value,
-          dose: document.getElementById("medDose").value,
+          name: document.getElementById("medName").value.trim(),
+          dose: document.getElementById("medDose").value.trim(),
           time: document.getElementById("medTime").value,
           frequency: document.getElementById("medFrequency").value
         };
         db.collection("medications").doc(id).update(updated).then(() => {
-          document.getElementById("medName").value = "";
-          document.getElementById("medDose").value = "";
-          document.getElementById("medTime").value = "";
-          document.getElementById("medFrequency").value = "";
-          document.querySelector("button[onclick]").innerText = "Add Medication";
-          document.querySelector("button[onclick]").setAttribute("onclick", "addMedication()");
+          clearForm();
+          this.innerText = "Add Medication";
+          this.onclick = addMedication;
         });
       };
     }
 
     function exportToPDF() {
-      const doc = new jspdf.jsPDF();
-      doc.setFontSize(14);
-      doc.text("Medication Tracker Log", 20, 20);
-      let y = 30;
-
-      db.collection("medications")
-        .where("uid", "==", currentUser.uid)
-        .orderBy("timestamp", "desc")
-        .get().then(snapshot => {
-          snapshot.forEach(d => {
-            const m = d.data();
-            doc.text(`• ${m.name} – ${m.dose}, ${m.time}, ${m.frequency}`, 20, y);
-            y += 10;
-          });
-          doc.save("medications.pdf");
-        });
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("Medication Log", 14, 14);
+      let y = 25;
+      const meds = document.querySelectorAll(".med-entry");
+      meds.forEach(entry => {
+        doc.text(entry.innerText, 14, y);
+        y += 30;
+      });
+      doc.save("medications.pdf");
     }
   </script>
 </body>
