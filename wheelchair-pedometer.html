@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,26 +50,46 @@
   <script>
     let pushCount = 0;
     let lastPushTime = 0;
-    const PUSH_THRESHOLD = 1.8; // Adjust based on test feedback
-    const MIN_PUSH_INTERVAL = 500; // ms
+    const PUSH_THRESHOLD = 1.8;
+    const MIN_PUSH_INTERVAL = 500;
     const METERS_PER_PUSH = 1.2;
     const WEIGHT_KG = 80;
     const MET = 2.5;
 
-    function initPedometer() {
-      if (window.DeviceMotionEvent) {
-        window.addEventListener("devicemotion", event => {
-          const acc = event.accelerationIncludingGravity;
-          const net = Math.sqrt(acc.x**2 + acc.y**2 + acc.z**2);
+    function startMotionListener() {
+      window.addEventListener("devicemotion", event => {
+        const acc = event.accelerationIncludingGravity;
+        const net = Math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2);
 
-          if (net > PUSH_THRESHOLD && Date.now() - lastPushTime > MIN_PUSH_INTERVAL) {
-            pushCount++;
-            lastPushTime = Date.now();
-            updateStats();
+        if (net > PUSH_THRESHOLD && Date.now() - lastPushTime > MIN_PUSH_INTERVAL) {
+          pushCount++;
+          lastPushTime = Date.now();
+          updateStats();
+        }
+      });
+    }
+
+    function initPedometer() {
+      if (
+        typeof DeviceMotionEvent !== "undefined" &&
+        typeof DeviceMotionEvent.requestPermission === "function"
+      ) {
+        DeviceMotionEvent.requestPermission().then(response => {
+          if (response === "granted") {
+            startMotionListener();
+            document.getElementById("startBtn").innerText = "Tracking...";
+            document.getElementById("startBtn").disabled = true;
+          } else {
+            alert("Motion permission denied. Enable it in Safari > Settings > Motion & Orientation Access.");
           }
+        }).catch(err => {
+          alert("Motion permission request failed: " + err);
         });
       } else {
-        alert("Your device does not support motion detection.");
+        // Android or older iOS
+        startMotionListener();
+        document.getElementById("startBtn").innerText = "Tracking...";
+        document.getElementById("startBtn").disabled = true;
       }
     }
 
@@ -82,11 +103,7 @@
       document.getElementById("calories").innerText = "Calories Burned: " + calories.toFixed(1);
     }
 
-    document.getElementById("startBtn").addEventListener("click", () => {
-      initPedometer();
-      document.getElementById("startBtn").innerText = "Tracking...";
-      document.getElementById("startBtn").disabled = true;
-    });
+    document.getElementById("startBtn").addEventListener("click", initPedometer);
   </script>
 </body>
 </html>
