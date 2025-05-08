@@ -47,6 +47,14 @@
       cursor: pointer;
       font-size: 1em;
     }
+    .link {
+      text-align: center;
+      margin-top: 1em;
+    }
+    .link a {
+      color: #3182ce;
+      text-decoration: none;
+    }
     .error {
       color: red;
       text-align: center;
@@ -60,14 +68,45 @@
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
     <button onclick="login()">Login</button>
+    <button onclick="createAccount()">Create Account</button>
+    <button onclick="resetPassword()">Forgot Password?</button>
+    <button onclick="anonymousAccess()">Continue as Guest</button>
     <div class="error" id="errorBox"></div>
   </div>
 
   <script>
+    function showError(msg) {
+      document.getElementById("errorBox").textContent = msg;
+    }
+
     function login() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      loginWithEmail(email, password);
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(() => window.location.href = "index.html")
+        .catch(err => showError("Login failed: " + err.message));
+    }
+
+    function createAccount() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(() => window.location.href = "index.html")
+        .catch(err => showError("Account creation failed: " + err.message));
+    }
+
+    function resetPassword() {
+      const email = document.getElementById("email").value;
+      if (!email) return showError("Enter your email to reset password.");
+      firebase.auth().sendPasswordResetEmail(email)
+        .then(() => alert("Password reset email sent."))
+        .catch(err => showError("Reset failed: " + err.message));
+    }
+
+    function anonymousAccess() {
+      firebase.auth().signInAnonymously()
+        .then(() => window.location.href = "index.html")
+        .catch(err => showError("Guest access failed: " + err.message));
     }
   </script>
 </body>
