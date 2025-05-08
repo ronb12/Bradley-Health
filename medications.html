@@ -44,7 +44,6 @@
     }
     .back-button {
       background: #4a5568;
-      margin-top: 1em;
     }
   </style>
 </head>
@@ -61,37 +60,21 @@
     <option value="As Needed">As Needed</option>
   </select>
   <button onclick="addMedication()">Add Medication</button>
-
   <button onclick="exportMedications()">📄 Export to PDF</button>
   <button class="back-button" onclick="window.location.href='index.html'">← Back to Home</button>
 
   <div id="medicationsList">Loading...</div>
 
   <script>
-    const db = firebase.firestore();
-    const messaging = firebase.messaging();
-
     firebase.auth().onAuthStateChanged(user => {
       if (!user) {
         window.location.href = "login.html";
       } else {
         currentUser = user;
-        requestNotificationPermission();
         loadMedications();
+        requestPushPermission(); // FCM support
       }
     });
-
-    function requestNotificationPermission() {
-      Notification.requestPermission().then(permission => {
-        if (permission === "granted") {
-          messaging.getToken({ vapidKey: 'YOUR_PUBLIC_VAPID_KEY' })
-            .then(token => {
-              console.log("Push Token:", token);
-              // Optional: store token in Firestore
-            });
-        }
-      });
-    }
 
     function addMedication() {
       const name = document.getElementById("medName").value.trim();
@@ -110,8 +93,6 @@
         dose,
         time,
         frequency,
-        reminderTime: time,
-        notified: false,
         timestamp: new Date()
       }).then(() => {
         document.getElementById("medName").value = "";
@@ -121,8 +102,6 @@
         loadMedications();
       });
     }
-
-    let latestMedications = [];
 
     function loadMedications() {
       db.collection("medications")
@@ -137,12 +116,8 @@
             return;
           }
 
-          latestMedications = [];
-
           snapshot.forEach(doc => {
             const m = doc.data();
-            latestMedications.push(m);
-
             list.innerHTML += `
               <div class="med-entry">
                 <strong>${m.name}</strong><br>
@@ -158,21 +133,38 @@
     async function exportMedications() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      doc.setFontSize(16);
-      doc.text("Medication Log", 20, 20);
-      doc.setFontSize(12);
+      let y = 10;
 
-      if (latestMedications.length === 0) {
-        doc.text("No medications found.", 20, 30);
-      } else {
-        let y = 30;
-        latestMedications.forEach((m, i) => {
-          doc.text(`${i + 1}. ${m.name} | ${m.dose} | ${m.time} | ${m.frequency}`, 20, y);
-          y += 10;
-        });
-      }
+      const snapshot = await db.collection("medications")
+        .where("uid", "==", currentUser.uid)
+        .orderBy("timestamp", "desc")
+        .get();
+
+      doc.setFontSize(16);
+      doc.text("Medication Log", 10, y);
+      y += 10;
+
+      snapshot.forEach(entry => {
+        const m = entry.data();
+        doc.setFontSize(12);
+        doc.text(`• ${m.name} | ${m.dose} | ${m.time} | ${m.frequency}`, 10, y);
+        y += 8;
+      });
 
       doc.save("medications.pdf");
+    }
+
+    // Firebase Messaging – optional push reminder setup
+    function requestPushPermission() {
+      const messaging = firebase.messaging();
+      messaging.requestPermission().then(() => {
+        return messaging.getToken();
+      }).then(token => {
+        console.log("✅ FCM Token:", token);
+        db.collection("fcmTokens").doc(currentUser.uid).set({ token });
+      }).catch(err => {
+        console.warn("⚠️ Notification permission denied:", err.message);
+      });
     }
   </script>
 </body>
