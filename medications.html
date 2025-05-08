@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Medication Tracker</title>
 
-  <!-- Firebase -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="firebase-init.js"></script>
 
@@ -41,14 +42,9 @@
       border-radius: 10px;
       margin-bottom: 1em;
     }
-    .actions {
-      display: flex;
-      gap: 0.5em;
-      margin-top: 0.5em;
-    }
     .back-button {
       background: #4a5568;
-      margin-top: 2em;
+      margin-top: 1em;
     }
   </style>
 </head>
@@ -65,21 +61,37 @@
     <option value="As Needed">As Needed</option>
   </select>
   <button onclick="addMedication()">Add Medication</button>
-  <button onclick="exportToPDF()">📄 Export to PDF</button>
-  <button class="back-button" onclick="location.href='index.html'">← Back to Home</button>
+
+  <button onclick="exportMedications()">📄 Export to PDF</button>
+  <button class="back-button" onclick="window.location.href='index.html'">← Back to Home</button>
 
   <div id="medicationsList">Loading...</div>
 
   <script>
-    let currentUser;
+    const db = firebase.firestore();
+    const messaging = firebase.messaging();
+
     firebase.auth().onAuthStateChanged(user => {
       if (!user) {
         window.location.href = "login.html";
       } else {
         currentUser = user;
+        requestNotificationPermission();
         loadMedications();
       }
     });
+
+    function requestNotificationPermission() {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          messaging.getToken({ vapidKey: 'YOUR_PUBLIC_VAPID_KEY' })
+            .then(token => {
+              console.log("Push Token:", token);
+              // Optional: store token in Firestore
+            });
+        }
+      });
+    }
 
     function addMedication() {
       const name = document.getElementById("medName").value.trim();
@@ -92,95 +104,73 @@
         return;
       }
 
-      firebase.firestore().collection("medications").add({
+      db.collection("medications").add({
         uid: currentUser.uid,
-        name, dose, time, frequency,
+        name,
+        dose,
+        time,
+        frequency,
+        reminderTime: time,
+        notified: false,
         timestamp: new Date()
       }).then(() => {
         document.getElementById("medName").value = "";
         document.getElementById("medDose").value = "";
         document.getElementById("medTime").value = "";
         document.getElementById("medFrequency").value = "";
+        loadMedications();
       });
     }
 
+    let latestMedications = [];
+
     function loadMedications() {
-      const db = firebase.firestore();
       db.collection("medications")
         .where("uid", "==", currentUser.uid)
         .orderBy("timestamp", "desc")
         .onSnapshot(snapshot => {
           const list = document.getElementById("medicationsList");
-          list.innerHTML = snapshot.empty ? "<p>No medications logged yet.</p>" : "";
+          list.innerHTML = "";
+
+          if (snapshot.empty) {
+            list.innerHTML = "<p>No medications logged yet.</p>";
+            return;
+          }
+
+          latestMedications = [];
+
           snapshot.forEach(doc => {
             const m = doc.data();
-            const div = document.createElement("div");
-            div.className = "med-entry";
-            div.innerHTML = `
-              <strong>${m.name}</strong><br>
-              Dosage: ${m.dose}<br>
-              Time: ${m.time}<br>
-              Frequency: ${m.frequency}
-              <div class="actions">
-                <button onclick="editMedication('${doc.id}', '${m.name}', '${m.dose}', '${m.time}', '${m.frequency}')">✏️</button>
-                <button onclick="deleteMedication('${doc.id}')">❌</button>
+            latestMedications.push(m);
+
+            list.innerHTML += `
+              <div class="med-entry">
+                <strong>${m.name}</strong><br>
+                Dosage: ${m.dose}<br>
+                Time: ${m.time}<br>
+                Frequency: ${m.frequency}
               </div>
             `;
-            list.appendChild(div);
           });
         });
     }
 
-    function editMedication(id, name, dose, time, frequency) {
-      document.getElementById("medName").value = name;
-      document.getElementById("medDose").value = dose;
-      document.getElementById("medTime").value = time;
-      document.getElementById("medFrequency").value = frequency;
-      document.querySelector("button[onclick='addMedication()']").textContent = "Update Medication";
-      document.querySelector("button[onclick='addMedication()']").onclick = () => updateMedication(id);
-    }
-
-    function updateMedication(id) {
-      const name = document.getElementById("medName").value.trim();
-      const dose = document.getElementById("medDose").value.trim();
-      const time = document.getElementById("medTime").value;
-      const frequency = document.getElementById("medFrequency").value;
-
-      firebase.firestore().collection("medications").doc(id).update({
-        name, dose, time, frequency
-      }).then(() => {
-        document.getElementById("medName").value = "";
-        document.getElementById("medDose").value = "";
-        document.getElementById("medTime").value = "";
-        document.getElementById("medFrequency").value = "";
-        document.querySelector("button[onclick^='updateMedication']").textContent = "Add Medication";
-        document.querySelector("button[onclick^='updateMedication']").setAttribute("onclick", "addMedication()")
-      });
-    }
-
-    function deleteMedication(id) {
-      if (confirm("Are you sure you want to delete this medication?")) {
-        firebase.firestore().collection("medications").doc(id).delete();
-      }
-    }
-
-    async function exportToPDF() {
+    async function exportMedications() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      const snapshot = await firebase.firestore().collection("medications")
-        .where("uid", "==", currentUser.uid)
-        .orderBy("timestamp", "desc")
-        .get();
+      doc.setFontSize(16);
+      doc.text("Medication Log", 20, 20);
+      doc.setFontSize(12);
 
-      let y = 10;
-      doc.setFontSize(14);
-      doc.text("Medication Log", 10, y);
-      y += 10;
-      snapshot.forEach((docItem, i) => {
-        const m = docItem.data();
-        doc.text(`${i+1}. ${m.name} - ${m.dose} - ${m.time} - ${m.frequency}`, 10, y);
-        y += 8;
-      });
+      if (latestMedications.length === 0) {
+        doc.text("No medications found.", 20, 30);
+      } else {
+        let y = 30;
+        latestMedications.forEach((m, i) => {
+          doc.text(`${i + 1}. ${m.name} | ${m.dose} | ${m.time} | ${m.frequency}`, 20, y);
+          y += 10;
+        });
+      }
 
       doc.save("medications.pdf");
     }
