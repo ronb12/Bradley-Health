@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mood Tracker</title>
 
-  <!-- Firebase & Chart.js -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -46,13 +46,14 @@
       width: 100%;
       margin-top: 2em;
       border-collapse: collapse;
-      background: white;
-      border-radius: 10px;
     }
     th, td {
-      padding: 0.8em;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
+      padding: 0.75em;
+      border: 1px solid #ccc;
+    }
+    #logTable th {
+      background: #2c7a7b;
+      color: white;
     }
   </style>
 </head>
@@ -70,25 +71,20 @@
 
   <textarea id="moodNote" placeholder="Optional note about today..."></textarea>
   <button onclick="addMood()">Log Mood</button>
-  <button onclick="downloadPDF()">📄 Export Mood Log</button>
+  <button onclick="exportPDF()">📄 Export Mood Log</button>
 
   <canvas id="moodChart"></canvas>
 
-  <table>
+  <table id="logTable">
     <thead>
       <tr><th>Date</th><th>Mood</th><th>Note</th></tr>
     </thead>
-    <tbody id="moodTable"></tbody>
+    <tbody id="logBody"></tbody>
   </table>
 
   <script>
-    const db = firebase.firestore();
-
     firebase.auth().onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
+      if (!user) return window.location.href = "login.html";
       currentUser = user;
       loadMoods();
     });
@@ -113,8 +109,6 @@
       });
     }
 
-    let moodData = [];
-
     function loadMoods() {
       db.collection("moods")
         .where("uid", "==", currentUser.uid)
@@ -122,19 +116,22 @@
         .limit(7)
         .get()
         .then(snapshot => {
-          const labels = [], values = [];
-          moodData = [];
+          const labels = [], values = [], logRows = [];
 
           snapshot.forEach(doc => {
-            const mood = doc.data();
-            labels.unshift(mood.date);
-            values.unshift(mood.rating);
-            moodData.unshift(mood);
+            const { date, rating, note } = doc.data();
+            labels.unshift(date);
+            values.unshift(rating);
+            logRows.unshift(`<tr><td>${date}</td><td>${emojiMood(rating)}</td><td>${note || "-"}</td></tr>`);
           });
 
+          document.getElementById("logBody").innerHTML = logRows.join("");
           drawChart(labels, values);
-          renderTable();
         });
+    }
+
+    function emojiMood(rating) {
+      return ["😟","😕","😐","🙂","😃"][rating-1] || "";
     }
 
     function drawChart(labels, values) {
@@ -148,10 +145,10 @@
           datasets: [{
             label: 'Mood (1–5)',
             data: values,
-            borderColor: '#2c7a7b',
-            fill: false,
             tension: 0.3,
-            borderWidth: 2
+            borderWidth: 2,
+            fill: false,
+            borderColor: '#2c7a7b'
           }]
         },
         options: {
@@ -160,38 +157,31 @@
               beginAtZero: true,
               min: 1,
               max: 5,
-              ticks: {
-                stepSize: 1,
-                callback: value => ['😟','😕','😐','🙂','😃'][value-1]
-              }
+              ticks: { stepSize: 1 }
             }
           }
         }
       });
     }
 
-    function renderTable() {
-      const tbody = document.getElementById("moodTable");
-      tbody.innerHTML = "";
-      moodData.forEach(m => {
-        tbody.innerHTML += `<tr><td>${m.date}</td><td>${['😟','😕','😐','🙂','😃'][m.rating-1]}</td><td>${m.note || ''}</td></tr>`;
-      });
-    }
-
-    function downloadPDF() {
+    async function exportPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      doc.setFontSize(16);
-      doc.text("Mood Tracker Log", 20, 20);
+      const rows = document.querySelectorAll("#logBody tr");
 
-      let y = 30;
-      moodData.forEach((m, i) => {
-        doc.setFontSize(12);
-        doc.text(`${m.date} - ${['😟','😕','😐','🙂','😃'][m.rating-1]} - ${m.note || ''}`, 20, y);
-        y += 10;
+      doc.setFontSize(18);
+      doc.text("Mood Log", 14, 16);
+      doc.setFontSize(12);
+
+      let y = 24;
+      rows.forEach(tr => {
+        const cells = tr.querySelectorAll("td");
+        const row = [...cells].map(td => td.innerText).join(" | ");
+        doc.text(row, 14, y);
+        y += 8;
       });
 
-      doc.save("mood_log.pdf");
+      doc.save("mood-log.pdf");
     }
   </script>
 </body>
