@@ -1,2 +1,87 @@
-<!-- export.html -->
-<!DOCTYPE html> ... (truncated for brevity) ...
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Export Health Data</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-init.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 2em;
+    }
+    h1 {
+      color: #2c7a7b;
+    }
+    button {
+      padding: 1em;
+      background: #2c7a7b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      width: 100%;
+    }
+    pre {
+      background: white;
+      padding: 1em;
+      border-radius: 10px;
+      max-height: 400px;
+      overflow: auto;
+      margin-top: 2em;
+    }
+  </style>
+</head>
+<body>
+  <h1>📤 Export My Health Data</h1>
+  <button onclick="exportData()">Download JSON Export</button>
+  <pre id="output">Your data will appear here...</pre>
+
+  <script>
+    let currentUser;
+    const db = firebase.firestore();
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+      currentUser = user;
+    });
+
+    async function exportData() {
+      if (!currentUser) return alert("User not authenticated.");
+
+      const collections = ['medications', 'moods', 'goals', 'visits'];
+      const exportObject = {};
+
+      for (let col of collections) {
+        const snapshot = await db.collection(col)
+          .where("uid", "==", currentUser.uid)
+          .orderBy("timestamp", "desc")
+          .get();
+
+        exportObject[col] = snapshot.docs.map(doc => doc.data());
+      }
+
+      const jsonStr = JSON.stringify(exportObject, null, 2);
+      document.getElementById("output").textContent = jsonStr;
+
+      const blob = new Blob([jsonStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "bradley-health-export.json";
+      a.click();
+    }
+  </script>
+</body>
+</html>
