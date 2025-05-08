@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bradley Health - Daily Summary</title>
 
-  <!-- Styles & Firebase & Chart.js -->
-  <link rel="stylesheet" href="assets/style.css" />
+  <!-- Firebase + Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
@@ -69,11 +68,13 @@
       const uid = currentUser.uid;
       const today = new Date().toISOString().split('T')[0];
 
-      // ✅ FIXED: Using 'timestamp' instead of 'date'
+      // ✅ FIX: Ensure BP reading for today loads correctly
       const bpSnap = await db.collection("bpReadings")
         .where("uid", "==", uid)
+        .where("date", "==", today)
         .orderBy("timestamp", "desc")
-        .limit(1).get();
+        .limit(1)
+        .get();
 
       if (!bpSnap.empty) {
         const d = bpSnap.docs[0].data();
@@ -85,10 +86,11 @@
 
       const rollSnap = await db.collection("rollDistances")
         .where("uid", "==", uid)
-        .where("date", "==", today).get();
+        .where("date", "==", today)
+        .get();
 
       let totalRoll = 0;
-      rollSnap.forEach(doc => totalRoll += parseFloat(doc.data().distance || 0));
+      rollSnap.forEach(doc => totalRoll += parseFloat(doc.data().distance));
       document.getElementById("rollCard").innerHTML = `<strong>Distance Rolled Today:</strong> ${totalRoll.toFixed(2)} m`;
 
       const MET = 2.5, weight = 80;
@@ -105,14 +107,17 @@
 
         const bpDay = await db.collection("bpReadings")
           .where("uid", "==", uid)
-          .where("date", "==", dayStr).limit(1).get();
+          .where("date", "==", dayStr)
+          .orderBy("timestamp", "desc")
+          .limit(1)
+          .get();
         bpTrend.push(bpDay.empty ? null : bpDay.docs[0].data().systolic);
 
         const rollDay = await db.collection("rollDistances")
           .where("uid", "==", uid)
           .where("date", "==", dayStr).get();
         let rollTotal = 0;
-        rollDay.forEach(doc => rollTotal += parseFloat(doc.data().distance || 0));
+        rollDay.forEach(doc => rollTotal += parseFloat(doc.data().distance));
         rollTrend.push(rollTotal || null);
       }
 
