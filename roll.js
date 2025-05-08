@@ -6,10 +6,12 @@ let totalDistance = 0,
     startTime = null,
     eightHourCheck = null;
 
+// Convert degrees to radians
 function toRad(x) {
   return x * Math.PI / 180;
 }
 
+// Compute distance between two GPS coordinates using Haversine formula
 function computeDistance(lat1, lon1, lat2, lon2) {
   const R = 6371e3; // Earth radius in meters
   const dLat = toRad(lat2 - lat1);
@@ -20,6 +22,7 @@ function computeDistance(lat1, lon1, lat2, lon2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+// Start GPS tracking
 async function startTracking() {
   document.getElementById('status').innerText = "Tracking...";
   startTime = Date.now();
@@ -34,7 +37,7 @@ async function startTracking() {
           pos.coords.longitude
         );
 
-        // ✅ Ignore false GPS movement < 2 meters
+        // Ignore small inaccurate movement
         if (dist > 2) {
           totalDistance += dist;
           document.getElementById('distance').innerText =
@@ -52,7 +55,7 @@ async function startTracking() {
     });
   }
 
-  // 🔁 Auto-save distance every 10 minutes
+  // Auto-save every 10 minutes
   autoSaveInterval = setInterval(() => {
     if (totalDistance > 0) {
       logDistance(totalDistance, false);
@@ -60,7 +63,7 @@ async function startTracking() {
     }
   }, 10 * 60 * 1000);
 
-  // ⏱️ Auto-log full distance after 8 hours
+  // Stop tracking after 8 hours and auto-log
   eightHourCheck = setInterval(() => {
     if (!startTime) return;
     const elapsed = Date.now() - startTime;
@@ -72,9 +75,10 @@ async function startTracking() {
       }
       clearInterval(eightHourCheck);
     }
-  }, 60 * 1000); // check every minute
+  }, 60 * 1000);
 }
 
+// Stop tracking and save final distance
 function stopTracking() {
   if (watchId !== null) navigator.geolocation.clearWatch(watchId);
   clearInterval(autoSaveInterval);
@@ -92,6 +96,7 @@ function stopTracking() {
   document.getElementById('calories').innerText = "Calories: 0.0";
 }
 
+// Add manual distance entry
 function addManualEntry() {
   const value = parseFloat(document.getElementById('manualDistance').value);
   if (!isNaN(value) && value > 0) {
@@ -100,24 +105,27 @@ function addManualEntry() {
   }
 }
 
+// Estimate calories burned
 function updateCalories() {
-  const weight = 80; // user weight (kg)
-  const MET = 2.5; // energy cost for wheelchair rolling
-  const hours = (totalDistance / 1000) / 3.2; // assume 3.2 km/h average
+  const weight = 80; // Replace with dynamic user profile data if needed
+  const MET = 2.5;
+  const hours = (totalDistance / 1000) / 3.2;
   const cals = MET * weight * hours;
   document.getElementById('calories').innerText = "Calories: " + cals.toFixed(1);
 }
 
+// Save distance to Firestore
 async function logDistance(dist, show = true) {
   const date = new Date().toISOString().split('T')[0];
   await db.collection("rollDistances").add({
     date,
-    distance: dist.toFixed(2),
+    distance: parseFloat(dist.toFixed(2)),
     uid: currentUser?.uid || ""
   });
   if (show) loadLog();
 }
 
+// Load recent log from Firestore
 async function loadLog() {
   const snapshot = await db.collection("rollDistances")
     .where("uid", "==", currentUser?.uid)
@@ -128,6 +136,7 @@ async function loadLog() {
   renderLog();
 }
 
+// Render data to table
 function renderLog() {
   const tbody = document.getElementById('distanceLog');
   tbody.innerHTML = "";
@@ -136,7 +145,7 @@ function renderLog() {
   });
 }
 
-// 🔐 Firebase authentication
+// Wait for Firebase auth and load data
 firebase.auth().onAuthStateChanged(user => {
   if (user) {
     currentUser = user;
