@@ -11,7 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="js/firebase-init.js"></script>
+  <script src="firebase-init.js"></script>
 
   <style>
     body { font-family: Arial; background: #f0f4f8; padding: 2em; }
@@ -31,12 +31,24 @@
       font-size: 0.8em;
     }
     .visit-entry button {
-      margin-top: 0.5em; margin-right: 0.5em; background: #555;
+      margin-top: 0.5em; margin-right: 0.5em;
+      background: #555;
+    }
+    .back-btn {
+      background-color: #3b4754;
+      color: white;
+      padding: 0.75em;
+      width: 100%;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 1em;
+      text-decoration: none;
+      display: inline-block;
     }
   </style>
 </head>
 <body>
-  <h1>🗓️ Doctor Visit Log</h1>
+  <h1>📅 Doctor Visit Log</h1>
 
   <input type="date" id="visitDate" />
   <input type="text" id="provider" placeholder="Doctor or Clinic Name" />
@@ -52,9 +64,7 @@
   <input type="file" id="docFile" />
   <button onclick="addVisit()">Add Visit</button>
   <button onclick="exportVisitsToPDF()">Export Visits as PDF</button>
-  <button onclick="window.location.href='index.html'" style="background-color:#3c4e5a; color:white; border:none; padding:0.75em; width:100%; margin-top:1em; border-radius:8px; font-size:1em;">
-    ← Back to Home
-  </button>
+  <a href="index.html" class="back-btn">← Back to Home</a>
 
   <div id="visitList">Loading visits...</div>
 
