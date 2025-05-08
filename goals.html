@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🏂 Health Goals</title>
+  <title>🎯 Health Goals</title>
 
-  <!-- Firebase + jsPDF -->
+  <!-- Firebase + PDF -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -24,11 +24,10 @@
     input, button {
       display: block;
       margin: 1em 0;
-      padding: 0.7em;
+      padding: 0.75em;
       width: 100%;
       border-radius: 8px;
       border: 1px solid #ccc;
-      box-sizing: border-box;
     }
     button {
       background-color: #2c7a7b;
@@ -42,64 +41,49 @@
       border-radius: 10px;
       margin-bottom: 1em;
       display: flex;
-      flex-direction: column;
-      align-items: stretch;
-    }
-    .goal-item textarea {
-      width: 100%;
-      padding: 0.5em;
-      margin-top: 0.5em;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-    .goal-meta {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-top: 0.5em;
+      justify-content: space-between;
+      gap: 0.5em;
     }
-    .goal-meta small {
-      color: #666;
+    .goal-item input[type="text"] {
+      flex-grow: 1;
+      border: none;
+      border-bottom: 1px solid #ccc;
+      outline: none;
+      font-size: 1em;
+    }
+    .back-button {
+      background-color: #4a5568;
     }
   </style>
 </head>
 <body>
-  <h1>🏂 My Health Goals</h1>
+  <h1>🏃‍♂️ My Health Goals</h1>
 
   <input type="text" id="goalDesc" placeholder="Enter a goal (e.g. Walk 30 minutes)">
-  <input type="date" id="goalDate" />
+  <input type="date" id="goalDueDate">
   <button onclick="addGoal()">Add Goal</button>
-  <button onclick="exportGoals()">📄 Export Goals as PDF</button>
-  <button onclick="window.location.href='index.html'">← Back to Home</button>
+  <button onclick="exportPDF()">📄 Export Goals as PDF</button>
+  <button onclick="window.location.href='index.html'" class="back-button">← Back to Home</button>
 
   <div id="goalList">Loading...</div>
 
   <script>
-    let currentUser;
-
-    firebase.auth().onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = "login.html";
-      } else {
-        currentUser = user;
-        loadGoals();
-      }
-    });
+    // No need to redeclare currentUser or db — they come from firebase-init.js
 
     function addGoal() {
       const desc = document.getElementById("goalDesc").value.trim();
-      const dueDate = document.getElementById("goalDate").value;
-      if (!desc || !dueDate) return alert("Please enter goal and due date.");
-
+      const due = document.getElementById("goalDueDate").value;
+      if (!desc || !due) return alert("Please enter a goal and due date.");
       db.collection("goals").add({
         uid: currentUser.uid,
         description: desc,
-        dueDate,
+        dueDate: due,
         completed: false,
         timestamp: new Date()
       }).then(() => {
         document.getElementById("goalDesc").value = "";
-        document.getElementById("goalDate").value = "";
+        document.getElementById("goalDueDate").value = "";
         loadGoals();
       });
     }
@@ -107,49 +91,36 @@
     function loadGoals() {
       db.collection("goals")
         .where("uid", "==", currentUser.uid)
-        .orderBy("dueDate", "asc")
+        .orderBy("dueDate")
         .onSnapshot(snapshot => {
           const list = document.getElementById("goalList");
           list.innerHTML = "";
           if (snapshot.empty) {
-            list.innerHTML = "<p>No goals yet. Add one above!</p>";
+            list.innerHTML = "<p>No goals yet.</p>";
             return;
           }
-
           snapshot.forEach(doc => {
             const goal = doc.data();
             const id = doc.id;
-
             const div = document.createElement("div");
             div.className = "goal-item";
-
-            const textarea = document.createElement("textarea");
-            textarea.value = goal.description;
-            textarea.onchange = () => updateGoal(id, textarea.value);
-
-            const meta = document.createElement("div");
-            meta.className = "goal-meta";
-            meta.innerHTML = `
+            div.innerHTML = `
+              <input type="checkbox" ${goal.completed ? "checked" : ""} onchange="toggleGoal('${id}', this.checked)">
+              <input type="text" value="${goal.description}" onchange="editGoal('${id}', this.value)">
               <small>Due: ${goal.dueDate}</small>
-              <div>
-                <input type="checkbox" ${goal.completed ? "checked" : ""} onchange="toggleGoal('${id}', this.checked)" />
-                <button onclick="deleteGoal('${id}')">❌</button>
-              </div>
+              <button onclick="deleteGoal('${id}')">❌</button>
             `;
-
-            div.appendChild(textarea);
-            div.appendChild(meta);
             list.appendChild(div);
           });
         });
     }
 
-    function updateGoal(id, newText) {
-      db.collection("goals").doc(id).update({ description: newText });
-    }
-
     function toggleGoal(id, state) {
       db.collection("goals").doc(id).update({ completed: state });
+    }
+
+    function editGoal(id, newDesc) {
+      db.collection("goals").doc(id).update({ description: newDesc });
     }
 
     function deleteGoal(id) {
@@ -158,28 +129,34 @@
       }
     }
 
-    function exportGoals() {
+    function exportPDF() {
       db.collection("goals")
         .where("uid", "==", currentUser.uid)
-        .orderBy("dueDate", "asc")
-        .get()
-        .then(snapshot => {
+        .orderBy("dueDate")
+        .get().then(snapshot => {
           const { jsPDF } = window.jspdf;
           const doc = new jsPDF();
-          doc.setFontSize(16);
-          doc.text("My Health Goals", 20, 20);
-          doc.setFontSize(12);
-
-          let y = 30;
-          snapshot.forEach(docSnap => {
+          doc.text("My Health Goals", 10, 10);
+          let y = 20;
+          snapshot.forEach((docSnap, i) => {
             const g = docSnap.data();
-            doc.text(`• ${g.description} (Due: ${g.dueDate})`, 20, y);
+            doc.text(`${i+1}. ${g.description} (Due: ${g.dueDate}) - ${g.completed ? "✅ Done" : "❌ Pending"}`, 10, y);
             y += 10;
           });
-
-          doc.save("Health_Goals.pdf");
+          doc.save("health-goals.pdf");
         });
     }
+
+    // Trigger on auth ready
+    if (currentUser) loadGoals();
+    else firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        loadGoals();
+      } else {
+        window.location.href = "login.html";
+      }
+    });
   </script>
 </body>
 </html>
