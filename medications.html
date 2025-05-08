@@ -1,2 +1,129 @@
-<!-- medications.html -->
-<!DOCTYPE html> ... (truncated for brevity) ...
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Medication Tracker</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-init.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 2em;
+    }
+    h1 {
+      color: #2c7a7b;
+    }
+    input, select, button {
+      display: block;
+      margin: 1em 0;
+      padding: 0.7em;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #2c7a7b;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .med-entry {
+      background: white;
+      padding: 1em;
+      border-radius: 10px;
+      margin-bottom: 1em;
+    }
+  </style>
+</head>
+<body>
+  <h1>💊 Medication Tracker</h1>
+
+  <input type="text" id="medName" placeholder="Medication Name" />
+  <input type="text" id="medDose" placeholder="Dosage (e.g. 10mg)" />
+  <input type="time" id="medTime" />
+  <select id="medFrequency">
+    <option value="">Select Frequency</option>
+    <option value="Daily">Daily</option>
+    <option value="Weekly">Weekly</option>
+    <option value="As Needed">As Needed</option>
+  </select>
+  <button onclick="addMedication()">Add Medication</button>
+
+  <div id="medicationsList">Loading...</div>
+
+  <script>
+    let currentUser;
+    const db = firebase.firestore();
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        currentUser = user;
+        loadMedications();
+      }
+    });
+
+    function addMedication() {
+      const name = document.getElementById("medName").value.trim();
+      const dose = document.getElementById("medDose").value.trim();
+      const time = document.getElementById("medTime").value;
+      const frequency = document.getElementById("medFrequency").value;
+
+      if (!name || !dose || !time || !frequency) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      db.collection("medications").add({
+        uid: currentUser.uid,
+        name,
+        dose,
+        time,
+        frequency,
+        timestamp: new Date()
+      }).then(() => {
+        document.getElementById("medName").value = "";
+        document.getElementById("medDose").value = "";
+        document.getElementById("medTime").value = "";
+        document.getElementById("medFrequency").value = "";
+        loadMedications();
+      });
+    }
+
+    function loadMedications() {
+      db.collection("medications")
+        .where("uid", "==", currentUser.uid)
+        .orderBy("timestamp", "desc")
+        .onSnapshot(snapshot => {
+          const list = document.getElementById("medicationsList");
+          list.innerHTML = "";
+
+          if (snapshot.empty) {
+            list.innerHTML = "<p>No medications logged yet.</p>";
+            return;
+          }
+
+          snapshot.forEach(doc => {
+            const m = doc.data();
+            list.innerHTML += `
+              <div class="med-entry">
+                <strong>${m.name}</strong><br>
+                Dosage: ${m.dose}<br>
+                Time: ${m.time}<br>
+                Frequency: ${m.frequency}
+              </div>
+            `;
+          });
+        });
+    }
+  </script>
+</body>
+</html>
