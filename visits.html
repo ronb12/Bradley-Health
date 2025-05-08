@@ -1,2 +1,125 @@
-<!-- visits.html -->
-<!DOCTYPE html> ... (truncated for brevity) ...
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Doctor Visit Log</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-init.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 2em;
+    }
+    h1 {
+      color: #2c7a7b;
+    }
+    input, textarea, button {
+      display: block;
+      width: 100%;
+      margin: 1em 0;
+      padding: 0.75em;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #2c7a7b;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .visit-entry {
+      background: white;
+      padding: 1em;
+      border-radius: 10px;
+      margin-bottom: 1em;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+  </style>
+</head>
+<body>
+  <h1>📅 Doctor Visit Log</h1>
+
+  <input type="date" id="visitDate" />
+  <input type="text" id="provider" placeholder="Doctor or Clinic Name" />
+  <input type="text" id="reason" placeholder="Reason for visit" />
+  <textarea id="notes" placeholder="Additional notes (optional)"></textarea>
+  <button onclick="addVisit()">Add Visit</button>
+
+  <div id="visitList">Loading visits...</div>
+
+  <script>
+    let currentUser;
+    const db = firebase.firestore();
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        currentUser = user;
+        loadVisits();
+      }
+    });
+
+    function addVisit() {
+      const date = document.getElementById("visitDate").value;
+      const provider = document.getElementById("provider").value.trim();
+      const reason = document.getElementById("reason").value.trim();
+      const notes = document.getElementById("notes").value.trim();
+
+      if (!date || !provider || !reason) {
+        alert("Please fill in the required fields.");
+        return;
+      }
+
+      db.collection("visits").add({
+        uid: currentUser.uid,
+        date,
+        provider,
+        reason,
+        notes,
+        timestamp: new Date()
+      }).then(() => {
+        document.getElementById("visitDate").value = "";
+        document.getElementById("provider").value = "";
+        document.getElementById("reason").value = "";
+        document.getElementById("notes").value = "";
+        loadVisits();
+      });
+    }
+
+    function loadVisits() {
+      db.collection("visits")
+        .where("uid", "==", currentUser.uid)
+        .orderBy("date", "desc")
+        .onSnapshot(snapshot => {
+          const list = document.getElementById("visitList");
+          list.innerHTML = "";
+
+          if (snapshot.empty) {
+            list.innerHTML = "<p>No visits logged yet.</p>";
+            return;
+          }
+
+          snapshot.forEach(doc => {
+            const v = doc.data();
+            list.innerHTML += `
+              <div class="visit-entry">
+                <strong>${v.date}</strong><br/>
+                <strong>Provider:</strong> ${v.provider}<br/>
+                <strong>Reason:</strong> ${v.reason}<br/>
+                ${v.notes ? `<em>${v.notes}</em>` : ""}
+              </div>
+            `;
+          });
+        });
+    }
+  </script>
+</body>
+</html>
