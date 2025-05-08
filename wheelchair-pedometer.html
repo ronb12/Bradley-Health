@@ -51,14 +51,11 @@
   <script>
     let pushCount = 0;
     let lastPushTime = 0;
-    const Y_PUSH_THRESHOLD = 0.7;
+    const ACCEL_THRESHOLD = 1.0; // net acceleration above baseline
     const MIN_PUSH_INTERVAL = 500;
-    const REQUIRED_SUSTAINED_READS = 2;
     const METERS_PER_PUSH = 1.2;
     const WEIGHT_KG = 80;
     const MET = 2.5;
-
-    let sustainedReadings = 0;
 
     function goHome() {
       window.location.href = "index.html";
@@ -67,19 +64,12 @@
     function startMotionListener() {
       window.addEventListener("devicemotion", event => {
         const acc = event.accelerationIncludingGravity;
-        const y = acc.y || 0;
+        const net = Math.abs(Math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2) - 9.81);
 
-        if (y > Y_PUSH_THRESHOLD) {
-          sustainedReadings++;
-          if (sustainedReadings >= REQUIRED_SUSTAINED_READS &&
-              Date.now() - lastPushTime > MIN_PUSH_INTERVAL) {
-            pushCount++;
-            lastPushTime = Date.now();
-            sustainedReadings = 0;
-            updateStats();
-          }
-        } else {
-          sustainedReadings = 0;
+        if (net > ACCEL_THRESHOLD && Date.now() - lastPushTime > MIN_PUSH_INTERVAL) {
+          pushCount++;
+          lastPushTime = Date.now();
+          updateStats();
         }
       });
     }
