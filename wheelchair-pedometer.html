@@ -45,9 +45,12 @@
     <div id="distance">Distance: 0.00 meters</div>
     <div id="calories">Calories Burned: 0.0</div>
     <button id="startBtn">Start Tracking</button>
-  </div>
+  <button onclick="goHome()" style="margin-top: 1.5em;">⬅ Back to Home</button></div>
 
   <script>
+    function goHome() {
+      window.location.href = "index.html";
+    }
     let pushCount = 0;
     let lastPushTime = 0;
     const PUSH_THRESHOLD = 2.5; // Increased threshold for stronger pushes
