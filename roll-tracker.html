@@ -11,6 +11,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
+  <!-- ✅ Firebase config (from root folder) -->
+  <script src="firebase-init.js"></script>
+
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -97,7 +100,7 @@
     <button class="back-button" onclick="window.location.href='index.html'">← Back to Home</button>
   </main>
 
-  <!-- ✅ Script fixed path -->
+  <!-- ✅ Must come last so all Firebase + DOM is ready -->
   <script src="roll.js"></script>
 </body>
 </html>
