@@ -44,13 +44,16 @@
     }
     table {
       width: 100%;
-      margin-top: 2em;
+      margin-top: 1em;
       border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
     }
     th, td {
-      padding: 0.8em;
-      border: 1px solid #ccc;
       text-align: left;
+      padding: 0.8em;
+      border-bottom: 1px solid #ccc;
     }
   </style>
 </head>
@@ -70,22 +73,24 @@
   <button onclick="addMood()">Log Mood</button>
   <button onclick="exportMoodLog()">📄 Export Mood Log</button>
 
-  <canvas id="moodChart" height="120"></canvas>
+  <canvas id="moodChart"></canvas>
 
   <table>
     <thead>
       <tr><th>Date</th><th>Mood</th><th>Note</th></tr>
     </thead>
-    <tbody id="moodTable"></tbody>
+    <tbody id="moodTableBody"></tbody>
   </table>
 
   <script>
-    const moodEmojis = ["😟", "😕", "😐", "🙂", "😃"];
+    const moodTableBody = document.getElementById("moodTableBody");
     let moodData = [];
-    let currentUser;
 
     firebase.auth().onAuthStateChanged(user => {
-      if (!user) return window.location.href = "login.html";
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
       currentUser = user;
       loadMoods();
     });
@@ -95,7 +100,10 @@
       const note = document.getElementById("moodNote").value.trim();
       const today = new Date().toISOString().split("T")[0];
 
-      if (!rating) return alert("Please select a mood.");
+      if (!rating) {
+        alert("Please select a mood.");
+        return;
+      }
 
       db.collection("moods").add({
         uid: currentUser.uid,
@@ -114,27 +122,34 @@
       db.collection("moods")
         .where("uid", "==", currentUser.uid)
         .orderBy("date", "desc")
-        .limit(7)
+        .limit(30)
         .get()
         .then(snapshot => {
-          const labels = [], values = [];
+          const labels = [];
+          const values = [];
           moodData = [];
+
+          moodTableBody.innerHTML = "";
 
           snapshot.forEach(doc => {
             const mood = doc.data();
             labels.unshift(mood.date);
             values.unshift(mood.rating);
             moodData.unshift(mood);
+
+            moodTableBody.innerHTML += `<tr>
+              <td>${mood.date}</td>
+              <td>${getMoodIcon(mood.rating)}</td>
+              <td>${mood.note || ""}</td>
+            </tr>`;
           });
 
           drawChart(labels, values);
-          renderTable();
         });
     }
 
     function drawChart(labels, values) {
       const ctx = document.getElementById("moodChart").getContext("2d");
-
       if (window.moodChart instanceof Chart) {
         window.moodChart.destroy();
       }
@@ -148,7 +163,6 @@
             data: values,
             tension: 0.3,
             borderColor: '#2c7a7b',
-            backgroundColor: '#b2dfdb',
             borderWidth: 2,
             fill: false
           }]
@@ -160,7 +174,8 @@
               min: 1,
               max: 5,
               ticks: {
-                stepSize: 1
+                stepSize: 1,
+                callback: value => getMoodIcon(value)
               }
             }
           }
@@ -168,40 +183,30 @@
       });
     }
 
-    function renderTable() {
-      const tbody = document.getElementById("moodTable");
-      tbody.innerHTML = "";
-
-      moodData.forEach(m => {
-        tbody.innerHTML += `
-          <tr>
-            <td>${m.date}</td>
-            <td>${moodEmojis[m.rating - 1]} (${m.rating})</td>
-            <td>${m.note || "-"}</td>
-          </tr>`;
-      });
+    function getMoodIcon(value) {
+      return {
+        1: "😟",
+        2: "😕",
+        3: "😐",
+        4: "🙂",
+        5: "😃"
+      }[value] || value;
     }
 
-    async function exportMoodLog() {
+    function exportMoodLog() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       doc.setFontSize(14);
-      doc.text("Mood Log", 10, 10);
+      doc.text("Mood Log", 14, 20);
 
-      let y = 20;
-      moodData.forEach((m, i) => {
-        doc.text(`${i + 1}. ${m.date} - ${moodEmojis[m.rating - 1]} (${m.rating})`, 10, y);
-        if (m.note) {
-          doc.setFontSize(11);
-          doc.text(`Note: ${m.note}`, 12, y + 6);
-          doc.setFontSize(14);
-          y += 12;
-        } else {
-          y += 8;
-        }
+      let y = 30;
+      doc.setFontSize(10);
+      moodData.forEach(entry => {
+        doc.text(`${entry.date}  ${getMoodIcon(entry.rating)}  ${entry.note || ''}`, 14, y);
+        y += 7;
       });
 
-      doc.save("Mood_Log.pdf");
+      doc.save("mood-log.pdf");
     }
   </script>
 </body>
