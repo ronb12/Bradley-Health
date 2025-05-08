@@ -1,2 +1,128 @@
-<!-- admin-dashboard.html -->
-<!DOCTYPE html> ... (truncated for brevity) ...
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Analytics - Bradley Health</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-init.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 2em;
+    }
+    h1 {
+      color: #2c7a7b;
+    }
+    .card {
+      background: white;
+      padding: 1.5em;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      margin: 1em 0;
+    }
+    canvas {
+      max-width: 100%;
+      margin-top: 1em;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 Admin Dashboard</h1>
+
+  <div class="card" id="userStats">Loading user stats...</div>
+
+  <div class="card">
+    <h2>Mood Averages (Past Entries)</h2>
+    <canvas id="moodAvgChart"></canvas>
+  </div>
+
+  <div class="card">
+    <h2>Feature Usage Overview</h2>
+    <canvas id="featureUsageChart"></canvas>
+  </div>
+
+  <script>
+    let currentUser;
+    const db = firebase.firestore();
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      currentUser = user;
+
+      // Optional Admin Validation
+      user.getIdTokenResult().then(idTokenResult => {
+        if (!idTokenResult.claims.admin) {
+          alert("Access denied: Admins only.");
+          window.location.href = "index.html";
+        } else {
+          loadStats();
+        }
+      });
+    });
+
+    async function loadStats() {
+      const userSnap = await db.collection("users").get();
+      const moodSnap = await db.collection("moods").get();
+      const visitSnap = await db.collection("visits").get();
+      const medSnap = await db.collection("medications").get();
+
+      document.getElementById("userStats").innerHTML = `
+        <strong>Total Users:</strong> ${userSnap.size}<br>
+        <strong>Total Mood Logs:</strong> ${moodSnap.size}<br>
+        <strong>Total Medications Logged:</strong> ${medSnap.size}<br>
+        <strong>Total Visits Logged:</strong> ${visitSnap.size}
+      `;
+
+      // Mood Ratings Bar Chart
+      const moodCounts = [0, 0, 0, 0, 0]; // For ratings 1–5
+      moodSnap.forEach(doc => {
+        const rating = doc.data().rating;
+        if (rating >= 1 && rating <= 5) moodCounts[rating - 1]++;
+      });
+
+      new Chart(document.getElementById('moodAvgChart'), {
+        type: 'bar',
+        data: {
+          labels: ['😟 1', '😕 2', '😐 3', '🙂 4', '😃 5'],
+          datasets: [{
+            label: 'Mood Ratings Count',
+            data: moodCounts,
+            backgroundColor: '#2c7a7b'
+          }]
+        },
+        options: {
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+
+      // Feature Usage Chart
+      new Chart(document.getElementById('featureUsageChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Medications', 'Moods', 'Visits'],
+          datasets: [{
+            data: [medSnap.size, moodSnap.size, visitSnap.size],
+            backgroundColor: ['#4299e1', '#48bb78', '#f6ad55']
+          }]
+        }
+      });
+    }
+  </script>
+</body>
+</html>
