@@ -9,7 +9,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-init.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="firebase-init.js"></script>
 
   <style>
     body {
@@ -46,19 +47,29 @@
       flex-grow: 1;
       padding-left: 10px;
     }
+    .controls {
+      display: flex;
+      gap: 1em;
+      flex-wrap: wrap;
+    }
   </style>
 </head>
 <body>
   <h1>🎯 My Health Goals</h1>
 
   <input type="text" id="goalDesc" placeholder="Enter a goal (e.g. Drink 8 glasses of water)">
-  <button onclick="addGoal()">Add Goal</button>
+  
+  <div class="controls">
+    <button onclick="addGoal()">Add Goal</button>
+    <button onclick="exportGoals()">📄 Export Goals as PDF</button>
+    <button onclick="window.location.href='index.html'">← Back to Home</button>
+  </div>
 
   <div id="goalList">Loading...</div>
 
   <script>
     let currentUser;
-    const db = firebase.firestore();
+    let goalSnapshotData = [];
 
     firebase.auth().onAuthStateChanged(user => {
       if (!user) {
@@ -72,7 +83,7 @@
     function addGoal() {
       const desc = document.getElementById("goalDesc").value.trim();
       if (!desc) return alert("Please enter a goal.");
-      db.collection("goals").add({
+      firebase.firestore().collection("goals").add({
         uid: currentUser.uid,
         description: desc,
         completed: false,
@@ -84,22 +95,27 @@
     }
 
     function loadGoals() {
+      const db = firebase.firestore();
       db.collection("goals")
         .where("uid", "==", currentUser.uid)
         .orderBy("timestamp", "desc")
         .onSnapshot(snapshot => {
           const list = document.getElementById("goalList");
           list.innerHTML = "";
+          goalSnapshotData = [];
+
           if (snapshot.empty) {
             list.innerHTML = "<p>No goals added yet.</p>";
             return;
           }
+
           snapshot.forEach(doc => {
             const goal = doc.data();
             const id = doc.id;
+            goalSnapshotData.push({ ...goal, id });
+
             const div = document.createElement("div");
             div.className = "goal-item";
-
             div.innerHTML = `
               <input type="checkbox" ${goal.completed ? "checked" : ""} onchange="toggleGoal('${id}', this.checked)">
               <label>${goal.description}</label>
@@ -111,13 +127,30 @@
     }
 
     function toggleGoal(id, state) {
-      db.collection("goals").doc(id).update({ completed: state });
+      firebase.firestore().collection("goals").doc(id).update({ completed: state });
     }
 
     function deleteGoal(id) {
       if (confirm("Are you sure you want to delete this goal?")) {
-        db.collection("goals").doc(id).delete();
+        firebase.firestore().collection("goals").doc(id).delete();
       }
+    }
+
+    function exportGoals() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(18);
+      doc.text("My Health Goals", 14, 20);
+      doc.setFontSize(12);
+
+      let y = 30;
+      goalSnapshotData.forEach((goal, i) => {
+        const status = goal.completed ? "✅ Completed" : "⬜ Not Done";
+        doc.text(`${i + 1}. ${goal.description} - ${status}`, 14, y);
+        y += 10;
+      });
+
+      doc.save("health_goals.pdf");
     }
   </script>
 </body>
