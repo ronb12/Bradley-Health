@@ -69,14 +69,7 @@
       weight: document.getElementById("profileWeight")
     };
 
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        currentUser = user;
-      } else {
-        window.location.href = "login.html";
-      }
-    });
-
+  
     function openProfile() {
       modal.style.display = "flex";
       if (currentUser) {
