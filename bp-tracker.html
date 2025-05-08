@@ -18,6 +18,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-init.js"></script>
 </head>
 <body>
   <header>
@@ -53,7 +54,6 @@
 
     <button onclick="window.print()">Export PDF</button>
     <button onclick="location.href='index.html'" style="margin-top: 1em;">⬅️ Back to Home</button>
-
   </main>
 
   <script>
@@ -147,7 +147,10 @@
         return;
       }
 
-      const timestamp = new Date().toISOString();
+      const now = new Date();
+      const timestamp = now.toISOString();
+      const date = now.toISOString().split('T')[0]; // 👈 required for summary view
+
       const status = getStatus(systolic, diastolic);
       const tip = getTips(status);
 
@@ -155,19 +158,20 @@
       feedbackBox.style.display = "block";
 
       await db.collection("bpReadings").add({
-        timestamp,
+        uid,
         systolic,
         diastolic,
         pulse,
         mood,
-        uid
+        timestamp,
+        date // 👈 ensure compatibility with daily-summary.html
       });
 
       form.reset();
       loadBP();
     });
 
-    // Let firebase-init.js handle auth and call loadBP()
+    // Firebase auth listener handled in firebase-init.js
   </script>
 </body>
 </html>
