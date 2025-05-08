@@ -50,7 +50,7 @@
   <script>
     let pushCount = 0;
     let lastPushTime = 0;
-    const PUSH_THRESHOLD = 1.8;
+    const PUSH_THRESHOLD = 2.5; // Increased threshold for stronger pushes
     const MIN_PUSH_INTERVAL = 500;
     const METERS_PER_PUSH = 1.2;
     const WEIGHT_KG = 80;
@@ -59,7 +59,8 @@
     function startMotionListener() {
       window.addEventListener("devicemotion", event => {
         const acc = event.accelerationIncludingGravity;
-        const net = Math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2);
+        const rawMagnitude = Math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2);
+        const net = Math.abs(rawMagnitude - 9.81); // Remove gravity
 
         if (net > PUSH_THRESHOLD && Date.now() - lastPushTime > MIN_PUSH_INTERVAL) {
           pushCount++;
