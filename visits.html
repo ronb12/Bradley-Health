@@ -36,7 +36,7 @@
   </style>
 </head>
 <body>
-  <h1>🗕️ Doctor Visit Log</h1>
+  <h1>📅 Doctor Visit Log</h1>
 
   <input type="date" id="visitDate" />
   <input type="text" id="provider" placeholder="Doctor or Clinic Name" />
@@ -56,13 +56,31 @@
   <div id="visitList">Loading visits...</div>
 
   <script>
-    let currentUser;
+    // ✅ Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyC--9xnMW4s8UPOJUnQbKjMpXgJvoh6ITw",
+      authDomain: "bradley-health.firebaseapp.com",
+      projectId: "bradley-health",
+      storageBucket: "bradley-health.appspot.com",
+      messagingSenderId: "294249919277",
+      appId: "1:294249919277:web:exampleappid"
+    };
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
     const db = firebase.firestore();
     const storage = firebase.storage();
+    const auth = firebase.auth();
+    let currentUser = null;
 
-    firebase.auth().onAuthStateChanged(user => {
-      if (!user) window.location.href = "login.html";
-      else { currentUser = user; loadVisits(); }
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        currentUser = user;
+        loadVisits();
+      }
     });
 
     async function addVisit() {
