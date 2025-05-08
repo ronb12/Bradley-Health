@@ -30,10 +30,14 @@
       padding: 0.2em 0.6em; margin-top: 0.5em; border-radius: 6px;
       font-size: 0.8em;
     }
+    .visit-entry button {
+      margin-top: 0.5em; margin-right: 0.5em;
+      background: #555;
+    }
   </style>
 </head>
 <body>
-  <h1>📅 Doctor Visit Log</h1>
+  <h1>🗕️ Doctor Visit Log</h1>
 
   <input type="date" id="visitDate" />
   <input type="text" id="provider" placeholder="Doctor or Clinic Name" />
@@ -85,13 +89,17 @@
         timestamp: new Date()
       });
 
+      clearForm();
+      loadVisits();
+    }
+
+    function clearForm() {
       document.getElementById("visitDate").value = "";
       document.getElementById("provider").value = "";
       document.getElementById("reason").value = "";
       document.getElementById("notes").value = "";
       document.getElementById("tag").value = "";
       document.getElementById("docFile").value = "";
-      loadVisits();
     }
 
     function loadVisits() {
@@ -108,17 +116,40 @@
 
           snapshot.forEach(doc => {
             const v = doc.data();
-            list.innerHTML += `
-              <div class="visit-entry">
-                <strong>${v.date}</strong><br/>
-                <strong>Provider:</strong> ${v.provider}<br/>
-                <strong>Reason:</strong> ${v.reason}<br/>
-                ${v.notes ? `<em>${v.notes}</em><br/>` : ""}
-                ${v.tag ? `<span class='tag'>${v.tag}</span><br/>` : ""}
-                ${v.fileUrl ? `<a href='${v.fileUrl}' target='_blank'>📎 View Document</a>` : ""}
-              </div>`;
+            const id = doc.id;
+            const div = document.createElement("div");
+            div.className = "visit-entry";
+            div.innerHTML = `
+              <strong>${v.date}</strong><br/>
+              <strong>Provider:</strong> ${v.provider}<br/>
+              <strong>Reason:</strong> ${v.reason}<br/>
+              ${v.notes ? `<em>${v.notes}</em><br/>` : ""}
+              ${v.tag ? `<span class='tag'>${v.tag}</span><br/>` : ""}
+              ${v.fileUrl ? `<a href='${v.fileUrl}' target='_blank'>📎 View Document</a><br/>` : ""}
+              <button onclick="editVisit('${id}')">Edit</button>
+              <button onclick="deleteVisit('${id}')">Delete</button>
+            `;
+            list.appendChild(div);
           });
         });
+    }
+
+    async function editVisit(id) {
+      const doc = await db.collection("visits").doc(id).get();
+      if (!doc.exists) return alert("Visit not found.");
+      const v = doc.data();
+      document.getElementById("visitDate").value = v.date;
+      document.getElementById("provider").value = v.provider;
+      document.getElementById("reason").value = v.reason;
+      document.getElementById("notes").value = v.notes;
+      document.getElementById("tag").value = v.tag;
+      deleteVisit(id);
+    }
+
+    function deleteVisit(id) {
+      if (confirm("Delete this visit?")) {
+        db.collection("visits").doc(id).delete();
+      }
     }
 
     async function exportVisitsToPDF() {
