@@ -10,7 +10,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-  <!-- Firebase config init (make sure this is in your root folder) -->
+  <!-- 🔧 Your Firebase config & global variables -->
   <script src="firebase-init.js"></script>
 
   <style>
@@ -80,8 +80,6 @@
   <pre id="output">Your data will appear here...</pre>
 
   <script>
-    // ✅ Do not redeclare currentUser if firebase-init.js already does
-    const db = firebase.firestore();
     const auth = firebase.auth();
 
     auth.onAuthStateChanged(user => {
@@ -91,7 +89,7 @@
           console.error(err);
         });
       } else {
-        currentUser = user;
+        currentUser = user; // Assume already defined in firebase-init.js
       }
     });
 
