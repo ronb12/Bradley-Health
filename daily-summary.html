@@ -24,6 +24,20 @@
       padding: 1.5em;
       text-align: center;
     }
+    .back-button {
+      text-align: center;
+      margin-top: 1em;
+    }
+    .back-button a button {
+      background-color: #2c7a7b;
+      color: white;
+      padding: 0.6em 1.2em;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
     main {
       max-width: 700px;
       margin: 2em auto;
@@ -44,6 +58,22 @@
       background: #fff;
       border-radius: 8px;
     }
+    #goalProgress {
+      background: #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      height: 25px;
+      margin-top: 1em;
+    }
+    #goalBar {
+      height: 100%;
+      width: 0%;
+      background-color: #2c7a7b;
+      text-align: center;
+      color: white;
+      font-weight: bold;
+      line-height: 25px;
+    }
   </style>
 </head>
 <body>
@@ -52,6 +82,13 @@
     <p>Daily Summary</p>
   </header>
 
+  <!-- Back to Home Button -->
+  <div class="back-button">
+    <a href="index.html">
+      <button>← Back to Home</button>
+    </a>
+  </div>
+
   <main>
     <div class="card" id="bpCard">Loading latest BP reading...</div>
     <div class="card" id="rollCard">Loading distance rolled today...</div>
@@ -59,12 +96,14 @@
 
     <h3>7-Day Health Trends</h3>
     <canvas id="summaryChart" height="120"></canvas>
+
+    <h3 style="margin-top: 2em;">Weekly Goal Completion</h3>
+    <div id="goalProgress">
+      <div id="goalBar">0%</div>
+    </div>
   </main>
 
   <script>
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-
     async function loadSummary() {
       if (!currentUser) return;
 
@@ -115,6 +154,8 @@
 
       try {
         const days = [], bpTrend = [], rollTrend = [];
+        let goalHits = 0;
+
         for (let i = 6; i >= 0; i--) {
           const date = new Date();
           date.setDate(date.getDate() - i);
@@ -127,7 +168,8 @@
             .orderBy("timestamp", "desc")
             .limit(1)
             .get();
-          bpTrend.push(bpDay.empty ? null : bpDay.docs[0].data().systolic);
+          const hasBP = !bpDay.empty;
+          bpTrend.push(hasBP ? bpDay.docs[0].data().systolic : null);
 
           const rollDay = await db.collection("rollDistances")
             .where("uid", "==", uid)
@@ -136,6 +178,8 @@
           let rollTotal = 0;
           rollDay.forEach(doc => rollTotal += parseFloat(doc.data().distance || 0));
           rollTrend.push(rollTotal || null);
+
+          if (hasBP && rollTotal > 0) goalHits++;
         }
 
         const canvas = document.getElementById("summaryChart");
@@ -168,6 +212,13 @@
             }
           });
         }
+
+        // ✅ Update goal progress bar
+        const percent = Math.round((goalHits / 7) * 100);
+        const bar = document.getElementById("goalBar");
+        bar.style.width = percent + "%";
+        bar.textContent = percent + "%";
+
       } catch (err) {
         console.error("Error loading trend data:", err);
       }
@@ -194,7 +245,7 @@
 
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        currentUser = user; // Already declared in firebase-init.js
+        currentUser = user; // From firebase-init.js
         loadSummary();
       } else {
         auth.signInAnonymously().catch(err =>
