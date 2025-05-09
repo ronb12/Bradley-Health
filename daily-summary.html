@@ -62,7 +62,6 @@
   </main>
 
   <script>
-    let currentUser;
     const db = firebase.firestore();
     const auth = firebase.auth();
 
@@ -72,7 +71,6 @@
       const uid = currentUser.uid;
       const today = new Date().toISOString().split('T')[0];
 
-      // BP Reading
       try {
         const bpSnap = await db.collection("bpReadings")
           .where("uid", "==", uid)
@@ -95,7 +93,6 @@
         console.error(err);
       }
 
-      // Roll Distance
       try {
         const rollSnap = await db.collection("rollDistances")
           .where("uid", "==", uid)
@@ -116,7 +113,6 @@
         console.error(err);
       }
 
-      // 7-Day Trend
       try {
         const days = [], bpTrend = [], rollTrend = [];
         for (let i = 6; i >= 0; i--) {
@@ -198,7 +194,7 @@
 
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        currentUser = user;
+        currentUser = user; // Already declared in firebase-init.js
         loadSummary();
       } else {
         auth.signInAnonymously().catch(err =>
