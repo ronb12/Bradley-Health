@@ -52,7 +52,6 @@
       font-size: 0.9em;
     }
 
-    /* Dark Mode */
     body.dark {
       background-color: #1e1e1e;
       color: white;
@@ -71,7 +70,6 @@
       background-color: #2d3748;
     }
 
-    /* Profile Modal */
     #profileModal {
       position: fixed;
       top: 0; left: 0;
@@ -96,6 +94,10 @@
       margin: 0.5em 0;
       border-radius: 8px;
       border: 1px solid #ccc;
+    }
+
+    .modal-content button {
+      margin-top: 1em;
     }
 
     body.dark .modal-content {
@@ -124,7 +126,6 @@
   <button class="button profile" onclick="openProfile()">👤 Profile</button>
   <button class="button logout" onclick="logout()">🔓 Logout</button>
 
-  <!-- ✅ Profile Modal -->
   <div id="profileModal">
     <div class="modal-content">
       <h2>User Profile</h2>
@@ -136,6 +137,7 @@
         <option value="Female">Female</option>
       </select>
       <input type="number" id="profileWeight" placeholder="Weight (lbs or kg)" />
+      <button onclick="saveProfile()">Save</button>
       <button onclick="closeProfile()">Close</button>
     </div>
   </div>
@@ -161,8 +163,9 @@
 
       currentUser = user;
       db.collection("users").doc(currentUser.uid).get().then(doc => {
-        if (doc.exists && doc.data().name) {
-          document.getElementById("welcome").textContent = `Welcome, ${doc.data().name}`;
+        if (doc.exists) {
+          const name = doc.data().name || "friend";
+          document.getElementById("welcome").textContent = `Welcome, ${name}`;
         }
       });
     });
@@ -173,7 +176,6 @@
       });
     }
 
-    // Dark Mode init
     if (localStorage.getItem("darkMode") === "true") {
       body.classList.add("dark");
       toggle.checked = true;
@@ -210,12 +212,19 @@
 
     function saveProfile() {
       if (!currentUser) return;
+      const name = profileFields.name.value.trim();
+      if (!name) return alert("Please enter your full name.");
+
       db.collection("users").doc(currentUser.uid).set({
-        name: profileFields.name.value,
+        name,
         age: parseInt(profileFields.age.value) || null,
         gender: profileFields.gender.value,
         weight: parseFloat(profileFields.weight.value) || null
-      }, { merge: true });
+      }, { merge: true }).then(() => {
+        alert("✅ Profile updated!");
+        closeProfile();
+        document.getElementById("welcome").textContent = `Welcome, ${name}`;
+      });
     }
 
     for (const key in profileFields) {
