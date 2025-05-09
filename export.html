@@ -10,7 +10,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-  <!-- 🔧 Load firebase-init.js from root directory -->
+  <!-- Firebase config init (make sure this is in your root folder) -->
   <script src="firebase-init.js"></script>
 
   <style>
@@ -23,8 +23,23 @@
     h1 {
       color: #2c7a7b;
       text-align: center;
+      margin-bottom: 0.5em;
     }
-    button {
+    .back-button {
+      text-align: center;
+      margin-bottom: 2em;
+    }
+    .back-button a button {
+      background-color: #2c7a7b;
+      color: white;
+      padding: 0.5em 1.2em;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    button.download {
+      display: block;
       padding: 1em;
       background: #2c7a7b;
       color: white;
@@ -32,7 +47,6 @@
       border-radius: 8px;
       font-size: 1em;
       cursor: pointer;
-      display: block;
       width: 100%;
       max-width: 300px;
       margin: 1em auto;
@@ -51,17 +65,22 @@
 </head>
 <body>
   <h1>📤 Export My Health Data</h1>
-  <button onclick="exportData()">Download JSON Export</button>
+
+  <!-- Back to Home Button -->
+  <div class="back-button">
+    <a href="index.html">
+      <button>← Back to Home</button>
+    </a>
+  </div>
+
+  <!-- Export Button -->
+  <button class="download" onclick="exportData()">Download JSON Export</button>
+
+  <!-- Output Display -->
   <pre id="output">Your data will appear here...</pre>
 
   <script>
-    let currentUser;
-
-    // ✅ Ensure Firebase is initialized
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig); // from firebase-init.js
-    }
-
+    // ✅ Do not redeclare currentUser if firebase-init.js already does
     const db = firebase.firestore();
     const auth = firebase.auth();
 
