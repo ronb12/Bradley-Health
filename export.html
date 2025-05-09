@@ -5,20 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Export Health Data</title>
 
-  <!-- Firebase -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-init.js"></script>
+
+  <!-- 🔧 Load firebase-init.js from root directory -->
+  <script src="firebase-init.js"></script>
 
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f0f4f8;
       padding: 2em;
+      margin: 0;
     }
     h1 {
       color: #2c7a7b;
+      text-align: center;
     }
     button {
       padding: 1em;
@@ -28,7 +32,10 @@
       border-radius: 8px;
       font-size: 1em;
       cursor: pointer;
+      display: block;
       width: 100%;
+      max-width: 300px;
+      margin: 1em auto;
     }
     pre {
       background: white;
@@ -37,6 +44,8 @@
       max-height: 400px;
       overflow: auto;
       margin-top: 2em;
+      white-space: pre-wrap;
+      word-wrap: break-word;
     }
   </style>
 </head>
@@ -47,14 +56,24 @@
 
   <script>
     let currentUser;
-    const db = firebase.firestore();
 
-    firebase.auth().onAuthStateChanged(user => {
+    // ✅ Ensure Firebase is initialized
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig); // from firebase-init.js
+    }
+
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged(user => {
       if (!user) {
-        window.location.href = "login.html";
-        return;
+        auth.signInAnonymously().catch(err => {
+          alert("Authentication failed.");
+          console.error(err);
+        });
+      } else {
+        currentUser = user;
       }
-      currentUser = user;
     });
 
     async function exportData() {
@@ -63,24 +82,29 @@
       const collections = ['medications', 'moods', 'goals', 'visits'];
       const exportObject = {};
 
-      for (let col of collections) {
-        const snapshot = await db.collection(col)
-          .where("uid", "==", currentUser.uid)
-          .orderBy("timestamp", "desc")
-          .get();
+      try {
+        for (let col of collections) {
+          const snapshot = await db.collection(col)
+            .where("uid", "==", currentUser.uid)
+            .orderBy("timestamp", "desc")
+            .get();
 
-        exportObject[col] = snapshot.docs.map(doc => doc.data());
+          exportObject[col] = snapshot.docs.map(doc => doc.data());
+        }
+
+        const jsonStr = JSON.stringify(exportObject, null, 2);
+        document.getElementById("output").textContent = jsonStr;
+
+        const blob = new Blob([jsonStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "bradley-health-export.json";
+        a.click();
+      } catch (err) {
+        console.error("Export failed:", err);
+        alert("Failed to export data.");
       }
-
-      const jsonStr = JSON.stringify(exportObject, null, 2);
-      document.getElementById("output").textContent = jsonStr;
-
-      const blob = new Blob([jsonStr], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "bradley-health-export.json";
-      a.click();
     }
   </script>
 </body>
