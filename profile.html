@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Profile - Bradley Health</title>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-init.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 2em;
+      color: #222;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 2em;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c7a7b;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.8em;
+      margin: 0.8em 0;
+      font-size: 1em;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.8em;
+      background: #2c7a7b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-top: 1em;
+    }
+
+    .back {
+      margin-top: 1em;
+      background: #718096;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>My Profile</h1>
+    <input type="text" id="name" placeholder="Full Name" />
+    <input type="number" id="age" placeholder="Age" />
+    <select id="gender">
+      <option value="">Select Gender</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+    <input type="number" id="weight" placeholder="Weight (lbs or kg)" />
+
+    <button onclick="saveProfile()">Save Changes</button>
+    <button class="back" onclick="window.location.href='index.html'">← Back to Dashboard</button>
+  </div>
+
+  <script>
+    let currentUser;
+    const fields = {
+      name: document.getElementById("name"),
+      age: document.getElementById("age"),
+      gender: document.getElementById("gender"),
+      weight: document.getElementById("weight")
+    };
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+      currentUser = user;
+      db.collection("users").doc(currentUser.uid).get().then(doc => {
+        if (doc.exists) {
+          const d = doc.data();
+          fields.name.value = d.name || "";
+          fields.age.value = d.age || "";
+          fields.gender.value = d.gender || "";
+          fields.weight.value = d.weight || "";
+        }
+      });
+    });
+
+    function saveProfile() {
+      if (!currentUser) return;
+      db.collection("users").doc(currentUser.uid).set({
+        name: fields.name.value,
+        age: parseInt(fields.age.value) || null,
+        gender: fields.gender.value,
+        weight: parseFloat(fields.weight.value) || null
+      }, { merge: true }).then(() => {
+        alert("✅ Profile updated!");
+      }).catch(err => {
+        alert("❌ Error: " + err.message);
+      });
+    }
+  </script>
+</body>
+</html>
