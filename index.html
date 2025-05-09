@@ -142,9 +142,9 @@
 
   <script>
     let currentUser;
+
     const body = document.body;
     const toggle = document.getElementById("darkToggle");
-
     const profileModal = document.getElementById("profileModal");
     const profileFields = {
       name: document.getElementById("profileName"),
@@ -153,7 +153,6 @@
       weight: document.getElementById("profileWeight")
     };
 
-    // Auth + personalized greeting
     firebase.auth().onAuthStateChanged(user => {
       if (!user) {
         window.location.href = "login.html";
@@ -174,7 +173,7 @@
       });
     }
 
-    // Dark mode init
+    // Dark Mode init
     if (localStorage.getItem("darkMode") === "true") {
       body.classList.add("dark");
       toggle.checked = true;
@@ -190,7 +189,6 @@
       }
     });
 
-    // Profile modal
     function openProfile() {
       profileModal.style.display = "flex";
       if (currentUser) {
