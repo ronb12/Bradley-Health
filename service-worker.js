@@ -1,15 +1,13 @@
 const CACHE_NAME = 'bradley-health-cache-v1';
 const FILES_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/assets/style.css',
-  '/assets/icon-192.png',
-  '/assets/icon-512.png',
-  '/firebase-messaging-sw.js',
-  '/js/firebase-init.js',
-  '/blood-pressure.html',
-  '/roll-tracker.html'
+  'index.html',
+  'manifest.json',
+  'assets/style.css',
+  'assets/icon-192.png',
+  'assets/icon-512.png',
+  'firebase-init.js',
+  'blood-pressure.html',
+  'roll-tracker.html'
 ];
 
 // Install: Cache essential files
@@ -19,12 +17,14 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME).then(cache => {
       console.log('[Service Worker] Caching app shell');
       return cache.addAll(FILES_TO_CACHE);
+    }).catch(err => {
+      console.error('❌ Failed to cache during install:', err);
     })
   );
-  self.skipWaiting(); // Activate immediately
+  self.skipWaiting();
 });
 
-// Activate: Cleanup old caches
+// Activate: Clean up old caches
 self.addEventListener('activate', event => {
   console.log('[Service Worker] Activate');
   event.waitUntil(
@@ -39,17 +39,16 @@ self.addEventListener('activate', event => {
       )
     )
   );
-  self.clients.claim(); // Claim control
+  self.clients.claim();
 });
 
-// Fetch: Serve from cache or fall back
+// Fetch: Serve from cache or fallback
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // Only return if status is OK
         return response.ok ? response : caches.match(event.request);
       })
       .catch(() => {
