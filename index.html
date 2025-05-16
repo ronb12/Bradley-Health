@@ -10,6 +10,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="firebase-init.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="/assets/icon-192.png" />
 
   <style>
     body {
@@ -230,6 +232,13 @@
 
     for (const key in profileFields) {
       profileFields[key].addEventListener("change", saveProfile);
+    }
+
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(() => console.log('✅ Service Worker Registered'))
+        .catch(err => console.error('❌ Service Worker Error:', err));
     }
   </script>
 </body>
