@@ -7,7 +7,9 @@ const FILES_TO_CACHE = [
   '/assets/icon-192.png',
   '/assets/icon-512.png',
   '/firebase-messaging-sw.js',
-  '/js/firebase-init.js'
+  '/js/firebase-init.js',
+  '/blood-pressure.html',
+  '/roll-tracker.html'
 ];
 
 // Install: Cache essential files
@@ -40,15 +42,23 @@ self.addEventListener('activate', event => {
   self.clients.claim(); // Claim control
 });
 
-// Fetch: Serve from cache if available
+// Fetch: Serve from cache or fall back
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    }).catch(() => {
-      return new Response('⚠️ Offline and not cached', { status: 503 });
-    })
+    fetch(event.request)
+      .then(response => {
+        // Only return if status is OK
+        return response.ok ? response : caches.match(event.request);
+      })
+      .catch(() => {
+        return caches.match(event.request).then(res => {
+          return res || new Response('⚠️ You are offline and this file is not cached.', {
+            status: 503,
+            statusText: 'Offline'
+          });
+        });
+      })
   );
 });
