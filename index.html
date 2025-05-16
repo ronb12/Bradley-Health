@@ -119,26 +119,8 @@
       gender: document.getElementById("profileGender"),
       weight: document.getElementById("profileWeight")
     };
-    let currentUser = null;
-    const db = firebase.firestore();
 
-    firebase.auth().onAuthStateChanged(user => {
-      if (!user) return (window.location.href = "login.html");
-      currentUser = user;
-      db.collection("users").doc(currentUser.uid).get().then(doc => {
-        if (doc.exists) {
-          const name = doc.data().name || "friend";
-          document.getElementById("welcome").textContent = `Welcome, ${name}`;
-        }
-      });
-    });
-
-    function logout() {
-      firebase.auth().signOut().then(() => {
-        window.location.href = "login.html";
-      });
-    }
-
+    // Dark mode state from localStorage
     if (localStorage.getItem("darkMode") === "true") {
       body.classList.add("dark");
       toggle.checked = true;
@@ -146,6 +128,17 @@
     toggle.addEventListener("change", () => {
       body.classList.toggle("dark", toggle.checked);
       localStorage.setItem("darkMode", toggle.checked);
+    });
+
+    // Update welcome message when ready
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) return (window.location.href = "login.html");
+      db.collection("users").doc(user.uid).get().then(doc => {
+        if (doc.exists) {
+          const name = doc.data().name || "friend";
+          document.getElementById("welcome").textContent = `Welcome, ${name}`;
+        }
+      });
     });
 
     function openProfile() {
