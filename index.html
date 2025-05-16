@@ -120,6 +120,8 @@
   <a class="button" href="goals.html">Health Goals</a>
   <a class="button" href="medications.html">Medication Tracker</a>
   <a class="button" href="visits.html">Doctor Visit Log</a>
+  <a class="button" href="blood-pressure.html">🩺 Blood Pressure Tracker</a>
+  <a class="button" href="roll-tracker.html">♿ Wheelchair Tracker</a>
   <a class="button" href="daily-summary.html">📊 Daily Summary</a>
   <a class="button" href="export.html">📥 Export My Data</a>
 
@@ -152,6 +154,7 @@
       gender: document.getElementById("profileGender"),
       weight: document.getElementById("profileWeight")
     };
+    let currentUser = null;
 
     firebase.auth().onAuthStateChanged(user => {
       if (!user) {
