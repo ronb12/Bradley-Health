@@ -4,14 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bradley Health</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="/assets/icon-192.png" />
+  <meta name="theme-color" content="#2c7a7b" />
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="firebase-init.js"></script>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="/assets/icon-192.png" />
 
   <style>
     body {
@@ -21,14 +22,12 @@
       text-align: center;
       padding: 2em;
     }
-
     header {
       background-color: #2c7a7b;
       color: white;
       padding: 1.5em;
       border-radius: 12px;
     }
-
     .button {
       display: block;
       width: 90%;
@@ -43,69 +42,33 @@
       cursor: pointer;
       text-decoration: none;
     }
-
-    .logout, .profile {
-      background-color: #2c7a7b;
-    }
-
-    label {
-      display: block;
-      margin-top: 1em;
-      font-size: 0.9em;
-    }
-
-    body.dark {
-      background-color: #1e1e1e;
-      color: white;
-    }
-
-    body.dark header {
-      background-color: #1a202c;
-    }
-
-    body.dark .button {
-      background-color: #4a5568;
-      color: white;
-    }
-
-    body.dark .logout, body.dark .profile {
-      background-color: #2d3748;
-    }
-
+    .logout, .profile { background-color: #2c7a7b; }
+    label { display: block; margin-top: 1em; font-size: 0.9em; }
+    body.dark { background-color: #1e1e1e; color: white; }
+    body.dark header { background-color: #1a202c; }
+    body.dark .button { background-color: #4a5568; color: white; }
+    body.dark .logout, body.dark .profile { background-color: #2d3748; }
     #profileModal {
-      position: fixed;
-      top: 0; left: 0;
+      position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.5);
       display: none;
       justify-content: center;
       align-items: center;
     }
-
     .modal-content {
       background: white;
       padding: 2em;
       border-radius: 12px;
-      width: 90%;
-      max-width: 400px;
+      width: 90%; max-width: 400px;
     }
-
     .modal-content input, .modal-content select {
-      width: 100%;
-      padding: 0.75em;
-      margin: 0.5em 0;
-      border-radius: 8px;
+      width: 100%; padding: 0.75em;
+      margin: 0.5em 0; border-radius: 8px;
       border: 1px solid #ccc;
     }
-
-    .modal-content button {
-      margin-top: 1em;
-    }
-
-    body.dark .modal-content {
-      background: #2d3748;
-      color: white;
-    }
+    .modal-content button { margin-top: 1em; }
+    body.dark .modal-content { background: #2d3748; color: white; }
   </style>
 </head>
 <body>
@@ -159,11 +122,7 @@
     let currentUser = null;
 
     firebase.auth().onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
-
+      if (!user) return (window.location.href = "login.html");
       currentUser = user;
       db.collection("users").doc(currentUser.uid).get().then(doc => {
         if (doc.exists) {
@@ -183,15 +142,9 @@
       body.classList.add("dark");
       toggle.checked = true;
     }
-
     toggle.addEventListener("change", () => {
-      if (toggle.checked) {
-        body.classList.add("dark");
-        localStorage.setItem("darkMode", "true");
-      } else {
-        body.classList.remove("dark");
-        localStorage.setItem("darkMode", "false");
-      }
+      body.classList.toggle("dark", toggle.checked);
+      localStorage.setItem("darkMode", toggle.checked);
     });
 
     function openProfile() {
@@ -234,7 +187,6 @@
       profileFields[key].addEventListener("change", saveProfile);
     }
 
-    // PWA Service Worker Registration
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/service-worker.js')
         .then(() => console.log('✅ Service Worker Registered'))
