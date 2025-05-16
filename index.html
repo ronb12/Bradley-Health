@@ -48,6 +48,7 @@
     body.dark header { background-color: #1a202c; }
     body.dark .button { background-color: #4a5568; color: white; }
     body.dark .logout, body.dark .profile { background-color: #2d3748; }
+
     #profileModal {
       position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
@@ -120,19 +121,20 @@
       weight: document.getElementById("profileWeight")
     };
 
-    // Dark mode state from localStorage
     if (localStorage.getItem("darkMode") === "true") {
       body.classList.add("dark");
       toggle.checked = true;
     }
+
     toggle.addEventListener("change", () => {
       body.classList.toggle("dark", toggle.checked);
       localStorage.setItem("darkMode", toggle.checked);
     });
 
-    // Update welcome message when ready
     firebase.auth().onAuthStateChanged(user => {
       if (!user) return (window.location.href = "login.html");
+
+      currentUser = user;
       db.collection("users").doc(user.uid).get().then(doc => {
         if (doc.exists) {
           const name = doc.data().name || "friend";
@@ -175,10 +177,6 @@
         closeProfile();
         document.getElementById("welcome").textContent = `Welcome, ${name}`;
       });
-    }
-
-    for (const key in profileFields) {
-      profileFields[key].addEventListener("change", saveProfile);
     }
 
     if ('serviceWorker' in navigator) {
