@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>😊 Mood Tracker</title>
+  
+  <link rel="icon" href="data:,">
 
   <!-- Firebase & Chart.js -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -66,7 +67,7 @@
   </style>
 </head>
 <body>
-  <button class="toggle-dark" onclick="toggleDarkMode()">🌓</button>
+  <button id="darkToggle" class="toggle-dark">🌓</button>
   <h1>😊 Mood Tracker</h1>
 
   <select id="moodRating">
@@ -79,8 +80,8 @@
   </select>
 
   <textarea id="moodNote" placeholder="Optional note about today..."></textarea>
-  <button onclick="addMood()">Log Mood</button>
-  <button onclick="exportMoodLog()">📄 Export Mood Log</button>
+  <button id="logMoodBtn">Log Mood</button>
+  <button id="exportBtn">📄 Export Mood Log</button>
 
   <h3 id="weeklySummary"></h3>
   <canvas id="moodChart" height="100"></canvas>
@@ -93,7 +94,6 @@
   <button onclick="window.location.href='index.html'" class="back-button">← Back to Home</button>
 
   <script>
-    let db = firebase.firestore();
     let currentUser;
     let moodData = [];
 
@@ -110,26 +110,11 @@
 
       if (!rating) return alert("Please select a mood.");
 
-      db.collection("moods").add({
-        uid: currentUser.uid,
-        rating,
-        note,
-        date: today,
-        timestamp: new Date()
-      }).then(() => {
-        document.getElementById("moodRating").value = "";
-        document.getElementById("moodNote").value = "";
-        loadMoods();
-      }).catch(err => alert("Error logging mood: " + err.message));
-    }
-
-    function loadMoods() {
-      db.collection("moods")
+      firebase.firestore().collection("moods")
         .where("uid", "==", currentUser.uid)
         .orderBy("date", "desc")
         .limit(7)
-        .get()
-        .then(snapshot => {
+        .onSnapshot(snapshot => {
           const labels = [], values = [], logRows = [];
           moodData = [];
 
@@ -220,6 +205,10 @@
       document.documentElement.style.setProperty('--bg', isDark ? '#1a202c' : '#f0f4f8');
       document.documentElement.style.setProperty('--text', isDark ? '#fff' : '#000');
     }
+
+    document.getElementById("logMoodBtn").addEventListener("click", addMood);
+    document.getElementById("exportBtn").addEventListener("click", exportMoodLog);
+    document.getElementById("darkToggle").addEventListener("click", toggleDarkMode);
   </script>
 </body>
 </html>
