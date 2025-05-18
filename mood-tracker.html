@@ -117,32 +117,46 @@ function editMood(id) {
         let moodData = [];
 
     firebase.auth().onAuthStateChanged(user => {
-      if (!user) return window.location.href = "login.html";
-      currentUser = user;
+  if (!user) return window.location.href = "login.html";
+  currentUser = user;
+  subscribeToMoods();
       
     });
 
     function addMood() {
-      const rating = parseInt(document.getElementById("moodRating").value);
-      const note = document.getElementById("moodNote").value.trim();
-      const today = new Date().toISOString().split("T")[0];
+  const rating = parseInt(document.getElementById("moodRating").value);
+  const note = document.getElementById("moodNote").value.trim();
+  const today = new Date().toISOString().split("T")[0];
 
-      if (!rating) return alert("Please select a mood.");
+  if (!rating) return alert("Please select a mood.");
 
-      firebase.firestore().collection("moods")
-        .where("uid", "==", currentUser.uid)
-        .orderBy("date", "desc")
-        .limit(7)
-        .onSnapshot(snapshot => {
+  firebase.firestore().collection("moods").add({
+    uid: currentUser.uid,
+    rating,
+    note,
+    date: today,
+    timestamp: new Date()
+  }).then(() => {
+    console.log("Mood logged!");
+    document.getElementById("moodRating").value = "";
+    document.getElementById("moodNote").value = "";
+  }).catch(err => alert("Error logging mood: " + err.message));
+}
+
+function subscribeToMoods() {
+  firebase.firestore().collection("moods")
+    .where("uid", "==", currentUser.uid)
+    .orderBy("date", "desc")
+    .limit(7)
+    .onSnapshot(snapshot => {snapshot => {
           const labels = [], values = [], logRows = [];
           moodData = [];
 
           snapshot.forEach(doc => {
             const mood = doc.data();
-            labels.unshift(mood.date);
-            values.unshift(mood.rating);
-            moodData.push(mood);
-            logRows.push(`<tr data-id="${doc.id}">
+            const time = mood.timestamp?.seconds ? new Date(mood.timestamp.seconds * 1000).toLocaleTimeString() : "";
+moodData.push({...mood, id: doc.id});
+logRows.push(`<tr data-id="${doc.id}">
   <td>${mood.date} ${time}</td>
   <td>${getEmoji(mood.rating)} (${mood.rating})</td>
   <td>${mood.note || ""}</td>
