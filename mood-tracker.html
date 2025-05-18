@@ -99,7 +99,7 @@
     firebase.auth().onAuthStateChanged(user => {
       if (!user) return window.location.href = "login.html";
       currentUser = user;
-      loadMoods();
+      
     });
 
     function addMood() {
@@ -128,7 +128,7 @@
           drawChart(labels, values);
           document.getElementById("moodLogTable").innerHTML = logRows.join("");
           updateWeeklySummary();
-        }).catch(err => alert("Error loading moods: " + err.message));
+        });
     }
 
     function getEmoji(rating) {
