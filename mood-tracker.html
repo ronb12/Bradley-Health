@@ -26,6 +26,25 @@ function editMood(id) {
   }).then(() => console.log("Mood updated."))
     .catch(err => alert("Error updating: " + err.message));
 }
+function deleteMood(id) {
+  if (!confirm("Delete this mood entry?")) return;
+  firebase.firestore().collection("moods").doc(id).delete()
+    .then(() => console.log("Mood deleted."))
+    .catch(err => alert("Error deleting: " + err.message));
+}
+
+function editMood(id) {
+  const row = document.querySelector(`tr[data-id='${id}']`);
+  const mood = moodData.find(m => m.id === id || m.docId === id);
+  const newRating = prompt("New mood (1-5):", mood.rating);
+  if (!newRating || isNaN(newRating) || newRating < 1 || newRating > 5) return;
+  const newNote = prompt("Update note:", mood.note || "");
+  firebase.firestore().collection("moods").doc(id).update({
+    rating: parseInt(newRating),
+    note: newNote
+  }).then(() => console.log("Mood updated."))
+    .catch(err => alert("Error updating: " + err.message));
+}
 </script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
