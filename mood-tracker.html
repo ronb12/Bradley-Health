@@ -88,7 +88,6 @@
 
   <script>
     let moodData = [];
-    let currentUser;
 
     firebase.auth().onAuthStateChanged(user => {
       if (!user) return window.location.href = "login.html";
