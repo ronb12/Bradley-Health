@@ -148,7 +148,7 @@ function subscribeToMoods() {
     .where("uid", "==", currentUser.uid)
     .orderBy("date", "desc")
     .limit(7)
-    .onSnapshot(snapshot => {snapshot => {
+    .onSnapshot(snapshot => {
           const labels = [], values = [], logRows = [];
           moodData = [];
 
@@ -175,9 +175,6 @@ logRows.push(`<tr data-id="${doc.id}">
 
     function getEmoji(rating) {
       return ["😟", "😕", "😐", "🙂", "😃"][rating - 1] || "";
-    }
-
-    
     }
 
     function updateWeeklySummary() {
