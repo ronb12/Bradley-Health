@@ -21,15 +21,16 @@ auth.onAuthStateChanged(user => {
     currentUser = user;
     console.log(user.isAnonymous ? "✅ Anonymous session" : "✅ Signed in:", user.email || user.uid);
   } else {
-    console.warn("⚠️ No user session found, signing in anonymously...");
-    auth.signInAnonymously().catch(err => console.error("❌ Anonymous auth failed:", err.message));
+    console.warn("⚠️ No user session. Awaiting login...");
+    // Removed anonymous login fallback
   }
 });
 
 function loginWithEmail(email, password) {
   auth.signInWithEmailAndPassword(email, password)
-    .then(userCred => {
-      console.log("✅ Email login successful:", userCred.user.email);
+    .then(() => {
+      console.log("✅ Email login successful:", email);
+      window.location.href = "dashboard.html"; // Change to your landing page
     })
     .catch(err => {
       console.error("❌ Email login failed:", err.message);
@@ -40,5 +41,6 @@ function loginWithEmail(email, password) {
 function logout() {
   auth.signOut().then(() => {
     console.log("🔓 Logged out");
+    window.location.href = "login.html"; // Optional: redirect to login page
   });
 }
