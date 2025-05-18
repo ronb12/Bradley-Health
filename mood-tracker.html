@@ -87,7 +87,7 @@
   <canvas id="moodChart" height="100"></canvas>
 
   <table>
-    <thead><tr><th>Date</th><th>Mood</th><th>Note</th></tr></thead>
+    <thead><tr><th>Date & Time</th><th>Mood</th><th>Note</th></tr></thead>
     <tbody id="moodLogTable"></tbody>
   </table>
 
@@ -122,7 +122,7 @@
             labels.unshift(mood.date);
             values.unshift(mood.rating);
             moodData.push(mood);
-            logRows.push(`<tr><td>${mood.date}</td><td>${getEmoji(mood.rating)} (${mood.rating})</td><td>${mood.note || ""}</td></tr>`);
+            logRows.push(`<tr><td>${mood.date} ${new Date(mood.timestamp.seconds * 1000).toLocaleTimeString()}</td><td>${getEmoji(mood.rating)} (${mood.rating})</td><td>${mood.note || ""}</td></tr>`);
           });
 
           drawChart(labels, values);
