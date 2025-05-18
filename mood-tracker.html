@@ -4,55 +4,15 @@
   <meta charset="UTF-8" />
   <title>😊 Mood Tracker</title>
   <link rel="icon" href="data:,">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  
-  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Firebase & Chart.js -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js">function deleteMood(id) {
-  if (!confirm("Delete this mood entry?")) return;
-  firebase.firestore().collection("moods").doc(id).delete()
-    .then(() => console.log("Mood deleted."))
-    .catch(err => alert("Error deleting: " + err.message));
-}
-
-function editMood(id) {
-  const row = document.querySelector(`tr[data-id='${id}']`);
-  const mood = moodData.find(m => m.id === id || m.docId === id);
-  const newRating = prompt("New mood (1-5):", mood.rating);
-  if (!newRating || isNaN(newRating) || newRating < 1 || newRating > 5) return;
-  const newNote = prompt("Update note:", mood.note || "");
-  firebase.firestore().collection("moods").doc(id).update({
-    rating: parseInt(newRating),
-    note: newNote
-  }).then(() => console.log("Mood updated."))
-    .catch(err => alert("Error updating: " + err.message));
-}
-function deleteMood(id) {
-  if (!confirm("Delete this mood entry?")) return;
-  firebase.firestore().collection("moods").doc(id).delete()
-    .then(() => console.log("Mood deleted."))
-    .catch(err => alert("Error deleting: " + err.message));
-}
-
-function editMood(id) {
-  const row = document.querySelector(`tr[data-id='${id}']`);
-  const mood = moodData.find(m => m.id === id || m.docId === id);
-  const newRating = prompt("New mood (1-5):", mood.rating);
-  if (!newRating || isNaN(newRating) || newRating < 1 || newRating > 5) return;
-  const newNote = prompt("Update note:", mood.note || "");
-  firebase.firestore().collection("moods").doc(id).update({
-    rating: parseInt(newRating),
-    note: newNote
-  }).then(() => console.log("Mood updated."))
-    .catch(err => alert("Error updating: " + err.message));
-}
-</script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="firebase-init.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -74,12 +34,6 @@ function editMood(id) {
       color: white;
       border: none;
       cursor: pointer;
-    }
-    canvas {
-      margin-top: 2em;
-      background: white;
-      border-radius: 10px;
-      padding: 1em;
     }
     table {
       width: 100%;
@@ -123,8 +77,20 @@ function editMood(id) {
   <button id="logMoodBtn">Log Mood</button>
   <button id="exportBtn">📄 Export Mood Log</button>
 
+  <div style="margin: 1em 0;">
+    <label for="filterMood">Filter by Mood:</label>
+    <select id="filterMood" onchange="applyMoodFilter()">
+      <option value="">All</option>
+      <option value="1">😟 Very Bad</option>
+      <option value="2">😕 Bad</option>
+      <option value="3">😐 Okay</option>
+      <option value="4">🙂 Good</option>
+      <option value="5">😃 Excellent</option>
+    </select>
+  </div>
+
   <h3 id="weeklySummary"></h3>
-  
+
   <table>
     <thead><tr><th>Date & Time</th><th>Mood</th><th>Note</th><th>Actions</th></tr></thead>
     <tbody id="moodLogTable"></tbody>
@@ -132,66 +98,83 @@ function editMood(id) {
 
   <button onclick="window.location.href='index.html'" class="back-button">← Back to Home</button>
 
+  <!-- Modal Editor -->
+  <div id="editModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    <div style="background:#fff; padding:2em; border-radius:8px; max-width:400px; width:100%;">
+      <h3>Edit Mood Entry</h3>
+      <label>Mood (1–5):</label>
+      <select id="editMoodRating">
+        <option value="1">😟 Very Bad</option>
+        <option value="2">😕 Bad</option>
+        <option value="3">😐 Okay</option>
+        <option value="4">🙂 Good</option>
+        <option value="5">😃 Excellent</option>
+      </select>
+      <label>Note:</label>
+      <textarea id="editMoodNote" rows="4"></textarea>
+      <input type="hidden" id="editMoodId" />
+      <button onclick="saveMoodEdit()">💾 Save</button>
+      <button onclick="closeEditModal()">❌ Cancel</button>
+    </div>
+  </div>
+
   <script>
-// Edit/Delete mood entries
-// Chart removed
-        let moodData = [];
+    let moodData = [];
 
     firebase.auth().onAuthStateChanged(user => {
-  if (!user) return window.location.href = "login.html";
-  currentUser = user;
-  subscribeToMoods();
-      
+      if (!user) return window.location.href = "login.html";
+      currentUser = user;
+      subscribeToMoods();
     });
 
-    function addMood() {
-  const rating = parseInt(document.getElementById("moodRating").value);
-  const note = document.getElementById("moodNote").value.trim();
-  const today = new Date().toISOString().split("T")[0];
-
-  if (!rating) return alert("Please select a mood.");
-
-  firebase.firestore().collection("moods").add({
-    uid: currentUser.uid,
-    rating,
-    note,
-    date: today,
-    timestamp: new Date()
-  }).then(() => {
-    console.log("Mood logged!");
-    document.getElementById("moodRating").value = "";
-    document.getElementById("moodNote").value = "";
-  }).catch(err => alert("Error logging mood: " + err.message));
-}
-
-function subscribeToMoods() {
-  firebase.firestore().collection("moods")
-    .where("uid", "==", currentUser.uid)
-    .orderBy("date", "desc")
-    .limit(7)
-    .onSnapshot(snapshot => {
-          const labels = [], values = [], logRows = [];
+    function subscribeToMoods() {
+      firebase.firestore().collection("moods")
+        .where("uid", "==", currentUser.uid)
+        .orderBy("date", "desc")
+        .limit(7)
+        .onSnapshot(snapshot => {
+          const logRows = [];
           moodData = [];
 
           snapshot.forEach(doc => {
             const mood = doc.data();
             const time = mood.timestamp?.seconds ? new Date(mood.timestamp.seconds * 1000).toLocaleTimeString() : "";
-moodData.push({...mood, id: doc.id});
-logRows.push(`<tr data-id="${doc.id}">
-  <td>${mood.date} ${time}</td>
-  <td>${getEmoji(mood.rating)} (${mood.rating})</td>
-  <td>${mood.note || ""}</td>
-  <td>
-    <button onclick="editMood('${doc.id}')">✏️</button>
-    <button onclick="deleteMood('${doc.id}')">🗑️</button>
-  </td>
-</tr>`);
+            moodData.push({ ...mood, id: doc.id });
+            logRows.push(`<tr data-id="${doc.id}">
+              <td>${mood.date} ${time}</td>
+              <td>${getEmoji(mood.rating)} (${mood.rating})</td>
+              <td>${mood.note || ""}</td>
+              <td>
+                <button onclick="editMood('${doc.id}')">✏️</button>
+                <button onclick="deleteMood('${doc.id}')">🗑️</button>
+              </td>
+            </tr>`);
           });
 
-          
           document.getElementById("moodLogTable").innerHTML = logRows.join("");
           updateWeeklySummary();
+          applyMoodFilter();
         });
+    }
+
+    function addMood() {
+      const rating = parseInt(document.getElementById("moodRating").value);
+      const note = document.getElementById("moodNote").value.trim();
+      const today = new Date().toISOString().split("T")[0];
+
+      if (!rating) return alert("Please select a mood.");
+
+      firebase.firestore().collection("moods").add({
+        uid: currentUser.uid,
+        rating,
+        note,
+        date: today,
+        timestamp: new Date()
+      }).then(() => {
+        console.log("Mood logged!");
+        document.getElementById("moodRating").value = "";
+        document.getElementById("moodNote").value = "";
+      }).catch(err => alert("Error logging mood: " + err.message));
     }
 
     function getEmoji(rating) {
@@ -212,7 +195,10 @@ logRows.push(`<tr data-id="${doc.id}">
       doc.setFontSize(12);
       let y = 30;
       moodData.forEach(entry => {
-        doc.text(`${entry.date} — ${getEmoji(entry.rating)} (${entry.rating})`, 14, y);
+        const time = entry.timestamp?.seconds
+          ? new Date(entry.timestamp.seconds * 1000).toLocaleTimeString()
+          : '';
+        doc.text(`${entry.date} ${time} — ${getEmoji(entry.rating)} (${entry.rating})`, 14, y);
         if (entry.note) {
           doc.setFontSize(10);
           doc.text(`Note: ${entry.note}`, 18, y + 6);
@@ -224,6 +210,48 @@ logRows.push(`<tr data-id="${doc.id}">
         if (y > 270) { doc.addPage(); y = 20; }
       });
       doc.save("mood_log.pdf");
+    }
+
+    function editMood(id) {
+      const mood = moodData.find(m => m.id === id);
+      if (!mood) return;
+      document.getElementById("editMoodRating").value = mood.rating;
+      document.getElementById("editMoodNote").value = mood.note || "";
+      document.getElementById("editMoodId").value = id;
+      document.getElementById("editModal").style.display = "flex";
+    }
+
+    function saveMoodEdit() {
+      const id = document.getElementById("editMoodId").value;
+      const rating = parseInt(document.getElementById("editMoodRating").value);
+      const note = document.getElementById("editMoodNote").value.trim();
+      firebase.firestore().collection("moods").doc(id).update({
+        rating,
+        note
+      }).then(() => {
+        console.log("Mood updated.");
+        closeEditModal();
+      }).catch(err => alert("Error updating: " + err.message));
+    }
+
+    function closeEditModal() {
+      document.getElementById("editModal").style.display = "none";
+    }
+
+    function deleteMood(id) {
+      if (!confirm("Delete this mood entry?")) return;
+      firebase.firestore().collection("moods").doc(id).delete()
+        .then(() => console.log("Mood deleted."))
+        .catch(err => alert("Error deleting: " + err.message));
+    }
+
+    function applyMoodFilter() {
+      const filterValue = document.getElementById("filterMood").value;
+      document.querySelectorAll("#moodLogTable tr").forEach(row => {
+        const moodText = row.children[1]?.textContent || "";
+        const matches = filterValue === "" || moodText.includes(`(${filterValue})`);
+        row.style.display = matches ? "table-row" : "none";
+      });
     }
 
     function toggleDarkMode() {
