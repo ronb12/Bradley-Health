@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  
+  <title>😊 Mood Tracker</title>
   <link rel="icon" href="data:,">
 
-  <!-- Firebase & Chart.js -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="firebase-init.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -34,12 +34,6 @@
       color: white;
       border: none;
       cursor: pointer;
-    }
-    canvas {
-      margin-top: 2em;
-      background: white;
-      border-radius: 10px;
-      padding: 1em;
     }
     table {
       width: 100%;
@@ -84,7 +78,7 @@
   <button id="exportBtn">📄 Export Mood Log</button>
 
   <h3 id="weeklySummary"></h3>
-  
+
   <table>
     <thead><tr><th>Date & Time</th><th>Mood</th><th>Note</th></tr></thead>
     <tbody id="moodLogTable"></tbody>
@@ -93,14 +87,41 @@
   <button onclick="window.location.href='index.html'" class="back-button">← Back to Home</button>
 
   <script>
-// Chart removed
-        let moodData = [];
+    let moodData = [];
+    let currentUser;
 
     firebase.auth().onAuthStateChanged(user => {
       if (!user) return window.location.href = "login.html";
       currentUser = user;
-      
+      subscribeToMoods();
     });
+
+    function subscribeToMoods() {
+      firebase.firestore().collection("moods")
+        .where("uid", "==", currentUser.uid)
+        .orderBy("date", "desc")
+        .limit(7)
+        .onSnapshot(snapshot => {
+          const logRows = [];
+          moodData = [];
+
+          snapshot.forEach(doc => {
+            const mood = doc.data();
+            const time = mood.timestamp?.seconds
+              ? new Date(mood.timestamp.seconds * 1000).toLocaleTimeString()
+              : '';
+            moodData.push(mood);
+            logRows.push(`<tr>
+              <td>${mood.date} ${time}</td>
+              <td>${getEmoji(mood.rating)} (${mood.rating})</td>
+              <td>${mood.note || ""}</td>
+            </tr>`);
+          });
+
+          document.getElementById("moodLogTable").innerHTML = logRows.join("");
+          updateWeeklySummary();
+        });
+    }
 
     function addMood() {
       const rating = parseInt(document.getElementById("moodRating").value);
@@ -109,33 +130,21 @@
 
       if (!rating) return alert("Please select a mood.");
 
-      firebase.firestore().collection("moods")
-        .where("uid", "==", currentUser.uid)
-        .orderBy("date", "desc")
-        .limit(7)
-        .onSnapshot(snapshot => {
-          const labels = [], values = [], logRows = [];
-          moodData = [];
-
-          snapshot.forEach(doc => {
-            const mood = doc.data();
-            labels.unshift(mood.date);
-            values.unshift(mood.rating);
-            moodData.push(mood);
-            logRows.push(`<tr><td>${mood.date} ${new Date(mood.timestamp.seconds * 1000).toLocaleTimeString()}</td><td>${getEmoji(mood.rating)} (${mood.rating})</td><td>${mood.note || ""}</td></tr>`);
-          });
-
-          
-          document.getElementById("moodLogTable").innerHTML = logRows.join("");
-          updateWeeklySummary();
-        });
+      firebase.firestore().collection("moods").add({
+        uid: currentUser.uid,
+        rating,
+        note,
+        date: today,
+        timestamp: new Date()
+      }).then(() => {
+        console.log("Mood logged!");
+        document.getElementById("moodRating").value = "";
+        document.getElementById("moodNote").value = "";
+      }).catch(err => alert("Error logging mood: " + err.message));
     }
 
     function getEmoji(rating) {
       return ["😟", "😕", "😐", "🙂", "😃"][rating - 1] || "";
-    }
-
-    
     }
 
     function updateWeeklySummary() {
@@ -152,7 +161,10 @@
       doc.setFontSize(12);
       let y = 30;
       moodData.forEach(entry => {
-        doc.text(`${entry.date} — ${getEmoji(entry.rating)} (${entry.rating})`, 14, y);
+        const time = entry.timestamp?.seconds
+          ? new Date(entry.timestamp.seconds * 1000).toLocaleTimeString()
+          : '';
+        doc.text(`${entry.date} ${time} — ${getEmoji(entry.rating)} (${entry.rating})`, 14, y);
         if (entry.note) {
           doc.setFontSize(10);
           doc.text(`Note: ${entry.note}`, 18, y + 6);
