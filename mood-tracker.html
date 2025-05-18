@@ -84,8 +84,7 @@
   <button id="exportBtn">📄 Export Mood Log</button>
 
   <h3 id="weeklySummary"></h3>
-  <canvas id="moodChart" height="100"></canvas>
-
+  
   <table>
     <thead><tr><th>Date & Time</th><th>Mood</th><th>Note</th></tr></thead>
     <tbody id="moodLogTable"></tbody>
@@ -94,6 +93,7 @@
   <button onclick="window.location.href='index.html'" class="back-button">← Back to Home</button>
 
   <script>
+// Chart removed
         let moodData = [];
 
     firebase.auth().onAuthStateChanged(user => {
@@ -125,7 +125,7 @@
             logRows.push(`<tr><td>${mood.date} ${new Date(mood.timestamp.seconds * 1000).toLocaleTimeString()}</td><td>${getEmoji(mood.rating)} (${mood.rating})</td><td>${mood.note || ""}</td></tr>`);
           });
 
-          drawChart(labels, values);
+          
           document.getElementById("moodLogTable").innerHTML = logRows.join("");
           updateWeeklySummary();
         });
@@ -135,40 +135,7 @@
       return ["😟", "😕", "😐", "🙂", "😃"][rating - 1] || "";
     }
 
-    function drawChart(labels, values) {
-      const ctx = document.getElementById("moodChart").getContext("2d");
-      if (window.moodChart instanceof Chart) {
-        window.moodChart.destroy();
-      }
-
-      window.moodChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Mood (1–5)',
-            data: values,
-            tension: 0.3,
-            borderWidth: 2,
-            fill: false,
-            pointStyle: 'circle',
-            pointRadius: 6,
-            pointHoverRadius: 8
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              min: 1,
-              max: 5,
-              ticks: {
-                stepSize: 1,
-                callback: val => getEmoji(Math.round(val))
-              }
-            }
-          }
-        }
-      });
+    
     }
 
     function updateWeeklySummary() {
