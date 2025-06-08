@@ -7,70 +7,14 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="assets/icon-192.png" />
   <meta name="theme-color" content="#2c7a7b" />
+  <link rel="stylesheet" href="assets/style.css" />
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="firebase-init.js"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f4f8;
-      margin: 0;
-      text-align: center;
-      padding: 2em;
-    }
-    header {
-      background-color: #2c7a7b;
-      color: white;
-      padding: 1.5em;
-      border-radius: 12px;
-    }
-    .button {
-      display: block;
-      width: 90%;
-      max-width: 300px;
-      margin: 1em auto;
-      padding: 1em;
-      font-size: 1.1em;
-      background-color: #3182ce;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .logout, .profile { background-color: #2c7a7b; }
-    label { display: block; margin-top: 1em; font-size: 0.9em; }
-    body.dark { background-color: #1e1e1e; color: white; }
-    body.dark header { background-color: #1a202c; }
-    body.dark .button { background-color: #4a5568; color: white; }
-    body.dark .logout, body.dark .profile { background-color: #2d3748; }
-
-    #profileModal {
-      position: fixed; top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background: white;
-      padding: 2em;
-      border-radius: 12px;
-      width: 90%; max-width: 400px;
-    }
-    .modal-content input, .modal-content select {
-      width: 100%; padding: 0.75em;
-      margin: 0.5em 0; border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    .modal-content button { margin-top: 1em; }
-    body.dark .modal-content { background: #2d3748; color: white; }
-  </style>
+  <script src="assets/shared.js"></script>
 </head>
 <body>
   <header>
@@ -82,100 +26,377 @@
     </label>
   </header>
 
-  <a class="button" href="mood-tracker.html">Mood Tracker</a>
-  <a class="button" href="goals.html">Health Goals</a>
-  <a class="button" href="medications.html">Medication Tracker</a>
-  <a class="button" href="visits.html">Doctor Visit Log</a>
-  <a class="button" href="blood-pressure.html">🩺 Blood Pressure Tracker</a>
-  <a class="button" href="roll-tracker.html">♿ Wheelchair Tracker</a>
-  <a class="button" href="daily-summary.html">📊 Daily Summary</a>
-  <a class="button" href="export.html">📥 Export My Data</a>
+  <main>
+    <a class="button" href="mood-tracker.html">Mood Tracker</a>
+    <a class="button" href="goals.html">Health Goals</a>
+    <a class="button" href="medications.html">Medication Tracker</a>
+    <a class="button" href="visits.html">Doctor Visit Log</a>
+    <a class="button" href="blood-pressure.html">🩺 Blood Pressure Tracker</a>
+    <a class="button" href="roll-tracker.html">♿ Wheelchair Tracker</a>
+    <a class="button" href="daily-summary.html">📊 Daily Summary</a>
+    <a class="button" href="export.html">📥 Export My Data</a>
 
-  <button class="button profile" onclick="openProfile()">👤 Profile</button>
-  <button class="button logout" onclick="logout()">🔓 Logout</button>
+    <button class="button profile" onclick="modal.show('profileModal')">👤 Profile</button>
+    <button class="button logout" onclick="logout()">🔓 Logout</button>
+  </main>
 
-  <div id="profileModal">
+  <div id="profileModal" class="modal">
     <div class="modal-content">
-      <h2>User Profile</h2>
-      <input type="text" id="profileName" placeholder="Full Name" />
-      <input type="number" id="profileAge" placeholder="Age" />
-      <select id="profileGender">
-        <option value="">Select Gender</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-      </select>
-      <input type="number" id="profileWeight" placeholder="Weight (lbs or kg)" />
-      <button onclick="saveProfile()">Save</button>
-      <button onclick="closeProfile()">Close</button>
+      <div class="modal-header">
+        <h2>User Profile</h2>
+        <button class="close-btn" onclick="modal.hide('profileModal')">×</button>
+      </div>
+      
+      <form id="profileForm" onsubmit="saveProfile(event)">
+        <div class="profile-section">
+          <div class="profile-picture">
+            <img id="profileImage" src="assets/default-avatar.png" alt="Profile Picture" />
+            <div class="upload-overlay">
+              <label for="imageUpload" class="upload-btn">
+                <span>📷</span>
+                <span>Change Photo</span>
+              </label>
+              <input type="file" id="imageUpload" accept="image/*" onchange="handleImageUpload(event)" hidden />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="profileName">Full Name</label>
+              <input type="text" id="profileName" placeholder="Enter your full name" required />
+            </div>
+
+            <div class="form-group">
+              <label for="profileEmail">Email</label>
+              <input type="email" id="profileEmail" readonly />
+            </div>
+
+            <div class="form-group">
+              <label for="profileAge">Age</label>
+              <input type="number" id="profileAge" min="1" max="120" placeholder="Enter your age" />
+            </div>
+
+            <div class="form-group">
+              <label for="profileGender">Gender</label>
+              <select id="profileGender">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="profileWeight">Weight</label>
+              <div class="input-with-unit">
+                <input type="number" id="profileWeight" min="1" step="0.1" placeholder="Enter weight" />
+                <select id="weightUnit">
+                  <option value="kg">kg</option>
+                  <option value="lbs">lbs</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="profileHeight">Height</label>
+              <div class="input-with-unit">
+                <input type="number" id="profileHeight" min="1" step="0.1" placeholder="Enter height" />
+                <select id="heightUnit">
+                  <option value="cm">cm</option>
+                  <option value="in">in</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>Health Preferences</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="activityLevel">Activity Level</label>
+              <select id="activityLevel">
+                <option value="sedentary">Sedentary</option>
+                <option value="light">Lightly Active</option>
+                <option value="moderate">Moderately Active</option>
+                <option value="very">Very Active</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="healthGoals">Primary Health Goal</label>
+              <select id="healthGoals">
+                <option value="general">General Health</option>
+                <option value="weight">Weight Management</option>
+                <option value="fitness">Fitness</option>
+                <option value="chronic">Chronic Condition Management</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="reminderPreference">Reminder Preference</label>
+              <select id="reminderPreference">
+                <option value="push">Push Notifications</option>
+                <option value="email">Email</option>
+                <option value="both">Both</option>
+                <option value="none">None</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>Accessibility Settings</h3>
+          <div class="form-grid">
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" id="highContrast" />
+                High Contrast Mode
+              </label>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" id="largeText" />
+                Large Text
+              </label>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" id="screenReader" />
+                Screen Reader Optimized
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>Health Information</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="bloodType">Blood Type</label>
+              <select id="bloodType">
+                <option value="">Select Blood Type</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="emergencyContact">Emergency Contact</label>
+              <input type="text" id="emergencyContact" placeholder="Name" />
+              <input type="tel" id="emergencyPhone" placeholder="Phone Number" class="mt-2" />
+            </div>
+
+            <div class="form-group">
+              <label for="primaryDoctor">Primary Doctor</label>
+              <input type="text" id="primaryDoctor" placeholder="Doctor's Name" />
+              <input type="tel" id="doctorPhone" placeholder="Phone Number" class="mt-2" />
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>Medical Conditions</h4>
+            <div class="tags-input">
+              <div id="conditionsList" class="tags-list"></div>
+              <div class="input-group">
+                <input type="text" id="conditionInput" placeholder="Add condition (press Enter)" />
+                <button type="button" class="add-btn" onclick="addCondition()">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>Allergies</h4>
+            <div class="tags-input">
+              <div id="allergiesList" class="tags-list"></div>
+              <div class="input-group">
+                <input type="text" id="allergyInput" placeholder="Add allergy (press Enter)" />
+                <button type="button" class="add-btn" onclick="addAllergy()">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>Additional Notes</h4>
+            <textarea id="healthNotes" rows="3" placeholder="Any other important health information..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="primary-btn">Save Changes</button>
+          <button type="button" class="secondary-btn" onclick="modal.hide('profileModal')">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
 
   <script>
-    const body = document.body;
-    const toggle = document.getElementById("darkToggle");
-    const profileModal = document.getElementById("profileModal");
-    const profileFields = {
-      name: document.getElementById("profileName"),
-      age: document.getElementById("profileAge"),
-      gender: document.getElementById("profileGender"),
-      weight: document.getElementById("profileWeight")
-    };
-
-    if (localStorage.getItem("darkMode") === "true") {
-      body.classList.add("dark");
-      toggle.checked = true;
-    }
-
-    toggle.addEventListener("change", () => {
-      body.classList.toggle("dark", toggle.checked);
-      localStorage.setItem("darkMode", toggle.checked);
-    });
+    let currentUser;
 
     firebase.auth().onAuthStateChanged(user => {
       if (!user) return (window.location.href = "login.html");
 
       currentUser = user;
-      db.collection("users").doc(user.uid).get().then(doc => {
-        if (doc.exists) {
-          const name = doc.data().name || "friend";
-          document.getElementById("welcome").textContent = `Welcome, ${name}`;
+      firebaseHelpers.getUserProfile(user.uid).then(profile => {
+        if (profile?.name) {
+          document.getElementById("welcome").textContent = `Welcome, ${profile.name}`;
         }
       });
     });
 
-    function openProfile() {
-      profileModal.style.display = "flex";
-      if (currentUser) {
-        db.collection("users").doc(currentUser.uid).get().then(doc => {
-          if (doc.exists) {
-            const d = doc.data();
-            profileFields.name.value = d.name || "";
-            profileFields.age.value = d.age || "";
-            profileFields.gender.value = d.gender || "";
-            profileFields.weight.value = d.weight || "";
-          }
-        });
+    async function saveProfile(event) {
+      event.preventDefault();
+      const spinner = loading.show(event.target);
+
+      try {
+        const profileData = {
+          name: document.getElementById("profileName").value.trim(),
+          email: document.getElementById("profileEmail").value,
+          age: parseInt(document.getElementById("profileAge").value) || null,
+          gender: document.getElementById("profileGender").value,
+          weight: {
+            value: parseFloat(document.getElementById("profileWeight").value) || null,
+            unit: document.getElementById("weightUnit").value
+          },
+          height: {
+            value: parseFloat(document.getElementById("profileHeight").value) || null,
+            unit: document.getElementById("heightUnit").value
+          },
+          preferences: {
+            activityLevel: document.getElementById("activityLevel").value,
+            healthGoal: document.getElementById("healthGoals").value,
+            reminderPreference: document.getElementById("reminderPreference").value
+          },
+          accessibility: {
+            highContrast: document.getElementById("highContrast").checked,
+            largeText: document.getElementById("largeText").checked,
+            screenReader: document.getElementById("screenReader").checked
+          },
+          healthInfo: {
+            bloodType: document.getElementById("bloodType").value,
+            emergencyContact: {
+              name: document.getElementById("emergencyContact").value.trim(),
+              phone: document.getElementById("emergencyPhone").value.trim()
+            },
+            primaryDoctor: {
+              name: document.getElementById("primaryDoctor").value.trim(),
+              phone: document.getElementById("doctorPhone").value.trim()
+            },
+            conditions: Array.from(document.getElementById("conditionsList").children)
+              .map(tag => tag.textContent.trim().replace('×', '')),
+            allergies: Array.from(document.getElementById("allergiesList").children)
+              .map(tag => tag.textContent.trim().replace('×', '')),
+            notes: document.getElementById("healthNotes").value.trim()
+          },
+          updatedAt: new Date()
+        };
+
+        if (!validation.required(profileData.name)) {
+          toast.show("Please enter your full name", "error");
+          return;
+        }
+
+        await firebaseHelpers.saveUserProfile(currentUser.uid, profileData);
+        document.getElementById("welcome").textContent = `Welcome, ${profileData.name}`;
+        modal.hide('profileModal');
+        toast.show("Profile updated successfully!");
+      } catch (error) {
+        toast.show("Error saving profile: " + error.message, "error");
+      } finally {
+        loading.hide(spinner);
       }
     }
 
-    function closeProfile() {
-      profileModal.style.display = "none";
+    async function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        const spinner = loading.show(document.getElementById("profileImage"));
+        const storageRef = firebase.storage().ref();
+        const imageRef = storageRef.child(`profile_images/${currentUser.uid}`);
+        
+        await imageRef.put(file);
+        const imageUrl = await imageRef.getDownloadURL();
+        
+        await firebaseHelpers.saveUserProfile(currentUser.uid, {
+          profileImage: imageUrl
+        });
+        
+        document.getElementById("profileImage").src = imageUrl;
+        toast.show("Profile picture updated successfully!");
+      } catch (error) {
+        toast.show("Error uploading image: " + error.message, "error");
+      } finally {
+        loading.hide(spinner);
+      }
     }
 
-    function saveProfile() {
-      if (!currentUser) return;
-      const name = profileFields.name.value.trim();
-      if (!name) return alert("Please enter your full name.");
+    // Load profile data when modal opens
+    document.getElementById("profileModal").addEventListener("show", async () => {
+      try {
+        const profile = await firebaseHelpers.getUserProfile(currentUser.uid);
+        if (profile) {
+          document.getElementById("profileName").value = profile.name || "";
+          document.getElementById("profileEmail").value = currentUser.email || "";
+          document.getElementById("profileAge").value = profile.age || "";
+          document.getElementById("profileGender").value = profile.gender || "";
+          document.getElementById("profileWeight").value = profile.weight?.value || "";
+          document.getElementById("weightUnit").value = profile.weight?.unit || "kg";
+          document.getElementById("profileHeight").value = profile.height?.value || "";
+          document.getElementById("heightUnit").value = profile.height?.unit || "cm";
+          document.getElementById("activityLevel").value = profile.preferences?.activityLevel || "moderate";
+          document.getElementById("healthGoals").value = profile.preferences?.healthGoal || "general";
+          document.getElementById("reminderPreference").value = profile.preferences?.reminderPreference || "push";
+          document.getElementById("highContrast").checked = profile.accessibility?.highContrast || false;
+          document.getElementById("largeText").checked = profile.accessibility?.largeText || false;
+          document.getElementById("screenReader").checked = profile.accessibility?.screenReader || false;
+          
+          if (profile.profileImage) {
+            document.getElementById("profileImage").src = profile.profileImage;
+          }
 
-      db.collection("users").doc(currentUser.uid).set({
-        name,
-        age: parseInt(profileFields.age.value) || null,
-        gender: profileFields.gender.value,
-        weight: parseFloat(profileFields.weight.value) || null
-      }, { merge: true }).then(() => {
-        alert("✅ Profile updated!");
-        closeProfile();
-        document.getElementById("welcome").textContent = `Welcome, ${name}`;
+          // Load health information
+          if (profile.healthInfo) {
+            document.getElementById("bloodType").value = profile.healthInfo.bloodType || "";
+            document.getElementById("emergencyContact").value = profile.healthInfo.emergencyContact?.name || "";
+            document.getElementById("emergencyPhone").value = profile.healthInfo.emergencyContact?.phone || "";
+            document.getElementById("primaryDoctor").value = profile.healthInfo.primaryDoctor?.name || "";
+            document.getElementById("doctorPhone").value = profile.healthInfo.primaryDoctor?.phone || "";
+            document.getElementById("healthNotes").value = profile.healthInfo.notes || "";
+
+            // Load conditions
+            if (profile.healthInfo.conditions) {
+              profile.healthInfo.conditions.forEach(condition => {
+                addTag('conditionsList', condition);
+              });
+            }
+
+            // Load allergies
+            if (profile.healthInfo.allergies) {
+              profile.healthInfo.allergies.forEach(allergy => {
+                addTag('allergiesList', allergy);
+              });
+            }
+          }
+        }
+      } catch (error) {
+        toast.show("Error loading profile: " + error.message, "error");
+      }
+    });
+
+    function logout() {
+      firebase.auth().signOut().then(() => {
+        window.location.href = "login.html";
       });
     }
 
@@ -184,6 +405,328 @@
         .then(() => console.log('✅ Service Worker Registered'))
         .catch(err => console.error('❌ Service Worker Error:', err));
     }
+
+    function addCondition() {
+      const input = document.getElementById('conditionInput');
+      const value = input.value.trim();
+      if (value) {
+        addTag('conditionsList', value);
+        input.value = '';
+      }
+    }
+
+    function addAllergy() {
+      const input = document.getElementById('allergyInput');
+      const value = input.value.trim();
+      if (value) {
+        addTag('allergiesList', value);
+        input.value = '';
+      }
+    }
+
+    function addTag(containerId, value) {
+      const container = document.getElementById(containerId);
+      const tag = document.createElement('div');
+      tag.className = 'tag';
+      tag.innerHTML = `
+        ${value}
+        <button onclick="this.parentElement.remove()">×</button>
+      `;
+      container.appendChild(tag);
+    }
+
+    // Add event listeners for Enter key
+    document.getElementById('conditionInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addCondition();
+      }
+    });
+
+    document.getElementById('allergyInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addAllergy();
+      }
+    });
   </script>
+
+  <style>
+    /* Profile Modal Styles */
+    .modal-content {
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text);
+      padding: 0.5rem;
+    }
+
+    .profile-section {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .profile-section h3 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .profile-picture {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      margin: 0 auto 2rem;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .profile-picture img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .upload-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 0.5rem;
+      text-align: center;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .profile-picture:hover .upload-overlay {
+      transform: translateY(0);
+    }
+
+    .upload-btn {
+      color: white;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .input-with-unit {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .input-with-unit input {
+      flex: 1;
+    }
+
+    .input-with-unit select {
+      width: 80px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+    }
+
+    .primary-btn {
+      background: var(--primary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .primary-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .secondary-btn {
+      background: var(--border);
+      color: var(--text);
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .secondary-btn:hover {
+      background: var(--text-light);
+      color: var(--white);
+    }
+
+    @media (max-width: 768px) {
+      .modal-content {
+        width: 95%;
+        margin: 1rem;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .form-actions button {
+        width: 100%;
+      }
+    }
+
+    .form-section {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .form-section h4 {
+      color: var(--text);
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .tags-input {
+      margin-bottom: 1rem;
+    }
+
+    .tags-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .tag {
+      background: var(--primary-light);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .tag button {
+      background: none;
+      border: none;
+      color: white;
+      padding: 0;
+      font-size: 1.2rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .add-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0;
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+    }
+
+    .mt-2 {
+      margin-top: 0.5rem;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(44, 122, 123, 0.2);
+    }
+  </style>
 </body>
 </html>

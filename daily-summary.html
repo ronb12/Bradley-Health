@@ -3,256 +3,589 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bradley Health - Daily Summary</title>
-
-  <!-- Firebase + Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>📊 Daily Health Summary - Bradley Health</title>
+  <link rel="stylesheet" href="assets/style.css" />
+  
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="firebase-init.js"></script>
+  <script src="assets/shared.js"></script>
 
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f4f8;
-      margin: 0;
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
     }
-    header {
-      background-color: #2c7a7b;
-      color: white;
-      padding: 1.5em;
-      text-align: center;
+
+    .summary-card {
+      background: var(--white);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      transition: transform var(--transition-normal);
     }
-    .back-button {
-      text-align: center;
-      margin-top: 1em;
+
+    .summary-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
     }
-    .back-button a button {
-      background-color: #2c7a7b;
-      color: white;
-      padding: 0.6em 1.2em;
-      border: none;
-      border-radius: 8px;
-      font-size: 1em;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    main {
-      max-width: 700px;
-      margin: 2em auto;
-      background: white;
-      padding: 2em;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .card {
-      background: #edf2f7;
-      border-left: 5px solid #2c7a7b;
-      padding: 1em;
-      margin-bottom: 1.5em;
-      border-radius: 8px;
-    }
-    canvas {
-      margin-top: 2em;
-      background: #fff;
-      border-radius: 8px;
-    }
-    #goalProgress {
-      background: #e2e8f0;
-      border-radius: 8px;
-      overflow: hidden;
-      height: 25px;
-      margin-top: 1em;
-    }
-    #goalBar {
-      height: 100%;
-      width: 0%;
-      background-color: #2c7a7b;
-      text-align: center;
-      color: white;
+
+    .metric-value {
+      font-size: 2em;
       font-weight: bold;
-      line-height: 25px;
+      color: var(--primary);
+      margin: var(--spacing-sm) 0;
+    }
+
+    .metric-label {
+      color: var(--text-light);
+      font-size: 0.9em;
+    }
+
+    .trend-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      font-size: 0.9em;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      margin-left: var(--spacing-sm);
+    }
+
+    .trend-up {
+      background: rgba(56, 161, 105, 0.1);
+      color: var(--success);
+    }
+
+    .trend-down {
+      background: rgba(229, 62, 62, 0.1);
+      color: var(--error);
+    }
+
+    .chart-container {
+      background: var(--white);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .recommendations {
+      background: var(--white);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .recommendation-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-sm);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .recommendation-item:last-child {
+      border-bottom: none;
+    }
+
+    .recommendation-icon {
+      font-size: 1.5em;
+      color: var(--primary);
+    }
+
+    .goal-progress {
+      background: var(--white);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--background);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin: var(--spacing-sm) 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width var(--transition-normal);
+    }
+
+    .goal-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-sm);
+    }
+
+    .goal-stat {
+      text-align: center;
+      padding: var(--spacing-sm);
+      background: var(--background);
+      border-radius: var(--radius-sm);
+    }
+
+    .goal-stat-value {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: var(--primary);
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Bradley Health</h1>
-    <p>Daily Summary</p>
+    <h1>📊 Daily Health Summary</h1>
+    <button class="back-button" onclick="window.location.href='index.html'">← Back to Home</button>
   </header>
 
-  <!-- Back to Home Button -->
-  <div class="back-button">
-    <a href="index.html">
-      <button>← Back to Home</button>
-    </a>
-  </div>
-
   <main>
-    <div class="card" id="bpCard">Loading latest BP reading...</div>
-    <div class="card" id="rollCard">Loading distance rolled today...</div>
-    <div class="card" id="caloriesCard">Loading calories burned today...</div>
+    <section class="summary-grid">
+      <div class="summary-card">
+        <h3>Blood Pressure</h3>
+        <div id="bpSummary">Loading...</div>
+      </div>
+      <div class="summary-card">
+        <h3>Activity</h3>
+        <div id="activitySummary">Loading...</div>
+      </div>
+      <div class="summary-card">
+        <h3>Mood</h3>
+        <div id="moodSummary">Loading...</div>
+      </div>
+      <div class="summary-card">
+        <h3>Medications</h3>
+        <div id="medsSummary">Loading...</div>
+      </div>
+    </section>
 
-    <h3>7-Day Health Trends</h3>
-    <canvas id="summaryChart" height="120"></canvas>
+    <section class="chart-container">
+      <h2>7-Day Health Trends</h2>
+      <canvas id="trendsChart"></canvas>
+    </section>
 
-    <h3 style="margin-top: 2em;">Weekly Goal Completion</h3>
-    <div id="goalProgress">
-      <div id="goalBar">0%</div>
-    </div>
+    <section class="goal-progress">
+      <h2>Weekly Goals Progress</h2>
+      <div class="progress-bar">
+        <div id="goalProgressBar" class="progress-fill" style="width: 0%"></div>
+      </div>
+      <div class="goal-stats">
+        <div class="goal-stat">
+          <div class="goal-stat-value" id="bpGoal">0/7</div>
+          <div class="goal-label">BP Readings</div>
+        </div>
+        <div class="goal-stat">
+          <div class="goal-stat-value" id="activityGoal">0/7</div>
+          <div class="goal-label">Activity Days</div>
+        </div>
+        <div class="goal-stat">
+          <div class="goal-stat-value" id="moodGoal">0/7</div>
+          <div class="goal-label">Mood Logs</div>
+        </div>
+        <div class="goal-stat">
+          <div class="goal-stat-value" id="medsGoal">0/7</div>
+          <div class="goal-label">Medication Adherence</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="recommendations">
+      <h2>Personalized Recommendations</h2>
+      <div id="recommendationsList">
+        <div class="recommendation-item">
+          <span class="recommendation-icon">📊</span>
+          <div>
+            <h4>Loading recommendations...</h4>
+            <p>Please wait while we analyze your health data.</p>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script>
+    let currentUser = null;
+    let healthData = {
+      bloodPressure: [],
+      activity: [],
+      mood: [],
+      medications: []
+    };
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        currentUser = user;
+        loadSummary();
+      }
+    });
+
     async function loadSummary() {
-      if (!currentUser) return;
-
-      const uid = currentUser.uid;
       const today = new Date().toISOString().split('T')[0];
+      const weekStart = new Date();
+      weekStart.setDate(weekStart.getDate() - 6);
+      const weekStartStr = weekStart.toISOString().split('T')[0];
 
       try {
-        const bpSnap = await db.collection("bpReadings")
-          .where("uid", "==", uid)
-          .where("date", "==", today)
-          .orderBy("timestamp", "desc")
-          .limit(1)
-          .get();
+        // Load today's data
+        await Promise.all([
+          loadBPSummary(today),
+          loadActivitySummary(today),
+          loadMoodSummary(today),
+          loadMedsSummary(today)
+        ]);
 
-        if (!bpSnap.empty) {
-          const d = bpSnap.docs[0].data();
-          const status = getStatus(d.systolic, d.diastolic);
-          const tip = getTips(status);
-          document.getElementById("bpCard").innerHTML =
-            `<strong>Latest BP:</strong> ${d.systolic}/${d.diastolic} - <strong>Status:</strong> ${status}<br><em>${tip}</em>`;
-        } else {
-          document.getElementById("bpCard").innerHTML = "No BP data found for today.";
-        }
-      } catch (err) {
-        document.getElementById("bpCard").innerHTML = "Error loading BP data.";
-        console.error(err);
-      }
+        // Load weekly data for trends
+        await Promise.all([
+          loadWeeklyBP(weekStartStr),
+          loadWeeklyActivity(weekStartStr),
+          loadWeeklyMood(weekStartStr),
+          loadWeeklyMeds(weekStartStr)
+        ]);
 
-      try {
-        const rollSnap = await db.collection("rollDistances")
-          .where("uid", "==", uid)
-          .where("date", "==", today)
-          .get();
-
-        let totalRoll = 0;
-        rollSnap.forEach(doc => totalRoll += parseFloat(doc.data().distance || 0));
-        document.getElementById("rollCard").innerHTML = `<strong>Distance Rolled Today:</strong> ${totalRoll.toFixed(2)} m`;
-
-        const MET = 2.5, weight = 80;
-        const hours = totalRoll > 0 ? (totalRoll / 1000) / 3.2 : 0;
-        const cals = MET * weight * hours;
-        document.getElementById("caloriesCard").innerHTML = `<strong>Calories Burned:</strong> ${cals.toFixed(1)} kcal`;
-      } catch (err) {
-        document.getElementById("rollCard").innerHTML = "Error loading roll data.";
-        document.getElementById("caloriesCard").innerHTML = "Error calculating calories.";
-        console.error(err);
-      }
-
-      try {
-        const days = [], bpTrend = [], rollTrend = [];
-        let goalHits = 0;
-
-        for (let i = 6; i >= 0; i--) {
-          const date = new Date();
-          date.setDate(date.getDate() - i);
-          const dayStr = date.toISOString().split('T')[0];
-          days.push(dayStr);
-
-          const bpDay = await db.collection("bpReadings")
-            .where("uid", "==", uid)
-            .where("date", "==", dayStr)
-            .orderBy("timestamp", "desc")
-            .limit(1)
-            .get();
-          const hasBP = !bpDay.empty;
-          bpTrend.push(hasBP ? bpDay.docs[0].data().systolic : null);
-
-          const rollDay = await db.collection("rollDistances")
-            .where("uid", "==", uid)
-            .where("date", "==", dayStr)
-            .get();
-          let rollTotal = 0;
-          rollDay.forEach(doc => rollTotal += parseFloat(doc.data().distance || 0));
-          rollTrend.push(rollTotal || null);
-
-          if (hasBP && rollTotal > 0) goalHits++;
-        }
-
-        const canvas = document.getElementById("summaryChart");
-        if (canvas) {
-          const ctx = canvas.getContext("2d");
-          new Chart(ctx, {
-            type: "line",
-            data: {
-              labels: days,
-              datasets: [
-                {
-                  label: "Systolic BP",
-                  data: bpTrend,
-                  borderColor: "red",
-                  fill: false
-                },
-                {
-                  label: "Distance Rolled (m)",
-                  data: rollTrend,
-                  borderColor: "blue",
-                  fill: false
-                }
-              ]
-            },
-            options: {
-              responsive: true,
-              plugins: {
-                legend: { position: "bottom" }
-              }
-            }
-          });
-        }
-
-        // ✅ Update goal progress bar
-        const percent = Math.round((goalHits / 7) * 100);
-        const bar = document.getElementById("goalBar");
-        bar.style.width = percent + "%";
-        bar.textContent = percent + "%";
-
-      } catch (err) {
-        console.error("Error loading trend data:", err);
+        // Update charts and recommendations
+        updateTrendsChart();
+        updateGoalProgress();
+        generateRecommendations();
+      } catch (error) {
+        toast.show("Error loading summary: " + error.message, "error");
       }
     }
 
-    function getStatus(s, d) {
-      if (s >= 180 || d >= 120) return "Crisis";
-      if (s >= 140 || d >= 90) return "Stage2";
-      if (s >= 130 || d >= 80) return "Stage1";
-      if (s >= 120 && d < 80) return "Elevated";
+    async function loadBPSummary(date) {
+      const snapshot = await db.collection("bloodPressure")
+        .where("uid", "==", currentUser.uid)
+        .where("date", "==", date)
+        .orderBy("timestamp", "desc")
+        .get();
+
+      const element = document.getElementById("bpSummary");
+      if (snapshot.empty) {
+        element.innerHTML = `
+          <div class="metric-value">No readings</div>
+          <div class="metric-label">No blood pressure readings logged today</div>
+        `;
+        return;
+      }
+
+      const latest = snapshot.docs[0].data();
+      const status = getBPStatus(latest.systolic, latest.diastolic);
+      const trend = calculateBPTrend(snapshot.docs);
+
+      element.innerHTML = `
+        <div class="metric-value">${latest.systolic}/${latest.diastolic}</div>
+        <div class="metric-label">
+          ${status}
+          ${trend ? `<span class="trend-indicator ${trend > 0 ? 'trend-up' : 'trend-down'}">
+            ${trend > 0 ? '↑' : '↓'} ${Math.abs(trend)}%
+          </span>` : ''}
+        </div>
+      `;
+    }
+
+    async function loadActivitySummary(date) {
+      const snapshot = await db.collection("activity")
+        .where("uid", "==", currentUser.uid)
+        .where("date", "==", date)
+        .get();
+
+      const element = document.getElementById("activitySummary");
+      if (snapshot.empty) {
+        element.innerHTML = `
+          <div class="metric-value">0 m</div>
+          <div class="metric-label">No activity logged today</div>
+        `;
+        return;
+      }
+
+      const totalDistance = snapshot.docs.reduce((sum, doc) => sum + doc.data().distance, 0);
+      const calories = calculateCalories(totalDistance);
+      const trend = calculateActivityTrend(snapshot.docs);
+
+      element.innerHTML = `
+        <div class="metric-value">${(totalDistance / 1000).toFixed(1)} km</div>
+        <div class="metric-label">
+          ${calories.toFixed(0)} calories burned
+          ${trend ? `<span class="trend-indicator ${trend > 0 ? 'trend-up' : 'trend-down'}">
+            ${trend > 0 ? '↑' : '↓'} ${Math.abs(trend)}%
+          </span>` : ''}
+        </div>
+      `;
+    }
+
+    async function loadMoodSummary(date) {
+      const snapshot = await db.collection("moods")
+        .where("uid", "==", currentUser.uid)
+        .where("date", "==", date)
+        .orderBy("timestamp", "desc")
+        .get();
+
+      const element = document.getElementById("moodSummary");
+      if (snapshot.empty) {
+        element.innerHTML = `
+          <div class="metric-value">-</div>
+          <div class="metric-label">No mood logged today</div>
+        `;
+        return;
+      }
+
+      const latest = snapshot.docs[0].data();
+      const avgRating = snapshot.docs.reduce((sum, doc) => sum + doc.data().rating, 0) / snapshot.docs.length;
+      const trend = calculateMoodTrend(snapshot.docs);
+
+      element.innerHTML = `
+        <div class="metric-value">${getMoodEmoji(Math.round(avgRating))}</div>
+        <div class="metric-label">
+          Average: ${avgRating.toFixed(1)}/5
+          ${trend ? `<span class="trend-indicator ${trend > 0 ? 'trend-up' : 'trend-down'}">
+            ${trend > 0 ? '↑' : '↓'} ${Math.abs(trend)}%
+          </span>` : ''}
+        </div>
+      `;
+    }
+
+    async function loadMedsSummary(date) {
+      const snapshot = await db.collection("medications")
+        .where("uid", "==", currentUser.uid)
+        .where("date", "==", date)
+        .get();
+
+      const element = document.getElementById("medsSummary");
+      if (snapshot.empty) {
+        element.innerHTML = `
+          <div class="metric-value">0%</div>
+          <div class="metric-label">No medications scheduled today</div>
+        `;
+        return;
+      }
+
+      const total = snapshot.docs.length;
+      const taken = snapshot.docs.filter(doc => doc.data().taken).length;
+      const adherence = (taken / total) * 100;
+      const trend = calculateMedsTrend(snapshot.docs);
+
+      element.innerHTML = `
+        <div class="metric-value">${adherence.toFixed(0)}%</div>
+        <div class="metric-label">
+          ${taken}/${total} medications taken
+          ${trend ? `<span class="trend-indicator ${trend > 0 ? 'trend-up' : 'trend-down'}">
+            ${trend > 0 ? '↑' : '↓'} ${Math.abs(trend)}%
+          </span>` : ''}
+        </div>
+      `;
+    }
+
+    function updateTrendsChart() {
+      const ctx = document.getElementById('trendsChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: healthData.bloodPressure.map(d => formatDate(d.date)),
+          datasets: [
+            {
+              label: 'Systolic BP',
+              data: healthData.bloodPressure.map(d => d.systolic),
+              borderColor: '#e53e3e',
+              tension: 0.4
+            },
+            {
+              label: 'Diastolic BP',
+              data: healthData.bloodPressure.map(d => d.diastolic),
+              borderColor: '#dd6b20',
+              tension: 0.4
+            },
+            {
+              label: 'Activity (km)',
+              data: healthData.activity.map(d => d.distance / 1000),
+              borderColor: '#2c7a7b',
+              tension: 0.4
+            },
+            {
+              label: 'Mood Rating',
+              data: healthData.mood.map(d => d.rating),
+              borderColor: '#4299e1',
+              tension: 0.4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          },
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    function updateGoalProgress() {
+      const goals = {
+        bp: healthData.bloodPressure.filter(d => d.date >= weekStartStr).length,
+        activity: healthData.activity.filter(d => d.date >= weekStartStr).length,
+        mood: healthData.mood.filter(d => d.date >= weekStartStr).length,
+        meds: healthData.medications.filter(d => d.date >= weekStartStr && d.taken).length
+      };
+
+      const totalProgress = (goals.bp + goals.activity + goals.mood + goals.meds) / 28 * 100;
+      document.getElementById('goalProgressBar').style.width = `${totalProgress}%`;
+
+      document.getElementById('bpGoal').textContent = `${goals.bp}/7`;
+      document.getElementById('activityGoal').textContent = `${goals.activity}/7`;
+      document.getElementById('moodGoal').textContent = `${goals.mood}/7`;
+      document.getElementById('medsGoal').textContent = `${goals.meds}/7`;
+    }
+
+    function generateRecommendations() {
+      const recommendations = [];
+      const latestBP = healthData.bloodPressure[0];
+      const latestActivity = healthData.activity[0];
+      const latestMood = healthData.mood[0];
+      const latestMeds = healthData.medications[0];
+
+      // BP recommendations
+      if (latestBP) {
+        if (latestBP.systolic > 140 || latestBP.diastolic > 90) {
+          recommendations.push({
+            icon: '🩺',
+            title: 'High Blood Pressure',
+            text: 'Consider reducing salt intake and scheduling a doctor visit.'
+          });
+        }
+      }
+
+      // Activity recommendations
+      if (latestActivity) {
+        const avgDistance = healthData.activity.reduce((sum, a) => sum + a.distance, 0) / healthData.activity.length;
+        if (latestActivity.distance < avgDistance * 0.7) {
+          recommendations.push({
+            icon: '♿',
+            title: 'Low Activity Level',
+            text: 'Try to increase your activity level to maintain mobility.'
+          });
+        }
+      }
+
+      // Mood recommendations
+      if (latestMood) {
+        if (latestMood.rating < 3) {
+          recommendations.push({
+            icon: '😊',
+            title: 'Low Mood',
+            text: 'Consider activities that usually improve your mood.'
+          });
+        }
+      }
+
+      // Medication recommendations
+      if (latestMeds) {
+        const adherence = healthData.medications.filter(m => m.taken).length / healthData.medications.length;
+        if (adherence < 0.8) {
+          recommendations.push({
+            icon: '💊',
+            title: 'Medication Adherence',
+            text: 'Try to improve medication adherence for better health outcomes.'
+          });
+        }
+      }
+
+      // Update recommendations list
+      const container = document.getElementById('recommendationsList');
+      if (recommendations.length === 0) {
+        container.innerHTML = `
+          <div class="recommendation-item">
+            <span class="recommendation-icon">✅</span>
+            <div>
+              <h4>All Good!</h4>
+              <p>Your health metrics are within normal ranges. Keep up the good work!</p>
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = recommendations.map(rec => `
+          <div class="recommendation-item">
+            <span class="recommendation-icon">${rec.icon}</span>
+            <div>
+              <h4>${rec.title}</h4>
+              <p>${rec.text}</p>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // Helper functions
+    function getBPStatus(systolic, diastolic) {
+      if (systolic >= 180 || diastolic >= 120) return "Crisis";
+      if (systolic >= 140 || diastolic >= 90) return "Stage 2";
+      if (systolic >= 130 || diastolic >= 80) return "Stage 1";
+      if (systolic >= 120 && diastolic < 80) return "Elevated";
       return "Normal";
     }
 
-    function getTips(status) {
-      const tips = {
-        Normal: ["Keep up the healthy lifestyle!"],
-        Elevated: ["Consider reducing salt intake and increasing activity."],
-        Stage1: ["Monitor regularly and consider seeing a provider."],
-        Stage2: ["High BP detected — consult a doctor."],
-        Crisis: ["Immediate medical attention is needed!"]
-      };
-      return tips[status][0];
+    function getMoodEmoji(rating) {
+      const emojis = ['😟', '😕', '😐', '🙂', '😃'];
+      return emojis[Math.min(Math.max(rating - 1, 0), 4)];
     }
 
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        currentUser = user; // From firebase-init.js
-        loadSummary();
-      } else {
-        auth.signInAnonymously().catch(err =>
-          console.error("❌ Anonymous auth failed:", err.message)
-        );
-      }
-    });
+    function calculateCalories(distance) {
+      const MET = 2.5;
+      const weight = 80; // kg
+      const hours = distance / 1000 / 3.2; // Assuming average speed of 3.2 km/h
+      return MET * weight * hours;
+    }
+
+    function formatDate(dateStr) {
+      return new Date(dateStr).toLocaleDateString(undefined, { weekday: 'short' });
+    }
+
+    // Trend calculation functions
+    function calculateBPTrend(docs) {
+      if (docs.length < 2) return null;
+      const first = docs[docs.length - 1].data().systolic;
+      const last = docs[0].data().systolic;
+      return ((last - first) / first) * 100;
+    }
+
+    function calculateActivityTrend(docs) {
+      if (docs.length < 2) return null;
+      const first = docs[docs.length - 1].data().distance;
+      const last = docs[0].data().distance;
+      return ((last - first) / first) * 100;
+    }
+
+    function calculateMoodTrend(docs) {
+      if (docs.length < 2) return null;
+      const first = docs[docs.length - 1].data().rating;
+      const last = docs[0].data().rating;
+      return ((last - first) / first) * 100;
+    }
+
+    function calculateMedsTrend(docs) {
+      if (docs.length < 2) return null;
+      const first = docs[docs.length - 1].data().taken;
+      const last = docs[0].data().taken;
+      return ((last - first) / first) * 100;
+    }
   </script>
 </body>
 </html>

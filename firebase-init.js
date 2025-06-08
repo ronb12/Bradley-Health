@@ -8,29 +8,55 @@ const firebaseConfig = {
   appId: "1:294249919277:web:exampleappid"
 };
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
+// Wait for Firebase SDKs to load
+function initializeFirebase() {
+  if (typeof firebase === 'undefined') {
+    console.error('Firebase SDKs not loaded. Retrying in 1 second...');
+    setTimeout(initializeFirebase, 1000);
+    return;
+  }
+
+  if (!firebase.apps.length) {
+    try {
+      firebase.initializeApp(firebaseConfig);
+      console.log('✅ Firebase initialized successfully');
+    } catch (error) {
+      console.error('❌ Firebase initialization error:', error);
+    }
+  }
+
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  let currentUser = null;
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      currentUser = user;
+      console.log(user.isAnonymous ? "✅ Anonymous session" : "✅ Signed in:", user.email || user.uid);
+    } else {
+      console.warn("⚠️ No user session. Awaiting login...");
+    }
+  });
+
+  // Make auth and db available globally
+  window.auth = auth;
+  window.db = db;
+  window.currentUser = currentUser;
 }
 
-const auth = firebase.auth();
-const db = firebase.firestore();
-let currentUser = null;
-
-auth.onAuthStateChanged(user => {
-  if (user) {
-    currentUser = user;
-    console.log(user.isAnonymous ? "✅ Anonymous session" : "✅ Signed in:", user.email || user.uid);
-  } else {
-    console.warn("⚠️ No user session. Awaiting login...");
-    // Removed anonymous login fallback
-  }
-});
+// Start initialization
+initializeFirebase();
 
 function loginWithEmail(email, password) {
-  auth.signInWithEmailAndPassword(email, password)
+  if (!window.auth) {
+    console.error('Auth not initialized');
+    return;
+  }
+
+  window.auth.signInWithEmailAndPassword(email, password)
     .then(() => {
       console.log("✅ Email login successful:", email);
-      window.location.href = "dashboard.html"; // Change to your landing page
+      window.location.href = "dashboard.html";
     })
     .catch(err => {
       console.error("❌ Email login failed:", err.message);
@@ -39,8 +65,13 @@ function loginWithEmail(email, password) {
 }
 
 function logout() {
-  auth.signOut().then(() => {
+  if (!window.auth) {
+    console.error('Auth not initialized');
+    return;
+  }
+
+  window.auth.signOut().then(() => {
     console.log("🔓 Logged out");
-    window.location.href = "login.html"; // Optional: redirect to login page
+    window.location.href = "login.html";
   });
 }

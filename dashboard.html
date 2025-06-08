@@ -5,18 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bradley Health Dashboard</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" sizes="192x192" href="icon-192-final.png" />
-  <link rel="apple-touch-icon" sizes="512x512" href="icon-512-final.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="assets/icon-512.png" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="stylesheet" href="assets/style.css" />
 
-  <!-- Firebase -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="firebase-init.js"></script>
+  <script src="assets/shared.js"></script>
 
   <style>
     body {
@@ -101,107 +102,295 @@
   </style>
 </head>
 <body>
-  <header id="dashboardHeader">
+  <header>
     <h1>Bradley Health</h1>
     <p id="welcomeText">Welcome to your dashboard</p>
-    <label style="font-size: 0.9em;">
-      🌙 Dark Mode:
-      <input type="checkbox" id="darkToggle" />
-    </label>
+    <div class="header-controls">
+      <label>
+        🌙 Dark Mode:
+        <input type="checkbox" id="darkToggle" aria-label="Toggle dark mode" />
+      </label>
+      <button onclick="modal.show('settingsModal')" class="settings-btn" aria-label="Open settings">
+        ⚙️ Settings
+      </button>
+    </div>
   </header>
 
   <main>
-    <a class="tool-link" href="bp-tracker.html">Blood Pressure Tracker</a>
-    <a class="tool-link" href="roll-tracker.html">Wheelchair Roll Tracker</a>
-    <a class="tool-link" href="wheelchair-pedometer.html">Wheelchair Pedometer</a>
-    <a class="tool-link" href="mood-tracker.html">Mood Tracker</a>
-    <a class="tool-link" href="goals.html">Health Goals</a>
-    <a class="tool-link" href="medications.html">Medication Tracker</a>
-    <a class="tool-link" href="visits.html">Doctor Visit Log</a>
-    <a class="tool-link" href="daily-summary.html">📊 Daily Summary</a>
-    <a class="tool-link" href="export.html">📥 Export My Data</a>
+    <section class="quick-stats">
+      <h2>Today's Overview</h2>
+      <div class="stats-grid">
+        <div class="stat-card" id="moodStat">
+          <h3>Current Mood</h3>
+          <p>Loading...</p>
+        </div>
+        <div class="stat-card" id="bpStat">
+          <h3>Blood Pressure</h3>
+          <p>Loading...</p>
+        </div>
+        <div class="stat-card" id="medsStat">
+          <h3>Medications</h3>
+          <p>Loading...</p>
+        </div>
+        <div class="stat-card" id="activityStat">
+          <h3>Activity</h3>
+          <p>Loading...</p>
+        </div>
+      </div>
+    </section>
 
-    <button onclick="openProfile()">👤 Profile</button>
-    <button onclick="logout()">🔓 Logout</button>
+    <section class="quick-actions">
+      <h2>Quick Actions</h2>
+      <div class="action-grid">
+        <a href="mood-tracker.html" class="action-card">
+          <span class="emoji">😊</span>
+          <span class="label">Log Mood</span>
+        </a>
+        <a href="blood-pressure.html" class="action-card">
+          <span class="emoji">🩺</span>
+          <span class="label">Blood Pressure</span>
+        </a>
+        <a href="medications.html" class="action-card">
+          <span class="emoji">💊</span>
+          <span class="label">Medications</span>
+        </a>
+        <a href="roll-tracker.html" class="action-card">
+          <span class="emoji">♿</span>
+          <span class="label">Activity</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="recent-activity">
+      <h2>Recent Activity</h2>
+      <div id="activityFeed" class="activity-feed">
+        <p>Loading recent activity...</p>
+      </div>
+    </section>
   </main>
 
-  <div id="profileModal">
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal">
     <div class="modal-content">
-      <h2>User Profile</h2>
-      <input type="text" id="profileName" placeholder="Full Name" />
-      <input type="number" id="profileAge" placeholder="Age" />
-      <select id="profileGender">
-        <option value="">Select Gender</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-      </select>
-      <input type="number" id="profileWeight" placeholder="Weight (lbs or kg)" />
-      <button onclick="closeProfile()">Close</button>
+      <h2>Settings</h2>
+      <form id="settingsForm" onsubmit="saveSettings(event)">
+        <div class="form-group">
+          <label for="notificationToggle">Enable Notifications</label>
+          <input type="checkbox" id="notificationToggle" />
+        </div>
+        <div class="form-group">
+          <label for="reminderTime">Daily Reminder Time</label>
+          <input type="time" id="reminderTime" />
+        </div>
+        <div class="form-group">
+          <label for="units">Preferred Units</label>
+          <select id="units">
+            <option value="metric">Metric (kg, cm)</option>
+            <option value="imperial">Imperial (lbs, in)</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="submit">Save Settings</button>
+          <button type="button" onclick="modal.hide('settingsModal')">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
 
   <script>
     let currentUser;
-    const modal = document.getElementById("profileModal");
-    const fields = {
-      name: document.getElementById("profileName"),
-      age: document.getElementById("profileAge"),
-      gender: document.getElementById("profileGender"),
-      weight: document.getElementById("profileWeight")
-    };
+    let userSettings = {};
 
-    function openProfile() {
-      modal.style.display = "flex";
-      if (currentUser) {
-        db.collection("users").doc(currentUser.uid).get().then(doc => {
-          if (doc.exists) {
-            const d = doc.data();
-            fields.name.value = d.name || "";
-            fields.age.value = d.age || "";
-            fields.gender.value = d.gender || "";
-            fields.weight.value = d.weight || "";
-          }
-        });
-      }
-    }
-
-    function closeProfile() {
-      modal.style.display = "none";
-    }
-
-    function saveProfile() {
-      if (!currentUser) return;
-      db.collection("users").doc(currentUser.uid).set({
-        name: fields.name.value,
-        age: fields.age.value,
-        gender: fields.gender.value,
-        weight: fields.weight.value
-      }, { merge: true });
-    }
-
-    for (const key in fields) {
-      fields[key].addEventListener("change", saveProfile);
-    }
-
-    function logout() {
-      firebase.auth().signOut().then(() => {
-        window.location.href = "login.html";
-      });
-    }
-
-    // ✅ Auth & greeting
+    // Initialize dashboard
     firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        currentUser = user;
-        db.collection("users").doc(currentUser.uid).get().then(doc => {
-          if (doc.exists && doc.data().name) {
-            document.getElementById("welcomeText").textContent = `Welcome, ${doc.data().name}`;
-          }
-        });
-      } else {
-        window.location.href = "login.html";
-      }
+      if (!user) return window.location.href = "login.html";
+      currentUser = user;
+      initializeDashboard();
     });
+
+    async function initializeDashboard() {
+      try {
+        // Load user profile
+        const profile = await firebaseHelpers.getUserProfile(currentUser.uid);
+        if (profile?.name) {
+          document.getElementById("welcomeText").textContent = `Welcome, ${profile.name}`;
+        }
+
+        // Load user settings
+        const settingsDoc = await db.collection("settings").doc(currentUser.uid).get();
+        if (settingsDoc.exists) {
+          userSettings = settingsDoc.data();
+          updateSettingsUI();
+        }
+
+        // Load quick stats
+        await Promise.all([
+          loadMoodStat(),
+          loadBPStat(),
+          loadMedsStat(),
+          loadActivityStat()
+        ]);
+
+        // Load recent activity
+        loadRecentActivity();
+      } catch (error) {
+        toast.show("Error loading dashboard: " + error.message, "error");
+      }
+    }
+
+    async function loadMoodStat() {
+      const today = new Date().toISOString().split('T')[0];
+      const moodDoc = await db.collection("moods")
+        .where("uid", "==", currentUser.uid)
+        .where("date", "==", today)
+        .orderBy("timestamp", "desc")
+        .limit(1)
+        .get();
+
+      const statElement = document.getElementById("moodStat").querySelector("p");
+      if (!moodDoc.empty) {
+        const mood = moodDoc.docs[0].data();
+        statElement.textContent = `${getEmoji(mood.rating)} (${mood.rating}/5)`;
+      } else {
+        statElement.textContent = "Not logged today";
+      }
+    }
+
+    async function loadBPStat() {
+      const today = new Date().toISOString().split('T')[0];
+      const bpDoc = await db.collection("bloodPressure")
+        .where("uid", "==", currentUser.uid)
+        .where("date", "==", today)
+        .orderBy("timestamp", "desc")
+        .limit(1)
+        .get();
+
+      const statElement = document.getElementById("bpStat").querySelector("p");
+      if (!bpDoc.empty) {
+        const bp = bpDoc.docs[0].data();
+        statElement.textContent = `${bp.systolic}/${bp.diastolic}`;
+      } else {
+        statElement.textContent = "Not logged today";
+      }
+    }
+
+    async function loadMedsStat() {
+      const today = new Date().toISOString().split('T')[0];
+      const medsDoc = await db.collection("medications")
+        .where("uid", "==", currentUser.uid)
+        .where("date", "==", today)
+        .get();
+
+      const statElement = document.getElementById("medsStat").querySelector("p");
+      if (!medsDoc.empty) {
+        const taken = medsDoc.docs.filter(doc => doc.data().taken).length;
+        const total = medsDoc.docs.length;
+        statElement.textContent = `${taken}/${total} taken`;
+      } else {
+        statElement.textContent = "No medications today";
+      }
+    }
+
+    async function loadActivityStat() {
+      const today = new Date().toISOString().split('T')[0];
+      const activityDoc = await db.collection("activity")
+        .where("uid", "==", currentUser.uid)
+        .where("date", "==", today)
+        .get();
+
+      const statElement = document.getElementById("activityStat").querySelector("p");
+      if (!activityDoc.empty) {
+        const totalRolls = activityDoc.docs.reduce((sum, doc) => sum + doc.data().rolls, 0);
+        statElement.textContent = `${totalRolls} rolls today`;
+      } else {
+        statElement.textContent = "No activity logged";
+      }
+    }
+
+    async function loadRecentActivity() {
+      const feedElement = document.getElementById("activityFeed");
+      const spinner = loading.show(feedElement);
+
+      try {
+        const activities = await db.collection("activityLog")
+          .where("uid", "==", currentUser.uid)
+          .orderBy("timestamp", "desc")
+          .limit(5)
+          .get();
+
+        if (activities.empty) {
+          feedElement.innerHTML = "<p>No recent activity</p>";
+          return;
+        }
+
+        const activityList = activities.docs.map(doc => {
+          const activity = doc.data();
+          return `
+            <div class="activity-item">
+              <span class="activity-icon">${getActivityIcon(activity.type)}</span>
+              <span class="activity-text">${activity.description}</span>
+              <span class="activity-time">${formatTime(activity.timestamp)}</span>
+            </div>
+          `;
+        }).join("");
+
+        feedElement.innerHTML = activityList;
+      } catch (error) {
+        feedElement.innerHTML = "<p>Error loading activity</p>";
+        toast.show("Error loading activity: " + error.message, "error");
+      } finally {
+        loading.hide(spinner);
+      }
+    }
+
+    function getActivityIcon(type) {
+      const icons = {
+        mood: "😊",
+        bp: "🩺",
+        meds: "💊",
+        activity: "♿"
+      };
+      return icons[type] || "📝";
+    }
+
+    function formatTime(timestamp) {
+      if (!timestamp?.seconds) return "";
+      const date = new Date(timestamp.seconds * 1000);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function getEmoji(rating) {
+      return ["😟", "😕", "😐", "🙂", "😃"][rating - 1] || "";
+    }
+
+    function updateSettingsUI() {
+      document.getElementById("notificationToggle").checked = userSettings.notifications || false;
+      document.getElementById("reminderTime").value = userSettings.reminderTime || "09:00";
+      document.getElementById("units").value = userSettings.units || "metric";
+    }
+
+    async function saveSettings(event) {
+      event.preventDefault();
+      const spinner = loading.show(event.target);
+
+      try {
+        const settings = {
+          notifications: document.getElementById("notificationToggle").checked,
+          reminderTime: document.getElementById("reminderTime").value,
+          units: document.getElementById("units").value,
+          updatedAt: new Date()
+        };
+
+        await db.collection("settings").doc(currentUser.uid).set(settings, { merge: true });
+        userSettings = settings;
+        modal.hide('settingsModal');
+        toast.show("Settings saved successfully!");
+      } catch (error) {
+        toast.show("Error saving settings: " + error.message, "error");
+      } finally {
+        loading.hide(spinner);
+      }
+    }
 
     // ✅ Dark mode toggle
     const toggle = document.getElementById("darkToggle");

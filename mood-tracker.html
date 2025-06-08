@@ -2,267 +2,932 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>😊 Mood Tracker</title>
-  <link rel="icon" href="data:,">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mood Tracker - Bradley Health</title>
+  <link rel="icon" href="assets/icon-192.png" />
+  <link rel="stylesheet" href="assets/style.css" />
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="firebase-init.js"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: var(--bg, #f0f4f8);
-      color: var(--text, #000);
-      padding: 2em;
-    }
-    h1 { color: #2c7a7b; }
-    select, textarea, button {
-      display: block;
-      width: 100%;
-      margin: 1em 0;
-      padding: 0.8em;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background: #2c7a7b;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    table {
-      width: 100%;
-      margin-top: 1em;
-      border-collapse: collapse;
-    }
-    th, td {
-      padding: 0.75em;
-      border-bottom: 1px solid #ccc;
-      text-align: left;
-    }
-    .back-button {
-      background: #4a5568;
-      margin-top: 2em;
-    }
-    .toggle-dark {
-      position: absolute;
-      top: 1em;
-      right: 1em;
-      padding: 0.5em;
-      border-radius: 6px;
-      background: #ccc;
-      border: none;
-    }
-  </style>
+  <script src="assets/shared.js"></script>
 </head>
 <body>
-  <button id="darkToggle" class="toggle-dark">🌓</button>
-  <h1>😊 Mood Tracker</h1>
+  <header>
+    <h1>😊 Mood Tracker</h1>
+    <button id="darkToggle" class="toggle-dark" aria-label="Toggle dark mode">🌓</button>
+  </header>
 
-  <select id="moodRating">
-    <option value="">Select Mood (1-5)</option>
-    <option value="1">😟 Very Bad</option>
-    <option value="2">😕 Bad</option>
-    <option value="3">😐 Okay</option>
-    <option value="4">🙂 Good</option>
-    <option value="5">😃 Excellent</option>
-  </select>
+  <main>
+    <section class="mood-input">
+      <h2>Log Your Mood</h2>
+      <form id="moodForm" onsubmit="logMood(event)">
+        <div class="mood-rating">
+          <h3>How are you feeling?</h3>
+          <div class="rating-buttons">
+            <button type="button" data-rating="1" onclick="setRating(1)">😟</button>
+            <button type="button" data-rating="2" onclick="setRating(2)">😕</button>
+            <button type="button" data-rating="3" onclick="setRating(3)">😐</button>
+            <button type="button" data-rating="4" onclick="setRating(4)">🙂</button>
+            <button type="button" data-rating="5" onclick="setRating(5)">😃</button>
+          </div>
+          <input type="hidden" id="rating" required />
+        </div>
 
-  <textarea id="moodNote" placeholder="Optional note about today..."></textarea>
-  <button id="logMoodBtn">Log Mood</button>
-  <button id="exportBtn">📄 Export Mood Log</button>
+        <div class="mood-factors">
+          <h3>What's affecting your mood?</h3>
+          <div class="factor-grid">
+            <label class="factor-item">
+              <input type="checkbox" name="factors" value="sleep">
+              <span>Sleep Quality</span>
+            </label>
+            <label class="factor-item">
+              <input type="checkbox" name="factors" value="exercise">
+              <span>Exercise</span>
+            </label>
+            <label class="factor-item">
+              <input type="checkbox" name="factors" value="medication">
+              <span>Medication</span>
+            </label>
+            <label class="factor-item">
+              <input type="checkbox" name="factors" value="pain">
+              <span>Pain Level</span>
+            </label>
+            <label class="factor-item">
+              <input type="checkbox" name="factors" value="social">
+              <span>Social Activity</span>
+            </label>
+            <label class="factor-item">
+              <input type="checkbox" name="factors" value="stress">
+              <span>Stress Level</span>
+            </label>
+            <label class="factor-item">
+              <input type="checkbox" name="factors" value="weather">
+              <span>Weather</span>
+            </label>
+            <label class="factor-item">
+              <input type="checkbox" name="factors" value="diet">
+              <span>Diet</span>
+            </label>
+          </div>
+        </div>
 
-  <div style="margin: 1em 0;">
-    <label for="filterMood">Filter by Mood:</label>
-    <select id="filterMood" onchange="applyMoodFilter()">
-      <option value="">All</option>
-      <option value="1">😟 Very Bad</option>
-      <option value="2">😕 Bad</option>
-      <option value="3">😐 Okay</option>
-      <option value="4">🙂 Good</option>
-      <option value="5">😃 Excellent</option>
-    </select>
-  </div>
+        <div class="mood-triggers">
+          <h3>Mood Triggers</h3>
+          <div class="trigger-grid">
+            <label class="trigger-item">
+              <input type="checkbox" name="triggers" value="anxiety">
+              <span>Anxiety</span>
+            </label>
+            <label class="trigger-item">
+              <input type="checkbox" name="triggers" value="depression">
+              <span>Depression</span>
+            </label>
+            <label class="trigger-item">
+              <input type="checkbox" name="triggers" value="fatigue">
+              <span>Fatigue</span>
+            </label>
+            <label class="trigger-item">
+              <input type="checkbox" name="triggers" value="irritability">
+              <span>Irritability</span>
+            </label>
+          </div>
+        </div>
 
-  <h3 id="weeklySummary"></h3>
+        <div class="medication-correlation">
+          <h3>Medication Status</h3>
+          <div class="medication-grid">
+            <label class="medication-item">
+              <input type="checkbox" name="medications" value="taken">
+              <span>Medications Taken</span>
+            </label>
+            <label class="medication-item">
+              <input type="checkbox" name="medications" value="missed">
+              <span>Medications Missed</span>
+            </label>
+            <label class="medication-item">
+              <input type="checkbox" name="medications" value="side_effects">
+              <span>Side Effects</span>
+            </label>
+          </div>
+        </div>
 
-  <table>
-    <thead><tr><th>Date & Time</th><th>Mood</th><th>Note</th><th>Actions</th></tr></thead>
-    <tbody id="moodLogTable"></tbody>
-  </table>
+        <div class="mood-details">
+          <div class="input-group">
+            <label for="energyLevel">Energy Level (1-10)</label>
+            <input type="range" id="energyLevel" min="1" max="10" value="5" 
+                   oninput="this.nextElementSibling.value = this.value" />
+            <output>5</output>
+          </div>
 
-  <button onclick="window.location.href='index.html'" class="back-button">← Back to Home</button>
+          <div class="input-group">
+            <label for="sleepHours">Hours of Sleep</label>
+            <input type="number" id="sleepHours" min="0" max="24" step="0.5" />
+          </div>
 
-  <!-- Modal Editor -->
-  <div id="editModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-    <div style="background:#fff; padding:2em; border-radius:8px; max-width:400px; width:100%;">
+          <div class="input-group">
+            <label for="moodNote">Notes</label>
+            <textarea id="moodNote" rows="3" 
+                      placeholder="Describe what's affecting your mood today..."
+                      aria-label="Mood notes"></textarea>
+          </div>
+        </div>
+
+        <button type="submit" id="logMoodBtn">Log Mood</button>
+      </form>
+    </section>
+
+    <section class="mood-summary">
+      <h2>Today's Summary</h2>
+      <div id="todaySummary" class="summary-card">
+        <p>Loading today's mood...</p>
+      </div>
+    </section>
+
+    <section class="mood-analysis">
+      <h2>Mood Analysis</h2>
+      <div class="analysis-grid">
+        <div class="analysis-card">
+          <h3>Weekly Trend</h3>
+          <div class="chart-container">
+            <canvas id="weeklyChart"></canvas>
+          </div>
+        </div>
+        <div class="analysis-card">
+          <h3>Factor Impact</h3>
+          <div class="chart-container">
+            <canvas id="factorsChart"></canvas>
+          </div>
+        </div>
+        <div class="analysis-card">
+          <h3>Energy vs Mood</h3>
+          <div class="chart-container">
+            <canvas id="energyChart"></canvas>
+          </div>
+        </div>
+        <div class="analysis-card">
+          <h3>Sleep Impact</h3>
+          <div class="chart-container">
+            <canvas id="sleepChart"></canvas>
+          </div>
+        </div>
+        <div class="analysis-card">
+          <h3>Trigger Analysis</h3>
+          <div class="chart-container">
+            <canvas id="triggersChart"></canvas>
+          </div>
+        </div>
+        <div class="analysis-card">
+          <h3>Medication Impact</h3>
+          <div class="chart-container">
+            <canvas id="medicationChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mood-history">
+      <h2>Mood History</h2>
+      <div class="filter-controls">
+        <label for="dateFilter">Filter by Date:</label>
+        <input type="date" id="dateFilter" onchange="filterMoods()" />
+        <select id="ratingFilter" onchange="filterMoods()">
+          <option value="all">All Ratings</option>
+          <option value="1">😟 (1)</option>
+          <option value="2">😕 (2)</option>
+          <option value="3">😐 (3)</option>
+          <option value="4">🙂 (4)</option>
+          <option value="5">😃 (5)</option>
+        </select>
+      </div>
+      <div id="moodsList" class="moods-list">
+        <p>Loading mood history...</p>
+      </div>
+      <button onclick="exportData()" class="export-btn">📥 Export Data</button>
+    </section>
+
+    <button onclick="window.location.href='index.html'" class="back-button">← Back to Home</button>
+  </main>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
       <h3>Edit Mood Entry</h3>
-      <label>Mood (1–5):</label>
-      <select id="editMoodRating">
-        <option value="1">😟 Very Bad</option>
-        <option value="2">😕 Bad</option>
-        <option value="3">😐 Okay</option>
-        <option value="4">🙂 Good</option>
-        <option value="5">😃 Excellent</option>
-      </select>
-      <label>Note:</label>
-      <textarea id="editMoodNote" rows="4"></textarea>
-      <input type="hidden" id="editMoodId" />
-      <button onclick="saveMoodEdit()">💾 Save</button>
-      <button onclick="closeEditModal()">❌ Cancel</button>
+      <form id="editForm" onsubmit="saveEdit(event)">
+        <div class="mood-rating">
+          <h4>How were you feeling?</h4>
+          <div class="rating-buttons">
+            <button type="button" data-rating="1" onclick="setEditRating(1)">😟</button>
+            <button type="button" data-rating="2" onclick="setEditRating(2)">😕</button>
+            <button type="button" data-rating="3" onclick="setEditRating(3)">😐</button>
+            <button type="button" data-rating="4" onclick="setEditRating(4)">🙂</button>
+            <button type="button" data-rating="5" onclick="setEditRating(5)">😃</button>
+          </div>
+          <input type="hidden" id="editRating" required />
+        </div>
+
+        <div class="mood-factors">
+          <h4>What affected your mood?</h4>
+          <div class="factor-grid">
+            <label class="factor-item">
+              <input type="checkbox" name="editFactors" value="sleep">
+              <span>Sleep Quality</span>
+            </label>
+            <label class="factor-item">
+              <input type="checkbox" name="editFactors" value="exercise">
+              <span>Exercise</span>
+            </label>
+            <label class="factor-item">
+              <input type="checkbox" name="editFactors" value="medication">
+              <span>Medication</span>
+            </label>
+            <label class="factor-item">
+              <input type="checkbox" name="editFactors" value="pain">
+              <span>Pain Level</span>
+            </label>
+            <label class="factor-item">
+              <input type="checkbox" name="editFactors" value="social">
+              <span>Social Activity</span>
+            </label>
+            <label class="factor-item">
+              <input type="checkbox" name="editFactors" value="stress">
+              <span>Stress Level</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="mood-details">
+          <div class="input-group">
+            <label for="editEnergyLevel">Energy Level (1-10)</label>
+            <input type="range" id="editEnergyLevel" min="1" max="10" value="5" 
+                   oninput="this.nextElementSibling.value = this.value" />
+            <output>5</output>
+          </div>
+
+          <div class="input-group">
+            <label for="editSleepHours">Hours of Sleep</label>
+            <input type="number" id="editSleepHours" min="0" max="24" step="0.5" />
+          </div>
+
+          <div class="input-group">
+            <label for="editNote">Notes</label>
+            <textarea id="editNote" rows="3"></textarea>
+          </div>
+        </div>
+
+        <input type="hidden" id="editId" />
+        <div class="form-actions">
+          <button type="submit">Save Changes</button>
+          <button type="button" onclick="modal.hide('editModal')">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
 
   <script>
-    let moodData = [];
+    let currentUser;
+    let moods = [];
+    let currentRating = 0;
+    let currentEditRating = 0;
 
+    // Initialize page
     firebase.auth().onAuthStateChanged(user => {
       if (!user) return window.location.href = "login.html";
       currentUser = user;
-      subscribeToMoods();
+      loadMoods();
     });
 
-    function subscribeToMoods() {
-      firebase.firestore().collection("moods")
-        .where("uid", "==", currentUser.uid)
-        .orderBy("date", "desc")
-        .limit(7)
-        .onSnapshot(snapshot => {
-          const logRows = [];
-          moodData = [];
-
-          snapshot.forEach(doc => {
-            const mood = doc.data();
-            const time = mood.timestamp?.seconds ? new Date(mood.timestamp.seconds * 1000).toLocaleTimeString() : "";
-            moodData.push({ ...mood, id: doc.id });
-            logRows.push(`<tr data-id="${doc.id}">
-              <td>${mood.date} ${time}</td>
-              <td>${getEmoji(mood.rating)} (${mood.rating})</td>
-              <td>${mood.note || ""}</td>
-              <td>
-                <button onclick="editMood('${doc.id}')">✏️</button>
-                <button onclick="deleteMood('${doc.id}')">🗑️</button>
-              </td>
-            </tr>`);
-          });
-
-          document.getElementById("moodLogTable").innerHTML = logRows.join("");
-          updateWeeklySummary();
-          applyMoodFilter();
-        });
+    function setRating(rating) {
+      currentRating = rating;
+      document.getElementById('rating').value = rating;
+      
+      // Update button styles
+      document.querySelectorAll('.rating-buttons button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.rating == rating);
+      });
     }
 
-    function addMood() {
-      const rating = parseInt(document.getElementById("moodRating").value);
-      const note = document.getElementById("moodNote").value.trim();
-      const today = new Date().toISOString().split("T")[0];
+    function setEditRating(rating) {
+      currentEditRating = rating;
+      document.getElementById('editRating').value = rating;
+      
+      // Update button styles
+      document.querySelectorAll('#editForm .rating-buttons button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.rating == rating);
+      });
+    }
 
-      if (!rating) return alert("Please select a mood.");
+    async function loadMoods() {
+      const spinner = loading.show(document.getElementById('moodsList'));
+      
+      try {
+        const snapshot = await db.collection("moods")
+          .where("uid", "==", currentUser.uid)
+          .orderBy("timestamp", "desc")
+          .limit(30)
+          .get();
 
-      firebase.firestore().collection("moods").add({
-        uid: currentUser.uid,
-        rating,
-        note,
-        date: today,
-        timestamp: new Date()
-      }).then(() => {
-        console.log("Mood logged!");
-        document.getElementById("moodRating").value = "";
-        document.getElementById("moodNote").value = "";
-      }).catch(err => alert("Error logging mood: " + err.message));
+        moods = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        updateMoodsList();
+        updateTodaySummary();
+        updateCharts();
+      } catch (error) {
+        toast.show("Error loading moods: " + error.message, "error");
+      } finally {
+        loading.hide(spinner);
+      }
+    }
+
+    function updateMoodsList() {
+      const listElement = document.getElementById("moodsList");
+      if (moods.length === 0) {
+        listElement.innerHTML = "<p>No mood entries found</p>";
+        return;
+      }
+
+      const list = moods.map(mood => `
+        <div class="mood-card">
+          <div class="mood-header">
+            <span class="mood-time">${formatDateTime(mood.timestamp)}</span>
+            <div class="mood-actions">
+              <button onclick="editMood('${mood.id}')" aria-label="Edit mood">✏️</button>
+              <button onclick="deleteMood('${mood.id}')" aria-label="Delete mood">🗑️</button>
+            </div>
+          </div>
+          <div class="mood-content">
+            <div class="mood-rating-display">
+              ${getEmoji(mood.rating)} (${mood.rating}/5)
+            </div>
+            <div class="mood-details">
+              <div class="detail-item">
+                <span class="label">Energy Level:</span>
+                <span class="value">${mood.energyLevel}/10</span>
+              </div>
+              ${mood.sleepHours ? `
+                <div class="detail-item">
+                  <span class="label">Sleep:</span>
+                  <span class="value">${mood.sleepHours} hours</span>
+                </div>
+              ` : ''}
+              ${mood.factors?.length ? `
+                <div class="detail-item">
+                  <span class="label">Factors:</span>
+                  <span class="value">${mood.factors.join(', ')}</span>
+                </div>
+              ` : ''}
+            </div>
+            ${mood.note ? `<div class="mood-note">${mood.note}</div>` : ''}
+          </div>
+        </div>
+      `).join('');
+
+      listElement.innerHTML = list;
+    }
+
+    function updateTodaySummary() {
+      const today = new Date().toISOString().split('T')[0];
+      const todayMoods = moods.filter(m => m.date === today);
+      
+      if (todayMoods.length === 0) {
+        document.getElementById('todaySummary').innerHTML = '<p>No mood entries for today</p>';
+        return;
+      }
+
+      const latest = todayMoods[0];
+      const avgEnergy = todayMoods.reduce((sum, m) => sum + (m.energyLevel || 0), 0) / todayMoods.length;
+      const avgSleep = todayMoods.reduce((sum, m) => sum + (m.sleepHours || 0), 0) / todayMoods.length;
+
+      const summary = `
+        <div class="summary-content">
+          <div class="latest-mood">
+            <h3>Latest Mood</h3>
+            <div class="mood-rating-display large">
+              ${getEmoji(latest.rating)} (${latest.rating}/5)
+            </div>
+          </div>
+          <div class="today-stats">
+            <h3>Today's Stats</h3>
+            <p>Entries: ${todayMoods.length}</p>
+            <p>Average Energy: ${Math.round(avgEnergy * 10) / 10}/10</p>
+            ${avgSleep ? `<p>Average Sleep: ${Math.round(avgSleep * 10) / 10} hours</p>` : ''}
+          </div>
+          ${latest.factors?.length ? `
+            <div class="factors-list">
+              <h3>Factors</h3>
+              <ul>
+                ${latest.factors.map(f => `<li>${f}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+        </div>
+      `;
+
+      document.getElementById('todaySummary').innerHTML = summary;
+    }
+
+    function updateCharts() {
+      updateWeeklyChart();
+      updateFactorsChart();
+      updateEnergyChart();
+      updateSleepChart();
+      updateTriggersChart();
+      updateMedicationChart();
+    }
+
+    function updateWeeklyChart() {
+      const ctx = document.getElementById('weeklyChart').getContext('2d');
+      const data = prepareWeeklyData();
+      
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Mood Rating',
+            data: data.ratings,
+            borderColor: '#4299e1',
+            backgroundColor: 'rgba(66, 153, 225, 0.1)',
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              min: 1,
+              max: 5,
+              ticks: {
+                callback: value => getEmoji(value)
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateFactorsChart() {
+      const ctx = document.getElementById('factorsChart').getContext('2d');
+      const data = analyzeFactors();
+      
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Average Mood with Factor',
+            data: data.ratings,
+            backgroundColor: 'rgba(72, 187, 120, 0.6)'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              min: 1,
+              max: 5,
+              ticks: {
+                callback: value => getEmoji(value)
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateEnergyChart() {
+      const ctx = document.getElementById('energyChart').getContext('2d');
+      const data = analyzeEnergyCorrelation();
+      
+      new Chart(ctx, {
+        type: 'scatter',
+        data: {
+          datasets: [{
+            label: 'Energy vs Mood',
+            data: data,
+            backgroundColor: 'rgba(66, 153, 225, 0.6)'
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Energy Level'
+              },
+              min: 1,
+              max: 10
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Mood Rating'
+              },
+              min: 1,
+              max: 5,
+              ticks: {
+                callback: value => getEmoji(value)
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateSleepChart() {
+      const ctx = document.getElementById('sleepChart').getContext('2d');
+      const data = analyzeSleepImpact();
+      
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Average Mood',
+            data: data.ratings,
+            backgroundColor: 'rgba(246, 173, 85, 0.6)'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              min: 1,
+              max: 5,
+              ticks: {
+                callback: value => getEmoji(value)
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateTriggersChart() {
+      const ctx = document.getElementById('triggersChart').getContext('2d');
+      const data = analyzeTriggers();
+      
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Average Mood with Trigger',
+            data: data.ratings,
+            backgroundColor: 'rgba(237, 100, 166, 0.6)'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              min: 1,
+              max: 5,
+              ticks: {
+                callback: value => getEmoji(value)
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateMedicationChart() {
+      const ctx = document.getElementById('medicationChart').getContext('2d');
+      const data = analyzeMedicationImpact();
+      
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Average Mood',
+            data: data.ratings,
+            backgroundColor: 'rgba(159, 122, 234, 0.6)'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              min: 1,
+              max: 5,
+              ticks: {
+                callback: value => getEmoji(value)
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function prepareWeeklyData() {
+      const now = new Date();
+      const startDate = new Date(now.setDate(now.getDate() - 7));
+      
+      const dailyAverages = {};
+      moods.forEach(mood => {
+        const date = new Date(mood.timestamp);
+        if (date >= startDate) {
+          const dateStr = date.toLocaleDateString();
+          if (!dailyAverages[dateStr]) {
+            dailyAverages[dateStr] = { sum: 0, count: 0 };
+          }
+          dailyAverages[dateStr].sum += mood.rating;
+          dailyAverages[dateStr].count++;
+        }
+      });
+
+      const labels = [];
+      const ratings = [];
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toLocaleDateString();
+        labels.push(dateStr);
+        ratings.push(dailyAverages[dateStr] ? 
+          dailyAverages[dateStr].sum / dailyAverages[dateStr].count : null);
+      }
+
+      return { labels, ratings };
+    }
+
+    function analyzeFactors() {
+      const factors = ['sleep', 'exercise', 'medication', 'pain', 'social', 'stress'];
+      const factorData = {};
+
+      factors.forEach(factor => {
+        const moodsWithFactor = moods.filter(m => m.factors?.includes(factor));
+        if (moodsWithFactor.length > 0) {
+          factorData[factor] = moodsWithFactor.reduce((sum, m) => sum + m.rating, 0) / moodsWithFactor.length;
+        }
+      });
+
+      return {
+        labels: Object.keys(factorData).map(f => f.charAt(0).toUpperCase() + f.slice(1)),
+        ratings: Object.values(factorData)
+      };
+    }
+
+    function analyzeEnergyCorrelation() {
+      return moods
+        .filter(m => m.energyLevel)
+        .map(m => ({
+          x: m.energyLevel,
+          y: m.rating
+        }));
+    }
+
+    function analyzeSleepImpact() {
+      const sleepRanges = [
+        { min: 0, max: 4, label: '< 4 hours' },
+        { min: 4, max: 6, label: '4-6 hours' },
+        { min: 6, max: 8, label: '6-8 hours' },
+        { min: 8, max: 10, label: '8-10 hours' },
+        { min: 10, max: 24, label: '> 10 hours' }
+      ];
+
+      const rangeData = sleepRanges.map(range => {
+        const moodsInRange = moods.filter(m => 
+          m.sleepHours >= range.min && m.sleepHours < range.max
+        );
+        return {
+          label: range.label,
+          rating: moodsInRange.length ? 
+            moodsInRange.reduce((sum, m) => sum + m.rating, 0) / moodsInRange.length : null
+        };
+      });
+
+      return {
+        labels: rangeData.map(d => d.label),
+        ratings: rangeData.map(d => d.rating)
+      };
+    }
+
+    function analyzeTriggers() {
+      const triggers = ['anxiety', 'depression', 'fatigue', 'irritability'];
+      const triggerData = {};
+
+      triggers.forEach(trigger => {
+        const moodsWithTrigger = moods.filter(m => m.triggers?.includes(trigger));
+        if (moodsWithTrigger.length > 0) {
+          triggerData[trigger] = moodsWithTrigger.reduce((sum, m) => sum + m.rating, 0) / moodsWithTrigger.length;
+        }
+      });
+
+      return {
+        labels: Object.keys(triggerData).map(t => t.charAt(0).toUpperCase() + t.slice(1)),
+        ratings: Object.values(triggerData)
+      };
+    }
+
+    function analyzeMedicationImpact() {
+      const medicationStatuses = ['taken', 'missed', 'side_effects'];
+      const medicationData = {};
+
+      medicationStatuses.forEach(status => {
+        const moodsWithStatus = moods.filter(m => m.medications?.includes(status));
+        if (moodsWithStatus.length > 0) {
+          medicationData[status] = moodsWithStatus.reduce((sum, m) => sum + m.rating, 0) / moodsWithStatus.length;
+        }
+      });
+
+      return {
+        labels: Object.keys(medicationData).map(s => s.split('_').map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ')),
+        ratings: Object.values(medicationData)
+      };
+    }
+
+    function filterMoods() {
+      const date = document.getElementById("dateFilter").value;
+      const rating = document.getElementById("ratingFilter").value;
+      
+      let filteredMoods = moods;
+      if (date) {
+        filteredMoods = filteredMoods.filter(m => m.date === date);
+      }
+      if (rating !== 'all') {
+        filteredMoods = filteredMoods.filter(m => m.rating === parseInt(rating));
+      }
+      
+      const listElement = document.getElementById("moodsList");
+      if (filteredMoods.length === 0) {
+        listElement.innerHTML = "<p>No mood entries found for selected filters</p>";
+        return;
+      }
+
+      updateMoodsList(filteredMoods);
+    }
+
+    function exportData() {
+      const csv = [
+        ['Date', 'Time', 'Rating', 'Energy Level', 'Sleep Hours', 'Factors', 'Notes'],
+        ...moods.map(m => [
+          formatDate(m.timestamp),
+          formatTime(m.timestamp),
+          m.rating,
+          m.energyLevel || '',
+          m.sleepHours || '',
+          m.factors?.join(';') || '',
+          m.note || ''
+        ])
+      ].map(row => row.join(',')).join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mood-entries-${formatDate(new Date())}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     }
 
     function getEmoji(rating) {
       return ["😟", "😕", "😐", "🙂", "😃"][rating - 1] || "";
     }
 
-    function updateWeeklySummary() {
-      if (moodData.length === 0) return;
-      const avg = (moodData.reduce((sum, m) => sum + m.rating, 0) / moodData.length).toFixed(2);
-      document.getElementById("weeklySummary").textContent = `Weekly Average Mood: ${avg} ${getEmoji(Math.round(avg))}`;
+    function formatDate(timestamp) {
+      return new Date(timestamp).toLocaleDateString();
     }
 
-    function exportMoodLog() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.setFontSize(18);
-      doc.text("Mood Log", 14, 20);
-      doc.setFontSize(12);
-      let y = 30;
-      moodData.forEach(entry => {
-        const time = entry.timestamp?.seconds
-          ? new Date(entry.timestamp.seconds * 1000).toLocaleTimeString()
-          : '';
-        doc.text(`${entry.date} ${time} — ${getEmoji(entry.rating)} (${entry.rating})`, 14, y);
-        if (entry.note) {
-          doc.setFontSize(10);
-          doc.text(`Note: ${entry.note}`, 18, y + 6);
-          doc.setFontSize(12);
-          y += 12;
-        } else {
-          y += 8;
-        }
-        if (y > 270) { doc.addPage(); y = 20; }
-      });
-      doc.save("mood_log.pdf");
+    function formatTime(timestamp) {
+      return new Date(timestamp).toLocaleTimeString();
     }
 
-    function editMood(id) {
-      const mood = moodData.find(m => m.id === id);
+    function formatDateTime(timestamp) {
+      return `${formatDate(timestamp)} ${formatTime(timestamp)}`;
+    }
+
+    async function logMood(event) {
+      event.preventDefault();
+      
+      if (!currentRating) {
+        toast.show("Please select a mood rating", "error");
+        return;
+      }
+
+      const factors = Array.from(document.querySelectorAll('input[name="factors"]:checked'))
+        .map(cb => cb.value);
+      const triggers = Array.from(document.querySelectorAll('input[name="triggers"]:checked'))
+        .map(cb => cb.value);
+      const medications = Array.from(document.querySelectorAll('input[name="medications"]:checked'))
+        .map(cb => cb.value);
+
+      const moodData = {
+        uid: currentUser.uid,
+        rating: currentRating,
+        energyLevel: parseInt(document.getElementById('energyLevel').value),
+        sleepHours: parseFloat(document.getElementById('sleepHours').value) || null,
+        factors: factors.length ? factors : null,
+        triggers: triggers.length ? triggers : null,
+        medications: medications.length ? medications : null,
+        note: document.getElementById('moodNote').value.trim(),
+        date: new Date().toISOString().split('T')[0],
+        timestamp: new Date()
+      };
+
+      try {
+        await db.collection("moods").add(moodData);
+        toast.show("Mood logged successfully!", "success");
+        document.getElementById('moodForm').reset();
+        currentRating = 0;
+        document.querySelectorAll('.rating-buttons button').forEach(btn => 
+          btn.classList.remove('active')
+        );
+        loadMoods();
+      } catch (error) {
+        toast.show("Error logging mood: " + error.message, "error");
+      }
+    }
+
+    async function editMood(id) {
+      const mood = moods.find(m => m.id === id);
       if (!mood) return;
-      document.getElementById("editMoodRating").value = mood.rating;
-      document.getElementById("editMoodNote").value = mood.note || "";
-      document.getElementById("editMoodId").value = id;
-      document.getElementById("editModal").style.display = "flex";
-    }
 
-    function saveMoodEdit() {
-      const id = document.getElementById("editMoodId").value;
-      const rating = parseInt(document.getElementById("editMoodRating").value);
-      const note = document.getElementById("editMoodNote").value.trim();
-      firebase.firestore().collection("moods").doc(id).update({
-        rating,
-        note
-      }).then(() => {
-        console.log("Mood updated.");
-        closeEditModal();
-      }).catch(err => alert("Error updating: " + err.message));
-    }
+      currentEditRating = mood.rating;
+      document.getElementById('editRating').value = mood.rating;
+      document.getElementById('editEnergyLevel').value = mood.energyLevel || 5;
+      document.getElementById('editSleepHours').value = mood.sleepHours || '';
+      document.getElementById('editNote').value = mood.note || '';
+      document.getElementById('editId').value = id;
 
-    function closeEditModal() {
-      document.getElementById("editModal").style.display = "none";
-    }
-
-    function deleteMood(id) {
-      if (!confirm("Delete this mood entry?")) return;
-      firebase.firestore().collection("moods").doc(id).delete()
-        .then(() => console.log("Mood deleted."))
-        .catch(err => alert("Error deleting: " + err.message));
-    }
-
-    function applyMoodFilter() {
-      const filterValue = document.getElementById("filterMood").value;
-      document.querySelectorAll("#moodLogTable tr").forEach(row => {
-        const moodText = row.children[1]?.textContent || "";
-        const matches = filterValue === "" || moodText.includes(`(${filterValue})`);
-        row.style.display = matches ? "table-row" : "none";
+      // Set factors
+      document.querySelectorAll('input[name="editFactors"]').forEach(cb => {
+        cb.checked = mood.factors?.includes(cb.value) || false;
       });
+
+      // Update rating buttons
+      document.querySelectorAll('#editForm .rating-buttons button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.rating == mood.rating);
+      });
+
+      modal.show('editModal');
     }
 
-    function toggleDarkMode() {
-      const isDark = document.body.classList.toggle("dark");
-      document.documentElement.style.setProperty('--bg', isDark ? '#1a202c' : '#f0f4f8');
-      document.documentElement.style.setProperty('--text', isDark ? '#fff' : '#000');
+    async function saveEdit(event) {
+      event.preventDefault();
+      
+      const id = document.getElementById('editId').value;
+      const factors = Array.from(document.querySelectorAll('input[name="editFactors"]:checked'))
+        .map(cb => cb.value);
+
+      const moodData = {
+        rating: parseInt(document.getElementById('editRating').value),
+        energyLevel: parseInt(document.getElementById('editEnergyLevel').value),
+        sleepHours: parseFloat(document.getElementById('editSleepHours').value) || null,
+        factors: factors.length ? factors : null,
+        note: document.getElementById('editNote').value.trim(),
+        updatedAt: new Date()
+      };
+
+      try {
+        await db.collection("moods").doc(id).update(moodData);
+        toast.show("Mood entry updated successfully!", "success");
+        modal.hide('editModal');
+        loadMoods();
+      } catch (error) {
+        toast.show("Error updating mood: " + error.message, "error");
+      }
     }
 
-    document.getElementById("logMoodBtn").addEventListener("click", addMood);
-    document.getElementById("exportBtn").addEventListener("click", exportMoodLog);
-    document.getElementById("darkToggle").addEventListener("click", toggleDarkMode);
+    async function deleteMood(id) {
+      if (!confirm("Are you sure you want to delete this mood entry?")) return;
+
+      try {
+        await db.collection("moods").doc(id).delete();
+        toast.show("Mood entry deleted successfully!", "success");
+        loadMoods();
+      } catch (error) {
+        toast.show("Error deleting mood: " + error.message, "error");
+      }
+    }
   </script>
 </body>
 </html>

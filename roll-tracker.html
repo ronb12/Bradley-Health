@@ -3,16 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bradley Health - Roll Tracker</title>
+  <title>Wheelchair Activity Tracker - Bradley Health</title>
+  <link rel="icon" href="assets/icon-192.png" />
   <link rel="stylesheet" href="assets/style.css" />
-
-  <!-- Firebase SDKs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-  <!-- ✅ Firebase config (from root folder) -->
   <script src="firebase-init.js"></script>
+  <script src="assets/shared.js"></script>
 
   <style>
     body {
@@ -72,35 +71,933 @@
       background: #4a5568;
       margin-top: 2em;
     }
+    .route-filters {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+    }
+    .filter-group {
+      flex: 1;
+    }
+    .route-list {
+      display: grid;
+      gap: var(--spacing-md);
+    }
+    .route-card {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-md);
+      box-shadow: var(--shadow);
+      transition: transform var(--transition-normal);
+    }
+    .route-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+    .route-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-sm);
+    }
+    .route-terrain {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+    .route-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--spacing-sm);
+      margin: var(--spacing-sm) 0;
+    }
+    .route-stat {
+      text-align: center;
+      padding: var(--spacing-sm);
+      background: var(--background);
+      border-radius: var(--radius-sm);
+    }
+    .route-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-sm);
+    }
+    .route-actions button {
+      flex: 1;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Bradley Health</h1>
-    <p>Wheelchair Roll Tracker</p>
+    <h1>♿ Wheelchair Activity Tracker</h1>
+    <button id="darkToggle" class="toggle-dark" aria-label="Toggle dark mode">🌓</button>
   </header>
 
   <main>
-    <button onclick="startTracking()">Start Tracking</button>
-    <button onclick="stopTracking()">Stop Tracking</button>
+    <section class="tracking-controls">
+      <div class="control-group">
+        <button id="startBtn" onclick="startTracking()" class="primary-btn">Start Tracking</button>
+        <button id="stopBtn" onclick="stopTracking()" class="secondary-btn" disabled>Stop Tracking</button>
+      </div>
+      
+      <div class="status-display">
+        <div class="status-item">
+          <span class="label">Status:</span>
+          <span id="status" class="value">Not tracking</span>
+        </div>
+        <div class="status-item">
+          <span class="label">Distance:</span>
+          <span id="distance" class="value">0.00 meters</span>
+        </div>
+        <div class="status-item">
+          <span class="label">Calories:</span>
+          <span id="calories" class="value">0.0</span>
+        </div>
+        <div class="status-item">
+          <span class="label">Duration:</span>
+          <span id="duration" class="value">00:00:00</span>
+        </div>
+      </div>
+    </section>
 
-    <p id="status">Status: Not tracking</p>
-    <p id="distance">Distance: 0.00 meters</p>
-    <p id="calories">Calories: 0.0</p>
+    <section class="manual-entry">
+      <h2>Manual Entry</h2>
+      <form id="manualEntryForm" onsubmit="addManualEntry(event)">
+        <div class="input-group">
+          <label for="manualDistance">Distance (meters)</label>
+          <input type="number" id="manualDistance" required min="0" step="0.1" />
+        </div>
+        <div class="input-group">
+          <label for="manualDuration">Duration (minutes)</label>
+          <input type="number" id="manualDuration" required min="0" step="1" />
+        </div>
+        <div class="input-group">
+          <label for="manualTerrain">Terrain Type</label>
+          <select id="manualTerrain">
+            <option value="flat">Flat</option>
+            <option value="uphill">Uphill</option>
+            <option value="downhill">Downhill</option>
+            <option value="mixed">Mixed</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="manualNote">Notes (Optional)</label>
+          <textarea id="manualNote" rows="2" placeholder="Add any notes about your activity"></textarea>
+        </div>
+        <button type="submit" class="primary-btn">Add Entry</button>
+      </form>
+    </section>
 
-    <input type="number" id="manualDistance" placeholder="Manual Distance (meters)" />
-    <button onclick="addManualEntry()">Add Manual Entry</button>
+    <section class="activity-analysis">
+      <h2>Activity Analysis</h2>
+      <div class="analysis-grid">
+        <div class="analysis-card">
+          <h3>Daily Distance</h3>
+          <div class="chart-container">
+            <canvas id="dailyChart"></canvas>
+          </div>
+        </div>
+        <div class="analysis-card">
+          <h3>Terrain Distribution</h3>
+          <div class="chart-container">
+            <canvas id="terrainChart"></canvas>
+          </div>
+        </div>
+        <div class="analysis-card">
+          <h3>Calories Burned</h3>
+          <div class="chart-container">
+            <canvas id="caloriesChart"></canvas>
+          </div>
+        </div>
+        <div class="analysis-card">
+          <h3>Activity Duration</h3>
+          <div class="chart-container">
+            <canvas id="durationChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <h3>Distance Log</h3>
-    <table>
-      <thead><tr><th>Date</th><th>Distance (m)</th></tr></thead>
-      <tbody id="distanceLog"></tbody>
-    </table>
+    <section class="activity-history">
+      <h2>Activity History</h2>
+      <div class="history-controls">
+        <div class="filter-group">
+          <label for="dateFilter">Date Range:</label>
+          <select id="dateFilter" onchange="filterHistory()">
+            <option value="7">Last 7 Days</option>
+            <option value="30">Last 30 Days</option>
+            <option value="90">Last 90 Days</option>
+            <option value="all">All Time</option>
+          </select>
+        </div>
+        <button onclick="exportData()" class="secondary-btn">Export Data</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Distance (m)</th>
+              <th>Duration</th>
+              <th>Calories</th>
+              <th>Terrain</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="activityLog"></tbody>
+        </table>
+      </div>
+    </section>
 
-    <button class="back-button" onclick="window.location.href='index.html'">← Back to Home</button>
+    <!-- Route Recommendations Section -->
+    <section class="card">
+      <h2>Route Recommendations</h2>
+      <div class="route-filters">
+        <div class="filter-group">
+          <label for="terrainFilter">Terrain Preference:</label>
+          <select id="terrainFilter" onchange="updateRouteRecommendations()">
+            <option value="all">All Terrains</option>
+            <option value="flat">Mostly Flat</option>
+            <option value="mixed">Mixed Terrain</option>
+            <option value="challenging">Challenging (Hills)</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="distanceFilter">Distance Range:</label>
+          <select id="distanceFilter" onchange="updateRouteRecommendations()">
+            <option value="short">Short (0-1 km)</option>
+            <option value="medium">Medium (1-3 km)</option>
+            <option value="long">Long (3+ km)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="routeRecommendations" class="route-list">
+        <!-- Routes will be populated here -->
+      </div>
+    </section>
   </main>
 
-  <!-- ✅ Must come last so all Firebase + DOM is ready -->
-  <script src="roll.js"></script>
+  <script>
+    let currentUser;
+    let watchId = null;
+    let startTime = null;
+    let totalDistance = 0;
+    let lastPosition = null;
+    let timerInterval = null;
+    let activities = [];
+    let motionWatchId = null;
+    let isTracking = false;
+    let lastMotionTime = null;
+    let motionThreshold = 1.0;
+    let pushCount = 0;
+    let lastPushTime = 0;
+    const MIN_PUSH_INTERVAL = 500;
+    
+    // Terrain detection variables
+    let terrainBuffer = [];
+    const BUFFER_SIZE = 10;
+    let currentTerrain = 'flat';
+    let lastTerrainChange = Date.now();
+    const MIN_TERRAIN_CHANGE_INTERVAL = 5000; // 5 seconds minimum between terrain changes
+
+    // Terrain detection thresholds
+    const TERRAIN_THRESHOLDS = {
+      flat: { min: 0.8, max: 1.2, variance: 0.1 },
+      uphill: { min: 1.2, max: 2.0, variance: 0.3 },
+      downhill: { min: 0.5, max: 0.8, variance: 0.2 },
+      mixed: { min: 0.8, max: 2.0, variance: 0.4 }
+    };
+
+    // Initialize Firebase
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+      currentUser = user;
+      loadActivities();
+    });
+
+    async function startTracking() {
+      if (isTracking) return;
+      
+      document.getElementById('status').innerText = "Starting tracking...";
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('stopBtn').disabled = false;
+      startTime = Date.now();
+      startTimer();
+      isTracking = true;
+
+      // Request motion permission on iOS
+      if (typeof DeviceMotionEvent !== 'undefined' && 
+          typeof DeviceMotionEvent.requestPermission === 'function') {
+        try {
+          const permission = await DeviceMotionEvent.requestPermission();
+          if (permission === 'granted') {
+            startMotionTracking();
+          } else {
+            toast.show("Motion permission denied. Please enable it in Settings.", "error");
+            stopTracking();
+            return;
+          }
+        } catch (error) {
+          toast.show("Error requesting motion permission: " + error.message, "error");
+          stopTracking();
+          return;
+        }
+      } else {
+        // Android or older iOS - start tracking directly
+        startMotionTracking();
+      }
+
+      // Start GPS tracking as backup
+      if (navigator.geolocation) {
+        watchId = navigator.geolocation.watchPosition(
+          position => {
+            if (lastPosition) {
+              const dist = computeDistance(
+                lastPosition.coords.latitude,
+                lastPosition.coords.longitude,
+                position.coords.latitude,
+                position.coords.longitude
+              );
+
+              if (dist > 2) { // Ignore small inaccurate movements
+                totalDistance += dist;
+                updateDisplay();
+              }
+            }
+            lastPosition = position;
+          },
+          error => {
+            console.error("Geolocation error:", error);
+            // Don't show error toast as we have motion tracking
+          },
+          {
+            enableHighAccuracy: true,
+            maximumAge: 10000,
+            timeout: 5000
+          }
+        );
+      }
+    }
+
+    function startMotionTracking() {
+      document.getElementById('status').innerText = "Tracking motion...";
+      
+      // Listen for device motion events
+      window.addEventListener('devicemotion', handleMotion);
+      
+      // Auto-stop after 8 hours of inactivity
+      motionWatchId = setInterval(() => {
+        if (lastMotionTime && Date.now() - lastMotionTime > 8 * 60 * 60 * 1000) {
+          toast.show("8 hours of tracking completed. Auto-stopping.", "info");
+          stopTracking();
+        }
+      }, 60000);
+    }
+
+    function handleMotion(event) {
+      if (!isTracking) return;
+
+      const acceleration = event.accelerationIncludingGravity;
+      if (!acceleration) return;
+
+      // Calculate total acceleration
+      const totalAcc = Math.sqrt(
+        Math.pow(acceleration.x, 2) +
+        Math.pow(acceleration.y, 2) +
+        Math.pow(acceleration.z, 2)
+      );
+
+      // Detect terrain
+      const terrain = detectTerrain(totalAcc);
+
+      // Detect significant movement
+      if (totalAcc > motionThreshold && Date.now() - lastPushTime > MIN_PUSH_INTERVAL) {
+        pushCount++;
+        lastPushTime = Date.now();
+        lastMotionTime = Date.now();
+
+        // Calculate distance based on push count and terrain
+        const basePushDistance = 1.2; // Base distance per push in meters
+        let pushDistance = basePushDistance;
+
+        // Adjust distance based on terrain
+        switch (terrain) {
+          case 'uphill':
+            pushDistance *= 0.8; // Shorter distance uphill
+            break;
+          case 'downhill':
+            pushDistance *= 1.2; // Longer distance downhill
+            break;
+          case 'mixed':
+            pushDistance *= 1.0; // Average distance for mixed terrain
+            break;
+          default: // flat
+            pushDistance *= 1.0;
+        }
+
+        totalDistance += pushDistance;
+        updateDisplay();
+      }
+    }
+
+    function detectTerrain(acceleration) {
+      // Add current acceleration to buffer
+      terrainBuffer.push(acceleration);
+      if (terrainBuffer.length > BUFFER_SIZE) {
+        terrainBuffer.shift();
+      }
+
+      // Calculate average acceleration and variance
+      const avgAcc = terrainBuffer.reduce((sum, acc) => sum + acc, 0) / terrainBuffer.length;
+      const variance = terrainBuffer.reduce((sum, acc) => sum + Math.pow(acc - avgAcc, 2), 0) / terrainBuffer.length;
+
+      // Determine terrain based on patterns
+      let detectedTerrain = 'flat';
+      let maxConfidence = 0;
+
+      for (const [terrain, thresholds] of Object.entries(TERRAIN_THRESHOLDS)) {
+        const inRange = avgAcc >= thresholds.min && avgAcc <= thresholds.max;
+        const varianceMatch = Math.abs(variance - thresholds.variance) < 0.1;
+        
+        if (inRange && varianceMatch) {
+          const confidence = 1 - (Math.abs(avgAcc - (thresholds.min + thresholds.max) / 2) / (thresholds.max - thresholds.min));
+          if (confidence > maxConfidence) {
+            maxConfidence = confidence;
+            detectedTerrain = terrain;
+          }
+        }
+      }
+
+      // Only update terrain if enough time has passed and confidence is high
+      if (Date.now() - lastTerrainChange > MIN_TERRAIN_CHANGE_INTERVAL && maxConfidence > 0.7) {
+        currentTerrain = detectedTerrain;
+        lastTerrainChange = Date.now();
+        updateTerrainDisplay();
+      }
+
+      return currentTerrain;
+    }
+
+    function updateTerrainDisplay() {
+      const terrainEmoji = {
+        flat: '🛣️',
+        uphill: '⛰️',
+        downhill: '⬇️',
+        mixed: '🔄'
+      };
+      
+      const terrainNames = {
+        flat: 'Mostly Flat',
+        uphill: 'Uphill',
+        downhill: 'Downhill',
+        mixed: 'Mixed Terrain'
+      };
+
+      const statusElement = document.getElementById('status');
+      statusElement.innerHTML = `Tracking... ${terrainEmoji[currentTerrain]} ${terrainNames[currentTerrain]}`;
+    }
+
+    function calculateCalories(distance) {
+      // Enhanced calorie calculation based on distance, push count, and terrain
+      const baseMET = 2.5; // Base Metabolic Equivalent of Task
+      const weight = 80; // kg
+      const hours = distance / 1000 / 3.2; // Assuming average speed of 3.2 km/h
+      
+      // Adjust MET based on push frequency
+      const pushesPerMinute = pushCount / (hours * 60);
+      let adjustedMET = baseMET;
+      
+      if (pushesPerMinute > 30) {
+        adjustedMET *= 1.5; // High intensity
+      } else if (pushesPerMinute > 20) {
+        adjustedMET *= 1.3; // Moderate intensity
+      } else if (pushesPerMinute > 10) {
+        adjustedMET *= 1.1; // Light intensity
+      }
+
+      // Adjust MET based on terrain
+      switch (currentTerrain) {
+        case 'uphill':
+          adjustedMET *= 1.5; // More effort uphill
+          break;
+        case 'downhill':
+          adjustedMET *= 0.8; // Less effort downhill
+          break;
+        case 'mixed':
+          adjustedMET *= 1.2; // Moderate effort for mixed terrain
+          break;
+      }
+      
+      return adjustedMET * weight * hours;
+    }
+
+    function computeDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371e3; // Earth's radius in meters
+      const φ1 = lat1 * Math.PI/180;
+      const φ2 = lat2 * Math.PI/180;
+      const Δφ = (lat2-lat1) * Math.PI/180;
+      const Δλ = (lon2-lon1) * Math.PI/180;
+
+      const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ/2) * Math.sin(Δλ/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+      return R * c;
+    }
+
+    async function logActivity(distance, isAuto = false) {
+      const duration = Math.floor((Date.now() - startTime) / 1000);
+      const calories = calculateCalories(distance);
+      
+      const activity = {
+        uid: currentUser.uid,
+        distance: distance,
+        duration: duration,
+        calories: calories,
+        terrain: isAuto ? currentTerrain : document.getElementById('manualTerrain').value,
+        pushCount: pushCount,
+        note: isAuto ? `Auto-tracked activity (${currentTerrain} terrain)` : document.getElementById('manualNote').value,
+        timestamp: new Date(),
+        date: new Date().toISOString().split('T')[0]
+      };
+
+      try {
+        await db.collection("activities").add(activity);
+        toast.show("Activity logged successfully!", "success");
+        await loadActivities();
+      } catch (error) {
+        toast.show("Error logging activity: " + error.message, "error");
+      }
+    }
+
+    async function addManualEntry(event) {
+      event.preventDefault();
+      const distance = parseFloat(document.getElementById('manualDistance').value);
+      const duration = parseInt(document.getElementById('manualDuration').value);
+      
+      if (distance > 0 && duration > 0) {
+        await logActivity(distance, false);
+        document.getElementById('manualEntryForm').reset();
+      } else {
+        toast.show("Please enter valid distance and duration", "error");
+      }
+    }
+
+    async function loadActivities() {
+      try {
+        const snapshot = await db.collection("activities")
+          .where("uid", "==", currentUser.uid)
+          .orderBy("timestamp", "desc")
+          .get();
+
+        activities = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        updateActivityLog();
+        updateCharts();
+      } catch (error) {
+        toast.show("Error loading activities: " + error.message, "error");
+      }
+    }
+
+    function updateActivityLog() {
+      const logElement = document.getElementById('activityLog');
+      const dateFilter = document.getElementById('dateFilter').value;
+      const filteredActivities = filterActivitiesByDate(activities, dateFilter);
+
+      logElement.innerHTML = filteredActivities.map(activity => `
+        <tr>
+          <td>${formatDate(activity.timestamp)}</td>
+          <td>${activity.distance.toFixed(2)}</td>
+          <td>${formatDuration(activity.duration)}</td>
+          <td>${activity.calories.toFixed(1)}</td>
+          <td>${activity.terrain}</td>
+          <td>${activity.note || '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function updateCharts() {
+      updateDailyChart();
+      updateTerrainChart();
+      updateCaloriesChart();
+      updateDurationChart();
+    }
+
+    function updateDailyChart() {
+      const ctx = document.getElementById('dailyChart').getContext('2d');
+      const data = prepareDailyData();
+      
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Distance (meters)',
+            data: data.distances,
+            backgroundColor: 'rgba(44, 122, 123, 0.6)'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    function updateTerrainChart() {
+      const ctx = document.getElementById('terrainChart').getContext('2d');
+      const data = prepareTerrainData();
+      
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            data: data.values,
+            backgroundColor: [
+              'rgba(44, 122, 123, 0.6)',
+              'rgba(237, 100, 166, 0.6)',
+              'rgba(159, 122, 234, 0.6)',
+              'rgba(56, 161, 105, 0.6)'
+            ]
+          }]
+        },
+        options: {
+          responsive: true
+        }
+      });
+    }
+
+    function updateCaloriesChart() {
+      const ctx = document.getElementById('caloriesChart').getContext('2d');
+      const data = prepareCaloriesData();
+      
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Calories Burned',
+            data: data.values,
+            borderColor: 'rgba(237, 100, 166, 0.6)',
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    function updateDurationChart() {
+      const ctx = document.getElementById('durationChart').getContext('2d');
+      const data = prepareDurationData();
+      
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Duration (minutes)',
+            data: data.values,
+            backgroundColor: 'rgba(159, 122, 234, 0.6)'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    function prepareDailyData() {
+      const last7Days = Array.from({length: 7}, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        return date.toISOString().split('T')[0];
+      }).reverse();
+
+      return {
+        labels: last7Days.map(date => formatDate(new Date(date))),
+        distances: last7Days.map(date => {
+          const dayActivities = activities.filter(a => a.date === date);
+          return dayActivities.reduce((sum, a) => sum + a.distance, 0);
+        })
+      };
+    }
+
+    function prepareTerrainData() {
+      const terrains = ['flat', 'uphill', 'downhill', 'mixed', 'auto'];
+      const counts = {};
+      
+      terrains.forEach(terrain => {
+        counts[terrain] = activities.filter(a => a.terrain === terrain).length;
+      });
+
+      return {
+        labels: Object.keys(counts).map(t => t.charAt(0).toUpperCase() + t.slice(1)),
+        values: Object.values(counts)
+      };
+    }
+
+    function prepareCaloriesData() {
+      const last7Days = Array.from({length: 7}, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        return date.toISOString().split('T')[0];
+      }).reverse();
+
+      return {
+        labels: last7Days.map(date => formatDate(new Date(date))),
+        values: last7Days.map(date => {
+          const dayActivities = activities.filter(a => a.date === date);
+          return dayActivities.reduce((sum, a) => sum + a.calories, 0);
+        })
+      };
+    }
+
+    function prepareDurationData() {
+      const last7Days = Array.from({length: 7}, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        return date.toISOString().split('T')[0];
+      }).reverse();
+
+      return {
+        labels: last7Days.map(date => formatDate(new Date(date))),
+        values: last7Days.map(date => {
+          const dayActivities = activities.filter(a => a.date === date);
+          return dayActivities.reduce((sum, a) => sum + a.duration / 60, 0);
+        })
+      };
+    }
+
+    function filterActivitiesByDate(activities, days) {
+      if (days === 'all') return activities;
+      
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - parseInt(days));
+      
+      return activities.filter(activity => 
+        new Date(activity.timestamp) >= cutoff
+      );
+    }
+
+    function filterHistory() {
+      updateActivityLog();
+      updateCharts();
+    }
+
+    function exportData() {
+      const csv = [
+        ['Date', 'Distance (m)', 'Duration (s)', 'Calories', 'Terrain', 'Notes'],
+        ...activities.map(a => [
+          formatDate(a.timestamp),
+          a.distance.toFixed(2),
+          a.duration,
+          a.calories.toFixed(1),
+          a.terrain,
+          a.note || ''
+        ])
+      ].map(row => row.join(',')).join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `activity-data-${formatDate(new Date())}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }
+
+    function formatDate(timestamp) {
+      return new Date(timestamp).toLocaleDateString();
+    }
+
+    function formatDuration(seconds) {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const remainingSeconds = seconds % 60;
+      
+      if (hours > 0) {
+        return `${hours}h ${minutes}m ${remainingSeconds}s`;
+      } else if (minutes > 0) {
+        return `${minutes}m ${remainingSeconds}s`;
+      } else {
+        return `${remainingSeconds}s`;
+      }
+    }
+
+    // Sample route data - In a real app, this would come from a database
+    const sampleRoutes = [
+      {
+        id: 1,
+        name: "Riverside Path",
+        distance: 2.5,
+        terrain: "flat",
+        elevation: 10,
+        difficulty: "easy",
+        description: "Scenic route along the river with smooth pavement and rest areas.",
+        features: ["Rest Areas", "Water Fountains", "Shaded Paths"],
+        estimatedTime: 30
+      },
+      {
+        id: 2,
+        name: "Park Loop Trail",
+        distance: 3.2,
+        terrain: "mixed",
+        elevation: 45,
+        difficulty: "moderate",
+        description: "Circular route through the park with some gentle slopes.",
+        features: ["Park Benches", "Picnic Areas", "Wildlife Viewing"],
+        estimatedTime: 45
+      },
+      {
+        id: 3,
+        name: "Hill Challenge",
+        distance: 1.8,
+        terrain: "challenging",
+        elevation: 80,
+        difficulty: "hard",
+        description: "Challenging route with significant elevation changes.",
+        features: ["Viewpoints", "Rest Stops", "Emergency Access"],
+        estimatedTime: 35
+      }
+    ];
+
+    function updateRouteRecommendations() {
+      const terrainFilter = document.getElementById('terrainFilter').value;
+      const distanceFilter = document.getElementById('distanceFilter').value;
+      const container = document.getElementById('routeRecommendations');
+      
+      // Filter routes based on preferences
+      const filteredRoutes = sampleRoutes.filter(route => {
+        const terrainMatch = terrainFilter === 'all' || route.terrain === terrainFilter;
+        const distanceMatch = 
+          (distanceFilter === 'short' && route.distance <= 1) ||
+          (distanceFilter === 'medium' && route.distance > 1 && route.distance <= 3) ||
+          (distanceFilter === 'long' && route.distance > 3);
+        
+        return terrainMatch && distanceMatch;
+      });
+
+      // Sort routes by difficulty and distance
+      filteredRoutes.sort((a, b) => {
+        if (a.difficulty === b.difficulty) {
+          return a.distance - b.distance;
+        }
+        return a.difficulty === 'easy' ? -1 : 1;
+      });
+
+      // Generate route cards
+      container.innerHTML = filteredRoutes.map(route => `
+        <div class="route-card">
+          <div class="route-header">
+            <h3>${route.name}</h3>
+            <div class="route-terrain">
+              ${getTerrainEmoji(route.terrain)}
+              <span>${getTerrainName(route.terrain)}</span>
+            </div>
+          </div>
+          <p>${route.description}</p>
+          <div class="route-stats">
+            <div class="route-stat">
+              <strong>${route.distance} km</strong>
+              <div>Distance</div>
+            </div>
+            <div class="route-stat">
+              <strong>${route.elevation} m</strong>
+              <div>Elevation</div>
+            </div>
+            <div class="route-stat">
+              <strong>${route.estimatedTime} min</strong>
+              <div>Est. Time</div>
+            </div>
+          </div>
+          <div class="route-features">
+            <strong>Features:</strong>
+            ${route.features.map(feature => `<span class="feature-tag">${feature}</span>`).join('')}
+          </div>
+          <div class="route-actions">
+            <button onclick="startRoute(${route.id})" class="primary">Start Route</button>
+            <button onclick="saveRoute(${route.id})" class="secondary">Save Route</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function getTerrainEmoji(terrain) {
+      const emojis = {
+        flat: '🛣️',
+        mixed: '🔄',
+        challenging: '⛰️'
+      };
+      return emojis[terrain] || '🛣️';
+    }
+
+    function getTerrainName(terrain) {
+      const names = {
+        flat: 'Mostly Flat',
+        mixed: 'Mixed Terrain',
+        challenging: 'Challenging'
+      };
+      return names[terrain] || 'Unknown';
+    }
+
+    async function startRoute(routeId) {
+      const route = sampleRoutes.find(r => r.id === routeId);
+      if (!route) return;
+
+      // Start tracking with route information
+      if (!isTracking) {
+        await startTracking();
+      }
+
+      // Update status with route information
+      document.getElementById('status').innerHTML = 
+        `Tracking Route: ${route.name} - ${route.distance}km ${getTerrainEmoji(route.terrain)}`;
+      
+      toast.show(`Started tracking route: ${route.name}`, "success");
+    }
+
+    async function saveRoute(routeId) {
+      const route = sampleRoutes.find(r => r.id === routeId);
+      if (!route) return;
+
+      try {
+        await db.collection("saved_routes").add({
+          uid: currentUser.uid,
+          routeId: route.id,
+          savedAt: new Date(),
+          ...route
+        });
+        toast.show("Route saved to your favorites!", "success");
+      } catch (error) {
+        toast.show("Error saving route: " + error.message, "error");
+      }
+    }
+
+    // Initialize route recommendations when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      updateRouteRecommendations();
+    });
+  </script>
 </body>
 </html>

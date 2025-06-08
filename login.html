@@ -3,234 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bradley Health – Login / Register</title>
-
+  <meta name="theme-color" content="#2c7a7b"/>
+  <meta name="description" content="Bradley Health - Your Personal Health Companion"/>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png"/>
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png"/>
+  <link rel="manifest" href="manifest.json"/>
+  
+  <title>Login - Bradley Health</title>
+  <link rel="stylesheet" href="assets/style.css" />
+  
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  
+  <!-- Initialize Firebase -->
   <script src="firebase-init.js"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f4f8;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-
-    .container {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 400px;
-      padding: 2em;
-    }
-
-    h2 {
-      text-align: center;
-      color: #2c7a7b;
-      margin-bottom: 1em;
-    }
-
-    .tabs {
-      display: flex;
-      justify-content: space-around;
-      margin-bottom: 1em;
-    }
-
-    .tab {
-      flex: 1;
-      padding: 0.8em;
-      cursor: pointer;
-      background: #e2e8f0;
-      border-radius: 6px;
-      margin: 0 0.25em;
-      font-weight: bold;
-      color: #2c7a7b;
-    }
-
-    .tab.active {
-      background: #2c7a7b;
-      color: white;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 0.8em;
-      margin: 0.6em 0;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 1em;
-    }
-
-    button {
-      width: 100%;
-      padding: 0.8em;
-      background: #2c7a7b;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 1em;
-      cursor: pointer;
-      margin-top: 1em;
-    }
-
-    .forgot {
-      text-align: center;
-      margin-top: 0.5em;
-    }
-
-    .forgot a {
-      color: #2c7a7b;
-      font-size: 0.9em;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    .error {
-      color: red;
-      font-size: 0.9em;
-      text-align: center;
-      margin-top: 0.5em;
-    }
-
-    .success {
-      color: green;
-      font-size: 0.9em;
-      text-align: center;
-      margin-top: 0.5em;
-    }
-
-    .hidden {
-      display: none;
-    }
-  </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Bradley Health Login</h2>
+  <header>
+    <h1>Bradley Health</h1>
+    <p>Login</p>
+  </header>
 
-    <div class="tabs">
-      <div class="tab active" id="loginTab" onclick="showTab('login')">Login</div>
-      <div class="tab" id="registerTab" onclick="showTab('register')">Register</div>
-    </div>
-
-    <!-- Login Form -->
-    <div id="loginForm">
-      <input type="email" id="loginEmail" placeholder="Email" />
-      <input type="password" id="loginPassword" placeholder="Password" />
-      <button onclick="login()">Login</button>
-      <div class="forgot">
-        <a onclick="resetPassword()">Forgot Password?</a>
+  <main>
+    <form id="loginForm" onsubmit="return false;">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" required />
       </div>
-    </div>
-
-    <!-- Register Form -->
-    <div id="registerForm" class="hidden">
-      <input type="text" id="name" placeholder="Full Name" />
-      <input type="number" id="age" placeholder="Age" />
-      <select id="gender">
-        <option value="">Select Gender</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-      </select>
-      <input type="number" id="weight" placeholder="Weight (lbs or kg)" />
-      <input type="email" id="registerEmail" placeholder="Email" />
-      <input type="password" id="registerPassword" placeholder="Password" />
-      <button onclick="register()">Register</button>
-    </div>
-
-    <div id="errorMessage" class="error"></div>
-    <div id="successMessage" class="success"></div>
-  </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" required />
+      </div>
+      
+      <button type="submit" onclick="login()">Login</button>
+    </form>
+  </main>
 
   <script>
-    function showTab(tab) {
-      document.getElementById("loginForm").classList.add("hidden");
-      document.getElementById("registerForm").classList.add("hidden");
-      document.getElementById("loginTab").classList.remove("active");
-      document.getElementById("registerTab").classList.remove("active");
-
-      if (tab === "login") {
-        document.getElementById("loginForm").classList.remove("hidden");
-        document.getElementById("loginTab").classList.add("active");
+    // Wait for Firebase to initialize
+    function waitForFirebase(callback) {
+      if (window.auth) {
+        callback();
       } else {
-        document.getElementById("registerForm").classList.remove("hidden");
-        document.getElementById("registerTab").classList.add("active");
+        setTimeout(() => waitForFirebase(callback), 100);
       }
-
-      clearMessages();
     }
 
     function login() {
-      clearMessages();
-      const email = document.getElementById("loginEmail").value.trim();
-      const password = document.getElementById("loginPassword").value;
+      waitForFirebase(() => {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        if (!email || !password) {
+          alert('Please enter both email and password');
+          return;
+        }
 
-      firebase.auth().signInWithEmailAndPassword(email, password)
-        .then(() => window.location.href = "index.html")
-        .catch(error => {
-          document.getElementById("errorMessage").textContent = error.message;
-        });
+        loginWithEmail(email, password);
+      });
     }
 
-    function register() {
-      clearMessages();
-      const name = document.getElementById("name").value.trim();
-      const age = parseInt(document.getElementById("age").value.trim());
-      const gender = document.getElementById("gender").value;
-      const weight = parseFloat(document.getElementById("weight").value.trim());
-      const email = document.getElementById("registerEmail").value.trim();
-      const password = document.getElementById("registerPassword").value;
+    // Handle form submission
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      login();
+    });
 
-      if (!name) {
-        document.getElementById("errorMessage").textContent = "Please enter your full name.";
-        return;
-      }
-
-      firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then(userCred => {
-          return db.collection("users").doc(userCred.user.uid).set({
-            name,
-            age: isNaN(age) ? null : age,
-            gender,
-            weight: isNaN(weight) ? null : weight,
-            email,
-            createdAt: new Date().toISOString()
-          });
-        })
-        .then(() => window.location.href = "index.html")
-        .catch(error => {
-          document.getElementById("errorMessage").textContent = error.message;
-        });
-    }
-
-    function resetPassword() {
-      clearMessages();
-      const email = document.getElementById("loginEmail").value.trim();
-      if (!email) {
-        document.getElementById("errorMessage").textContent = "Please enter your email to reset password.";
-        return;
-      }
-
-      firebase.auth().sendPasswordResetEmail(email)
-        .then(() => {
-          document.getElementById("successMessage").textContent = "Reset email sent. Check your inbox.";
-        })
-        .catch(error => {
-          document.getElementById("errorMessage").textContent = error.message;
-        });
-    }
-
-    function clearMessages() {
-      document.getElementById("errorMessage").textContent = "";
-      document.getElementById("successMessage").textContent = "";
-    }
+    // Check if user is already logged in
+    waitForFirebase(() => {
+      window.auth.onAuthStateChanged(user => {
+        if (user) {
+          window.location.href = 'dashboard.html';
+        }
+      });
+    });
   </script>
 </body>
 </html>
