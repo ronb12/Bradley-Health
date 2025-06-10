@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>�� Medication Tracker - Bradley Health</title>
+  <title>Medications - Bradley Health</title>
   <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="assets/mobile.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2B6CB0">
   
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -153,6 +156,120 @@
   </style>
 </head>
 <body>
+  <div class="mobile-header">
+    <div class="mobile-header-content">
+      <h1>Medications</h1>
+      <button class="mobile-menu-button" aria-label="Menu">☰</button>
+    </div>
+  </div>
+
+  <main class="container">
+    <!-- Today's Schedule Card -->
+    <div class="mobile-card">
+      <div class="mobile-card-header">
+        <h2>Today's Schedule</h2>
+        <span class="status-badge status-normal">On Track</span>
+      </div>
+      <div class="medication-list" id="todaySchedule">
+        <!-- Today's medications will be populated here -->
+      </div>
+    </div>
+
+    <!-- Add Medication Card -->
+    <div class="mobile-card">
+      <div class="mobile-card-header">
+        <h2>Add Medication</h2>
+      </div>
+      <form class="mobile-form" id="medicationForm">
+        <div class="form-group">
+          <label for="medName">Medication Name</label>
+          <input type="text" id="medName" class="mobile-input" placeholder="e.g., Lisinopril" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="dosage">Dosage</label>
+            <input type="text" id="dosage" class="mobile-input" placeholder="e.g., 10mg" required>
+          </div>
+          <div class="form-group">
+            <label for="frequency">Frequency</label>
+            <select id="frequency" class="mobile-select" required>
+              <option value="daily">Daily</option>
+              <option value="twice">Twice Daily</option>
+              <option value="three">Three Times Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="as-needed">As Needed</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="time">Time</label>
+          <input type="time" id="time" class="mobile-input" required>
+        </div>
+        <div class="form-group">
+          <label for="notes">Notes</label>
+          <textarea id="notes" class="mobile-input" placeholder="Special instructions or reminders"></textarea>
+        </div>
+        <button type="submit" class="mobile-button mobile-button-primary">Add Medication</button>
+      </form>
+    </div>
+
+    <!-- Medication Statistics Card -->
+    <div class="mobile-card">
+      <div class="mobile-card-header">
+        <h2>Statistics</h2>
+        <select class="mobile-select" id="timeRange">
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="year">This Year</option>
+        </select>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-label">Adherence</span>
+          <span class="stat-value">95%</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">On Time</span>
+          <span class="stat-value">92%</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Missed</span>
+          <span class="stat-value">3</span>
+        </div>
+      </div>
+      <div class="chart-container" id="adherenceChart">
+        <!-- Chart will be rendered here -->
+      </div>
+    </div>
+
+    <!-- All Medications Card -->
+    <div class="mobile-card">
+      <div class="mobile-card-header">
+        <h2>All Medications</h2>
+        <button class="mobile-button mobile-button-secondary" id="exportBtn">Export</button>
+      </div>
+      <div class="medication-list" id="allMedications">
+        <!-- All medications will be populated here -->
+      </div>
+    </div>
+  </main>
+
+  <nav class="mobile-nav">
+    <div class="mobile-nav-items">
+      <a href="dashboard.html" class="mobile-nav-item">
+        <span class="mobile-nav-icon">🏠</span>
+        <span>Home</span>
+      </a>
+      <a href="blood-pressure.html" class="mobile-nav-item">
+        <span class="mobile-nav-icon">❤️</span>
+        <span>BP</span>
+      </a>
+      <a href="medications.html" class="mobile-nav-item active">
+        <span class="mobile-nav-icon">💊</span>
+        <span>Meds</span>
+      </a>
+      <a href="profile.html" class="mobile-nav-item">
+        <span class="mobile-nav-icon">👤</span>
   <header>
     <h1>💊 Medication Tracker</h1>
     <button class="back-button" onclick="window.location.href='index.html'">← Back to Home</button>

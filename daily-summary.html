@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>📊 Daily Health Summary - Bradley Health</title>
   <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="assets/mobile.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2B6CB0">
   
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -143,479 +146,154 @@
   </style>
 </head>
 <body>
-  <header>
-    <h1>📊 Daily Health Summary</h1>
-    <button class="back-button" onclick="window.location.href='index.html'">← Back to Home</button>
-  </header>
+  <div class="mobile-container">
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+      <h1>Daily Summary</h1>
+      <button class="menu-btn" aria-label="Menu">
+        <span></span>
+      </button>
+    </header>
 
-  <main>
-    <section class="summary-grid">
-      <div class="summary-card">
-        <h3>Blood Pressure</h3>
-        <div id="bpSummary">Loading...</div>
-      </div>
-      <div class="summary-card">
-        <h3>Activity</h3>
-        <div id="activitySummary">Loading...</div>
-      </div>
-      <div class="summary-card">
-        <h3>Mood</h3>
-        <div id="moodSummary">Loading...</div>
-      </div>
-      <div class="summary-card">
-        <h3>Medications</h3>
-        <div id="medsSummary">Loading...</div>
-      </div>
-    </section>
-
-    <section class="chart-container">
-      <h2>7-Day Health Trends</h2>
-      <canvas id="trendsChart"></canvas>
-    </section>
-
-    <section class="goal-progress">
-      <h2>Weekly Goals Progress</h2>
-      <div class="progress-bar">
-        <div id="goalProgressBar" class="progress-fill" style="width: 0%"></div>
-      </div>
-      <div class="goal-stats">
-        <div class="goal-stat">
-          <div class="goal-stat-value" id="bpGoal">0/7</div>
-          <div class="goal-label">BP Readings</div>
-        </div>
-        <div class="goal-stat">
-          <div class="goal-stat-value" id="activityGoal">0/7</div>
-          <div class="goal-label">Activity Days</div>
-        </div>
-        <div class="goal-stat">
-          <div class="goal-stat-value" id="moodGoal">0/7</div>
-          <div class="goal-label">Mood Logs</div>
-        </div>
-        <div class="goal-stat">
-          <div class="goal-stat-value" id="medsGoal">0/7</div>
-          <div class="goal-label">Medication Adherence</div>
+    <!-- Main Content -->
+    <main class="mobile-content">
+      <!-- Date Selector -->
+      <div class="mobile-card">
+        <div class="date-selector">
+          <button class="date-nav-btn" id="prevDate">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <h2 id="currentDate">Today, March 15, 2024</h2>
+          <button class="date-nav-btn" id="nextDate">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
         </div>
       </div>
-    </section>
 
-    <section class="recommendations">
-      <h2>Personalized Recommendations</h2>
-      <div id="recommendationsList">
-        <div class="recommendation-item">
-          <span class="recommendation-icon">📊</span>
-          <div>
-            <h4>Loading recommendations...</h4>
-            <p>Please wait while we analyze your health data.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    let currentUser = null;
-    let healthData = {
-      bloodPressure: [],
-      activity: [],
-      mood: [],
-      medications: []
-    };
-
-    firebase.auth().onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = "login.html";
-      } else {
-        currentUser = user;
-        loadSummary();
-      }
-    });
-
-    async function loadSummary() {
-      const today = new Date().toISOString().split('T')[0];
-      const weekStart = new Date();
-      weekStart.setDate(weekStart.getDate() - 6);
-      const weekStartStr = weekStart.toISOString().split('T')[0];
-
-      try {
-        // Load today's data
-        await Promise.all([
-          loadBPSummary(today),
-          loadActivitySummary(today),
-          loadMoodSummary(today),
-          loadMedsSummary(today)
-        ]);
-
-        // Load weekly data for trends
-        await Promise.all([
-          loadWeeklyBP(weekStartStr),
-          loadWeeklyActivity(weekStartStr),
-          loadWeeklyMood(weekStartStr),
-          loadWeeklyMeds(weekStartStr)
-        ]);
-
-        // Update charts and recommendations
-        updateTrendsChart();
-        updateGoalProgress();
-        generateRecommendations();
-      } catch (error) {
-        toast.show("Error loading summary: " + error.message, "error");
-      }
-    }
-
-    async function loadBPSummary(date) {
-      const snapshot = await db.collection("bloodPressure")
-        .where("uid", "==", currentUser.uid)
-        .where("date", "==", date)
-        .orderBy("timestamp", "desc")
-        .get();
-
-      const element = document.getElementById("bpSummary");
-      if (snapshot.empty) {
-        element.innerHTML = `
-          <div class="metric-value">No readings</div>
-          <div class="metric-label">No blood pressure readings logged today</div>
-        `;
-        return;
-      }
-
-      const latest = snapshot.docs[0].data();
-      const status = getBPStatus(latest.systolic, latest.diastolic);
-      const trend = calculateBPTrend(snapshot.docs);
-
-      element.innerHTML = `
-        <div class="metric-value">${latest.systolic}/${latest.diastolic}</div>
-        <div class="metric-label">
-          ${status}
-          ${trend ? `<span class="trend-indicator ${trend > 0 ? 'trend-up' : 'trend-down'}">
-            ${trend > 0 ? '↑' : '↓'} ${Math.abs(trend)}%
-          </span>` : ''}
-        </div>
-      `;
-    }
-
-    async function loadActivitySummary(date) {
-      const snapshot = await db.collection("activity")
-        .where("uid", "==", currentUser.uid)
-        .where("date", "==", date)
-        .get();
-
-      const element = document.getElementById("activitySummary");
-      if (snapshot.empty) {
-        element.innerHTML = `
-          <div class="metric-value">0 m</div>
-          <div class="metric-label">No activity logged today</div>
-        `;
-        return;
-      }
-
-      const totalDistance = snapshot.docs.reduce((sum, doc) => sum + doc.data().distance, 0);
-      const calories = calculateCalories(totalDistance);
-      const trend = calculateActivityTrend(snapshot.docs);
-
-      element.innerHTML = `
-        <div class="metric-value">${(totalDistance / 1000).toFixed(1)} km</div>
-        <div class="metric-label">
-          ${calories.toFixed(0)} calories burned
-          ${trend ? `<span class="trend-indicator ${trend > 0 ? 'trend-up' : 'trend-down'}">
-            ${trend > 0 ? '↑' : '↓'} ${Math.abs(trend)}%
-          </span>` : ''}
-        </div>
-      `;
-    }
-
-    async function loadMoodSummary(date) {
-      const snapshot = await db.collection("moods")
-        .where("uid", "==", currentUser.uid)
-        .where("date", "==", date)
-        .orderBy("timestamp", "desc")
-        .get();
-
-      const element = document.getElementById("moodSummary");
-      if (snapshot.empty) {
-        element.innerHTML = `
-          <div class="metric-value">-</div>
-          <div class="metric-label">No mood logged today</div>
-        `;
-        return;
-      }
-
-      const latest = snapshot.docs[0].data();
-      const avgRating = snapshot.docs.reduce((sum, doc) => sum + doc.data().rating, 0) / snapshot.docs.length;
-      const trend = calculateMoodTrend(snapshot.docs);
-
-      element.innerHTML = `
-        <div class="metric-value">${getMoodEmoji(Math.round(avgRating))}</div>
-        <div class="metric-label">
-          Average: ${avgRating.toFixed(1)}/5
-          ${trend ? `<span class="trend-indicator ${trend > 0 ? 'trend-up' : 'trend-down'}">
-            ${trend > 0 ? '↑' : '↓'} ${Math.abs(trend)}%
-          </span>` : ''}
-        </div>
-      `;
-    }
-
-    async function loadMedsSummary(date) {
-      const snapshot = await db.collection("medications")
-        .where("uid", "==", currentUser.uid)
-        .where("date", "==", date)
-        .get();
-
-      const element = document.getElementById("medsSummary");
-      if (snapshot.empty) {
-        element.innerHTML = `
-          <div class="metric-value">0%</div>
-          <div class="metric-label">No medications scheduled today</div>
-        `;
-        return;
-      }
-
-      const total = snapshot.docs.length;
-      const taken = snapshot.docs.filter(doc => doc.data().taken).length;
-      const adherence = (taken / total) * 100;
-      const trend = calculateMedsTrend(snapshot.docs);
-
-      element.innerHTML = `
-        <div class="metric-value">${adherence.toFixed(0)}%</div>
-        <div class="metric-label">
-          ${taken}/${total} medications taken
-          ${trend ? `<span class="trend-indicator ${trend > 0 ? 'trend-up' : 'trend-down'}">
-            ${trend > 0 ? '↑' : '↓'} ${Math.abs(trend)}%
-          </span>` : ''}
-        </div>
-      `;
-    }
-
-    function updateTrendsChart() {
-      const ctx = document.getElementById('trendsChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: healthData.bloodPressure.map(d => formatDate(d.date)),
-          datasets: [
-            {
-              label: 'Systolic BP',
-              data: healthData.bloodPressure.map(d => d.systolic),
-              borderColor: '#e53e3e',
-              tension: 0.4
-            },
-            {
-              label: 'Diastolic BP',
-              data: healthData.bloodPressure.map(d => d.diastolic),
-              borderColor: '#dd6b20',
-              tension: 0.4
-            },
-            {
-              label: 'Activity (km)',
-              data: healthData.activity.map(d => d.distance / 1000),
-              borderColor: '#2c7a7b',
-              tension: 0.4
-            },
-            {
-              label: 'Mood Rating',
-              data: healthData.mood.map(d => d.rating),
-              borderColor: '#4299e1',
-              tension: 0.4
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          interaction: {
-            intersect: false,
-            mode: 'index'
-          },
-          plugins: {
-            legend: {
-              position: 'bottom'
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-    }
-
-    function updateGoalProgress() {
-      const goals = {
-        bp: healthData.bloodPressure.filter(d => d.date >= weekStartStr).length,
-        activity: healthData.activity.filter(d => d.date >= weekStartStr).length,
-        mood: healthData.mood.filter(d => d.date >= weekStartStr).length,
-        meds: healthData.medications.filter(d => d.date >= weekStartStr && d.taken).length
-      };
-
-      const totalProgress = (goals.bp + goals.activity + goals.mood + goals.meds) / 28 * 100;
-      document.getElementById('goalProgressBar').style.width = `${totalProgress}%`;
-
-      document.getElementById('bpGoal').textContent = `${goals.bp}/7`;
-      document.getElementById('activityGoal').textContent = `${goals.activity}/7`;
-      document.getElementById('moodGoal').textContent = `${goals.mood}/7`;
-      document.getElementById('medsGoal').textContent = `${goals.meds}/7`;
-    }
-
-    function generateRecommendations() {
-      const recommendations = [];
-      const latestBP = healthData.bloodPressure[0];
-      const latestActivity = healthData.activity[0];
-      const latestMood = healthData.mood[0];
-      const latestMeds = healthData.medications[0];
-
-      // BP recommendations
-      if (latestBP) {
-        if (latestBP.systolic >= 180 || latestBP.diastolic >= 120) {
-          recommendations.push({
-            icon: '🚨',
-            title: 'Hypertensive Crisis',
-            text: 'Seek immediate medical attention. Your blood pressure is dangerously high.'
-          });
-        } else if (latestBP.systolic >= 140 || latestBP.diastolic >= 90) {
-          recommendations.push({
-            icon: '🩺',
-            title: 'High Blood Pressure',
-            text: 'Consider reducing salt intake, increasing physical activity, and scheduling a doctor visit.'
-          });
-        } else if (latestBP.systolic < 90 || latestBP.diastolic < 60) {
-          recommendations.push({
-            icon: '💧',
-            title: 'Low Blood Pressure',
-            text: 'Stay hydrated and consider increasing salt intake if approved by your doctor.'
-          });
-        }
-      }
-
-      // Activity recommendations
-      if (latestActivity) {
-        const avgDistance = healthData.activity.reduce((sum, a) => sum + a.distance, 0) / healthData.activity.length;
-        if (latestActivity.distance < avgDistance * 0.7) {
-          recommendations.push({
-            icon: '♿',
-            title: 'Low Activity Level',
-            text: 'Try to increase your activity level gradually. Consider short, frequent movement breaks.'
-          });
-        } else if (latestActivity.distance > avgDistance * 1.3) {
-          recommendations.push({
-            icon: '💪',
-            title: 'High Activity Level',
-            text: 'Great job! Remember to stay hydrated and take rest periods as needed.'
-          });
-        }
-      }
-
-      // Mood recommendations
-      if (latestMood) {
-        if (latestMood.rating < 3) {
-          recommendations.push({
-            icon: '😊',
-            title: 'Low Mood',
-            text: 'Consider activities that usually improve your mood, such as social interaction or hobbies.'
-          });
-        } else if (latestMood.rating > 4) {
-          recommendations.push({
-            icon: '🌟',
-            title: 'Positive Mood',
-            text: 'Great to see you\'re feeling well! Keep up the activities that contribute to your positive mood.'
-          });
-        }
-      }
-
-      // Medication recommendations
-      if (latestMeds) {
-        const adherence = healthData.medications.filter(m => m.taken).length / healthData.medications.length;
-        if (adherence < 0.8) {
-          recommendations.push({
-            icon: '💊',
-            title: 'Medication Adherence',
-            text: 'Try setting reminders or using a pill organizer to improve medication adherence.'
-          });
-        } else if (adherence >= 0.95) {
-          recommendations.push({
-            icon: '✅',
-            title: 'Excellent Adherence',
-            text: 'Great job maintaining your medication schedule!'
-          });
-        }
-      }
-
-      // Update recommendations list
-      const container = document.getElementById('recommendationsList');
-      if (recommendations.length === 0) {
-        container.innerHTML = `
-          <div class="recommendation-item">
-            <span class="recommendation-icon">✅</span>
-            <div>
-              <h4>All Good!</h4>
-              <p>Your health metrics are within normal ranges. Keep up the good work!</p>
+      <!-- Health Overview -->
+      <div class="mobile-card">
+        <h2>Health Overview</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Blood Pressure</span>
+              <span class="status-badge status-normal">Normal</span>
             </div>
+            <div class="stat-value">120/80</div>
+            <div class="stat-details">Last reading: 9:30 AM</div>
           </div>
-        `;
-      } else {
-        container.innerHTML = recommendations.map(rec => `
-          <div class="recommendation-item">
-            <span class="recommendation-icon">${rec.icon}</span>
-            <div>
-              <h4>${rec.title}</h4>
-              <p>${rec.text}</p>
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Mood</span>
+              <span class="status-badge status-good">Good</span>
             </div>
+            <div class="stat-value">😄</div>
+            <div class="stat-details">Sleep: Good, Stress: Moderate</div>
           </div>
-        `).join('');
-      }
-    }
+        </div>
+      </div>
 
-    // Helper functions
-    function getBPStatus(systolic, diastolic) {
-      if (systolic >= 180 || diastolic >= 120) return "Crisis";
-      if (systolic >= 140 || diastolic >= 90) return "Stage 2";
-      if (systolic >= 130 || diastolic >= 80) return "Stage 1";
-      if (systolic >= 120 && diastolic < 80) return "Elevated";
-      return "Normal";
-    }
+      <!-- Medications -->
+      <div class="mobile-card">
+        <h2>Medications</h2>
+        <div class="medication-list">
+          <div class="medication-item">
+            <div class="medication-info">
+              <div class="medication-name">Lisinopril 10mg</div>
+              <div class="medication-time">8:00 AM</div>
+            </div>
+            <span class="status-badge status-success">Taken</span>
+          </div>
+          <div class="medication-item">
+            <div class="medication-info">
+              <div class="medication-name">Metformin 500mg</div>
+              <div class="medication-time">8:00 AM</div>
+            </div>
+            <span class="status-badge status-success">Taken</span>
+          </div>
+          <div class="medication-item">
+            <div class="medication-info">
+              <div class="medication-name">Aspirin 81mg</div>
+              <div class="medication-time">8:00 PM</div>
+            </div>
+            <span class="status-badge status-pending">Pending</span>
+          </div>
+        </div>
+      </div>
 
-    function getMoodEmoji(rating) {
-      const emojis = ['😟', '😕', '😐', '🙂', '😃'];
-      return emojis[Math.min(Math.max(rating - 1, 0), 4)];
-    }
+      <!-- Activity Log -->
+      <div class="mobile-card">
+        <h2>Activity Log</h2>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="activity-icon">🚶</div>
+            <div class="activity-info">
+              <div class="activity-name">Morning Walk</div>
+              <div class="activity-details">30 minutes</div>
+            </div>
+            <div class="activity-time">7:00 AM</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon">💧</div>
+            <div class="activity-info">
+              <div class="activity-name">Water Intake</div>
+              <div class="activity-details">1.5L</div>
+            </div>
+            <div class="activity-time">Throughout day</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon">🧘</div>
+            <div class="activity-info">
+              <div class="activity-name">Meditation</div>
+              <div class="activity-details">15 minutes</div>
+            </div>
+            <div class="activity-time">6:00 PM</div>
+          </div>
+        </div>
+      </div>
 
-    function calculateCalories(distance) {
-      const MET = 2.5;
-      const weight = 80; // kg
-      const hours = distance / 1000 / 3.2; // Assuming average speed of 3.2 km/h
-      return MET * weight * hours;
-    }
+      <!-- Notes -->
+      <div class="mobile-card">
+        <h2>Notes</h2>
+        <div class="notes-content">
+          <p>Feeling good today. Energy levels are high.</p>
+        </div>
+      </div>
+    </main>
 
-    function formatDate(dateStr) {
-      return new Date(dateStr).toLocaleDateString(undefined, { weekday: 'short' });
-    }
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+      <a href="index.html" class="nav-item">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        <span>Home</span>
+      </a>
+      <a href="favorites.html" class="nav-item">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+        </svg>
+        <span>Favorites</span>
+      </a>
+      <a href="medications.html" class="nav-item">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+        </svg>
+        <span>Medications</span>
+      </a>
+      <a href="mood.html" class="nav-item">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>Mood</span>
+      </a>
+    </nav>
+  </div>
 
-    // Trend calculation functions
-    function calculateBPTrend(docs) {
-      if (docs.length < 2) return null;
-      const first = docs[docs.length - 1].data().systolic;
-      const last = docs[0].data().systolic;
-      return ((last - first) / first) * 100;
-    }
-
-    function calculateActivityTrend(docs) {
-      if (docs.length < 2) return null;
-      const first = docs[docs.length - 1].data().distance;
-      const last = docs[0].data().distance;
-      return ((last - first) / first) * 100;
-    }
-
-    function calculateMoodTrend(docs) {
-      if (docs.length < 2) return null;
-      const first = docs[docs.length - 1].data().rating;
-      const last = docs[0].data().rating;
-      return ((last - first) / first) * 100;
-    }
-
-    function calculateMedsTrend(docs) {
-      if (docs.length < 2) return null;
-      const first = docs[docs.length - 1].data().taken;
-      const last = docs[0].data().taken;
-      return ((last - first) / first) * 100;
-    }
-  </script>
+  <script src="assets/mobile.js"></script>
 </body>
 </html>

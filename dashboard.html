@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <title>Bradley Health Dashboard</title>
+  <title>Dashboard - Bradley Health</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" sizes="192x192" href="assets/icon-192.png" />
   <link rel="apple-touch-icon" sizes="512x512" href="assets/icon-512.png" />
@@ -84,145 +84,148 @@
   </style>
 </head>
 <body>
-  <!-- Mobile Header -->
-  <header class="mobile-header">
-    <div class="mobile-header-content">
-      <button class="mobile-menu-button" aria-label="Open menu">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 12h18M3 6h18M3 18h18"></path>
-        </svg>
-      </button>
+  <div class="mobile-container">
+    <!-- Mobile Header -->
+    <header class="mobile-header">
       <h1>Dashboard</h1>
-      <button class="mobile-menu-button" aria-label="Open notifications">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-        </svg>
+      <button class="menu-btn" aria-label="Menu">
+        <span></span>
       </button>
-    </div>
-  </header>
+    </header>
 
-  <!-- Mobile Menu -->
-  <nav class="mobile-menu">
-    <div class="mobile-menu-header">
-      <h2>Menu</h2>
-      <button class="mobile-menu-close" aria-label="Close menu">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M18 6L6 18M6 6l12 12"></path>
-        </svg>
-      </button>
-    </div>
-    <div class="mobile-menu-items">
-      <a href="dashboard.html" class="mobile-menu-item active">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-          <polyline points="9 22 9 12 15 12 15 22"></polyline>
-        </svg>
-        Dashboard
-      </a>
-      <a href="blood-pressure.html" class="mobile-menu-item">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-        </svg>
-        Blood Pressure
-      </a>
-      <a href="medications.html" class="mobile-menu-item">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
-        </svg>
-        Medications
-      </a>
-      <a href="mood-tracker.html" class="mobile-menu-item">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"></path>
-          <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-          <line x1="9" y1="9" x2="9.01" y2="9"></line>
-          <line x1="15" y1="9" x2="15.01" y2="9"></line>
-        </svg>
-        Mood Tracker
-      </a>
-      <a href="profile.html" class="mobile-menu-item">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        Profile
-      </a>
-    </div>
-  </nav>
+    <!-- Main Content -->
+    <main class="mobile-content">
+      <!-- Quick Actions -->
+      <div class="mobile-card">
+        <h2>Quick Actions</h2>
+        <div class="quick-actions">
+          <button class="action-btn" onclick="location.href='blood-pressure.html'">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+            <span>Log BP</span>
+          </button>
+          <button class="action-btn" onclick="location.href='mood.html'">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>Log Mood</span>
+          </button>
+          <button class="action-btn" onclick="location.href='medications.html'">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+            </svg>
+            <span>Log Meds</span>
+          </button>
+        </div>
+      </div>
 
-  <!-- Main Content -->
-  <main class="container">
-    <!-- Quick Actions -->
-    <section class="mobile-card">
-      <div class="mobile-card-header">
-        <h2 class="mobile-card-title">Quick Actions</h2>
+      <!-- Health Summary -->
+      <div class="mobile-card">
+        <h2>Health Summary</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Blood Pressure</span>
+              <span class="status-badge status-normal">Normal</span>
+            </div>
+            <div class="stat-value">120/80</div>
+            <div class="stat-details">Last reading: 9:30 AM</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Mood</span>
+              <span class="status-badge status-good">Good</span>
+            </div>
+            <div class="stat-value">😄</div>
+            <div class="stat-details">Sleep: Good, Stress: Moderate</div>
+          </div>
+        </div>
       </div>
-      <div class="quick-actions">
-        <button class="mobile-button mobile-button-primary" onclick="location.href='blood-pressure.html'">
-          Log Blood Pressure
-        </button>
-        <button class="mobile-button mobile-button-secondary" onclick="location.href='medications.html'">
-          Log Medication
-        </button>
-        <button class="mobile-button mobile-button-secondary" onclick="location.href='mood-tracker.html'">
-          Log Mood
-        </button>
-      </div>
-    </section>
 
-    <!-- Health Summary -->
-    <section class="mobile-card">
-      <div class="mobile-card-header">
-        <h2 class="mobile-card-title">Health Summary</h2>
-        <button class="mobile-button mobile-button-secondary" onclick="refreshHealthSummary()">
-          Refresh
-        </button>
+      <!-- Recent Activity -->
+      <div class="mobile-card">
+        <h2>Recent Activity</h2>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="activity-icon">❤️</div>
+            <div class="activity-info">
+              <div class="activity-name">Blood Pressure</div>
+              <div class="activity-details">120/80 - Normal</div>
+            </div>
+            <div class="activity-time">9:30 AM</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon">😄</div>
+            <div class="activity-info">
+              <div class="activity-name">Mood Entry</div>
+              <div class="activity-details">Feeling great today!</div>
+            </div>
+            <div class="activity-time">8:45 AM</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon">💊</div>
+            <div class="activity-info">
+              <div class="activity-name">Medication</div>
+              <div class="activity-details">Lisinopril 10mg taken</div>
+            </div>
+            <div class="activity-time">8:00 AM</div>
+          </div>
+        </div>
       </div>
-      <div id="health-summary" class="health-summary">
-        <!-- Health summary content will be loaded here -->
-      </div>
-    </section>
 
-    <!-- Recent Activity -->
-    <section class="mobile-card">
-      <div class="mobile-card-header">
-        <h2 class="mobile-card-title">Recent Activity</h2>
-        <button class="mobile-button mobile-button-secondary" onclick="loadMoreActivity()">
-          Load More
-        </button>
+      <!-- Upcoming -->
+      <div class="mobile-card">
+        <h2>Upcoming</h2>
+        <div class="upcoming-list">
+          <div class="upcoming-item">
+            <div class="upcoming-icon">💊</div>
+            <div class="upcoming-info">
+              <div class="upcoming-name">Aspirin 81mg</div>
+              <div class="upcoming-details">8:00 PM</div>
+            </div>
+            <div class="upcoming-status">In 2 hours</div>
+          </div>
+          <div class="upcoming-item">
+            <div class="upcoming-icon">📅</div>
+            <div class="upcoming-info">
+              <div class="upcoming-name">Doctor Appointment</div>
+              <div class="upcoming-details">Tomorrow, 10:00 AM</div>
+            </div>
+            <div class="upcoming-status">Tomorrow</div>
+          </div>
+        </div>
       </div>
-      <div id="recent-activity" class="mobile-list">
-        <!-- Recent activity items will be loaded here -->
-      </div>
-    </section>
-  </main>
+    </main>
 
-  <!-- Mobile Navigation -->
-  <nav class="mobile-nav">
-    <div class="mobile-nav-items">
-      <a href="dashboard.html" class="mobile-nav-item active">
-        <span class="mobile-nav-icon">🏠</span>
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+      <a href="index.html" class="nav-item active">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
         <span>Home</span>
       </a>
-      <a href="blood-pressure.html" class="mobile-nav-item">
-        <span class="mobile-nav-icon">❤️</span>
-        <span>BP</span>
+      <a href="favorites.html" class="nav-item">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+        </svg>
+        <span>Favorites</span>
       </a>
-      <a href="medications.html" class="mobile-nav-item">
-        <span class="mobile-nav-icon">💊</span>
-        <span>Meds</span>
+      <a href="medications.html" class="nav-item">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+        </svg>
+        <span>Medications</span>
       </a>
-      <a href="mood-tracker.html" class="mobile-nav-item">
-        <span class="mobile-nav-icon">😊</span>
+      <a href="mood.html" class="nav-item">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
         <span>Mood</span>
       </a>
-      <a href="profile.html" class="mobile-nav-item">
-        <span class="mobile-nav-icon">👤</span>
-        <span>Profile</span>
-      </a>
-    </div>
-  </nav>
+    </nav>
+  </div>
 
   <!-- Mobile Toast -->
   <div id="mobile-toast" class="mobile-toast"></div>

@@ -1,121 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Profile - Bradley Health</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Bradley Health</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/mobile.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2B6CB0">
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="firebase-init.js"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f4f8;
-      margin: 0;
-      padding: 2em;
-      color: #222;
-    }
-
-    .container {
-      max-width: 500px;
-      margin: auto;
-      background: white;
-      padding: 2em;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    h1 {
-      text-align: center;
-      color: #2c7a7b;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 0.8em;
-      margin: 0.8em 0;
-      font-size: 1em;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      width: 100%;
-      padding: 0.8em;
-      background: #2c7a7b;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 1em;
-      cursor: pointer;
-      margin-top: 1em;
-    }
-
-    .back {
-      margin-top: 1em;
-      background: #718096;
-    }
-  </style>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="firebase-init.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>My Profile</h1>
-    <input type="text" id="name" placeholder="Full Name" />
-    <input type="number" id="age" placeholder="Age" />
-    <select id="gender">
-      <option value="">Select Gender</option>
-      <option value="Male">Male</option>
-      <option value="Female">Female</option>
-    </select>
-    <input type="number" id="weight" placeholder="Weight (lbs or kg)" />
+    <div class="mobile-container">
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <h1>Profile</h1>
+            <button class="menu-btn" aria-label="Menu">
+                <span></span>
+            </button>
+        </header>
 
-    <button onclick="saveProfile()">Save Changes</button>
-    <button class="back" onclick="window.location.href='index.html'">← Back to Dashboard</button>
-  </div>
+        <!-- Main Content -->
+        <main class="mobile-content">
+            <!-- Profile Info -->
+            <div class="mobile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <span class="avatar-text">👤</span>
+                    </div>
+                    <div class="profile-info">
+                        <h2 class="profile-name">John Doe</h2>
+                        <p class="profile-email">john.doe@example.com</p>
+                    </div>
+                </div>
+            </div>
 
-  <script>
-    let currentUser;
-    const fields = {
-      name: document.getElementById("name"),
-      age: document.getElementById("age"),
-      gender: document.getElementById("gender"),
-      weight: document.getElementById("weight")
-    };
+            <!-- Health Information -->
+            <div class="mobile-card">
+                <h2>Health Information</h2>
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="info-label">Date of Birth</span>
+                        <span class="info-value">01/01/1980</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Blood Type</span>
+                        <span class="info-value">O+</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Allergies</span>
+                        <span class="info-value">None</span>
+                    </div>
+                </div>
+            </div>
 
-    firebase.auth().onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
-      currentUser = user;
-      db.collection("users").doc(currentUser.uid).get().then(doc => {
-        if (doc.exists) {
-          const d = doc.data();
-          fields.name.value = d.name || "";
-          fields.age.value = d.age || "";
-          fields.gender.value = d.gender || "";
-          fields.weight.value = d.weight || "";
+            <!-- Emergency Contacts -->
+            <div class="mobile-card">
+                <h2>Emergency Contacts</h2>
+                <div class="contact-list">
+                    <div class="contact-item">
+                        <div class="contact-info">
+                            <div class="contact-name">Jane Doe</div>
+                            <div class="contact-relation">Spouse</div>
+                        </div>
+                        <a href="tel:+15551234567" class="contact-phone">(555) 123-4567</a>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-info">
+                            <div class="contact-name">Dr. Smith</div>
+                            <div class="contact-relation">Primary Doctor</div>
+                        </div>
+                        <a href="tel:+15559876543" class="contact-phone">(555) 987-6543</a>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-info">
+                            <div class="contact-name">Emergency Services</div>
+                            <div class="contact-relation">Emergency</div>
+                        </div>
+                        <a href="tel:911" class="contact-phone">911</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="mobile-card">
+                <h2>Settings</h2>
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Notifications</span>
+                            <span class="setting-description">Receive alerts for medications and appointments</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Dark Mode</span>
+                            <span class="setting-description">Switch between light and dark themes</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Language</span>
+                            <span class="setting-description">English</span>
+                        </div>
+                        <button class="setting-action">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Navigation -->
+        <nav class="mobile-nav">
+            <a href="index.html" class="nav-item">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span>Home</span>
+            </a>
+            <a href="favorites.html" class="nav-item">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+                <span>Favorites</span>
+            </a>
+            <a href="medications.html" class="nav-item">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                </svg>
+                <span>Medications</span>
+            </a>
+            <a href="mood.html" class="nav-item">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>Mood</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="assets/mobile.js"></script>
+    <script>
+        let currentUser;
+        const fields = {
+            name: document.getElementById("name"),
+            age: document.getElementById("age"),
+            gender: document.getElementById("gender"),
+            weight: document.getElementById("weight")
+        };
+
+        firebase.auth().onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
+            currentUser = user;
+            db.collection("users").doc(currentUser.uid).get().then(doc => {
+                if (doc.exists) {
+                    const d = doc.data();
+                    fields.name.value = d.name || "";
+                    fields.age.value = d.age || "";
+                    fields.gender.value = d.gender || "";
+                    fields.weight.value = d.weight || "";
+                }
+            });
+        });
+
+        function saveProfile() {
+            if (!currentUser) return;
+            db.collection("users").doc(currentUser.uid).set({
+                name: fields.name.value,
+                age: parseInt(fields.age.value) || null,
+                gender: fields.gender.value,
+                weight: parseFloat(fields.weight.value) || null
+            }, { merge: true }).then(() => {
+                alert("✅ Profile updated!");
+            }).catch(err => {
+                alert("❌ Error: " + err.message);
+            });
         }
-      });
-    });
-
-    function saveProfile() {
-      if (!currentUser) return;
-      db.collection("users").doc(currentUser.uid).set({
-        name: fields.name.value,
-        age: parseInt(fields.age.value) || null,
-        gender: fields.gender.value,
-        weight: parseFloat(fields.weight.value) || null
-      }, { merge: true }).then(() => {
-        alert("✅ Profile updated!");
-      }).catch(err => {
-        alert("❌ Error: " + err.message);
-      });
-    }
-  </script>
+    </script>
 </body>
 </html>
