@@ -219,4 +219,224 @@ class MobileUI {
 // Initialize mobile UI
 document.addEventListener('DOMContentLoaded', () => {
     window.mobileUI = new MobileUI();
-}); 
+});
+
+// Blood Pressure Tracking
+const BP_CATEGORIES = {
+    NORMAL: { min: 0, max: 120, diastolicMax: 80, label: 'Normal', class: 'status-normal' },
+    ELEVATED: { min: 121, max: 129, diastolicMax: 80, label: 'Elevated', class: 'status-elevated' },
+    HIGH_STAGE1: { min: 130, max: 139, diastolicMax: 89, label: 'High Stage 1', class: 'status-high' },
+    HIGH_STAGE2: { min: 140, max: 999, diastolicMax: 999, label: 'High Stage 2', class: 'status-high' }
+};
+
+// Initialize IndexedDB
+const initDB = () => {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('BradleyHealth', 1);
+        
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+        
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('bpReadings')) {
+                const store = db.createObjectStore('bpReadings', { keyPath: 'id', autoIncrement: true });
+                store.createIndex('timestamp', 'timestamp', { unique: false });
+            }
+        };
+    });
+};
+
+// Save BP Reading
+const saveBPReading = async (reading) => {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['bpReadings'], 'readwrite');
+        const store = transaction.objectStore('bpReadings');
+        const request = store.add({
+            ...reading,
+            timestamp: new Date().toISOString()
+        });
+        
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+};
+
+// Get BP Readings
+const getBPReadings = async (timeRange = 'week') => {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['bpReadings'], 'readonly');
+        const store = transaction.objectStore('bpReadings');
+        const index = store.index('timestamp');
+        
+        const now = new Date();
+        let startDate;
+        
+        switch(timeRange) {
+            case 'week':
+                startDate = new Date(now.setDate(now.getDate() - 7));
+                break;
+            case 'month':
+                startDate = new Date(now.setMonth(now.getMonth() - 1));
+                break;
+            case 'year':
+                startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+                break;
+            default:
+                startDate = new Date(now.setDate(now.getDate() - 7));
+        }
+        
+        const range = IDBKeyRange.lowerBound(startDate.toISOString());
+        const request = index.getAll(range);
+        
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+};
+
+// Calculate BP Category
+const getBPCategory = (systolic, diastolic) => {
+    for (const [key, category] of Object.entries(BP_CATEGORIES)) {
+        if (systolic >= category.min && systolic <= category.max && diastolic <= category.diastolicMax) {
+            return category;
+        }
+    }
+    return BP_CATEGORIES.HIGH_STAGE2;
+};
+
+// Update BP Display
+const updateBPDisplay = async () => {
+    const readings = await getBPReadings('week');
+    if (readings.length === 0) return;
+    
+    const latest = readings[readings.length - 1];
+    const category = getBPCategory(latest.systolic, latest.diastolic);
+    
+    // Update current reading display
+    document.querySelector('.bp-value .systolic').textContent = latest.systolic;
+    document.querySelector('.bp-value .diastolic').textContent = latest.diastolic;
+    document.querySelector('.bp-pulse .pulse-value').textContent = latest.pulse || '--';
+    
+    const statusBadge = document.querySelector('.status-badge');
+    statusBadge.textContent = category.label;
+    statusBadge.className = `status-badge ${category.class}`;
+    
+    // Update timestamp
+    const timestamp = new Date(latest.timestamp);
+    document.querySelector('.bp-timestamp').textContent = 
+        `Last reading: ${timestamp.toLocaleDateString()} at ${timestamp.toLocaleTimeString()}`;
+    
+    // Update readings list
+    updateReadingsList(readings);
+};
+
+// Update Readings List
+const updateReadingsList = (readings) => {
+    const list = document.getElementById('readingsList');
+    list.innerHTML = readings.reverse().map(reading => {
+        const category = getBPCategory(reading.systolic, reading.diastolic);
+        const timestamp = new Date(reading.timestamp);
+        
+        return `
+            <div class="reading-item">
+                <div class="reading-values">
+                    <div class="reading-bp">
+                        <span class="systolic">${reading.systolic}</span>/
+                        <span class="diastolic">${reading.diastolic}</span>
+                    </div>
+                    <div class="reading-pulse">${reading.pulse || '--'} bpm</div>
+                </div>
+                <div class="reading-info">
+                    <div class="reading-time">${timestamp.toLocaleString()}</div>
+                    <span class="reading-status ${category.class}">${category.label}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+};
+
+// Update BP Statistics
+const updateBPStats = async (timeRange) => {
+    const readings = await getBPReadings(timeRange);
+    if (readings.length === 0) return;
+    
+    const systolicValues = readings.map(r => r.systolic);
+    const diastolicValues = readings.map(r => r.diastolic);
+    
+    const avgSystolic = Math.round(systolicValues.reduce((a, b) => a + b, 0) / readings.length);
+    const avgDiastolic = Math.round(diastolicValues.reduce((a, b) => a + b, 0) / readings.length);
+    const maxSystolic = Math.max(...systolicValues);
+    const maxDiastolic = Math.max(...diastolicValues);
+    const minSystolic = Math.min(...systolicValues);
+    const minDiastolic = Math.min(...diastolicValues);
+    
+    document.querySelector('.stat-item:nth-child(1) .stat-value').textContent = 
+        `${avgSystolic}/${avgDiastolic}`;
+    document.querySelector('.stat-item:nth-child(2) .stat-value').textContent = 
+        `${maxSystolic}/${maxDiastolic}`;
+    document.querySelector('.stat-item:nth-child(3) .stat-value').textContent = 
+        `${minSystolic}/${minDiastolic}`;
+    
+    renderBPChart(readings);
+};
+
+// Render BP Chart
+const renderBPChart = (readings) => {
+    const ctx = document.getElementById('bpChart');
+    if (!ctx) return;
+    
+    // Clear previous chart
+    ctx.innerHTML = '';
+    
+    // Create SVG chart
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+    svg.setAttribute('viewBox', '0 0 100 100');
+    svg.setAttribute('preserveAspectRatio', 'none');
+    
+    // Add chart elements
+    const points = readings.map((reading, i) => {
+        const x = (i / (readings.length - 1)) * 100;
+        const y = 100 - (reading.systolic / 200) * 100;
+        return `${x},${y}`;
+    }).join(' ');
+    
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${points}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', 'var(--primary)');
+    path.setAttribute('stroke-width', '2');
+    
+    svg.appendChild(path);
+    ctx.appendChild(svg);
+};
+
+// Export BP Data
+const exportBPData = async () => {
+    const readings = await getBPReadings('year');
+    const csv = [
+        ['Date', 'Time', 'Systolic', 'Diastolic', 'Pulse', 'Notes'],
+        ...readings.map(reading => {
+            const date = new Date(reading.timestamp);
+            return [
+                date.toLocaleDateString(),
+                date.toLocaleTimeString(),
+                reading.systolic,
+                reading.diastolic,
+                reading.pulse || '',
+                reading.notes || ''
+            ];
+        })
+    ].map(row => row.join(',')).join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bp-readings-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}; 

@@ -427,4 +427,197 @@
   .mobile-loading-spinner {
     animation: none;
   }
+}
+
+/* Blood Pressure Specific Styles */
+.bp-reading {
+    text-align: center;
+    padding: var(--spacing-4) 0;
+}
+
+.bp-value {
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+}
+
+.bp-value .systolic,
+.bp-value .diastolic {
+    color: var(--primary);
+}
+
+.bp-value .divider {
+    color: var(--text-light);
+    margin: 0 var(--spacing-2);
+}
+
+.bp-value .unit {
+    font-size: var(--font-size-lg);
+    color: var(--text-light);
+    margin-left: var(--spacing-2);
+}
+
+.bp-pulse {
+    margin-top: var(--spacing-2);
+    font-size: var(--font-size-xl);
+    color: var(--text-light);
+}
+
+.bp-pulse .pulse-value {
+    color: var(--secondary);
+    font-weight: 600;
+}
+
+.bp-pulse .pulse-unit {
+    font-size: var(--font-size-base);
+    margin-left: var(--spacing-1);
+}
+
+.bp-timestamp {
+    text-align: center;
+    color: var(--text-lighter);
+    font-size: var(--font-size-sm);
+    margin-top: var(--spacing-2);
+}
+
+.form-row {
+    display: flex;
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-4);
+}
+
+.form-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-4);
+}
+
+.stat-item {
+    text-align: center;
+    padding: var(--spacing-3);
+    background: var(--background-secondary);
+    border-radius: var(--radius-md);
+}
+
+.stat-label {
+    display: block;
+    font-size: var(--font-size-sm);
+    color: var(--text-light);
+    margin-bottom: var(--spacing-1);
+}
+
+.stat-value {
+    display: block;
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text);
+}
+
+.chart-container {
+    height: 200px;
+    margin-top: var(--spacing-4);
+    background: var(--white);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-4);
+}
+
+.mobile-select {
+    padding: var(--spacing-2) var(--spacing-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--white);
+    color: var(--text);
+    font-size: var(--font-size-sm);
+}
+
+/* Reading List Styles */
+.reading-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-4);
+    border-bottom: 1px solid var(--border);
+}
+
+.reading-item:last-child {
+    border-bottom: none;
+}
+
+.reading-values {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+}
+
+.reading-bp {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+}
+
+.reading-bp .systolic {
+    color: var(--primary);
+}
+
+.reading-bp .diastolic {
+    color: var(--primary);
+}
+
+.reading-pulse {
+    color: var(--text-light);
+    font-size: var(--font-size-base);
+}
+
+.reading-info {
+    text-align: right;
+}
+
+.reading-time {
+    font-size: var(--font-size-sm);
+    color: var(--text-lighter);
+}
+
+.reading-status {
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--radius-full);
+    margin-top: var(--spacing-1);
+}
+
+/* Status Colors */
+.status-normal {
+    background: rgba(56, 161, 105, 0.1);
+    color: var(--success);
+}
+
+.status-elevated {
+    background: rgba(237, 137, 54, 0.1);
+    color: var(--warning);
+}
+
+.status-high {
+    background: rgba(229, 62, 62, 0.1);
+    color: var(--error);
+}
+
+/* Dark Mode Adjustments */
+[data-theme="dark"] {
+    .stat-item {
+        background: var(--background-tertiary);
+    }
+    
+    .chart-container {
+        background: var(--background-secondary);
+    }
+    
+    .mobile-select {
+        background: var(--background-tertiary);
+        color: var(--text);
+    }
 } 

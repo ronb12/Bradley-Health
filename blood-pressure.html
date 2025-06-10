@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Blood Pressure Tracker - Bradley Health</title>
+  <title>Blood Pressure - Bradley Health</title>
   <link rel="icon" href="assets/icon-192.png" />
   <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="assets/mobile.css" />
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
   <meta name="theme-color" content="#2B6CB0">
@@ -20,434 +21,124 @@
   <script src="assets/shared.js"></script>
 </head>
 <body>
-  <header>
-    <h1>
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-      </svg>
-      Blood Pressure Tracker
-    </h1>
-    <button id="darkModeToggle" class="icon-button" aria-label="Toggle dark mode">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-      </svg>
-    </button>
-  </header>
+  <div class="mobile-header">
+    <div class="mobile-header-content">
+      <h1>Blood Pressure</h1>
+      <button class="mobile-menu-button" aria-label="Menu">☰</button>
+    </div>
+  </div>
 
-  <nav class="nav-menu">
-    <a href="index.html" class="nav-item">Dashboard</a>
-    <a href="blood-pressure.html" class="nav-item active">Blood Pressure</a>
-    <a href="medications.html" class="nav-item">Medications</a>
-    <a href="appointments.html" class="nav-item">Appointments</a>
-  </nav>
-
-  <main>
-    <section class="data-entry-section">
-      <h2>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 5v14M5 12h14"/>
-        </svg>
-        Log Blood Pressure
-      </h2>
-      <div class="form-help-text">
-        <p>Please take your blood pressure reading in a quiet, comfortable setting. Sit with your back supported and feet flat on the floor.</p>
+  <main class="container">
+    <!-- Current Status Card -->
+    <div class="mobile-card">
+      <div class="mobile-card-header">
+        <h2>Current Status</h2>
+        <span class="status-badge status-normal">Normal</span>
       </div>
-      <form id="bpForm" class="medical-form">
+      <div class="bp-reading">
+        <div class="bp-value">
+          <span class="systolic">120</span>
+          <span class="divider">/</span>
+          <span class="diastolic">80</span>
+          <span class="unit">mmHg</span>
+        </div>
+        <div class="bp-pulse">
+          <span class="pulse-value">72</span>
+          <span class="pulse-unit">bpm</span>
+        </div>
+      </div>
+      <div class="bp-timestamp">Last reading: Today at 9:30 AM</div>
+    </div>
+
+    <!-- Quick Add Reading -->
+    <div class="mobile-card">
+      <div class="mobile-card-header">
+        <h2>Add Reading</h2>
+      </div>
+      <form class="mobile-form" id="bpForm">
         <div class="form-row">
           <div class="form-group">
-            <label for="systolic">
-              Systolic (Top Number)
-              <span class="help-icon" title="The higher number that measures pressure when your heart beats">ⓘ</span>
-            </label>
-            <input type="number" id="systolic" required min="60" max="250" 
-                   placeholder="e.g., 120" aria-label="Systolic blood pressure">
-            <div class="input-help">Normal range: 90-120 mmHg</div>
+            <label for="systolic">Systolic</label>
+            <input type="number" id="systolic" class="mobile-input" placeholder="120" required>
           </div>
           <div class="form-group">
-            <label for="diastolic">
-              Diastolic (Bottom Number)
-              <span class="help-icon" title="The lower number that measures pressure when your heart rests">ⓘ</span>
-            </label>
-            <input type="number" id="diastolic" required min="40" max="150" 
-                   placeholder="e.g., 80" aria-label="Diastolic blood pressure">
-            <div class="input-help">Normal range: 60-80 mmHg</div>
-          </div>
-          <div class="form-group">
-            <label for="pulse">
-              Pulse Rate
-              <span class="help-icon" title="Your heart rate in beats per minute">ⓘ</span>
-            </label>
-            <input type="number" id="pulse" required min="40" max="200" 
-                   placeholder="e.g., 72" aria-label="Pulse rate">
-            <div class="input-help">Normal range: 60-100 bpm</div>
+            <label for="diastolic">Diastolic</label>
+            <input type="number" id="diastolic" class="mobile-input" placeholder="80" required>
           </div>
         </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="timeOfDay">Time of Day</label>
-            <select id="timeOfDay" required>
-              <option value="morning">Morning (6 AM - 12 PM)</option>
-              <option value="afternoon">Afternoon (12 PM - 6 PM)</option>
-              <option value="evening">Evening (6 PM - 10 PM)</option>
-              <option value="night">Night (10 PM - 6 AM)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="medicationStatus">Medication Status</label>
-            <select id="medicationStatus" required>
-              <option value="taken">Taken as Prescribed</option>
-              <option value="missed">Missed Dose</option>
-              <option value="delayed">Delayed Dose</option>
-              <option value="none">No Medication</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="activityLevel">Activity Level</label>
-            <select id="activityLevel" required>
-              <option value="resting">Resting (5+ minutes)</option>
-              <option value="light">Light Activity</option>
-              <option value="moderate">Moderate Activity</option>
-              <option value="strenuous">Strenuous Activity</option>
-            </select>
-          </div>
-        </div>
-
         <div class="form-group">
-          <label for="notes">Additional Notes</label>
-          <textarea id="notes" rows="3" 
-                    placeholder="Add any relevant notes (e.g., after exercise, feeling stressed, recent meal)"></textarea>
+          <label for="pulse">Pulse</label>
+          <input type="number" id="pulse" class="mobile-input" placeholder="72">
         </div>
-
-        <div class="form-actions">
-          <button type="submit" class="primary-button">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-              <polyline points="17 21 17 13 7 13 7 21"/>
-              <polyline points="7 3 7 8 15 8"/>
-            </svg>
-            Save Reading
-          </button>
-          <button type="button" class="secondary-button" onclick="showMeasurementGuide()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="16" x2="12" y2="12"/>
-              <line x1="12" y1="8" x2="12.01" y2="8"/>
-            </svg>
-            How to Measure
-          </button>
+        <div class="form-group">
+          <label for="notes">Notes</label>
+          <textarea id="notes" class="mobile-input" placeholder="How are you feeling?"></textarea>
         </div>
+        <button type="submit" class="mobile-button mobile-button-primary">Save Reading</button>
       </form>
-    </section>
+    </div>
 
-    <section class="today-summary-section">
-      <h2>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/>
-          <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        Today's Summary
-      </h2>
-      <div class="data-cards">
-        <div class="data-card">
-          <div class="data-card-header">
-            <span class="data-card-title">Latest Reading</span>
-            <span class="status-indicator status-normal">Normal</span>
-          </div>
-          <div class="data-card-value">120/80</div>
-          <div class="data-card-trend">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="18 15 12 9 6 15"/>
-            </svg>
-            Within normal range
-          </div>
-        </div>
-        <div class="data-card">
-          <div class="data-card-header">
-            <span class="data-card-title">Average Today</span>
-          </div>
-          <div class="data-card-value">118/78</div>
-          <div class="data-card-trend">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="18 15 12 9 6 15"/>
-            </svg>
-            Stable
-          </div>
-        </div>
-        <div class="data-card">
-          <div class="data-card-header">
-            <span class="data-card-title">Readings Today</span>
-          </div>
-          <div class="data-card-value">3</div>
-          <div class="data-card-trend">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 16 14"/>
-            </svg>
-            Last: 2 hours ago
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="chart-section">
-      <h2>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 21H3"/>
-          <path d="M3 7v14"/>
-          <path d="M7 3v18"/>
-          <path d="M11 7v14"/>
-          <path d="M15 3v18"/>
-          <path d="M19 7v14"/>
-        </svg>
-        7-Day History
-      </h2>
-      <div class="chart-container">
-        <canvas id="bpChart"></canvas>
-        <div class="chart-controls">
-          <button class="active">All</button>
-          <button>Systolic</button>
-          <button>Diastolic</button>
-          <button>Pulse</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="readings-section">
-      <h2>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <polyline points="14 2 14 8 20 8"/>
-          <line x1="16" y1="13" x2="8" y2="13"/>
-          <line x1="16" y1="17" x2="8" y2="17"/>
-          <polyline points="10 9 9 9 8 9"/>
-        </svg>
-        Recent Readings
-      </h2>
-      <div class="filter-controls">
-        <select id="timeFilter">
-          <option value="7">Last 7 Days</option>
-          <option value="30">Last 30 Days</option>
-          <option value="90">Last 90 Days</option>
+    <!-- Statistics Card -->
+    <div class="mobile-card">
+      <div class="mobile-card-header">
+        <h2>Statistics</h2>
+        <select class="mobile-select" id="timeRange">
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="year">This Year</option>
         </select>
-        <button class="secondary-button" id="exportData">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-          Export Data
-        </button>
       </div>
-      <div class="readings-list" id="readingsList">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-label">Average</span>
+          <span class="stat-value">118/78</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Highest</span>
+          <span class="stat-value">130/85</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Lowest</span>
+          <span class="stat-value">110/70</span>
+        </div>
+      </div>
+      <div class="chart-container" id="bpChart">
+        <!-- Chart will be rendered here -->
+      </div>
+    </div>
+
+    <!-- Recent Readings -->
+    <div class="mobile-card">
+      <div class="mobile-card-header">
+        <h2>Recent Readings</h2>
+        <button class="mobile-button mobile-button-secondary" id="exportBtn">Export</button>
+      </div>
+      <div class="mobile-list" id="readingsList">
         <!-- Readings will be populated here -->
       </div>
-    </section>
-
-    <section class="education-section">
-        <h2>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-            </svg>
-            Understanding Blood Pressure
-        </h2>
-        
-        <div class="education-tabs">
-            <button class="tab-button active" data-tab="basics">Basics</button>
-            <button class="tab-button" data-tab="risks">Risks & Prevention</button>
-            <button class="tab-button" data-tab="lifestyle">Lifestyle Tips</button>
-            <button class="tab-button" data-tab="faq">FAQ</button>
-        </div>
-
-        <div class="tab-content active" id="basics">
-            <div class="education-card">
-                <h3>What is Blood Pressure?</h3>
-                <p>Blood pressure is the force of blood pushing against the walls of your arteries. It's measured in millimeters of mercury (mmHg) and consists of two numbers:</p>
-                
-                <div class="info-cards">
-                    <div class="info-card">
-                        <div class="info-card-header">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                            </svg>
-                            <h4>Systolic (Top Number)</h4>
-                        </div>
-                        <p>The pressure when your heart beats and pumps blood</p>
-                        <div class="range-indicator">
-                            <span class="range-label">Normal: 90-120 mmHg</span>
-                            <div class="range-bar">
-                                <div class="range-normal" style="width: 60%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="info-card">
-                        <div class="info-card-header">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2v20M6 5h11.5a3.5 3.5 0 0 1 0 7H6"/>
-                            </svg>
-                            <h4>Diastolic (Bottom Number)</h4>
-                        </div>
-                        <p>The pressure when your heart rests between beats</p>
-                        <div class="range-indicator">
-                            <span class="range-label">Normal: 60-80 mmHg</span>
-                            <div class="range-bar">
-                                <div class="range-normal" style="width: 40%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="education-card">
-                <h3>Blood Pressure Categories</h3>
-                <div class="bp-categories">
-                    <div class="bp-category normal">
-                        <h4>Normal</h4>
-                        <p>Less than 120/80 mmHg</p>
-                        <div class="category-icon">✓</div>
-                    </div>
-                    <div class="bp-category elevated">
-                        <h4>Elevated</h4>
-                        <p>120-129/less than 80 mmHg</p>
-                        <div class="category-icon">⚠</div>
-                    </div>
-                    <div class="bp-category stage1">
-                        <h4>Stage 1 Hypertension</h4>
-                        <p>130-139/80-89 mmHg</p>
-                        <div class="category-icon">!</div>
-                    </div>
-                    <div class="bp-category stage2">
-                        <h4>Stage 2 Hypertension</h4>
-                        <p>140 or higher/90 or higher mmHg</p>
-                        <div class="category-icon">!!</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="tab-content" id="risks">
-            <div class="education-card">
-                <h3>Risk Factors</h3>
-                <div class="risk-factors">
-                    <div class="risk-factor">
-                        <div class="risk-icon">👤</div>
-                        <h4>Age</h4>
-                        <p>Risk increases with age</p>
-                    </div>
-                    <div class="risk-factor">
-                        <div class="risk-icon">👥</div>
-                        <h4>Family History</h4>
-                        <p>Genetic predisposition</p>
-                    </div>
-                    <div class="risk-factor">
-                        <div class="risk-icon">🍽️</div>
-                        <h4>Diet</h4>
-                        <p>High sodium intake</p>
-                    </div>
-                    <div class="risk-factor">
-                        <div class="risk-icon">🏃</div>
-                        <h4>Lifestyle</h4>
-                        <p>Physical inactivity</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="education-card">
-                <h3>Prevention Strategies</h3>
-                <div class="prevention-strategies">
-                    <div class="strategy">
-                        <h4>Regular Monitoring</h4>
-                        <p>Track your blood pressure regularly</p>
-                        <button class="strategy-button" onclick="showMeasurementGuide()">Learn How to Measure</button>
-                    </div>
-                    <div class="strategy">
-                        <h4>Healthy Diet</h4>
-                        <p>Follow DASH diet principles</p>
-                        <button class="strategy-button" onclick="showDietGuide()">View Diet Guide</button>
-                    </div>
-                    <div class="strategy">
-                        <h4>Exercise</h4>
-                        <p>30 minutes of moderate activity daily</p>
-                        <button class="strategy-button" onclick="showExerciseGuide()">Exercise Tips</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="tab-content" id="lifestyle">
-            <div class="education-card">
-                <h3>Lifestyle Modifications</h3>
-                <div class="lifestyle-tips">
-                    <div class="tip-card">
-                        <h4>Dietary Changes</h4>
-                        <ul>
-                            <li>Reduce sodium intake</li>
-                            <li>Increase potassium-rich foods</li>
-                            <li>Limit alcohol consumption</li>
-                            <li>Eat more fruits and vegetables</li>
-                        </ul>
-                    </div>
-                    <div class="tip-card">
-                        <h4>Physical Activity</h4>
-                        <ul>
-                            <li>Regular aerobic exercise</li>
-                            <li>Strength training 2-3 times/week</li>
-                            <li>Stay active throughout the day</li>
-                            <li>Find activities you enjoy</li>
-                        </ul>
-                    </div>
-                    <div class="tip-card">
-                        <h4>Stress Management</h4>
-                        <ul>
-                            <li>Practice deep breathing</li>
-                            <li>Try meditation or yoga</li>
-                            <li>Get adequate sleep</li>
-                            <li>Maintain social connections</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="tab-content" id="faq">
-            <div class="education-card">
-                <h3>Frequently Asked Questions</h3>
-                <div class="faq-list">
-                    <div class="faq-item">
-                        <button class="faq-question">
-                            How often should I check my blood pressure?
-                            <span class="faq-icon">+</span>
-                        </button>
-                        <div class="faq-answer">
-                            <p>If you have normal blood pressure, check it once a year. If you have high blood pressure or are at risk, your doctor may recommend more frequent monitoring. Always follow your healthcare provider's recommendations.</p>
-                        </div>
-                    </div>
-                    <div class="faq-item">
-                        <button class="faq-question">
-                            What time of day is best to measure blood pressure?
-                            <span class="faq-icon">+</span>
-                        </button>
-                        <div class="faq-answer">
-                            <p>Measure at the same time each day, preferably in the morning before taking medications and in the evening before bed. Avoid measuring right after exercise or when you're stressed.</p>
-                        </div>
-                    </div>
-                    <div class="faq-item">
-                        <button class="faq-question">
-                            Can I lower my blood pressure naturally?
-                            <span class="faq-icon">+</span>
-                        </button>
-                        <div class="faq-answer">
-                            <p>Yes, through lifestyle changes like regular exercise, healthy diet, stress management, and limiting alcohol and sodium. However, always consult your doctor before making significant changes.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    </div>
   </main>
+
+  <nav class="mobile-nav">
+    <div class="mobile-nav-items">
+      <a href="dashboard.html" class="mobile-nav-item">
+        <span class="mobile-nav-icon">🏠</span>
+        <span>Home</span>
+      </a>
+      <a href="blood-pressure.html" class="mobile-nav-item active">
+        <span class="mobile-nav-icon">❤️</span>
+        <span>BP</span>
+      </a>
+      <a href="medications.html" class="mobile-nav-item">
+        <span class="mobile-nav-icon">💊</span>
+        <span>Meds</span>
+      </a>
+      <a href="profile.html" class="mobile-nav-item">
+        <span class="mobile-nav-icon">👤</span>
+        <span>Profile</span>
+      </a>
+    </div>
+  </nav>
 
   <div id="editModal" class="modal">
     <div class="modal-content">
@@ -1068,6 +759,52 @@
         // Implement exercise guide modal
         console.log('Show exercise guide');
     }
+
+    // Initialize service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(registration => console.log('ServiceWorker registered'))
+        .catch(err => console.log('ServiceWorker registration failed:', err));
+    }
+
+    // Blood Pressure Form Handler
+    document.getElementById('bpForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const systolic = document.getElementById('systolic').value;
+      const diastolic = document.getElementById('diastolic').value;
+      const pulse = document.getElementById('pulse').value;
+      const notes = document.getElementById('notes').value;
+      
+      // Save to IndexedDB
+      saveBPReading({
+        systolic,
+        diastolic,
+        pulse,
+        notes,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Update UI
+      updateBPDisplay();
+      this.reset();
+    });
+
+    // Export Handler
+    document.getElementById('exportBtn').addEventListener('click', function() {
+      exportBPData();
+    });
+
+    // Time Range Handler
+    document.getElementById('timeRange').addEventListener('change', function() {
+      updateBPStats(this.value);
+    });
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+      updateBPDisplay();
+      updateBPStats('week');
+      renderBPChart();
+    });
   </script>
 </body>
 </html>
