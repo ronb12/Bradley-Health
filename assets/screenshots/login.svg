@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1080" height="1920" viewBox="0 0 1080 1920" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="1080" height="1920" fill="#F7FAFC"/>
+    
+    <!-- Status Bar -->
+    <rect width="1080" height="60" fill="#2B6CB0"/>
+    <text x="40" y="40" font-family="system-ui" font-size="24" fill="#FFFFFF">9:41</text>
+    <text x="1040" y="40" font-family="system-ui" font-size="24" fill="#FFFFFF" text-anchor="end">100%</text>
+    
+    <!-- Logo -->
+    <circle cx="540" cy="300" r="120" fill="#2B6CB0"/>
+    <text x="540" y="320" font-family="system-ui" font-size="72" fill="#FFFFFF" text-anchor="middle">❤️</text>
+    
+    <!-- App Name -->
+    <text x="540" y="500" font-family="system-ui" font-size="48" font-weight="bold" fill="#2D3748" text-anchor="middle">Bradley Health</text>
+    <text x="540" y="560" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">Your Health, Your Way</text>
+    
+    <!-- Login Form -->
+    <rect x="40" y="640" width="1000" height="600" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="720" font-family="system-ui" font-size="32" font-weight="bold" fill="#2D3748">Welcome Back</text>
+    <text x="80" y="760" font-family="system-ui" font-size="20" fill="#718096">Sign in to continue</text>
+    
+    <!-- Email Input -->
+    <text x="80" y="840" font-family="system-ui" font-size="20" fill="#4A5568">Email</text>
+    <rect x="80" y="860" width="920" height="60" rx="8" fill="#F7FAFC" stroke="#E2E8F0"/>
+    <text x="100" y="900" font-family="system-ui" font-size="20" fill="#2D3748">Enter your email</text>
+    
+    <!-- Password Input -->
+    <text x="80" y="960" font-family="system-ui" font-size="20" fill="#4A5568">Password</text>
+    <rect x="80" y="980" width="920" height="60" rx="8" fill="#F7FAFC" stroke="#E2E8F0"/>
+    <text x="100" y="1020" font-family="system-ui" font-size="20" fill="#2D3748">Enter your password</text>
+    
+    <!-- Forgot Password -->
+    <text x="1000" y="1060" font-family="system-ui" font-size="16" fill="#2B6CB0" text-anchor="end">Forgot Password?</text>
+    
+    <!-- Login Button -->
+    <rect x="40" y="1080" width="1000" height="80" rx="8" fill="#2B6CB0"/>
+    <text x="540" y="1130" font-family="system-ui" font-size="24" fill="#FFFFFF" text-anchor="middle">Sign In</text>
+    
+    <!-- Or Divider -->
+    <line x1="40" y1="1200" x2="1040" y2="1200" stroke="#E2E8F0" stroke-width="2"/>
+    <text x="540" y="1240" font-family="system-ui" font-size="20" fill="#718096" text-anchor="middle">or continue with</text>
+    
+    <!-- Social Login -->
+    <rect x="40" y="1280" width="480" height="60" rx="8" fill="#F7FAFC" stroke="#E2E8F0"/>
+    <text x="280" y="1320" font-family="system-ui" font-size="20" fill="#2D3748" text-anchor="middle">Google</text>
+    
+    <rect x="560" y="1280" width="480" height="60" rx="8" fill="#F7FAFC" stroke="#E2E8F0"/>
+    <text x="800" y="1320" font-family="system-ui" font-size="20" fill="#2D3748" text-anchor="middle">Apple</text>
+    
+    <!-- Sign Up -->
+    <text x="540" y="1400" font-family="system-ui" font-size="20" fill="#718096" text-anchor="middle">Don't have an account?</text>
+    <text x="540" y="1440" font-family="system-ui" font-size="20" fill="#2B6CB0" text-anchor="middle">Sign Up</text>
+    
+    <!-- Privacy Notice -->
+    <text x="540" y="1500" font-family="system-ui" font-size="16" fill="#718096" text-anchor="middle">By signing in, you agree to our</text>
+    <text x="540" y="1540" font-family="system-ui" font-size="16" fill="#2B6CB0" text-anchor="middle">Terms of Service and Privacy Policy</text>
+</svg> 

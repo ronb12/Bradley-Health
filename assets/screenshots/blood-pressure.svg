@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1080" height="1920" viewBox="0 0 1080 1920" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="1080" height="1920" fill="#F7FAFC"/>
+    
+    <!-- Status Bar -->
+    <rect width="1080" height="60" fill="#2B6CB0"/>
+    <text x="40" y="40" font-family="system-ui" font-size="24" fill="#FFFFFF">9:41</text>
+    <text x="1040" y="40" font-family="system-ui" font-size="24" fill="#FFFFFF" text-anchor="end">100%</text>
+    
+    <!-- Header -->
+    <rect y="60" width="1080" height="120" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="40" y="140" font-family="system-ui" font-size="32" font-weight="bold" fill="#2D3748">Blood Pressure</text>
+    
+    <!-- Current Reading -->
+    <rect x="40" y="200" width="1000" height="300" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="280" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748">Latest Reading</text>
+    
+    <!-- Reading Display -->
+    <text x="540" y="380" font-family="system-ui" font-size="72" font-weight="bold" fill="#2B6CB0" text-anchor="middle">120/80</text>
+    <text x="540" y="440" font-family="system-ui" font-size="24" fill="#38A169" text-anchor="middle">Normal</text>
+    <text x="540" y="480" font-family="system-ui" font-size="20" fill="#718096" text-anchor="middle">Today at 9:30 AM</text>
+    
+    <!-- New Reading Form -->
+    <rect x="40" y="520" width="1000" height="600" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="600" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748">Log New Reading</text>
+    
+    <!-- Systolic Input -->
+    <text x="80" y="660" font-family="system-ui" font-size="20" fill="#4A5568">Systolic (Top Number)</text>
+    <rect x="80" y="680" width="440" height="60" rx="8" fill="#F7FAFC" stroke="#E2E8F0"/>
+    <text x="100" y="720" font-family="system-ui" font-size="20" fill="#2D3748">Enter systolic pressure</text>
+    
+    <!-- Diastolic Input -->
+    <text x="560" y="660" font-family="system-ui" font-size="20" fill="#4A5568">Diastolic (Bottom Number)</text>
+    <rect x="560" y="680" width="440" height="60" rx="8" fill="#F7FAFC" stroke="#E2E8F0"/>
+    <text x="580" y="720" font-family="system-ui" font-size="20" fill="#2D3748">Enter diastolic pressure</text>
+    
+    <!-- Pulse Input -->
+    <text x="80" y="780" font-family="system-ui" font-size="20" fill="#4A5568">Pulse Rate</text>
+    <rect x="80" y="800" width="440" height="60" rx="8" fill="#F7FAFC" stroke="#E2E8F0"/>
+    <text x="100" y="840" font-family="system-ui" font-size="20" fill="#2D3748">Enter pulse rate</text>
+    
+    <!-- Time Input -->
+    <text x="560" y="780" font-family="system-ui" font-size="20" fill="#4A5568">Time</text>
+    <rect x="560" y="800" width="440" height="60" rx="8" fill="#F7FAFC" stroke="#E2E8F0"/>
+    <text x="580" y="840" font-family="system-ui" font-size="20" fill="#2D3748">Select time</text>
+    
+    <!-- Notes Input -->
+    <text x="80" y="900" font-family="system-ui" font-size="20" fill="#4A5568">Notes</text>
+    <rect x="80" y="920" width="920" height="120" rx="8" fill="#F7FAFC" stroke="#E2E8F0"/>
+    <text x="100" y="960" font-family="system-ui" font-size="20" fill="#2D3748">Add any notes about this reading...</text>
+    
+    <!-- Submit Button -->
+    <rect x="40" y="1140" width="1000" height="80" rx="8" fill="#2B6CB0"/>
+    <text x="540" y="1190" font-family="system-ui" font-size="24" fill="#FFFFFF" text-anchor="middle">Save Reading</text>
+    
+    <!-- Reading History -->
+    <rect x="40" y="1240" width="1000" height="400" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="1320" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748">Recent Readings</text>
+    
+    <!-- History Items -->
+    <rect x="80" y="1360" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1410" font-family="system-ui" font-size="20" fill="#2D3748">Today - 9:30 AM</text>
+    <text x="940" y="1410" font-family="system-ui" font-size="20" fill="#38A169" text-anchor="end">120/80</text>
+    
+    <rect x="80" y="1460" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1510" font-family="system-ui" font-size="20" fill="#2D3748">Yesterday - 8:45 PM</text>
+    <text x="940" y="1510" font-family="system-ui" font-size="20" fill="#ED8936" text-anchor="end">135/85</text>
+    
+    <rect x="80" y="1560" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1610" font-family="system-ui" font-size="20" fill="#2D3748">Yesterday - 9:15 AM</text>
+    <text x="940" y="1610" font-family="system-ui" font-size="20" fill="#38A169" text-anchor="end">118/78</text>
+    
+    <!-- Bottom Navigation -->
+    <rect y="1860" width="1080" height="60" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="216" y="1900" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">🏠</text>
+    <text x="432" y="1900" font-family="system-ui" font-size="24" fill="#2B6CB0" text-anchor="middle">❤️</text>
+    <text x="648" y="1900" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">💊</text>
+    <text x="864" y="1900" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">😊</text>
+</svg> 

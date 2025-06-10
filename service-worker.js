@@ -4,18 +4,31 @@ const OFFLINE_URL = '/offline.html';
 const STATIC_ASSETS = [
     '/',
     '/index.html',
-    '/login.html',
     '/dashboard.html',
     '/blood-pressure.html',
     '/medications.html',
     '/mood-tracker.html',
-    '/roll-tracker.html',
-    '/daily-summary.html',
+    '/profile.html',
     '/offline.html',
     '/assets/style.css',
+    '/assets/mobile.css',
+    '/assets/mobile.js',
     '/assets/shared.js',
-    '/assets/favicon-16x16.png',
-    '/assets/favicon-32x32.png',
+    '/assets/blood-pressure.js',
+    '/assets/icons/icon-72x72.png',
+    '/assets/icons/icon-96x96.png',
+    '/assets/icons/icon-128x128.png',
+    '/assets/icons/icon-144x144.png',
+    '/assets/icons/icon-152x152.png',
+    '/assets/icons/icon-192x192.png',
+    '/assets/icons/icon-384x384.png',
+    '/assets/icons/icon-512x512.png',
+    '/assets/icons/bp-96x96.png',
+    '/assets/icons/meds-96x96.png',
+    '/assets/icons/mood-96x96.png',
+    '/assets/screenshots/dashboard.png',
+    '/assets/screenshots/blood-pressure.png',
+    '/assets/screenshots/medications.png',
     '/manifest.json'
 ];
 
@@ -24,11 +37,10 @@ self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
+                console.log('Opened cache');
                 return cache.addAll(STATIC_ASSETS);
             })
-            .then(() => {
-                return self.skipWaiting();
-            })
+            .then(() => self.skipWaiting())
     );
 });
 
@@ -39,26 +51,46 @@ self.addEventListener('activate', (event) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
                     if (cacheName !== CACHE_NAME) {
+                        console.log('Deleting old cache:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
-        }).then(() => {
-            return self.clients.claim();
-        })
+        }).then(() => self.clients.claim())
     );
 });
 
-// Fetch event - handle offline support
+// Fetch event - serve from cache or network
 self.addEventListener('fetch', (event) => {
     // Skip cross-origin requests
     if (!event.request.url.startsWith(self.location.origin)) {
         return;
     }
 
+    // Handle navigation requests
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request)
+                .catch(() => {
+                    return caches.match(OFFLINE_URL);
+                })
+        );
+        return;
+    }
+
     // Handle API requests
     if (event.request.url.includes('/api/')) {
-        event.respondWith(handleApiRequest(event.request));
+        event.respondWith(
+            fetch(event.request)
+                .catch(() => {
+                    return new Response(
+                        JSON.stringify({ error: 'You are offline' }),
+                        {
+                            headers: { 'Content-Type': 'application/json' }
+                        }
+                    );
+                })
+        );
         return;
     }
 
@@ -69,135 +101,47 @@ self.addEventListener('fetch', (event) => {
                 if (response) {
                     return response;
                 }
+
                 return fetch(event.request)
                     .then((response) => {
-                        // Cache successful responses
-                        if (response && response.status === 200) {
-                            const responseClone = response.clone();
-                            caches.open(CACHE_NAME)
-                                .then((cache) => {
-                                    cache.put(event.request, responseClone);
-                                });
+                        // Check if we received a valid response
+                        if (!response || response.status !== 200 || response.type !== 'basic') {
+                            return response;
                         }
+
+                        // Clone the response
+                        const responseToCache = response.clone();
+
+                        caches.open(CACHE_NAME)
+                            .then((cache) => {
+                                cache.put(event.request, responseToCache);
+                            });
+
                         return response;
                     })
                     .catch(() => {
-                        // Return offline page for navigation requests
-                        if (event.request.mode === 'navigate') {
-                            return caches.match(OFFLINE_URL);
+                        // If the network request fails and it's an image, return a placeholder
+                        if (event.request.destination === 'image') {
+                            return caches.match('/assets/icons/placeholder.png');
                         }
-                        return new Response('Offline', {
-                            status: 503,
-                            statusText: 'Service Unavailable',
-                            headers: new Headers({
-                                'Content-Type': 'text/plain'
-                            })
-                        });
                     });
             })
     );
 });
 
-// Handle API requests with offline support
-async function handleApiRequest(request) {
-    try {
-        // Try network first
-        const response = await fetch(request);
-        return response;
-    } catch (error) {
-        // If offline, try to get from cache
-        const cachedResponse = await caches.match(request);
-        if (cachedResponse) {
-            return cachedResponse;
-        }
-
-        // If no cache, queue for sync
-        if (request.method === 'POST' || request.method === 'PUT') {
-            await queueRequest(request);
-            return new Response('Queued for sync', {
-                status: 202,
-                statusText: 'Accepted'
-            });
-        }
-
-        throw error;
-    }
-}
-
-// Queue requests for background sync
-async function queueRequest(request) {
-    const db = await openDB();
-    const transaction = db.transaction(['syncQueue'], 'readwrite');
-    const store = transaction.objectStore('syncQueue');
-    
-    const requestData = {
-        url: request.url,
-        method: request.method,
-        headers: Object.fromEntries(request.headers),
-        body: await request.clone().text(),
-        timestamp: Date.now()
-    };
-    
-    await store.add(requestData);
-}
-
-// Open IndexedDB
-function openDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open('BradleyHealthDB', 1);
-        
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result);
-        
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains('syncQueue')) {
-                db.createObjectStore('syncQueue', { keyPath: 'id', autoIncrement: true });
-            }
-        };
-    });
-}
-
-// Handle background sync
+// Background sync for offline data
 self.addEventListener('sync', (event) => {
     if (event.tag === 'sync-health-data') {
         event.waitUntil(syncHealthData());
     }
 });
 
-// Sync health data
-async function syncHealthData() {
-    const db = await openDB();
-    const transaction = db.transaction(['syncQueue'], 'readonly');
-    const store = transaction.objectStore('syncQueue');
-    const requests = await store.getAll();
-
-    for (const request of requests) {
-        try {
-            const response = await fetch(request.url, {
-                method: request.method,
-                headers: new Headers(request.headers),
-                body: request.body
-            });
-
-            if (response.ok) {
-                // Remove from queue if successful
-                const deleteTransaction = db.transaction(['syncQueue'], 'readwrite');
-                const deleteStore = deleteTransaction.objectStore('syncQueue');
-                await deleteStore.delete(request.id);
-            }
-        } catch (error) {
-            console.error('Sync failed:', error);
-        }
-    }
-}
-
-// Handle push notifications
+// Push notification handling
 self.addEventListener('push', (event) => {
     const options = {
         body: event.data.text(),
-        icon: '/assets/favicon-32x32.png',
-        badge: '/assets/favicon-16x16.png',
+        icon: '/assets/icons/icon-192x192.png',
+        badge: '/assets/icons/badge-72x72.png',
         vibrate: [100, 50, 100],
         data: {
             dateOfArrival: Date.now(),
@@ -206,11 +150,13 @@ self.addEventListener('push', (event) => {
         actions: [
             {
                 action: 'explore',
-                title: 'View Details'
+                title: 'View Details',
+                icon: '/assets/icons/checkmark.png'
             },
             {
                 action: 'close',
-                title: 'Close'
+                title: 'Close',
+                icon: '/assets/icons/close.png'
             }
         ]
     };
@@ -220,7 +166,7 @@ self.addEventListener('push', (event) => {
     );
 });
 
-// Handle notification clicks
+// Notification click handling
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
 
@@ -230,3 +176,42 @@ self.addEventListener('notificationclick', (event) => {
         );
     }
 });
+
+// Helper function to sync health data
+async function syncHealthData() {
+    const db = await openDB();
+    const offlineData = await db.getAll('offlineHealthData');
+
+    for (const data of offlineData) {
+        try {
+            await fetch('/api/health-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            await db.delete('offlineHealthData', data.id);
+        } catch (error) {
+            console.error('Failed to sync health data:', error);
+        }
+    }
+}
+
+// Helper function to open IndexedDB
+function openDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('BradleyHealth', 1);
+
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('offlineHealthData')) {
+                db.createObjectStore('offlineHealthData', { keyPath: 'id' });
+            }
+        };
+    });
+}

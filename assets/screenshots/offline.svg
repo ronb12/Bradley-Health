@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1080" height="1920" viewBox="0 0 1080 1920" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="1080" height="1920" fill="#F7FAFC"/>
+    
+    <!-- Status Bar -->
+    <rect width="1080" height="60" fill="#2B6CB0"/>
+    <text x="40" y="40" font-family="system-ui" font-size="24" fill="#FFFFFF">9:41</text>
+    <text x="1040" y="40" font-family="system-ui" font-size="24" fill="#FFFFFF" text-anchor="end">100%</text>
+    
+    <!-- Offline Icon -->
+    <circle cx="540" cy="400" r="200" fill="#FED7D7"/>
+    <text x="540" y="440" font-family="system-ui" font-size="120" fill="#E53E3E" text-anchor="middle">📡</text>
+    
+    <!-- Offline Message -->
+    <text x="540" y="700" font-family="system-ui" font-size="48" font-weight="bold" fill="#2D3748" text-anchor="middle">You're Offline</text>
+    <text x="540" y="780" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">Please check your internet connection</text>
+    
+    <!-- Offline Features -->
+    <rect x="40" y="840" width="1000" height="400" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="920" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748">Available Offline</text>
+    
+    <!-- Feature Items -->
+    <rect x="80" y="960" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1010" font-family="system-ui" font-size="20" fill="#2D3748">View Health History</text>
+    <text x="940" y="1010" font-family="system-ui" font-size="20" fill="#38A169" text-anchor="end">✓</text>
+    
+    <rect x="80" y="1060" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1110" font-family="system-ui" font-size="20" fill="#2D3748">Log Health Data</text>
+    <text x="940" y="1110" font-family="system-ui" font-size="20" fill="#38A169" text-anchor="end">✓</text>
+    
+    <rect x="80" y="1160" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1210" font-family="system-ui" font-size="20" fill="#2D3748">View Medications</text>
+    <text x="940" y="1210" font-family="system-ui" font-size="20" fill="#38A169" text-anchor="end">✓</text>
+    
+    <!-- Sync Status -->
+    <rect x="40" y="1260" width="1000" height="200" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="1340" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748">Sync Status</text>
+    <text x="80" y="1380" font-family="system-ui" font-size="20" fill="#718096">Your data will sync when you're back online</text>
+    
+    <!-- Retry Button -->
+    <rect x="40" y="1480" width="1000" height="80" rx="8" fill="#2B6CB0"/>
+    <text x="540" y="1530" font-family="system-ui" font-size="24" fill="#FFFFFF" text-anchor="middle">Retry Connection</text>
+    
+    <!-- Help Text -->
+    <text x="540" y="1640" font-family="system-ui" font-size="20" fill="#718096" text-anchor="middle">Need help?</text>
+    <text x="540" y="1680" font-family="system-ui" font-size="20" fill="#2B6CB0" text-anchor="middle">Contact Support</text>
+</svg> 

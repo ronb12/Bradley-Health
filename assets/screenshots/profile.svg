@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1080" height="1920" viewBox="0 0 1080 1920" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="1080" height="1920" fill="#F7FAFC"/>
+    
+    <!-- Status Bar -->
+    <rect width="1080" height="60" fill="#2B6CB0"/>
+    <text x="40" y="40" font-family="system-ui" font-size="24" fill="#FFFFFF">9:41</text>
+    <text x="1040" y="40" font-family="system-ui" font-size="24" fill="#FFFFFF" text-anchor="end">100%</text>
+    
+    <!-- Header -->
+    <rect y="60" width="1080" height="120" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="40" y="140" font-family="system-ui" font-size="32" font-weight="bold" fill="#2D3748">Profile</text>
+    
+    <!-- Profile Info -->
+    <rect x="40" y="200" width="1000" height="400" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    
+    <!-- Avatar -->
+    <circle cx="540" cy="300" r="80" fill="#E2E8F0"/>
+    <text x="540" y="320" font-family="system-ui" font-size="48" fill="#718096" text-anchor="middle">👤</text>
+    
+    <!-- Name -->
+    <text x="540" y="420" font-family="system-ui" font-size="32" font-weight="bold" fill="#2D3748" text-anchor="middle">John Doe</text>
+    <text x="540" y="460" font-family="system-ui" font-size="20" fill="#718096" text-anchor="middle">john.doe@example.com</text>
+    
+    <!-- Health Info -->
+    <rect x="40" y="620" width="1000" height="400" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="700" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748">Health Information</text>
+    
+    <!-- Info Items -->
+    <rect x="80" y="740" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="790" font-family="system-ui" font-size="20" fill="#2D3748">Date of Birth</text>
+    <text x="940" y="790" font-family="system-ui" font-size="20" fill="#718096" text-anchor="end">01/01/1980</text>
+    
+    <rect x="80" y="840" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="890" font-family="system-ui" font-size="20" fill="#2D3748">Blood Type</text>
+    <text x="940" y="890" font-family="system-ui" font-size="20" fill="#718096" text-anchor="end">O+</text>
+    
+    <rect x="80" y="940" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="990" font-family="system-ui" font-size="20" fill="#2D3748">Allergies</text>
+    <text x="940" y="990" font-family="system-ui" font-size="20" fill="#718096" text-anchor="end">None</text>
+    
+    <!-- Emergency Contacts -->
+    <rect x="40" y="1040" width="1000" height="400" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="1120" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748">Emergency Contacts</text>
+    
+    <!-- Contact Items -->
+    <rect x="80" y="1160" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1210" font-family="system-ui" font-size="20" fill="#2D3748">Jane Doe (Spouse)</text>
+    <text x="940" y="1210" font-family="system-ui" font-size="20" fill="#718096" text-anchor="end">(555) 123-4567</text>
+    
+    <rect x="80" y="1260" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1310" font-family="system-ui" font-size="20" fill="#2D3748">Dr. Smith (Primary)</text>
+    <text x="940" y="1310" font-family="system-ui" font-size="20" fill="#718096" text-anchor="end">(555) 987-6543</text>
+    
+    <rect x="80" y="1360" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1410" font-family="system-ui" font-size="20" fill="#2D3748">Emergency Services</text>
+    <text x="940" y="1410" font-family="system-ui" font-size="20" fill="#718096" text-anchor="end">911</text>
+    
+    <!-- Settings -->
+    <rect x="40" y="1460" width="1000" height="400" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="1540" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748">Settings</text>
+    
+    <!-- Setting Items -->
+    <rect x="80" y="1580" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1630" font-family="system-ui" font-size="20" fill="#2D3748">Notifications</text>
+    <text x="940" y="1630" font-family="system-ui" font-size="20" fill="#718096" text-anchor="end">On</text>
+    
+    <rect x="80" y="1680" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1730" font-family="system-ui" font-size="20" fill="#2D3748">Dark Mode</text>
+    <text x="940" y="1730" font-family="system-ui" font-size="20" fill="#718096" text-anchor="end">Off</text>
+    
+    <rect x="80" y="1780" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1830" font-family="system-ui" font-size="20" fill="#2D3748">Language</text>
+    <text x="940" y="1830" font-family="system-ui" font-size="20" fill="#718096" text-anchor="end">English</text>
+    
+    <!-- Bottom Navigation -->
+    <rect y="1860" width="1080" height="60" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="216" y="1900" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">🏠</text>
+    <text x="432" y="1900" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">❤️</text>
+    <text x="648" y="1900" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">💊</text>
+    <text x="864" y="1900" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">😊</text>
+</svg> 

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1080" height="1920" viewBox="0 0 1080 1920" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="1080" height="1920" fill="#F7FAFC"/>
+    
+    <!-- Status Bar -->
+    <rect width="1080" height="60" fill="#2B6CB0"/>
+    <text x="40" y="40" font-family="system-ui" font-size="24" fill="#FFFFFF">9:41</text>
+    <text x="1040" y="40" font-family="system-ui" font-size="24" fill="#FFFFFF" text-anchor="end">100%</text>
+    
+    <!-- Header -->
+    <rect y="60" width="1080" height="120" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="40" y="140" font-family="system-ui" font-size="32" font-weight="bold" fill="#2D3748">Medications</text>
+    
+    <!-- Today's Schedule -->
+    <rect x="40" y="200" width="1000" height="400" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="280" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748">Today's Schedule</text>
+    
+    <!-- Medication Items -->
+    <rect x="80" y="320" width="920" height="100" rx="8" fill="#F0FFF4"/>
+    <text x="140" y="380" font-family="system-ui" font-size="20" fill="#2D3748">Lisinopril 10mg</text>
+    <text x="140" y="410" font-family="system-ui" font-size="16" fill="#718096">1 tablet - Morning</text>
+    <text x="940" y="380" font-family="system-ui" font-size="20" fill="#38A169" text-anchor="end">Taken</text>
+    
+    <rect x="80" y="440" width="920" height="100" rx="8" fill="#F0FFF4"/>
+    <text x="140" y="500" font-family="system-ui" font-size="20" fill="#2D3748">Metformin 500mg</text>
+    <text x="140" y="530" font-family="system-ui" font-size="16" fill="#718096">1 tablet - Morning</text>
+    <text x="940" y="500" font-family="system-ui" font-size="20" fill="#38A169" text-anchor="end">Taken</text>
+    
+    <rect x="80" y="560" width="920" height="100" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="620" font-family="system-ui" font-size="20" fill="#2D3748">Aspirin 81mg</text>
+    <text x="140" y="650" font-family="system-ui" font-size="16" fill="#718096">1 tablet - Evening</text>
+    <text x="940" y="620" font-family="system-ui" font-size="20" fill="#ED8936" text-anchor="end">Pending</text>
+    
+    <!-- Add Medication -->
+    <rect x="40" y="640" width="1000" height="600" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="720" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748">Add Medication</text>
+    
+    <!-- Name Input -->
+    <text x="80" y="780" font-family="system-ui" font-size="20" fill="#4A5568">Medication Name</text>
+    <rect x="80" y="800" width="920" height="60" rx="8" fill="#F7FAFC" stroke="#E2E8F0"/>
+    <text x="100" y="840" font-family="system-ui" font-size="20" fill="#2D3748">Enter medication name</text>
+    
+    <!-- Dosage Input -->
+    <text x="80" y="900" font-family="system-ui" font-size="20" fill="#4A5568">Dosage</text>
+    <rect x="80" y="920" width="440" height="60" rx="8" fill="#F7FAFC" stroke="#E2E8F0"/>
+    <text x="100" y="960" font-family="system-ui" font-size="20" fill="#2D3748">Enter dosage</text>
+    
+    <!-- Frequency Input -->
+    <text x="560" y="900" font-family="system-ui" font-size="20" fill="#4A5568">Frequency</text>
+    <rect x="560" y="920" width="440" height="60" rx="8" fill="#F7FAFC" stroke="#E2E8F0"/>
+    <text x="580" y="960" font-family="system-ui" font-size="20" fill="#2D3748">Select frequency</text>
+    
+    <!-- Time Input -->
+    <text x="80" y="1020" font-family="system-ui" font-size="20" fill="#4A5568">Time</text>
+    <rect x="80" y="1040" width="440" height="60" rx="8" fill="#F7FAFC" stroke="#E2E8F0"/>
+    <text x="100" y="1080" font-family="system-ui" font-size="20" fill="#2D3748">Select time</text>
+    
+    <!-- Notes Input -->
+    <text x="560" y="1020" font-family="system-ui" font-size="20" fill="#4A5568">Notes</text>
+    <rect x="560" y="1040" width="440" height="60" rx="8" fill="#F7FAFC" stroke="#E2E8F0"/>
+    <text x="580" y="1080" font-family="system-ui" font-size="20" fill="#2D3748">Add notes</text>
+    
+    <!-- Submit Button -->
+    <rect x="40" y="1160" width="1000" height="80" rx="8" fill="#2B6CB0"/>
+    <text x="540" y="1210" font-family="system-ui" font-size="24" fill="#FFFFFF" text-anchor="middle">Add Medication</text>
+    
+    <!-- Medication List -->
+    <rect x="40" y="1280" width="1000" height="400" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="1340" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748">All Medications</text>
+    
+    <!-- List Items -->
+    <rect x="80" y="1380" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1430" font-family="system-ui" font-size="20" fill="#2D3748">Lisinopril 10mg - Daily</text>
+    <text x="940" y="1430" font-family="system-ui" font-size="16" fill="#718096" text-anchor="end">Active</text>
+    
+    <rect x="80" y="1480" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1530" font-family="system-ui" font-size="20" fill="#2D3748">Metformin 500mg - Daily</text>
+    <text x="940" y="1530" font-family="system-ui" font-size="16" fill="#718096" text-anchor="end">Active</text>
+    
+    <rect x="80" y="1580" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1630" font-family="system-ui" font-size="20" fill="#2D3748">Aspirin 81mg - Daily</text>
+    <text x="940" y="1630" font-family="system-ui" font-size="16" fill="#718096" text-anchor="end">Active</text>
+    
+    <!-- Bottom Navigation -->
+    <rect y="1860" width="1080" height="60" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="216" y="1900" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">🏠</text>
+    <text x="432" y="1900" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">❤️</text>
+    <text x="648" y="1900" font-family="system-ui" font-size="24" fill="#2B6CB0" text-anchor="middle">💊</text>
+    <text x="864" y="1900" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">😊</text>
+</svg> 

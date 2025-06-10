@@ -1,10 +1,10 @@
 {
   "name": "Bradley Health",
   "short_name": "Bradley Health",
-  "description": "Professional medical tracking and management app",
-  "start_url": "/index.html",
+  "description": "A comprehensive health tracking application",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#F7FAFC",
+  "background_color": "#2B6CB0",
   "theme_color": "#2B6CB0",
   "orientation": "portrait",
   "icons": [
@@ -60,62 +60,62 @@
   "screenshots": [
     {
       "src": "assets/screenshots/dashboard.png",
-      "sizes": "1280x720",
+      "sizes": "1080x1920",
       "type": "image/png",
-      "platform": "wide",
-      "label": "Dashboard view of Bradley Health"
+      "platform": "narrow",
+      "label": "Dashboard"
     },
     {
       "src": "assets/screenshots/blood-pressure.png",
-      "sizes": "1280x720",
+      "sizes": "1080x1920",
       "type": "image/png",
-      "platform": "wide",
-      "label": "Blood Pressure tracking interface"
+      "platform": "narrow",
+      "label": "Blood Pressure Tracking"
     },
     {
       "src": "assets/screenshots/medications.png",
-      "sizes": "1280x720",
+      "sizes": "1080x1920",
       "type": "image/png",
-      "platform": "wide",
-      "label": "Medication management interface"
+      "platform": "narrow",
+      "label": "Medication Management"
     }
   ],
   "shortcuts": [
     {
       "name": "Log Blood Pressure",
-      "short_name": "BP Log",
+      "short_name": "BP",
       "description": "Quickly log your blood pressure reading",
       "url": "/blood-pressure.html",
       "icons": [{ "src": "assets/icons/bp-96x96.png", "sizes": "96x96" }]
     },
     {
-      "name": "Daily Summary",
-      "short_name": "Summary",
-      "description": "View your daily health summary",
-      "url": "/daily-summary.html",
-      "icons": [{ "src": "assets/icons/summary-96x96.png", "sizes": "96x96" }]
+      "name": "Log Medication",
+      "short_name": "Meds",
+      "description": "Record your medication intake",
+      "url": "/medications.html",
+      "icons": [{ "src": "assets/icons/meds-96x96.png", "sizes": "96x96" }]
     },
     {
-      "name": "Mood Tracker",
+      "name": "Track Mood",
       "short_name": "Mood",
-      "description": "Track your mood and mental health",
+      "description": "Log your current mood",
       "url": "/mood-tracker.html",
       "icons": [{ "src": "assets/icons/mood-96x96.png", "sizes": "96x96" }]
     }
   ],
   "categories": ["health", "medical", "lifestyle"],
-  "scope": "/",
-  "dir": "ltr",
-  "lang": "en-US",
   "prefer_related_applications": false,
   "related_applications": [],
   "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
   "edge_side_panel": {
     "preferred_width": 400
   },
-  "handle_links": "preferred",
   "launch_handler": {
     "client_mode": ["focus-existing", "auto"]
   },
+  "handle_links": "preferred",
+  "scope": "/",
+  "lang": "en-US",
+  "dir": "ltr",
   "display_override": ["window-controls-overlay", "standalone", "minimal-ui"]
 }

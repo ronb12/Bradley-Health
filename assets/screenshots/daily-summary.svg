@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1080" height="1920" viewBox="0 0 1080 1920" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="1080" height="1920" fill="#F7FAFC"/>
+    
+    <!-- Status Bar -->
+    <rect width="1080" height="60" fill="#2B6CB0"/>
+    <text x="40" y="40" font-family="system-ui" font-size="24" fill="#FFFFFF">9:41</text>
+    <text x="1040" y="40" font-family="system-ui" font-size="24" fill="#FFFFFF" text-anchor="end">100%</text>
+    
+    <!-- Header -->
+    <rect y="60" width="1080" height="120" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="40" y="140" font-family="system-ui" font-size="32" font-weight="bold" fill="#2D3748">Daily Summary</text>
+    
+    <!-- Date Selector -->
+    <rect x="40" y="200" width="1000" height="100" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="540" y="270" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748" text-anchor="middle">Today, March 15, 2024</text>
+    
+    <!-- Health Overview -->
+    <rect x="40" y="320" width="1000" height="400" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="400" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748">Health Overview</text>
+    
+    <!-- Blood Pressure Card -->
+    <rect x="80" y="440" width="440" height="200" rx="8" fill="#EBF8FF"/>
+    <text x="120" y="480" font-family="system-ui" font-size="20" fill="#2D3748">Blood Pressure</text>
+    <text x="120" y="520" font-family="system-ui" font-size="36" font-weight="bold" fill="#2B6CB0">120/80</text>
+    <text x="120" y="560" font-family="system-ui" font-size="16" fill="#38A169">Normal</text>
+    <text x="120" y="600" font-family="system-ui" font-size="16" fill="#718096">Last reading: 9:30 AM</text>
+    
+    <!-- Mood Card -->
+    <rect x="560" y="440" width="440" height="200" rx="8" fill="#F0FFF4"/>
+    <text x="600" y="480" font-family="system-ui" font-size="20" fill="#2D3748">Mood</text>
+    <text x="600" y="520" font-family="system-ui" font-size="36" font-weight="bold" fill="#38A169">Good</text>
+    <text x="600" y="560" font-family="system-ui" font-size="16" fill="#718096">Sleep: 7.5 hours</text>
+    <text x="600" y="600" font-family="system-ui" font-size="16" fill="#718096">Stress: Moderate</text>
+    
+    <!-- Medications -->
+    <rect x="40" y="740" width="1000" height="400" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="820" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748">Medications</text>
+    
+    <!-- Medication Items -->
+    <rect x="80" y="860" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="910" font-family="system-ui" font-size="20" fill="#2D3748">Lisinopril 10mg</text>
+    <text x="940" y="910" font-family="system-ui" font-size="20" fill="#38A169" text-anchor="end">Taken</text>
+    
+    <rect x="80" y="960" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1010" font-family="system-ui" font-size="20" fill="#2D3748">Metformin 500mg</text>
+    <text x="940" y="1010" font-family="system-ui" font-size="20" fill="#38A169" text-anchor="end">Taken</text>
+    
+    <rect x="80" y="1060" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1110" font-family="system-ui" font-size="20" fill="#2D3748">Aspirin 81mg</text>
+    <text x="940" y="1110" font-family="system-ui" font-size="20" fill="#ED8936" text-anchor="end">Pending</text>
+    
+    <!-- Activity Log -->
+    <rect x="40" y="1160" width="1000" height="400" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="1240" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748">Activity Log</text>
+    
+    <!-- Activity Items -->
+    <rect x="80" y="1280" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1330" font-family="system-ui" font-size="20" fill="#2D3748">Morning Walk</text>
+    <text x="940" y="1330" font-family="system-ui" font-size="16" fill="#718096" text-anchor="end">30 min</text>
+    
+    <rect x="80" y="1380" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1430" font-family="system-ui" font-size="20" fill="#2D3748">Water Intake</text>
+    <text x="940" y="1430" font-family="system-ui" font-size="16" fill="#718096" text-anchor="end">1.5L</text>
+    
+    <rect x="80" y="1480" width="920" height="80" rx="8" fill="#F7FAFC"/>
+    <text x="140" y="1530" font-family="system-ui" font-size="20" fill="#2D3748">Meditation</text>
+    <text x="940" y="1530" font-family="system-ui" font-size="16" fill="#718096" text-anchor="end">15 min</text>
+    
+    <!-- Notes -->
+    <rect x="40" y="1580" width="1000" height="200" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="80" y="1660" font-family="system-ui" font-size="24" font-weight="bold" fill="#2D3748">Notes</text>
+    <text x="80" y="1700" font-family="system-ui" font-size="20" fill="#718096">Feeling good today. Energy levels are high.</text>
+    
+    <!-- Bottom Navigation -->
+    <rect y="1860" width="1080" height="60" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="216" y="1900" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">🏠</text>
+    <text x="432" y="1900" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">❤️</text>
+    <text x="648" y="1900" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">💊</text>
+    <text x="864" y="1900" font-family="system-ui" font-size="24" fill="#718096" text-anchor="middle">😊</text>
+</svg> 
