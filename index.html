@@ -4,236 +4,230 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bradley Health</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="assets/icon-192.png" />
-  <meta name="theme-color" content="#2c7a7b" />
-  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" href="./assets/favicon.svg" />
+  <meta name="theme-color" content="#2B6CB0" />
+  <link rel="stylesheet" href="./assets/style.css" />
+  <link rel="stylesheet" href="./assets/medical-design.css" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Bradley Health">
+  <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
+  <meta name="description" content="Bradley Health - Your personal health tracking companion">
+  
+  <!-- iOS Splash Screens -->
+  <link rel="apple-touch-startup-image" href="./assets/splash/launch-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
+  <link rel="apple-touch-startup-image" href="./assets/splash/launch-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
+  <link rel="apple-touch-startup-image" href="./assets/splash/launch-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)">
+  <link rel="apple-touch-startup-image" href="./assets/splash/launch-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+  <link rel="apple-touch-startup-image" href="./assets/splash/launch-1536x2048.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)">
+  <link rel="apple-touch-startup-image" href="./assets/splash/launch-1668x2224.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)">
+  <link rel="apple-touch-startup-image" href="./assets/splash/launch-2048x2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="firebase-init.js"></script>
-  <script src="assets/shared.js"></script>
+  <script src="./assets/shared.js"></script>
 </head>
 <body>
   <header>
-    <h1>Bradley Health</h1>
-    <p id="welcome">Welcome to your dashboard</p>
-    <label>
-      🌙 Dark Mode:
-      <input type="checkbox" id="darkToggle" />
-    </label>
+    <h1>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7 7-7z"/>
+      </svg>
+      Bradley Health
+    </h1>
+    <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
   </header>
 
-  <main>
-    <a class="button" href="mood-tracker.html">Mood Tracker</a>
-    <a class="button" href="goals.html">Health Goals</a>
-    <a class="button" href="medications.html">Medication Tracker</a>
-    <a class="button" href="visits.html">Doctor Visit Log</a>
-    <a class="button" href="blood-pressure.html">🩺 Blood Pressure Tracker</a>
-    <a class="button" href="roll-tracker.html">♿ Wheelchair Tracker</a>
-    <a class="button" href="daily-summary.html">📊 Daily Summary</a>
-    <a class="button" href="export.html">📥 Export My Data</a>
+  <nav class="nav-menu">
+    <a href="./index.html" class="nav-item active">Dashboard</a>
+    <a href="./blood-pressure.html" class="nav-item">Blood Pressure</a>
+    <a href="./medications.html" class="nav-item">Medications</a>
+    <a href="./appointments.html" class="nav-item">Appointments</a>
+  </nav>
 
-    <button class="button profile" onclick="modal.show('profileModal')">👤 Profile</button>
-    <button class="button logout" onclick="logout()">🔓 Logout</button>
+  <main>
+    <section class="welcome-section">
+      <h2>Welcome to your Dashboard</h2>
+      <p>Track and manage your health data in one place.</p>
+    </section>
+
+    <div class="dashboard-grid">
+      <section class="quick-actions">
+        <h3>Quick Actions</h3>
+        <div class="action-buttons">
+          <a href="./blood-pressure.html" class="action-button">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            Log Blood Pressure
+          </a>
+          <a href="./medications.html" class="action-button">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7 7-7z"/>
+            </svg>
+            Track Medications
+          </a>
+          <a href="./appointments.html" class="action-button">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            Schedule Appointment
+          </a>
+        </div>
+      </section>
+
+      <section class="health-summary">
+        <h3>Health Summary</h3>
+        <div class="summary-cards">
+          <div class="summary-card">
+            <h4>Blood Pressure</h4>
+            <p class="summary-value">120/80</p>
+            <p class="summary-label">Last Reading</p>
+          </div>
+          <div class="summary-card">
+            <h4>Medications</h4>
+            <p class="summary-value">3</p>
+            <p class="summary-label">Active</p>
+          </div>
+          <div class="summary-card">
+            <h4>Appointments</h4>
+            <p class="summary-value">2</p>
+            <p class="summary-label">Upcoming</p>
+          </div>
+        </div>
+      </section>
+    </div>
   </main>
+
+  <footer>
+    <p>&copy; 2024 Bradley Health. All rights reserved.</p>
+  </footer>
 
   <div id="profileModal" class="modal">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2>User Profile</h2>
-        <button class="close-btn" onclick="modal.hide('profileModal')">×</button>
-      </div>
-      
+      <h2>Profile Settings</h2>
       <form id="profileForm" onsubmit="saveProfile(event)">
-        <div class="profile-section">
-          <div class="profile-picture">
-            <img id="profileImage" src="assets/default-avatar.png" alt="Profile Picture" />
-            <div class="upload-overlay">
-              <label for="imageUpload" class="upload-btn">
-                <span>📷</span>
-                <span>Change Photo</span>
-              </label>
-              <input type="file" id="imageUpload" accept="image/*" onchange="handleImageUpload(event)" hidden />
-            </div>
+        <div class="form-group">
+          <label for="profileName">Full Name</label>
+          <input type="text" id="profileName" required>
+        </div>
+        <div class="form-group">
+          <label for="profileEmail">Email</label>
+          <input type="email" id="profileEmail" readonly>
+        </div>
+        <div class="form-group">
+          <label for="profileAge">Age</label>
+          <input type="number" id="profileAge" min="0" max="120">
+        </div>
+        <div class="form-group">
+          <label for="profileGender">Gender</label>
+          <select id="profileGender">
+            <option value="">Select gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+            <option value="prefer-not-to-say">Prefer not to say</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="profileWeight">Weight</label>
+          <div class="input-group">
+            <input type="number" id="profileWeight" min="0" step="0.1">
+            <select id="weightUnit">
+              <option value="kg">kg</option>
+              <option value="lbs">lbs</option>
+            </select>
           </div>
-
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="profileName">Full Name</label>
-              <input type="text" id="profileName" placeholder="Enter your full name" required />
-            </div>
-
-            <div class="form-group">
-              <label for="profileEmail">Email</label>
-              <input type="email" id="profileEmail" readonly />
-            </div>
-
-            <div class="form-group">
-              <label for="profileAge">Age</label>
-              <input type="number" id="profileAge" min="1" max="120" placeholder="Enter your age" />
-            </div>
-
-            <div class="form-group">
-              <label for="profileGender">Gender</label>
-              <select id="profileGender">
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-                <option value="Prefer not to say">Prefer not to say</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="profileWeight">Weight</label>
-              <div class="input-with-unit">
-                <input type="number" id="profileWeight" min="1" step="0.1" placeholder="Enter weight" />
-                <select id="weightUnit">
-                  <option value="kg">kg</option>
-                  <option value="lbs">lbs</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="profileHeight">Height</label>
-              <div class="input-with-unit">
-                <input type="number" id="profileHeight" min="1" step="0.1" placeholder="Enter height" />
-                <select id="heightUnit">
-                  <option value="cm">cm</option>
-                  <option value="in">in</option>
-                </select>
-              </div>
-            </div>
+        </div>
+        <div class="form-group">
+          <label for="profileHeight">Height</label>
+          <div class="input-group">
+            <input type="number" id="profileHeight" min="0" step="0.1">
+            <select id="heightUnit">
+              <option value="cm">cm</option>
+              <option value="ft">ft</option>
+            </select>
           </div>
         </div>
 
-        <div class="profile-section">
-          <h3>Health Preferences</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="activityLevel">Activity Level</label>
-              <select id="activityLevel">
-                <option value="sedentary">Sedentary</option>
-                <option value="light">Lightly Active</option>
-                <option value="moderate">Moderately Active</option>
-                <option value="very">Very Active</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="healthGoals">Primary Health Goal</label>
-              <select id="healthGoals">
-                <option value="general">General Health</option>
-                <option value="weight">Weight Management</option>
-                <option value="fitness">Fitness</option>
-                <option value="chronic">Chronic Condition Management</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="reminderPreference">Reminder Preference</label>
-              <select id="reminderPreference">
-                <option value="push">Push Notifications</option>
-                <option value="email">Email</option>
-                <option value="both">Both</option>
-                <option value="none">None</option>
-              </select>
-            </div>
+        <!-- Health Information Section -->
+        <div class="form-section">
+          <h4>Health Information</h4>
+          <div class="form-group">
+            <label for="bloodType">Blood Type</label>
+            <select id="bloodType">
+              <option value="">Select blood type</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
           </div>
-        </div>
-
-        <div class="profile-section">
-          <h3>Accessibility Settings</h3>
-          <div class="form-grid">
-            <div class="form-group checkbox-group">
-              <label>
-                <input type="checkbox" id="highContrast" />
-                High Contrast Mode
-              </label>
-            </div>
-
-            <div class="form-group checkbox-group">
-              <label>
-                <input type="checkbox" id="largeText" />
-                Large Text
-              </label>
-            </div>
-
-            <div class="form-group checkbox-group">
-              <label>
-                <input type="checkbox" id="screenReader" />
-                Screen Reader Optimized
-              </label>
-            </div>
+          <div class="form-group">
+            <label for="emergencyContact">Emergency Contact Name</label>
+            <input type="text" id="emergencyContact">
           </div>
-        </div>
-
-        <div class="profile-section">
-          <h3>Health Information</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="bloodType">Blood Type</label>
-              <select id="bloodType">
-                <option value="">Select Blood Type</option>
-                <option value="A+">A+</option>
-                <option value="A-">A-</option>
-                <option value="B+">B+</option>
-                <option value="B-">B-</option>
-                <option value="AB+">AB+</option>
-                <option value="AB-">AB-</option>
-                <option value="O+">O+</option>
-                <option value="O-">O-</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="emergencyContact">Emergency Contact</label>
-              <input type="text" id="emergencyContact" placeholder="Name" />
-              <input type="tel" id="emergencyPhone" placeholder="Phone Number" class="mt-2" />
-            </div>
-
-            <div class="form-group">
-              <label for="primaryDoctor">Primary Doctor</label>
-              <input type="text" id="primaryDoctor" placeholder="Doctor's Name" />
-              <input type="tel" id="doctorPhone" placeholder="Phone Number" class="mt-2" />
-            </div>
+          <div class="form-group">
+            <label for="emergencyPhone">Emergency Contact Phone</label>
+            <input type="tel" id="emergencyPhone">
           </div>
-
-          <div class="form-section">
-            <h4>Medical Conditions</h4>
+          <div class="form-group">
+            <label for="primaryDoctor">Primary Doctor Name</label>
+            <input type="text" id="primaryDoctor">
+          </div>
+          <div class="form-group">
+            <label for="doctorPhone">Doctor's Phone</label>
+            <input type="tel" id="doctorPhone">
+          </div>
+          <div class="form-group">
+            <label for="conditionInput">Medical Conditions</label>
             <div class="tags-input">
               <div id="conditionsList" class="tags-list"></div>
               <div class="input-group">
-                <input type="text" id="conditionInput" placeholder="Add condition (press Enter)" />
+                <input type="text" id="conditionInput" placeholder="Add a condition">
                 <button type="button" class="add-btn" onclick="addCondition()">+</button>
               </div>
             </div>
           </div>
-
-          <div class="form-section">
-            <h4>Allergies</h4>
+          <div class="form-group">
+            <label for="allergyInput">Allergies</label>
             <div class="tags-input">
               <div id="allergiesList" class="tags-list"></div>
               <div class="input-group">
-                <input type="text" id="allergyInput" placeholder="Add allergy (press Enter)" />
+                <input type="text" id="allergyInput" placeholder="Add an allergy">
                 <button type="button" class="add-btn" onclick="addAllergy()">+</button>
               </div>
             </div>
           </div>
-
-          <div class="form-section">
-            <h4>Additional Notes</h4>
-            <textarea id="healthNotes" rows="3" placeholder="Any other important health information..."></textarea>
+          <div class="form-group">
+            <label for="healthNotes">Additional Health Notes</label>
+            <textarea id="healthNotes" placeholder="Any other important health information..."></textarea>
           </div>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="primary-btn">Save Changes</button>
-          <button type="button" class="secondary-btn" onclick="modal.hide('profileModal')">Cancel</button>
+          <button type="submit">Save Changes</button>
+          <button type="button" onclick="modal.hide('profileModal')">Cancel</button>
         </div>
       </form>
     </div>
@@ -270,16 +264,6 @@
           height: {
             value: parseFloat(document.getElementById("profileHeight").value) || null,
             unit: document.getElementById("heightUnit").value
-          },
-          preferences: {
-            activityLevel: document.getElementById("activityLevel").value,
-            healthGoal: document.getElementById("healthGoals").value,
-            reminderPreference: document.getElementById("reminderPreference").value
-          },
-          accessibility: {
-            highContrast: document.getElementById("highContrast").checked,
-            largeText: document.getElementById("largeText").checked,
-            screenReader: document.getElementById("screenReader").checked
           },
           healthInfo: {
             bloodType: document.getElementById("bloodType").value,
@@ -354,12 +338,6 @@
           document.getElementById("weightUnit").value = profile.weight?.unit || "kg";
           document.getElementById("profileHeight").value = profile.height?.value || "";
           document.getElementById("heightUnit").value = profile.height?.unit || "cm";
-          document.getElementById("activityLevel").value = profile.preferences?.activityLevel || "moderate";
-          document.getElementById("healthGoals").value = profile.preferences?.healthGoal || "general";
-          document.getElementById("reminderPreference").value = profile.preferences?.reminderPreference || "push";
-          document.getElementById("highContrast").checked = profile.accessibility?.highContrast || false;
-          document.getElementById("largeText").checked = profile.accessibility?.largeText || false;
-          document.getElementById("screenReader").checked = profile.accessibility?.screenReader || false;
           
           if (profile.profileImage) {
             document.getElementById("profileImage").src = profile.profileImage;
@@ -448,6 +426,26 @@
         e.preventDefault();
         addAllergy();
       }
+    });
+
+    // Initialize dark mode
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      document.body.setAttribute('data-theme', savedTheme);
+    } else if (prefersDarkScheme.matches) {
+      document.body.setAttribute('data-theme', 'dark');
+    }
+    
+    // Toggle dark mode
+    darkModeToggle.addEventListener('click', () => {
+      const currentTheme = document.body.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
     });
   </script>
 

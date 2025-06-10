@@ -829,7 +829,22 @@
       event.preventDefault();
       
       if (!currentRating) {
-        toast.show("Please select a mood rating", "error");
+        toast.show('Please select a mood rating', 'error');
+        return;
+      }
+
+      const energyLevel = parseInt(document.getElementById('energyLevel').value);
+      const sleepHours = parseFloat(document.getElementById('sleepHours').value);
+      
+      // Validate energy level
+      if (isNaN(energyLevel) || energyLevel < 1 || energyLevel > 10) {
+        toast.show('Please select a valid energy level', 'error');
+        return;
+      }
+      
+      // Validate sleep hours
+      if (sleepHours && (isNaN(sleepHours) || sleepHours < 0 || sleepHours > 24)) {
+        toast.show('Please enter a valid number of sleep hours', 'error');
         return;
       }
 
@@ -843,8 +858,8 @@
       const moodData = {
         uid: currentUser.uid,
         rating: currentRating,
-        energyLevel: parseInt(document.getElementById('energyLevel').value),
-        sleepHours: parseFloat(document.getElementById('sleepHours').value) || null,
+        energyLevel,
+        sleepHours: sleepHours || null,
         factors: factors.length ? factors : null,
         triggers: triggers.length ? triggers : null,
         medications: medications.length ? medications : null,
@@ -854,16 +869,19 @@
       };
 
       try {
-        await db.collection("moods").add(moodData);
-        toast.show("Mood logged successfully!", "success");
+        const spinner = loading.show(document.getElementById('moodForm'));
+        await db.collection('moods').add(moodData);
+        loading.hide(spinner);
+        
+        toast.show('Mood logged successfully!', 'success');
         document.getElementById('moodForm').reset();
         currentRating = 0;
         document.querySelectorAll('.rating-buttons button').forEach(btn => 
           btn.classList.remove('active')
         );
-        loadMoods();
+        await loadMoods();
       } catch (error) {
-        toast.show("Error logging mood: " + error.message, "error");
+        toast.show('Error logging mood: ' + error.message, 'error');
       }
     }
 

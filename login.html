@@ -16,72 +16,120 @@
   <link rel="stylesheet" href="assets/style.css" />
   
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  
-  <!-- Initialize Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth.js"></script>
   <script src="firebase-init.js"></script>
 </head>
 <body>
   <header>
     <h1>Bradley Health</h1>
-    <p>Login</p>
+    <p>Your Personal Health Companion</p>
   </header>
 
   <main>
-    <form id="loginForm" onsubmit="return false;">
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" required />
-      </div>
-      
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" required />
-      </div>
-      
-      <button type="submit" onclick="login()">Login</button>
-    </form>
+    <section class="card">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" required />
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required />
+        </div>
+        
+        <button type="submit">Login</button>
+      </form>
+      <p class="text-center mt-2">
+        Don't have an account? <a href="#" id="showSignup">Sign up</a>
+      </p>
+    </section>
+
+    <section class="card" id="signupSection" style="display: none;">
+      <h2>Sign Up</h2>
+      <form id="signupForm">
+        <div class="form-group">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" required />
+        </div>
+        <div class="form-group">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" required minlength="6" />
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" required minlength="6" />
+        </div>
+        <button type="submit">Sign Up</button>
+      </form>
+      <p class="text-center mt-2">
+        Already have an account? <a href="#" id="showLogin">Login</a>
+      </p>
+    </section>
   </main>
 
   <script>
-    // Wait for Firebase to initialize
-    function waitForFirebase(callback) {
-      if (window.auth) {
-        callback();
-      } else {
-        setTimeout(() => waitForFirebase(callback), 100);
-      }
-    }
+    // Initialize Firebase
+    const auth = firebase.auth();
 
-    function login() {
-      waitForFirebase(() => {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        
-        if (!email || !password) {
-          alert('Please enter both email and password');
-          return;
-        }
-
-        loginWithEmail(email, password);
-      });
-    }
-
-    // Handle form submission
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
+    // Toggle between login and signup forms
+    document.getElementById('showSignup').addEventListener('click', (e) => {
       e.preventDefault();
-      login();
+      document.getElementById('loginForm').parentElement.style.display = 'none';
+      document.getElementById('signupSection').style.display = 'block';
+    });
+
+    document.getElementById('showLogin').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('signupSection').style.display = 'none';
+      document.getElementById('loginForm').parentElement.style.display = 'block';
+    });
+
+    // Login form submission
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        window.location.href = 'dashboard.html';
+      } catch (error) {
+        console.error('Login error:', error);
+        alert(error.message);
+      }
+    });
+
+    // Signup form submission
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      
+      if (password !== confirmPassword) {
+        alert('Passwords do not match');
+        return;
+      }
+      
+      try {
+        await auth.createUserWithEmailAndPassword(email, password);
+        window.location.href = 'dashboard.html';
+      } catch (error) {
+        console.error('Signup error:', error);
+        alert(error.message);
+      }
     });
 
     // Check if user is already logged in
-    waitForFirebase(() => {
-      window.auth.onAuthStateChanged(user => {
-        if (user) {
-          window.location.href = 'dashboard.html';
-        }
-      });
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        window.location.href = 'dashboard.html';
+      }
     });
   </script>
 </body>

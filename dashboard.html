@@ -20,121 +20,96 @@
   <script src="assets/shared.js"></script>
 
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f4f8;
-      margin: 0;
-    }
-    header {
-      background-color: #2c7a7b;
-      color: white;
-      padding: 1.5em;
-      text-align: center;
-    }
-    main {
-      max-width: 600px;
-      margin: 2em auto;
-      text-align: center;
-    }
-    a.tool-link {
-      display: block;
-      background: #3182ce;
-      color: white;
-      padding: 1em;
-      margin: 1em 0;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 1.2em;
-    }
-    button {
-      padding: 0.8em 1.2em;
-      border: none;
-      background: #2c7a7b;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1em;
-      margin-top: 1em;
-    }
-    #profileModal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background: white;
-      padding: 2em;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 400px;
-    }
-    .modal-content h2 {
-      margin-top: 0;
-    }
-    .modal-content input, .modal-content select {
-      width: 100%;
-      padding: 0.75em;
-      margin: 0.5em 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+    /* Component-specific styles that extend global styles */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-md);
     }
 
-    /* 🌙 Dark mode support */
-    body.dark {
-      background: #1e1e1e;
-      color: #f0f0f0;
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-md);
     }
-    body.dark a.tool-link {
-      background: #4a5568;
-      color: #fff;
+
+    .action-card {
+      text-decoration: none;
+      color: var(--primary);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-sm);
     }
-    body.dark header {
-      background-color: #1a202c;
+
+    .action-card:hover {
+      color: var(--primary-dark);
     }
-    body.dark .modal-content {
-      background: #2d3748;
-      color: white;
+
+    .action-card .emoji {
+      font-size: 2.5em;
+    }
+
+    .action-card .label {
+      font-weight: 500;
+      font-size: 1.1em;
+    }
+
+    .header-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-sm);
+    }
+
+    .settings-btn {
+      background: none;
+      border: none;
+      color: var(--white);
+      cursor: pointer;
+      font-size: 1.2em;
+      padding: var(--spacing-xs);
+      transition: transform var(--transition-normal);
+    }
+
+    .settings-btn:hover {
+      transform: rotate(30deg);
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Bradley Health</h1>
-    <p id="welcomeText">Welcome to your dashboard</p>
+    <h1>Bradley Health Dashboard</h1>
+    <p>Welcome back, <span id="userName">User</span>!</p>
     <div class="header-controls">
-      <label>
-        🌙 Dark Mode:
-        <input type="checkbox" id="darkToggle" aria-label="Toggle dark mode" />
-      </label>
-      <button onclick="modal.show('settingsModal')" class="settings-btn" aria-label="Open settings">
-        ⚙️ Settings
-      </button>
+      <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
+      <button class="settings-btn" id="themeToggle" title="Toggle Dark Mode">🌙</button>
     </div>
   </header>
 
   <main>
     <section class="quick-stats">
-      <h2>Today's Overview</h2>
+      <h2>Quick Stats</h2>
       <div class="stats-grid">
-        <div class="stat-card" id="moodStat">
-          <h3>Current Mood</h3>
-          <p>Loading...</p>
+        <div class="stat-card">
+          <h3>Today's Steps</h3>
+          <p id="todaySteps">0</p>
         </div>
-        <div class="stat-card" id="bpStat">
+        <div class="stat-card">
           <h3>Blood Pressure</h3>
-          <p>Loading...</p>
+          <p id="latestBP">--/--</p>
         </div>
-        <div class="stat-card" id="medsStat">
-          <h3>Medications</h3>
-          <p>Loading...</p>
+        <div class="stat-card">
+          <h3>Mood</h3>
+          <p id="latestMood">--</p>
         </div>
-        <div class="stat-card" id="activityStat">
-          <h3>Activity</h3>
-          <p>Loading...</p>
+        <div class="stat-card">
+          <h3>Rolls</h3>
+          <p id="todayRolls">0</p>
         </div>
       </div>
     </section>
@@ -142,29 +117,29 @@
     <section class="quick-actions">
       <h2>Quick Actions</h2>
       <div class="action-grid">
+        <a href="blood-pressure.html" class="action-card">
+          <span class="emoji">❤️</span>
+          <span class="label">Blood Pressure</span>
+        </a>
         <a href="mood-tracker.html" class="action-card">
           <span class="emoji">😊</span>
-          <span class="label">Log Mood</span>
+          <span class="label">Mood Tracker</span>
         </a>
-        <a href="blood-pressure.html" class="action-card">
-          <span class="emoji">🩺</span>
-          <span class="label">Blood Pressure</span>
+        <a href="roll-tracker.html" class="action-card">
+          <span class="emoji">🔄</span>
+          <span class="label">Roll Tracker</span>
         </a>
         <a href="medications.html" class="action-card">
           <span class="emoji">💊</span>
           <span class="label">Medications</span>
-        </a>
-        <a href="roll-tracker.html" class="action-card">
-          <span class="emoji">♿</span>
-          <span class="label">Activity</span>
         </a>
       </div>
     </section>
 
     <section class="recent-activity">
       <h2>Recent Activity</h2>
-      <div id="activityFeed" class="activity-feed">
-        <p>Loading recent activity...</p>
+      <div class="activity-feed">
+        <div id="activityList">Loading...</div>
       </div>
     </section>
   </main>
@@ -173,242 +148,140 @@
   <div id="settingsModal" class="modal">
     <div class="modal-content">
       <h2>Settings</h2>
-      <form id="settingsForm" onsubmit="saveSettings(event)">
+      <form id="settingsForm">
         <div class="form-group">
-          <label for="notificationToggle">Enable Notifications</label>
-          <input type="checkbox" id="notificationToggle" />
-        </div>
-        <div class="form-group">
-          <label for="reminderTime">Daily Reminder Time</label>
-          <input type="time" id="reminderTime" />
+          <label for="displayName">Display Name</label>
+          <input type="text" id="displayName" required>
         </div>
         <div class="form-group">
-          <label for="units">Preferred Units</label>
-          <select id="units">
-            <option value="metric">Metric (kg, cm)</option>
-            <option value="imperial">Imperial (lbs, in)</option>
-          </select>
+          <label for="email">Email</label>
+          <input type="email" id="email" required>
         </div>
-        <div class="form-actions">
-          <button type="submit">Save Settings</button>
-          <button type="button" onclick="modal.hide('settingsModal')">Cancel</button>
-        </div>
+        <button type="submit">Save Changes</button>
       </form>
+      <button id="logoutBtn" class="mt-2">Logout</button>
     </div>
   </div>
 
   <script>
-    let currentUser;
-    let userSettings = {};
+    // Initialize Firebase
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    // Initialize dashboard
-    firebase.auth().onAuthStateChanged(user => {
-      if (!user) return window.location.href = "login.html";
-      currentUser = user;
-      initializeDashboard();
+    // Check authentication state
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = 'login.html';
+      } else {
+        // Load user data
+        loadUserData(user);
+        // Load activity feed
+        loadActivityFeed(user);
+      }
     });
 
-    async function initializeDashboard() {
+    // Load user data
+    async function loadUserData(user) {
       try {
-        // Load user profile
-        const profile = await firebaseHelpers.getUserProfile(currentUser.uid);
-        if (profile?.name) {
-          document.getElementById("welcomeText").textContent = `Welcome, ${profile.name}`;
+        const doc = await db.collection('users').doc(user.uid).get();
+        if (doc.exists) {
+          const data = doc.data();
+          document.getElementById('userName').textContent = data.displayName || 'User';
+          document.getElementById('displayName').value = data.displayName || '';
+          document.getElementById('email').value = user.email;
         }
-
-        // Load user settings
-        const settingsDoc = await db.collection("settings").doc(currentUser.uid).get();
-        if (settingsDoc.exists) {
-          userSettings = settingsDoc.data();
-          updateSettingsUI();
-        }
-
-        // Load quick stats
-        await Promise.all([
-          loadMoodStat(),
-          loadBPStat(),
-          loadMedsStat(),
-          loadActivityStat()
-        ]);
-
-        // Load recent activity
-        loadRecentActivity();
       } catch (error) {
-        toast.show("Error loading dashboard: " + error.message, "error");
+        console.error('Error loading user data:', error);
       }
     }
 
-    async function loadMoodStat() {
-      const today = new Date().toISOString().split('T')[0];
-      const moodDoc = await db.collection("moods")
-        .where("uid", "==", currentUser.uid)
-        .where("date", "==", today)
-        .orderBy("timestamp", "desc")
-        .limit(1)
-        .get();
-
-      const statElement = document.getElementById("moodStat").querySelector("p");
-      if (!moodDoc.empty) {
-        const mood = moodDoc.docs[0].data();
-        statElement.textContent = `${getEmoji(mood.rating)} (${mood.rating}/5)`;
-      } else {
-        statElement.textContent = "Not logged today";
-      }
-    }
-
-    async function loadBPStat() {
-      const today = new Date().toISOString().split('T')[0];
-      const bpDoc = await db.collection("bloodPressure")
-        .where("uid", "==", currentUser.uid)
-        .where("date", "==", today)
-        .orderBy("timestamp", "desc")
-        .limit(1)
-        .get();
-
-      const statElement = document.getElementById("bpStat").querySelector("p");
-      if (!bpDoc.empty) {
-        const bp = bpDoc.docs[0].data();
-        statElement.textContent = `${bp.systolic}/${bp.diastolic}`;
-      } else {
-        statElement.textContent = "Not logged today";
-      }
-    }
-
-    async function loadMedsStat() {
-      const today = new Date().toISOString().split('T')[0];
-      const medsDoc = await db.collection("medications")
-        .where("uid", "==", currentUser.uid)
-        .where("date", "==", today)
-        .get();
-
-      const statElement = document.getElementById("medsStat").querySelector("p");
-      if (!medsDoc.empty) {
-        const taken = medsDoc.docs.filter(doc => doc.data().taken).length;
-        const total = medsDoc.docs.length;
-        statElement.textContent = `${taken}/${total} taken`;
-      } else {
-        statElement.textContent = "No medications today";
-      }
-    }
-
-    async function loadActivityStat() {
-      const today = new Date().toISOString().split('T')[0];
-      const activityDoc = await db.collection("activity")
-        .where("uid", "==", currentUser.uid)
-        .where("date", "==", today)
-        .get();
-
-      const statElement = document.getElementById("activityStat").querySelector("p");
-      if (!activityDoc.empty) {
-        const totalRolls = activityDoc.docs.reduce((sum, doc) => sum + doc.data().rolls, 0);
-        statElement.textContent = `${totalRolls} rolls today`;
-      } else {
-        statElement.textContent = "No activity logged";
-      }
-    }
-
-    async function loadRecentActivity() {
-      const feedElement = document.getElementById("activityFeed");
-      const spinner = loading.show(feedElement);
-
+    // Load activity feed
+    async function loadActivityFeed(user) {
+      const activityList = document.getElementById('activityList');
+      
       try {
-        const activities = await db.collection("activityLog")
-          .where("uid", "==", currentUser.uid)
-          .orderBy("timestamp", "desc")
+        const snapshot = await db.collection('users').doc(user.uid)
+          .collection('activity')
+          .orderBy('timestamp', 'desc')
           .limit(5)
           .get();
-
-        if (activities.empty) {
-          feedElement.innerHTML = "<p>No recent activity</p>";
+        
+        if (snapshot.empty) {
+          activityList.innerHTML = '<p>No recent activity</p>';
           return;
         }
-
-        const activityList = activities.docs.map(doc => {
-          const activity = doc.data();
-          return `
-            <div class="activity-item">
-              <span class="activity-icon">${getActivityIcon(activity.type)}</span>
-              <span class="activity-text">${activity.description}</span>
-              <span class="activity-time">${formatTime(activity.timestamp)}</span>
-            </div>
+        
+        activityList.innerHTML = '';
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const date = data.timestamp ? data.timestamp.toDate() : new Date();
+          
+          const activity = document.createElement('div');
+          activity.className = 'activity-item';
+          activity.innerHTML = `
+            <p><strong>${data.type}</strong> - ${date.toLocaleString()}</p>
+            <p>${data.description}</p>
           `;
-        }).join("");
-
-        feedElement.innerHTML = activityList;
+          activityList.appendChild(activity);
+        });
       } catch (error) {
-        feedElement.innerHTML = "<p>Error loading activity</p>";
-        toast.show("Error loading activity: " + error.message, "error");
-      } finally {
-        loading.hide(spinner);
+        console.error('Error loading activity feed:', error);
+        activityList.innerHTML = '<p>Error loading activity feed</p>';
       }
     }
 
-    function getActivityIcon(type) {
-      const icons = {
-        mood: "😊",
-        bp: "🩺",
-        meds: "💊",
-        activity: "♿"
-      };
-      return icons[type] || "📝";
-    }
+    // Settings modal
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsModal = document.getElementById('settingsModal');
+    const settingsForm = document.getElementById('settingsForm');
+    const logoutBtn = document.getElementById('logoutBtn');
 
-    function formatTime(timestamp) {
-      if (!timestamp?.seconds) return "";
-      const date = new Date(timestamp.seconds * 1000);
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
+    settingsBtn.addEventListener('click', () => {
+      settingsModal.style.display = 'block';
+    });
 
-    function getEmoji(rating) {
-      return ["😟", "😕", "😐", "🙂", "😃"][rating - 1] || "";
-    }
+    window.addEventListener('click', (e) => {
+      if (e.target === settingsModal) {
+        settingsModal.style.display = 'none';
+      }
+    });
 
-    function updateSettingsUI() {
-      document.getElementById("notificationToggle").checked = userSettings.notifications || false;
-      document.getElementById("reminderTime").value = userSettings.reminderTime || "09:00";
-      document.getElementById("units").value = userSettings.units || "metric";
-    }
-
-    async function saveSettings(event) {
-      event.preventDefault();
-      const spinner = loading.show(event.target);
-
+    settingsForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const user = auth.currentUser;
+      const displayName = document.getElementById('displayName').value;
+      
       try {
-        const settings = {
-          notifications: document.getElementById("notificationToggle").checked,
-          reminderTime: document.getElementById("reminderTime").value,
-          units: document.getElementById("units").value,
-          updatedAt: new Date()
-        };
-
-        await db.collection("settings").doc(currentUser.uid).set(settings, { merge: true });
-        userSettings = settings;
-        modal.hide('settingsModal');
-        toast.show("Settings saved successfully!");
+        await db.collection('users').doc(user.uid).update({
+          displayName
+        });
+        
+        document.getElementById('userName').textContent = displayName;
+        settingsModal.style.display = 'none';
       } catch (error) {
-        toast.show("Error saving settings: " + error.message, "error");
-      } finally {
-        loading.hide(spinner);
+        console.error('Error updating settings:', error);
+        alert('Error updating settings');
       }
-    }
+    });
 
-    // ✅ Dark mode toggle
-    const toggle = document.getElementById("darkToggle");
-    const body = document.body;
-
-    if (localStorage.getItem("darkMode") === "true") {
-      body.classList.add("dark");
-      toggle.checked = true;
-    }
-
-    toggle.addEventListener("change", () => {
-      if (toggle.checked) {
-        body.classList.add("dark");
-        localStorage.setItem("darkMode", "true");
-      } else {
-        body.classList.remove("dark");
-        localStorage.setItem("darkMode", "false");
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await auth.signOut();
+        window.location.href = 'login.html';
+      } catch (error) {
+        console.error('Error signing out:', error);
       }
+    });
+
+    // Dark mode toggle
+    const themeToggle = document.getElementById('themeToggle');
+    
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+      const isDark = document.body.classList.contains('dark');
+      themeToggle.textContent = isDark ? '☀️' : '🌙';
+      document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
     });
   </script>
 </body>

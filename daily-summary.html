@@ -464,11 +464,23 @@
 
       // BP recommendations
       if (latestBP) {
-        if (latestBP.systolic > 140 || latestBP.diastolic > 90) {
+        if (latestBP.systolic >= 180 || latestBP.diastolic >= 120) {
+          recommendations.push({
+            icon: '🚨',
+            title: 'Hypertensive Crisis',
+            text: 'Seek immediate medical attention. Your blood pressure is dangerously high.'
+          });
+        } else if (latestBP.systolic >= 140 || latestBP.diastolic >= 90) {
           recommendations.push({
             icon: '🩺',
             title: 'High Blood Pressure',
-            text: 'Consider reducing salt intake and scheduling a doctor visit.'
+            text: 'Consider reducing salt intake, increasing physical activity, and scheduling a doctor visit.'
+          });
+        } else if (latestBP.systolic < 90 || latestBP.diastolic < 60) {
+          recommendations.push({
+            icon: '💧',
+            title: 'Low Blood Pressure',
+            text: 'Stay hydrated and consider increasing salt intake if approved by your doctor.'
           });
         }
       }
@@ -480,7 +492,13 @@
           recommendations.push({
             icon: '♿',
             title: 'Low Activity Level',
-            text: 'Try to increase your activity level to maintain mobility.'
+            text: 'Try to increase your activity level gradually. Consider short, frequent movement breaks.'
+          });
+        } else if (latestActivity.distance > avgDistance * 1.3) {
+          recommendations.push({
+            icon: '💪',
+            title: 'High Activity Level',
+            text: 'Great job! Remember to stay hydrated and take rest periods as needed.'
           });
         }
       }
@@ -491,7 +509,13 @@
           recommendations.push({
             icon: '😊',
             title: 'Low Mood',
-            text: 'Consider activities that usually improve your mood.'
+            text: 'Consider activities that usually improve your mood, such as social interaction or hobbies.'
+          });
+        } else if (latestMood.rating > 4) {
+          recommendations.push({
+            icon: '🌟',
+            title: 'Positive Mood',
+            text: 'Great to see you\'re feeling well! Keep up the activities that contribute to your positive mood.'
           });
         }
       }
@@ -503,7 +527,13 @@
           recommendations.push({
             icon: '💊',
             title: 'Medication Adherence',
-            text: 'Try to improve medication adherence for better health outcomes.'
+            text: 'Try setting reminders or using a pill organizer to improve medication adherence.'
+          });
+        } else if (adherence >= 0.95) {
+          recommendations.push({
+            icon: '✅',
+            title: 'Excellent Adherence',
+            text: 'Great job maintaining your medication schedule!'
           });
         }
       }
