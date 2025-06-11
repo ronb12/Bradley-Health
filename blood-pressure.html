@@ -184,9 +184,41 @@
     const exportManager = new ExportManager();
     const bloodPressureManager = new BloodPressureManager(notificationManager, exportManager);
     
+    // Handle PWA installation
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Show custom install button if needed
+        const installButton = document.createElement('button');
+        installButton.textContent = 'Install App';
+        installButton.className = 'btn btn-primary';
+        installButton.onclick = async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                deferredPrompt = null;
+            }
+        };
+        document.querySelector('.header-controls').prepend(installButton);
+    });
+    
     // Initialize when DOM is loaded
     document.addEventListener('DOMContentLoaded', () => {
-      bloodPressureManager.init();
+        bloodPressureManager.init();
+        
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => {
+                    console.log('ServiceWorker registration successful');
+                })
+                .catch(error => {
+                    console.error('ServiceWorker registration failed:', error);
+                });
+        }
     });
   </script>
 </body>

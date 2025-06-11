@@ -1,99 +1,118 @@
 const CACHE_NAME = 'bradley-health-v1';
+
+// Assets to cache
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/assets/style.css',
-  '/assets/mobile.css',
-  '/assets/shared.js',
-  '/assets/js/notifications.js',
-  '/assets/js/blood-pressure.js',
-  '/assets/js/theme.js',
-  '/assets/js/share.js',
-  '/assets/icons/icon.svg',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
-  'https://cdn.jsdelivr.net/npm/chart.js'
+    '/',
+    '/index.html',
+    '/login.html',
+    '/dashboard.html',
+    '/blood-pressure.html',
+    '/medications.html',
+    '/profile.html',
+    '/assets/style.css',
+    '/assets/blood-pressure.css',
+    '/assets/mobile.css',
+    '/assets/js/firebase-config.js',
+    '/assets/js/blood-pressure-manager.js',
+    '/assets/js/notification-manager.js',
+    '/assets/js/export-manager.js',
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+    'https://cdn.jsdelivr.net/npm/chart.js'
 ];
 
 // Install event - cache assets
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        return cache.addAll(ASSETS_TO_CACHE);
-      })
-  );
+self.addEventListener('install', event => {
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                console.log('Opened cache');
+                return cache.addAll(ASSETS_TO_CACHE);
+            })
+    );
 });
 
 // Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheName !== CACHE_NAME) {
+                        console.log('Deleting old cache:', cacheName);
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
         })
-      );
-    })
-  );
+    );
 });
 
 // Fetch event - serve from cache, fall back to network
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request)
-          .then((response) => {
-            // Check if we received a valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
+self.addEventListener('fetch', event => {
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => {
+                // Cache hit - return response
+                if (response) {
+                    return response;
+                }
 
-            // Clone the response
-            const responseToCache = response.clone();
+                // Clone the request
+                const fetchRequest = event.request.clone();
 
-            // Cache the fetched resource
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
+                return fetch(fetchRequest).then(response => {
+                    // Check if we received a valid response
+                    if (!response || response.status !== 200 || response.type !== 'basic') {
+                        return response;
+                    }
 
-            return response;
-          });
-      })
-  );
+                    // Clone the response
+                    const responseToCache = response.clone();
+
+                    caches.open(CACHE_NAME)
+                        .then(cache => {
+                            cache.put(event.request, responseToCache);
+                        });
+
+                    return response;
+                });
+            })
+    );
 });
 
 // Background sync for offline data
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-readings') {
-    event.waitUntil(syncReadings());
-  }
+self.addEventListener('sync', event => {
+    if (event.tag === 'sync-readings') {
+        event.waitUntil(syncReadings());
+    }
 });
 
 async function syncReadings() {
-  const db = await openDB();
-  const readings = await db.getAll('pendingReadings');
-  
-  for (const reading of readings) {
-    try {
-      await fetch('/api/readings', {
+    const db = await openDB();
+    const readings = await db.getAll('pendingReadings');
+    
+    for (const reading of readings) {
+        try {
+            await syncReading(reading);
+            await db.delete('pendingReadings', reading.id);
+        } catch (error) {
+            console.error('Error syncing reading:', error);
+        }
+    }
+}
+
+async function syncReading(reading) {
+    const response = await fetch('/api/readings', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(reading)
-      });
-      await db.delete('pendingReadings', reading.id);
-    } catch (error) {
-      console.error('Sync failed:', error);
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to sync reading');
     }
-  }
 }
 
 // Helper function to open IndexedDB

@@ -6,11 +6,14 @@ class BloodPressureManager {
     this.exportManager = exportManager;
     this.chart = null;
     this.currentRange = 7; // Default to 7 days
+    this.user = null;
   }
 
   init() {
+    // Wait for auth state to be ready
     this.auth.onAuthStateChanged(user => {
       if (user) {
+        this.user = user;
         this.loadReadings();
         this.setupEventListeners();
       } else {
@@ -48,15 +51,19 @@ class BloodPressureManager {
   }
 
   async loadReadings() {
+    if (!this.user) {
+      console.log('Waiting for user authentication...');
+      return;
+    }
+
     this.showLoading();
     try {
-      const user = this.auth.currentUser;
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - this.currentRange);
 
       const snapshot = await this.db
         .collection('users')
-        .doc(user.uid)
+        .doc(this.user.uid)
         .collection('bloodPressure')
         .where('timestamp', '>=', startDate)
         .orderBy('timestamp', 'desc')
