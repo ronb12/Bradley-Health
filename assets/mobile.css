@@ -97,6 +97,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
 }
 
 .mobile-menu-button {
@@ -105,6 +112,7 @@
   padding: var(--spacing-2);
   color: var(--text);
   cursor: pointer;
+  font-size: var(--font-size-xl);
 }
 
 /* Mobile Menu */

@@ -24,7 +24,10 @@
   <div class="mobile-header">
     <div class="mobile-header-content">
       <h1>Blood Pressure</h1>
-      <button class="mobile-menu-button" aria-label="Menu">☰</button>
+      <div class="header-actions">
+        <img src="assets/default-avatar.svg" alt="User Avatar" class="avatar" id="userAvatar">
+        <button class="mobile-menu-button" aria-label="Menu">☰</button>
+      </div>
     </div>
   </div>
 
@@ -207,18 +210,6 @@
       <button class="primary-button" onclick="closeMeasurementGuide()">Got it</button>
     </div>
   </div>
-
-  <!-- Update the avatar image source -->
-  <img src="assets/default-avatar.svg" alt="User Avatar" class="avatar" id="userAvatar">
-
-  <!-- Add a fallback for the avatar -->
-  <script>
-    // Add avatar fallback
-    document.getElementById('userAvatar').onerror = function() {
-        this.onerror = null;
-        this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIxMDAiIGZpbGw9IiNFMkU4RjAiLz48Y2lyY2xlIGN4PSIxMDAiIGN5PSI4NSIgcj0iMzUiIGZpbGw9IiMyQjZDQjAiLz48cGF0aCBkPSJNMTAwIDEzMEMxMzMuMTM3IDEzMCAxNjAgMTU2Ljg2MyAxNjAgMTkwVjIwMEg0MFYxOTBDNDAgMTU2Ljg2MyA2Ni44NjI5IDEzMCAxMDAgMTMwWiIgZmlsbD0iIzJCNkNCMCIvPjwvc3ZnPg==';
-    };
-  </script>
 
   <script>
     let currentUser;
@@ -805,6 +796,12 @@
       updateBPStats('week');
       renderBPChart();
     });
+
+    // Add avatar fallback
+    document.getElementById('userAvatar').onerror = function() {
+        this.onerror = null;
+        this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIxMDAiIGZpbGw9IiNFMkU4RjAiLz48Y2lyY2xlIGN4PSIxMDAiIGN5PSI4NSIgcj0iMzUiIGZpbGw9IiMyQjZDQjAiLz48cGF0aCBkPSJNMTAwIDEzMEMxMzMuMTM3IDEzMCAxNjAgMTU2Ljg2MyAxNjAgMTkwVjIwMEg0MFYxOTBDNDAgMTU2Ljg2MyA2Ni44NjI5IDEzMCAxMDAgMTMwWiIgZmlsbD0iIzJCNkNCMCIvPjwvc3ZnPg==';
+    };
   </script>
 </body>
 </html>
