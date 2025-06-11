@@ -3,132 +3,119 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="theme-color" content="#2c7a7b"/>
-  <meta name="description" content="Bradley Health - Your Personal Health Companion"/>
+  <meta name="theme-color" content="#1a56db"/>
+  <meta name="description" content="Login to Bradley Health"/>
   
   <!-- Favicon -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png"/>
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png"/>
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png"/>
-  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png"/>
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png"/>
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png"/>
+  <link rel="manifest" href="/manifest.json"/>
   
   <title>Login - Bradley Health</title>
   <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth.js"></script>
-  <script src="firebase-init.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  
+  <!-- Application Scripts -->
+  <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/notification-manager.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Bradley Health</h1>
-    <p>Your Personal Health Companion</p>
-  </header>
-
-  <main>
-    <section class="card">
-      <h2>Login</h2>
-      <form id="loginForm">
+  <div class="container">
+    <div class="login-container">
+      <div class="login-header">
+        <h1>Welcome Back</h1>
+        <p>Sign in to access your health dashboard</p>
+      </div>
+      
+      <form id="loginForm" class="login-form">
         <div class="form-group">
           <label for="email">Email</label>
-          <input type="email" id="email" required />
+          <input type="email" id="email" name="email" required />
         </div>
         
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" id="password" required />
+          <input type="password" id="password" name="password" required />
         </div>
         
-        <button type="submit">Login</button>
+        <button type="submit" class="btn btn-primary">Sign In</button>
+        
+        <div class="form-footer">
+          <a href="forgot-password.html">Forgot Password?</a>
+          <a href="register.html">Create Account</a>
+        </div>
       </form>
-      <p class="text-center mt-2">
-        Don't have an account? <a href="#" id="showSignup">Sign up</a>
-      </p>
-    </section>
+    </div>
+  </div>
 
-    <section class="card" id="signupSection" style="display: none;">
-      <h2>Sign Up</h2>
-      <form id="signupForm">
-        <div class="form-group">
-          <label for="signupEmail">Email</label>
-          <input type="email" id="signupEmail" required />
-        </div>
-        <div class="form-group">
-          <label for="signupPassword">Password</label>
-          <input type="password" id="signupPassword" required minlength="6" />
-        </div>
-        <div class="form-group">
-          <label for="confirmPassword">Confirm Password</label>
-          <input type="password" id="confirmPassword" required minlength="6" />
-        </div>
-        <button type="submit">Sign Up</button>
-      </form>
-      <p class="text-center mt-2">
-        Already have an account? <a href="#" id="showLogin">Login</a>
-      </p>
-    </section>
-  </main>
+  <div id="mobileToast" class="mobile-toast"></div>
 
   <script>
-    // Initialize Firebase
-    const auth = firebase.auth();
+    // Initialize managers
+    let notificationManager;
 
-    // Toggle between login and signup forms
-    document.getElementById('showSignup').addEventListener('click', (e) => {
-      e.preventDefault();
-      document.getElementById('loginForm').parentElement.style.display = 'none';
-      document.getElementById('signupSection').style.display = 'block';
-    });
-
-    document.getElementById('showLogin').addEventListener('click', (e) => {
-      e.preventDefault();
-      document.getElementById('signupSection').style.display = 'none';
-      document.getElementById('loginForm').parentElement.style.display = 'block';
-    });
-
-    // Login form submission
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      
+    // Wait for all scripts to load
+    window.addEventListener('load', async () => {
       try {
-        await auth.signInWithEmailAndPassword(email, password);
-        window.location.href = 'dashboard.html';
-      } catch (error) {
-        console.error('Login error:', error);
-        alert(error.message);
-      }
-    });
+        // Check if Firebase is loaded
+        if (typeof firebase === 'undefined') {
+          throw new Error('Firebase SDK not loaded');
+        }
 
-    // Signup form submission
-    document.getElementById('signupForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const email = document.getElementById('signupEmail').value;
-      const password = document.getElementById('signupPassword').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      
-      if (password !== confirmPassword) {
-        alert('Passwords do not match');
-        return;
-      }
-      
-      try {
-        await auth.createUserWithEmailAndPassword(email, password);
-        window.location.href = 'dashboard.html';
-      } catch (error) {
-        console.error('Signup error:', error);
-        alert(error.message);
-      }
-    });
+        // Check if Firebase config is available
+        if (typeof firebaseConfig === 'undefined') {
+          throw new Error('Firebase configuration is missing');
+        }
 
-    // Check if user is already logged in
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        window.location.href = 'dashboard.html';
+        // Initialize Firebase if not already initialized
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+          console.log('✅ Firebase initialized successfully');
+        }
+
+        // Initialize notification manager
+        notificationManager = new NotificationManager();
+
+        // Set up login form
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          const email = document.getElementById('email').value;
+          const password = document.getElementById('password').value;
+          
+          try {
+            const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+            window.location.href = 'dashboard.html';
+          } catch (error) {
+            console.error('Login error:', error);
+            notificationManager.showToast(error.message, 'error');
+          }
+        });
+
+        // Check if user is already logged in
+        firebase.auth().onAuthStateChanged(user => {
+          if (user) {
+            window.location.href = 'dashboard.html';
+          }
+        });
+      } catch (error) {
+        console.error('❌ Initialization error:', error);
+        document.body.innerHTML = `
+          <div class="error-message">
+            <h2>Error Loading Application</h2>
+            <p>${error.message}</p>
+            <p>Please try refreshing the page or contact support if the problem persists.</p>
+          </div>
+        `;
       }
     });
   </script>
