@@ -18,13 +18,9 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-  
   <!-- Application Scripts -->
   <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/firebase-init.js"></script>
   <script src="assets/js/notification-manager.js"></script>
 </head>
 <body>
@@ -65,22 +61,9 @@
     // Wait for all scripts to load
     window.addEventListener('load', async () => {
       try {
-        // Check if Firebase is loaded
-        if (typeof firebase === 'undefined') {
-          throw new Error('Firebase SDK not loaded');
-        }
-
-        // Check if Firebase config is available
-        if (typeof firebaseConfig === 'undefined') {
-          throw new Error('Firebase configuration is missing');
-        }
-
-        // Initialize Firebase if not already initialized
-        if (!firebase.apps.length) {
-          firebase.initializeApp(firebaseConfig);
-          console.log('✅ Firebase initialized successfully');
-        }
-
+        // Initialize Firebase
+        await window.initializeFirebase();
+        
         // Initialize notification manager
         notificationManager = new NotificationManager();
 
