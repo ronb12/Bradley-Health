@@ -11,13 +11,18 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="assets/icons/icon.svg">
   <meta name="theme-color" content="#2B6CB0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Application Scripts -->
   <script src="assets/js/firebase-config.js"></script>
   <script src="assets/js/notification-manager.js"></script>
   <script src="assets/js/export-manager.js"></script>
@@ -177,16 +182,20 @@
 
   <script>
     // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    
-    // Initialize managers
-    const notificationManager = new NotificationManager();
-    const exportManager = new ExportManager();
-    const bloodPressureManager = new BloodPressureManager(notificationManager, exportManager);
-    
-    // Handle PWA installation
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
+    if (typeof firebaseConfig === 'undefined') {
+      console.error('Firebase configuration is missing');
+      document.body.innerHTML = '<div class="error-message">Error: Firebase configuration is missing</div>';
+    } else {
+      firebase.initializeApp(firebaseConfig);
+      
+      // Initialize managers
+      const notificationManager = new NotificationManager();
+      const exportManager = new ExportManager();
+      const bloodPressureManager = new BloodPressureManager(notificationManager, exportManager);
+      
+      // Handle PWA installation
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
         
@@ -195,31 +204,32 @@
         installButton.textContent = 'Install App';
         installButton.className = 'btn btn-primary';
         installButton.onclick = async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log(`User response to the install prompt: ${outcome}`);
-                deferredPrompt = null;
-            }
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User response to the install prompt: ${outcome}`);
+            deferredPrompt = null;
+          }
         };
         document.querySelector('.header-controls').prepend(installButton);
-    });
-    
-    // Initialize when DOM is loaded
-    document.addEventListener('DOMContentLoaded', () => {
+      });
+      
+      // Initialize when DOM is loaded
+      document.addEventListener('DOMContentLoaded', () => {
         bloodPressureManager.init();
         
         // Register service worker
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(registration => {
-                    console.log('ServiceWorker registration successful');
-                })
-                .catch(error => {
-                    console.error('ServiceWorker registration failed:', error);
-                });
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+              console.log('ServiceWorker registration successful');
+            })
+            .catch(error => {
+              console.error('ServiceWorker registration failed:', error);
+            });
         }
-    });
+      });
+    }
   </script>
 </body>
 </html>
