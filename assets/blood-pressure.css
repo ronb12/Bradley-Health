@@ -1,0 +1,266 @@
+/* Blood Pressure specific styles */
+.bp-reading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.bp-value {
+  font-size: var(--font-size-4xl);
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+}
+
+.bp-value .divider {
+  color: var(--text-lighter);
+  margin: 0 var(--spacing-xs);
+}
+
+.bp-value .unit {
+  font-size: var(--font-size-sm);
+  color: var(--text-lighter);
+  margin-left: var(--spacing-xs);
+}
+
+.bp-pulse {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--text-light);
+}
+
+.pulse-value {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+}
+
+.pulse-unit {
+  font-size: var(--font-size-sm);
+  color: var(--text-lighter);
+}
+
+.bp-timestamp {
+  font-size: var(--font-size-sm);
+  color: var(--text-lighter);
+  text-align: center;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.stat-item {
+  text-align: center;
+  padding: var(--spacing-md);
+  background: var(--background-secondary);
+  border-radius: var(--radius-lg);
+}
+
+.stat-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--text-lighter);
+  margin-bottom: var(--spacing-xs);
+}
+
+.stat-value {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.chart-container {
+  height: 300px;
+  margin-top: var(--spacing-md);
+}
+
+.reading-info {
+  flex: 1;
+}
+
+.reading-values {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.reading-bp {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.reading-pulse {
+  color: var(--text-lighter);
+}
+
+.reading-time {
+  font-size: var(--font-size-sm);
+  color: var(--text-lighter);
+  margin-top: var(--spacing-xs);
+}
+
+.reading-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.edit-btn,
+.delete-btn {
+  background: none;
+  border: none;
+  padding: var(--spacing-xs);
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  transition: var(--transition-normal);
+}
+
+.edit-btn:hover {
+  color: var(--primary);
+}
+
+.delete-btn:hover {
+  color: var(--error);
+}
+
+.guide-steps {
+  margin: var(--spacing-md) 0;
+}
+
+.guide-step {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  color: var(--white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.step-content h3 {
+  margin-bottom: var(--spacing-xs);
+}
+
+.guide-tips {
+  background: var(--background-secondary);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  margin: var(--spacing-md) 0;
+}
+
+.guide-tips h3 {
+  margin-bottom: var(--spacing-sm);
+}
+
+.guide-tips ul {
+  list-style: disc;
+  padding-left: var(--spacing-md);
+}
+
+.guide-tips li {
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-light);
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+  .stat-item {
+    background: var(--background-tertiary);
+  }
+
+  .guide-tips {
+    background: var(--background-tertiary);
+  }
+
+  .reading-bp {
+    color: var(--text-light);
+  }
+
+  .edit-btn:hover {
+    color: var(--primary-light);
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bp-value {
+    font-size: var(--font-size-3xl);
+  }
+
+  .reading-values {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+}
+
+/* Loading overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgb(255 255 255 / 90%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-50);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--primary);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: var(--spacing-md);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .loading-spinner {
+    animation: none;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    transition: none;
+  }
+} 
