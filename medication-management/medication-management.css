@@ -52,7 +52,7 @@
 }
 
 .status-toggle input {
-    opacity: 0;
+    opacity: 0%;
     width: 0;
     height: 0;
 }
@@ -69,7 +69,7 @@
     border-radius: 1.25rem;
 }
 
-.toggle-slider:before {
+.toggle-slider::before {
     position: absolute;
     content: "";
     height: 1rem;
@@ -85,7 +85,7 @@ input:checked + .toggle-slider {
     background-color: var(--success);
 }
 
-input:checked + .toggle-slider:before {
+input:checked + .toggle-slider::before {
     transform: translateX(1.25rem);
 }
 
@@ -123,17 +123,17 @@ input:checked + .toggle-slider:before {
 }
 
 .interaction-alert.severe {
-    background: rgba(229, 62, 62, 0.1);
+    background: rgb(229 62 62 / 10%);
     border: 1px solid var(--error);
 }
 
 .interaction-alert.moderate {
-    background: rgba(237, 137, 54, 0.1);
+    background: rgb(237 137 54 / 10%);
     border: 1px solid var(--warning);
 }
 
 .interaction-alert.mild {
-    background: rgba(56, 161, 105, 0.1);
+    background: rgb(56 161 105 / 10%);
     border: 1px solid var(--success);
 }
 
@@ -178,12 +178,12 @@ input:checked + .toggle-slider:before {
 }
 
 .status-badge.pending {
-    background: rgba(237, 137, 54, 0.1);
+    background: rgb(237 137 54 / 10%);
     color: var(--warning);
 }
 
 .status-badge.completed {
-    background: rgba(56, 161, 105, 0.1);
+    background: rgb(56 161 105 / 10%);
     color: var(--success);
 }
 

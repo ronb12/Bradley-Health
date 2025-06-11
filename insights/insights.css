@@ -15,7 +15,7 @@
     align-items: center;
     margin: 0 auto 1.5rem;
     color: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
 }
 
 .score-value {
@@ -26,7 +26,7 @@
 
 .score-label {
     font-size: 0.875rem;
-    opacity: 0.9;
+    opacity: 90%;
 }
 
 .score-factors {

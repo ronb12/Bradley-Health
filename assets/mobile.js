@@ -1,6 +1,8 @@
 // Mobile-specific functionality
 class MobileUI {
     constructor() {
+        this.cache = new Map();
+        this.debounceTimers = new Map();
         this.menuButton = document.querySelector('.mobile-menu-button');
         this.menu = document.querySelector('.mobile-menu');
         this.menuClose = document.querySelector('.mobile-menu-close');
@@ -8,10 +10,18 @@ class MobileUI {
         this.loading = document.getElementById('mobile-loading');
         this.bottomSheet = document.querySelector('.mobile-bottom-sheet');
         
-        this.initializeEventListeners();
+        this.setupEventListeners();
     }
 
-    initializeEventListeners() {
+    // Performance optimized event listeners
+    setupEventListeners() {
+        const debouncedResize = this.debounce(this.handleResize.bind(this), 250);
+        window.addEventListener('resize', debouncedResize);
+        
+        // Use passive event listeners for better scroll performance
+        document.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
+        document.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: true });
+
         // Menu functionality
         if (this.menuButton) {
             this.menuButton.addEventListener('click', () => this.openMenu());
@@ -25,11 +35,14 @@ class MobileUI {
 
         // Handle orientation changes
         window.addEventListener('orientationchange', () => this.handleOrientationChange());
+    }
 
-        // Handle touch events
-        document.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: true });
-        document.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: true });
-        document.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: true });
+    // Debounce utility
+    debounce(func, wait) {
+        return (...args) => {
+            clearTimeout(this.debounceTimers.get(func));
+            this.debounceTimers.set(func, setTimeout(() => func(...args), wait));
+        };
     }
 
     // Menu methods
@@ -43,27 +56,141 @@ class MobileUI {
         document.body.style.overflow = '';
     }
 
-    // Toast methods
-    showToast(message, duration = 3000) {
-        if (!this.toast) return;
+    // Enhanced form validation with performance optimizations
+    validateForm(form) {
+        if (!form) return false;
         
-        this.toast.textContent = message;
-        this.toast.classList.add('active');
+        const inputs = form.querySelectorAll('input, select, textarea');
+        let isValid = true;
+        const errors = [];
         
-        setTimeout(() => {
-            this.toast.classList.remove('active');
-        }, duration);
+        inputs.forEach(input => {
+            if (input.hasAttribute('required') && !input.value.trim()) {
+                errors.push(`${input.name || 'Field'} is required`);
+                isValid = false;
+            }
+            
+            if (input.type === 'email' && !validation.email(input.value)) {
+                errors.push('Please enter a valid email address');
+                isValid = false;
+            }
+            
+            if (input.type === 'tel' && !validation.phone(input.value)) {
+                errors.push('Please enter a valid phone number');
+                isValid = false;
+            }
+        });
+        
+        if (!isValid) {
+            this.showToast(errors.join('\n'), 'error');
+        }
+        
+        return isValid;
     }
 
-    // Loading methods
+    // Performance optimized form submission
+    async submitForm(form) {
+        try {
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Cache validation results
+            const cacheKey = JSON.stringify(data);
+            if (this.cache.has(cacheKey)) {
+                return this.cache.get(cacheKey);
+            }
+            
+            const result = await this.processFormData(data);
+            this.cache.set(cacheKey, result);
+            return result;
+        } catch (error) {
+            console.error('Form submission error:', error);
+            throw new Error('Failed to submit form. Please try again.');
+        }
+    }
+
+    // Enhanced loading state management
     showLoading() {
-        if (!this.loading) return;
-        this.loading.style.display = 'flex';
+        const loadingElement = document.createElement('div');
+        loadingElement.className = 'loading';
+        loadingElement.setAttribute('role', 'status');
+        loadingElement.setAttribute('aria-label', 'Loading');
+        document.body.appendChild(loadingElement);
     }
 
     hideLoading() {
-        if (!this.loading) return;
-        this.loading.style.display = 'none';
+        const loadingElement = document.querySelector('.loading');
+        if (loadingElement) {
+            loadingElement.remove();
+        }
+    }
+
+    // Enhanced toast notifications
+    showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'polite');
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        // Use requestAnimationFrame for smooth animations
+        requestAnimationFrame(() => {
+            toast.classList.add('show');
+        });
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Touch event handlers
+    handleTouchStart(event) {
+        this.touchStartY = event.touches[0].clientY;
+    }
+
+    handleTouchMove(event) {
+        if (!this.touchStartY) return;
+        
+        const touchY = event.touches[0].clientY;
+        const diff = this.touchStartY - touchY;
+        
+        // Handle pull-to-refresh
+        if (diff > 50 && window.scrollY === 0) {
+            this.handlePullToRefresh();
+        }
+    }
+
+    handlePullToRefresh() {
+        this.showLoading();
+        // Implement your refresh logic here
+        setTimeout(() => this.hideLoading(), 1000);
+    }
+
+    handleResize() {
+        // Implement responsive layout adjustments
+        const width = window.innerWidth;
+        if (width <= 768) {
+            document.body.classList.add('mobile-view');
+        } else {
+            document.body.classList.remove('mobile-view');
+        }
+    }
+
+    // Orientation change handling
+    handleOrientationChange() {
+        // Adjust UI elements based on orientation
+        const isPortrait = window.innerHeight > window.innerWidth;
+        
+        if (isPortrait) {
+            document.body.classList.add('portrait');
+            document.body.classList.remove('landscape');
+        } else {
+            document.body.classList.add('landscape');
+            document.body.classList.remove('portrait');
+        }
     }
 
     // Bottom sheet methods
@@ -84,100 +211,6 @@ class MobileUI {
         
         this.bottomSheet.classList.remove('active');
         document.body.style.overflow = '';
-    }
-
-    // Touch handling methods
-    handleTouchStart(e) {
-        this.touchStartY = e.touches[0].clientY;
-    }
-
-    handleTouchMove(e) {
-        if (!this.touchStartY) return;
-        
-        const touchY = e.touches[0].clientY;
-        const diff = touchY - this.touchStartY;
-        
-        if (diff > 0 && this.bottomSheet && this.bottomSheet.classList.contains('active')) {
-            e.preventDefault();
-            this.bottomSheet.style.transform = `translateY(${diff}px)`;
-        }
-    }
-
-    handleTouchEnd(e) {
-        if (!this.touchStartY) return;
-        
-        const touchY = e.changedTouches[0].clientY;
-        const diff = touchY - this.touchStartY;
-        
-        if (diff > 100 && this.bottomSheet && this.bottomSheet.classList.contains('active')) {
-            this.closeBottomSheet();
-        } else if (this.bottomSheet) {
-            this.bottomSheet.style.transform = '';
-        }
-        
-        this.touchStartY = null;
-    }
-
-    // Orientation change handling
-    handleOrientationChange() {
-        // Adjust UI elements based on orientation
-        const isPortrait = window.innerHeight > window.innerWidth;
-        
-        if (isPortrait) {
-            document.body.classList.add('portrait');
-            document.body.classList.remove('landscape');
-        } else {
-            document.body.classList.add('landscape');
-            document.body.classList.remove('portrait');
-        }
-    }
-
-    // Form handling methods
-    setupFormValidation(form) {
-        if (!form) return;
-        
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (!this.validateForm(form)) {
-                return;
-            }
-            
-            this.showLoading();
-            
-            try {
-                await this.submitForm(form);
-                this.showToast('Form submitted successfully');
-                form.reset();
-            } catch (error) {
-                this.showToast('Failed to submit form');
-                console.error(error);
-            } finally {
-                this.hideLoading();
-            }
-        });
-    }
-
-    validateForm(form) {
-        const inputs = form.querySelectorAll('input, select, textarea');
-        let isValid = true;
-        
-        inputs.forEach(input => {
-            if (input.hasAttribute('required') && !input.value.trim()) {
-                this.showToast(`${input.name || 'Field'} is required`);
-                isValid = false;
-            }
-        });
-        
-        return isValid;
-    }
-
-    async submitForm(form) {
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        
-        // Implement your form submission logic here
-        // Example: await fetch('/api/submit', { method: 'POST', body: JSON.stringify(data) });
     }
 
     // List handling methods
@@ -1476,4 +1509,5 @@ document.addEventListener('DOMContentLoaded', () => {
     updateProfileDisplay();
     updateContactsDisplay();
     updateSettingsDisplay();
+}); 
 }); 

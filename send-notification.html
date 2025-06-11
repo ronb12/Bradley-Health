@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Send Notification - Admin Only</title>
+  <title>Send Notification - Bradley Health</title>
+  <link rel="icon" href="assets/icons/icon.svg" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon.svg">
+  <meta name="theme-color" content="#2B6CB0">
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -42,16 +47,27 @@
   </style>
 </head>
 <body>
-  <h1>📣 Admin: Send Push Notification</h1>
-
-  <input type="text" id="notiTitle" placeholder="Notification Title" />
-  <textarea id="notiBody" placeholder="Notification Body"></textarea>
-  <input type="text" id="notiIcon" placeholder="Icon URL (optional)" />
-
-  <button onclick="sendToAllUsers()">Send to All Users</button>
-
-  <div class="log">
-    <h3>📜 Log</h3>
+  <div class="container">
+    <h1>Send Push Notification</h1>
+    <form id="notificationForm">
+      <div class="form-group">
+        <label for="pushToken">Push Token:</label>
+        <input type="text" id="pushToken" required />
+      </div>
+      <div class="form-group">
+        <label for="notiTitle">Title:</label>
+        <input type="text" id="notiTitle" required />
+      </div>
+      <div class="form-group">
+        <label for="notiBody">Body:</label>
+        <textarea id="notiBody" required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="notiIcon">Icon URL (optional):</label>
+        <input type="text" id="notiIcon" value="assets/icons/icon.svg" />
+      </div>
+      <button type="submit">Send Notification</button>
+    </form>
     <pre id="logOutput">Ready...</pre>
   </div>
 
@@ -60,9 +76,9 @@
     const functions = firebase.functions();
     let currentUser;
 
-    function log(msg) {
+    const log = (msg) => {
       document.getElementById("logOutput").textContent += `\n${msg}`;
-    }
+    };
 
     firebase.auth().onAuthStateChanged(async user => {
       if (!user) {
@@ -80,10 +96,12 @@
       log("✅ Admin verified.");
     });
 
-    async function sendToAllUsers() {
+    document.getElementById("notificationForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const pushToken = document.getElementById("pushToken").value.trim();
       const title = document.getElementById("notiTitle").value.trim();
       const body = document.getElementById("notiBody").value.trim();
-      const icon = document.getElementById("notiIcon").value.trim() || "/icon-192-final.png";
+      const icon = document.getElementById("notiIcon").value.trim() || "assets/icons/icon.svg";
 
       if (!title || !body) {
         alert("Please enter a title and message.");
@@ -108,7 +126,7 @@
           log(`❌ Error sending to ${doc.id}: ${err.message}`);
         }
       }
-    }
+    });
   </script>
 </body>
 </html>

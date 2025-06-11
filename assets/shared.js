@@ -59,16 +59,22 @@ const modal = {
   }
 };
 
-// Form Validation
+// Enhanced Form Validation
 const validation = {
   required(value) {
-    return value.trim() !== '';
+    return value && value.trim() !== '';
   },
   email(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   },
   number(value) {
     return !isNaN(value) && value !== '';
+  },
+  phone(value) {
+    return /^\+?[\d\s-]{10,}$/.test(value);
+  },
+  sanitizeInput(value) {
+    return value.replace(/[<>]/g, '');
   }
 };
 
@@ -119,13 +125,16 @@ function hideLoading(element) {
     }
 }
 
-// Error Handling Component
+// Enhanced Error Handling
 function showError(message, element) {
+    const sanitizedMessage = validation.sanitizeInput(message);
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-message';
+    errorDiv.setAttribute('role', 'alert');
+    errorDiv.setAttribute('aria-live', 'polite');
     errorDiv.innerHTML = `
-        <p>⚠️ ${message}</p>
-        <button onclick="this.parentElement.remove()">Dismiss</button>
+        <p>⚠️ ${sanitizedMessage}</p>
+        <button onclick="this.parentElement.remove()" aria-label="Dismiss error message">Dismiss</button>
     `;
     element.appendChild(errorDiv);
 }
@@ -148,25 +157,34 @@ window.addEventListener('offline', () => {
     showError('You are currently offline. Some features may be limited.', document.body);
 });
 
-// Data Validation
+// Enhanced Health Data Validation
 function validateHealthData(data) {
     const errors = [];
     
     if (data.bloodPressure) {
-        if (data.bloodPressure.systolic < 60 || data.bloodPressure.systolic > 250) {
-            errors.push('Invalid systolic blood pressure reading');
+        if (data.bloodPressure.systolic < 70 || data.bloodPressure.systolic > 250) {
+            errors.push('Systolic blood pressure must be between 70 and 250');
         }
         if (data.bloodPressure.diastolic < 40 || data.bloodPressure.diastolic > 150) {
-            errors.push('Invalid diastolic blood pressure reading');
+            errors.push('Diastolic blood pressure must be between 40 and 150');
+        }
+        if (data.bloodPressure.systolic <= data.bloodPressure.diastolic) {
+            errors.push('Systolic pressure must be higher than diastolic pressure');
         }
     }
     
     if (data.weight && (data.weight < 20 || data.weight > 500)) {
-        errors.push('Invalid weight value');
+        errors.push('Weight must be between 20 and 500 pounds');
     }
     
     if (data.height && (data.height < 30 || data.height > 300)) {
-        errors.push('Invalid height value');
+        errors.push('Height must be between 30 and 300 centimeters');
+    }
+    
+    if (data.emergencyContact) {
+        if (!validation.phone(data.emergencyContact.phone)) {
+            errors.push('Please enter a valid emergency contact phone number');
+        }
     }
     
     return errors;

@@ -9,7 +9,13 @@
     "test": "jest --detectOpenHandles",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "stylelint": "stylelint \"**/*.css\"",
+    "stylelint:fix": "stylelint \"**/*.css\" --fix",
+    "css:build": "postcss assets/style.css -o dist/style.min.css",
+    "css:watch": "postcss assets/style.css -o dist/style.min.css --watch"
   },
   "dependencies": {
     "chart.js": "^4.4.1",
@@ -25,11 +31,18 @@
     "@babel/preset-env": "^7.23.9",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.1",
+    "autoprefixer": "^10.4.21",
     "babel-jest": "^29.7.0",
     "eslint": "^8.56.0",
     "firebase-tools": "^13.0.2",
     "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0"
+    "jest-environment-jsdom": "^29.7.0",
+    "postcss": "^8.5.4",
+    "postcss-cli": "^11.0.1",
+    "postcss-preset-env": "^10.2.2",
+    "prettier": "^3.5.3",
+    "stylelint": "^16.20.0",
+    "stylelint-config-standard": "^38.0.0"
   },
   "engines": {
     "node": ">=18.0.0"

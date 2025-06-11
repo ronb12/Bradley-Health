@@ -21,9 +21,9 @@
   --success: #38A169;
   --warning: #ED8936;
   --border: #E2E8F0;
-  --shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1);
-  --shadow-hover: 0 6px 12px rgba(0, 0, 0, 0.15);
+  --shadow: 0 2px 4px rgb(0 0 0 / 5%);
+  --shadow-lg: 0 4px 8px rgb(0 0 0 / 10%);
+  --shadow-hover: 0 6px 12px rgb(0 0 0 / 15%);
   
   /* Medical App Spacing */
   --spacing-xs: 0.5rem;
@@ -63,9 +63,9 @@
   --text-light: #E2E8F0;
   --text-lighter: #CBD5E0;
   --border: #4A5568;
-  --shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.3);
-  --shadow-hover: 0 6px 12px rgba(0, 0, 0, 0.4);
+  --shadow: 0 2px 4px rgb(0 0 0 / 20%);
+  --shadow-lg: 0 4px 8px rgb(0 0 0 / 30%);
+  --shadow-hover: 0 6px 12px rgb(0 0 0 / 40%);
   
   /* Dark Mode Specific Colors */
   --primary: #4299E1;
@@ -84,7 +84,7 @@
 
 /* Base Styles */
 body {
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: Inter, 'Segoe UI', system-ui, -apple-system, sans-serif;
   background: var(--background);
   margin: 0;
   color: var(--text);
@@ -224,7 +224,7 @@ section h2 {
 .form-group textarea:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.1);
+  box-shadow: 0 0 0 3px rgb(43 108 176 / 10%);
 }
 
 /* Professional Button Styles */
@@ -320,17 +320,17 @@ section h2 {
 }
 
 .status-normal {
-  background-color: rgba(56, 161, 105, 0.1);
+  background-color: rgb(56 161 105 / 10%);
   color: var(--secondary);
 }
 
 .status-warning {
-  background-color: rgba(237, 137, 54, 0.1);
+  background-color: rgb(237 137 54 / 10%);
   color: var(--accent);
 }
 
 .status-danger {
-  background-color: rgba(229, 62, 62, 0.1);
+  background-color: rgb(229 62 62 / 10%);
   color: var(--error);
 }
 
@@ -440,7 +440,7 @@ section h2 {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgb(0 0 0 / 50%);
   z-index: 1000;
   backdrop-filter: blur(4px);
 }
@@ -470,7 +470,7 @@ section h2 {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgb(255 255 255 / 90%);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -526,8 +526,8 @@ section h2 {
 }
 
 @keyframes slideUp {
-  from { transform: translate(-50%, 100%); opacity: 0; }
-  to { transform: translate(-50%, 0); opacity: 1; }
+  from { transform: translate(-50%, 100%); opacity: 0%; }
+  to { transform: translate(-50%, 0); opacity: 100%; }
 }
 
 /* Professional Responsive Design */
@@ -1007,7 +1007,7 @@ section h2 {
 .loading {
   position: relative;
   pointer-events: none;
-  opacity: 0.7;
+  opacity: 70%;
 }
 
 .loading::after {
@@ -1056,13 +1056,13 @@ section h2 {
 .form-group input:focus:invalid,
 .form-group select:focus:invalid,
 .form-group textarea:focus:invalid {
-  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+  box-shadow: 0 0 0 3px rgb(229 62 62 / 10%);
 }
 
 .form-group input:focus:valid,
 .form-group select:focus:valid,
 .form-group textarea:focus:valid {
-  box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.1);
+  box-shadow: 0 0 0 3px rgb(56 161 105 / 10%);
 }
 
 /* Additional Breakpoints */
@@ -1415,17 +1415,17 @@ section h2 {
 
   /* Status Indicators */
   .status-normal {
-    background: rgba(104, 211, 145, 0.1);
+    background: rgb(104 211 145 / 10%);
     color: var(--success);
   }
 
   .status-warning {
-    background: rgba(246, 173, 85, 0.1);
+    background: rgb(246 173 85 / 10%);
     color: var(--warning);
   }
 
   .status-danger {
-    background: rgba(252, 129, 129, 0.1);
+    background: rgb(252 129 129 / 10%);
     color: var(--error);
   }
 
@@ -1480,14 +1480,14 @@ section h2 {
 :focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(66, 153, 225, 0.15);
+  box-shadow: 0 0 0 4px rgb(66 153 225 / 15%);
 }
 
 /* Enhanced Loading States */
 .loading {
   position: relative;
   pointer-events: none;
-  opacity: 0.7;
+  opacity: 70%;
   filter: blur(1px);
 }
 
@@ -1531,11 +1531,11 @@ section h2 {
 .form-group input:focus:invalid,
 .form-group select:focus:invalid,
 .form-group textarea:focus:invalid {
-  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+  box-shadow: 0 0 0 3px rgb(229 62 62 / 10%);
 }
 
 .form-group input:focus:valid,
 .form-group select:focus:valid,
 .form-group textarea:focus:valid {
-  box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.1);
+  box-shadow: 0 0 0 3px rgb(56 161 105 / 10%);
 } 

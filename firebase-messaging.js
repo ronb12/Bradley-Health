@@ -47,7 +47,42 @@
     // Show a native browser notification
     new Notification(title, {
       body: body || "You have a new notification.",
-      icon: icon || "/icon-192-final.png"
+      icon: icon || "/assets/icons/icon.svg"
     });
+  });
+
+  const defaultIcon = "assets/icons/icon.svg";
+
+  // Handle incoming messages
+  self.addEventListener('push', function(event) {
+    if (event.data) {
+      const payload = event.data.json();
+      const { title, body, icon } = payload.notification;
+      
+      const options = {
+        body: body,
+        icon: icon || defaultIcon,
+        badge: defaultIcon,
+        vibrate: [100, 50, 100],
+        data: {
+          dateOfArrival: Date.now(),
+          primaryKey: 1
+        },
+        actions: [
+          {
+            action: 'explore',
+            title: 'View Details'
+          },
+          {
+            action: 'close',
+            title: 'Close'
+          }
+        ]
+      };
+
+      event.waitUntil(
+        self.registration.showNotification(title, options)
+      );
+    }
   });
 </script>

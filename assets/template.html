@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bradley Health</title>
+  
+  <!-- Standardized Icon References -->
+  <link rel="icon" href="assets/icons/icon.svg" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="assets/icons/icon.svg">
+  <meta name="theme-color" content="#2B6CB0">
+  
+  <!-- Standard Styles -->
+  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="assets/mobile.css" />
+  
+  <!-- PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Bradley Health">
+  <meta name="description" content="Bradley Health - Your personal health tracking companion">
+</head>
+<body>
+  <div class="mobile-container">
+    <!-- Include Navigation Component -->
+    <div id="navigation"></div>
+
+    <!-- Main Content -->
+    <main class="mobile-content">
+      <!-- Page content goes here -->
+    </main>
+  </div>
+
+  <script>
+    // Load navigation component
+    fetch('./assets/components/navigation.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('navigation').innerHTML = html;
+      });
+  </script>
+  <script src="assets/mobile.js"></script>
+</body>
+</html> 
