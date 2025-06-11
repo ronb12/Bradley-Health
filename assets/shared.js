@@ -603,29 +603,35 @@ window.BradleyHealth = {
 // Share Functionality
 class ShareFeatures {
     constructor() {
-        this.init();
+        this.shareButtons = [];
     }
 
     init() {
-        // Add share buttons to relevant sections
         this.addShareButtons();
-        
-        // Handle share events
         this.handleShareEvents();
     }
 
+    handleShareEvents() {
+        this.shareButtons.forEach(button => {
+            button.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const section = e.target.closest('[data-share-section]');
+                if (section) {
+                    await this.shareSection(section.dataset.shareSection);
+                }
+            });
+        });
+    }
+
     addShareButtons() {
-        // Add share button to health data sections
-        const shareableSections = document.querySelectorAll('.shareable-section');
-        shareableSections.forEach(section => {
-            const shareButton = document.createElement('button');
-            shareButton.className = 'share-button';
-            shareButton.innerHTML = `
-                <span class="emoji">📤</span>
-                <span>Share</span>
-            `;
-            shareButton.onclick = () => this.shareSection(section);
-            section.appendChild(shareButton);
+        const sections = document.querySelectorAll('[data-share-section]');
+        sections.forEach(section => {
+            const button = document.createElement('button');
+            button.className = 'share-button';
+            button.innerHTML = '📤 Share';
+            button.setAttribute('aria-label', 'Share this section');
+            section.appendChild(button);
+            this.shareButtons.push(button);
         });
     }
 

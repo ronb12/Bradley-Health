@@ -19,6 +19,8 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="firebase-init.js"></script>
   <script src="assets/shared.js"></script>
+  <script src="assets/js/notifications.js"></script>
+  <script src="assets/js/blood-pressure.js"></script>
 </head>
 <body>
   <div class="mobile-header">
@@ -802,6 +804,46 @@
         this.onerror = null;
         this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIxMDAiIGZpbGw9IiNFMkU4RjAiLz48Y2lyY2xlIGN4PSIxMDAiIGN5PSI4NSIgcj0iMzUiIGZpbGw9IiMyQjZDQjAiLz48cGF0aCBkPSJNMTAwIDEzMEMxMzMuMTM3IDEzMCAxNjAgMTU2Ljg2MyAxNjAgMTkwVjIwMEg0MFYxOTBDNDAgMTU2Ljg2MyA2Ni44NjI5IDEzMCAxMDAgMTMwWiIgZmlsbD0iIzJCNkNCMCIvPjwvc3ZnPg==';
     };
+
+    // Add this before the DOMContentLoaded event listener
+    function updateBPDisplay(readings) {
+      if (!readings || readings.length === 0) return;
+      
+      const latest = readings[0];
+      const systolic = document.querySelector('.systolic');
+      const diastolic = document.querySelector('.diastolic');
+      const pulse = document.querySelector('.pulse-value');
+      const timestamp = document.querySelector('.bp-timestamp');
+      const status = document.querySelector('.status-badge');
+      
+      if (systolic) systolic.textContent = latest.systolic;
+      if (diastolic) diastolic.textContent = latest.diastolic;
+      if (pulse) pulse.textContent = latest.pulse || '--';
+      if (timestamp) {
+        const date = new Date(latest.timestamp);
+        timestamp.textContent = `Last reading: ${date.toLocaleString()}`;
+      }
+      
+      // Update status badge
+      if (status) {
+        let statusClass = 'status-normal';
+        let statusText = 'Normal';
+        
+        if (latest.systolic >= 140 || latest.diastolic >= 90) {
+          statusClass = 'status-danger';
+          statusText = 'High';
+        } else if (latest.systolic >= 120 || latest.diastolic >= 80) {
+          statusClass = 'status-warning';
+          statusText = 'Elevated';
+        } else if (latest.systolic < 90 || latest.diastolic < 60) {
+          statusClass = 'status-warning';
+          statusText = 'Low';
+        }
+        
+        status.className = `status-badge ${statusClass}`;
+        status.textContent = statusText;
+      }
+    }
   </script>
 </body>
 </html>
