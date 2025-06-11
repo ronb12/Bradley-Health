@@ -1,25 +1,45 @@
 class BloodPressureManager {
   constructor(notificationManager, exportManager) {
+    // Check if Firebase is initialized
+    if (!firebase.apps.length) {
+      throw new Error('Firebase must be initialized before creating BloodPressureManager');
+    }
+
     this.auth = firebase.auth();
     this.db = firebase.firestore();
     this.notificationManager = notificationManager;
     this.exportManager = exportManager;
+    this.currentUser = null;
+    this.readings = [];
     this.chart = null;
     this.currentRange = 7; // Default to 7 days
-    this.user = null;
   }
 
-  init() {
-    // Wait for auth state to be ready
-    this.auth.onAuthStateChanged(user => {
-      if (user) {
-        this.user = user;
-        this.loadReadings();
-        this.setupEventListeners();
-      } else {
-        window.location.href = 'login.html';
-      }
-    });
+  async init() {
+    try {
+      // Wait for authentication state
+      await new Promise((resolve, reject) => {
+        const unsubscribe = this.auth.onAuthStateChanged(user => {
+          unsubscribe();
+          if (user) {
+            this.currentUser = user;
+            resolve();
+          } else {
+            reject(new Error('User not authenticated'));
+          }
+        });
+      });
+
+      // Load readings and set up event listeners
+      await this.loadReadings();
+      this.setupEventListeners();
+      this.updateStats();
+      this.initializeChart();
+    } catch (error) {
+      console.error('Failed to initialize BloodPressureManager:', error);
+      this.notificationManager.showToast('Failed to initialize blood pressure tracking', 'error');
+      throw error;
+    }
   }
 
   setupEventListeners() {
@@ -51,7 +71,7 @@ class BloodPressureManager {
   }
 
   async loadReadings() {
-    if (!this.user) {
+    if (!this.currentUser) {
       console.log('Waiting for user authentication...');
       return;
     }
@@ -63,7 +83,7 @@ class BloodPressureManager {
 
       const snapshot = await this.db
         .collection('users')
-        .doc(this.user.uid)
+        .doc(this.currentUser.uid)
         .collection('bloodPressure')
         .where('timestamp', '>=', startDate)
         .orderBy('timestamp', 'desc')

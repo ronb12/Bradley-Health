@@ -185,7 +185,7 @@
     let notificationManager, exportManager, bloodPressureManager;
 
     // Wait for all scripts to load
-    window.addEventListener('load', () => {
+    window.addEventListener('load', async () => {
       try {
         // Check if Firebase is loaded
         if (typeof firebase === 'undefined') {
@@ -197,9 +197,11 @@
           throw new Error('Firebase configuration is missing');
         }
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        console.log('✅ Firebase initialized successfully');
+        // Initialize Firebase if not already initialized
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+          console.log('✅ Firebase initialized successfully');
+        }
 
         // Initialize managers
         notificationManager = new NotificationManager();
@@ -228,7 +230,7 @@
         });
 
         // Initialize blood pressure manager
-        bloodPressureManager.init();
+        await bloodPressureManager.init();
 
         // Register service worker
         if ('serviceWorker' in navigator) {
