@@ -12,6 +12,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="stylesheet" href="assets/style.css" />
   <link rel="stylesheet" href="assets/mobile.css" />
+  <link rel="stylesheet" href="assets/dashboard.css" />
   <meta name="theme-color" content="#2B6CB0">
 
   <!-- Firebase SDKs -->
@@ -20,6 +21,11 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="firebase-init.js"></script>
   <script src="assets/shared.js"></script>
+  <script src="assets/js/charts.js"></script>
+  <script src="assets/js/export.js"></script>
+  <script src="assets/js/insights.js"></script>
+  <script src="assets/js/medication-reminder.js"></script>
+  <script src="assets/js/dashboard.js"></script>
 
   <style>
     /* Component-specific styles that extend global styles */
@@ -81,6 +87,28 @@
     .settings-btn:hover {
       transform: rotate(30deg);
     }
+
+    .chart-container {
+      height: 300px;
+      margin-top: var(--spacing-md);
+    }
+
+    .export-btn {
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      font-size: var(--font-size-sm);
+    }
+
+    .export-btn:hover {
+      background: var(--primary-dark);
+    }
   </style>
 </head>
 <body>
@@ -136,59 +164,30 @@
             <div class="stat-details">Sleep: Good, Stress: Moderate</div>
           </div>
         </div>
+        <div class="chart-container">
+          <canvas id="healthChart"></canvas>
+        </div>
+        <button class="export-btn" onclick="dashboard.exportHealthData()">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          Export Data
+        </button>
       </div>
 
       <!-- Recent Activity -->
       <div class="mobile-card">
         <h2>Recent Activity</h2>
-        <div class="activity-list">
-          <div class="activity-item">
-            <div class="activity-icon">❤️</div>
-            <div class="activity-info">
-              <div class="activity-name">Blood Pressure</div>
-              <div class="activity-details">120/80 - Normal</div>
-            </div>
-            <div class="activity-time">9:30 AM</div>
-          </div>
-          <div class="activity-item">
-            <div class="activity-icon">😄</div>
-            <div class="activity-info">
-              <div class="activity-name">Mood Entry</div>
-              <div class="activity-details">Feeling great today!</div>
-            </div>
-            <div class="activity-time">8:45 AM</div>
-          </div>
-          <div class="activity-item">
-            <div class="activity-icon">💊</div>
-            <div class="activity-info">
-              <div class="activity-name">Medication</div>
-              <div class="activity-details">Lisinopril 10mg taken</div>
-            </div>
-            <div class="activity-time">8:00 AM</div>
-          </div>
+        <div id="activityList" class="activity-list">
+          <!-- Activity items will be loaded dynamically -->
         </div>
       </div>
 
       <!-- Upcoming -->
       <div class="mobile-card">
         <h2>Upcoming</h2>
-        <div class="upcoming-list">
-          <div class="upcoming-item">
-            <div class="upcoming-icon">💊</div>
-            <div class="upcoming-info">
-              <div class="upcoming-name">Aspirin 81mg</div>
-              <div class="upcoming-details">8:00 PM</div>
-            </div>
-            <div class="upcoming-status">In 2 hours</div>
-          </div>
-          <div class="upcoming-item">
-            <div class="upcoming-icon">📅</div>
-            <div class="upcoming-info">
-              <div class="upcoming-name">Doctor Appointment</div>
-              <div class="upcoming-details">Tomorrow, 10:00 AM</div>
-            </div>
-            <div class="upcoming-status">Tomorrow</div>
-          </div>
+        <div id="upcomingList" class="upcoming-list">
+          <!-- Upcoming items will be loaded dynamically -->
         </div>
       </div>
     </main>
@@ -203,203 +202,11 @@
   </div>
 
   <script>
-    // Initialize Firebase
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Check authentication state
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = 'login.html';
-      } else {
-        // Load user data
-        loadUserData(user);
-        // Load activity feed
-        loadActivityFeed(user);
-      }
-    });
-
-    // Load user data
-    async function loadUserData(user) {
-      try {
-        const doc = await db.collection('users').doc(user.uid).get();
-        if (doc.exists) {
-          const data = doc.data();
-          document.getElementById('userName').textContent = data.displayName || 'User';
-          document.getElementById('displayName').value = data.displayName || '';
-          document.getElementById('email').value = user.email;
-        }
-      } catch (error) {
-        console.error('Error loading user data:', error);
-      }
-    }
-
-    // Load activity feed
-    async function loadActivityFeed(user) {
-      const activityList = document.getElementById('activityList');
-      
-      try {
-        const snapshot = await db.collection('users').doc(user.uid)
-          .collection('activity')
-          .orderBy('timestamp', 'desc')
-          .limit(5)
-          .get();
-        
-        if (snapshot.empty) {
-          activityList.innerHTML = '<p>No recent activity</p>';
-          return;
-        }
-        
-        activityList.innerHTML = '';
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const date = data.timestamp ? data.timestamp.toDate() : new Date();
-          
-          const activity = document.createElement('div');
-          activity.className = 'activity-item';
-          activity.innerHTML = `
-            <p><strong>${data.type}</strong> - ${date.toLocaleString()}</p>
-            <p>${data.description}</p>
-          `;
-          activityList.appendChild(activity);
-        });
-      } catch (error) {
-        console.error('Error loading activity feed:', error);
-        activityList.innerHTML = '<p>Error loading activity feed</p>';
-      }
-    }
-
-    // Settings modal
-    const settingsBtn = document.getElementById('settingsBtn');
-    const settingsModal = document.getElementById('settingsModal');
-    const settingsForm = document.getElementById('settingsForm');
-    const logoutBtn = document.getElementById('logoutBtn');
-
-    settingsBtn.addEventListener('click', () => {
-      settingsModal.style.display = 'block';
-    });
-
-    window.addEventListener('click', (e) => {
-      if (e.target === settingsModal) {
-        settingsModal.style.display = 'none';
-      }
-    });
-
-    settingsForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const user = auth.currentUser;
-      const displayName = document.getElementById('displayName').value;
-      
-      try {
-        await db.collection('users').doc(user.uid).update({
-          displayName
-        });
-        
-        document.getElementById('userName').textContent = displayName;
-        settingsModal.style.display = 'none';
-      } catch (error) {
-        console.error('Error updating settings:', error);
-        alert('Error updating settings');
-      }
-    });
-
-    logoutBtn.addEventListener('click', async () => {
-      try {
-        await auth.signOut();
-        window.location.href = 'login.html';
-      } catch (error) {
-        console.error('Error signing out:', error);
-      }
-    });
-
-    // Dark mode toggle
-    const themeToggle = document.getElementById('themeToggle');
-    
-    themeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark');
-      const isDark = document.body.classList.contains('dark');
-      themeToggle.textContent = isDark ? '☀️' : '🌙';
-      document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
-    });
-
-    // Mobile menu functionality
-    const menuButton = document.querySelector('.mobile-menu-button');
-    const menu = document.querySelector('.mobile-menu');
-    const menuClose = document.querySelector('.mobile-menu-close');
-
-    menuButton.addEventListener('click', () => {
-      menu.classList.add('active');
-    });
-
-    menuClose.addEventListener('click', () => {
-      menu.classList.remove('active');
-    });
-
-    // Toast functionality
-    function showToast(message, duration = 3000) {
-      const toast = document.getElementById('mobile-toast');
-      toast.textContent = message;
-      toast.classList.add('active');
-      setTimeout(() => {
-        toast.classList.remove('active');
-      }, duration);
-    }
-
-    // Loading functionality
-    function showLoading() {
-      document.getElementById('mobile-loading').style.display = 'flex';
-    }
-
-    function hideLoading() {
-      document.getElementById('mobile-loading').style.display = 'none';
-    }
-
-    // Health summary refresh
-    async function refreshHealthSummary() {
-      showLoading();
-      try {
-        // Fetch and update health summary
-        const summary = await fetchHealthSummary();
-        updateHealthSummary(summary);
-        showToast('Health summary updated');
-      } catch (error) {
-        showToast('Failed to update health summary');
-        console.error(error);
-      } finally {
-        hideLoading();
-      }
-    }
-
-    // Recent activity load more
-    async function loadMoreActivity() {
-      showLoading();
-      try {
-        // Fetch and append more activity items
-        const activities = await fetchMoreActivity();
-        appendActivityItems(activities);
-        showToast('More activities loaded');
-      } catch (error) {
-        showToast('Failed to load more activities');
-        console.error(error);
-      } finally {
-        hideLoading();
-      }
-    }
-
-    // Initialize dashboard
+    // Initialize dashboard when DOM is loaded
     document.addEventListener('DOMContentLoaded', () => {
-      refreshHealthSummary();
-      loadMoreActivity();
+      window.dashboard = new DashboardManager();
+      dashboard.init();
     });
-
-    // Load navigation component
-    fetch('./assets/components/navigation.html')
-      .then(response => response.text())
-      .then(html => {
-        document.getElementById('navigation').innerHTML = html;
-      });
   </script>
-  <script src="assets/mobile.js"></script>
 </body>
 </html>
