@@ -1,5 +1,11 @@
 // Firebase SDK loading and initialization
 const loadFirebaseSDK = async () => {
+    // Check if Firebase is already loaded and initialized
+    if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
+        console.log('✅ Firebase already initialized');
+        return true;
+    }
+    
     const sdkUrls = [
         'https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js',
         'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js',
@@ -28,7 +34,7 @@ const loadFirebaseSDK = async () => {
         }
 
         // Initialize Firebase if not already initialized
-        if (!firebase.apps.length) {
+        if (typeof firebase !== 'undefined' && (!firebase.apps || !firebase.apps.length)) {
             firebase.initializeApp(firebaseConfig);
             console.log('✅ Firebase initialized successfully');
         }

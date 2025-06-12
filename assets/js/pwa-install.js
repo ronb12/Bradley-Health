@@ -39,7 +39,11 @@ async function installPWA() {
 // Register service worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/assets/js/service-worker.js')
+        // Get the base path for the site
+        const basePath = window.location.pathname.includes('/Bradley-Health/') ? '/Bradley-Health/' : '/';
+        
+        // Register service worker with the correct path
+        navigator.serviceWorker.register(`${basePath}service-worker.js`)
             .then(registration => {
                 console.log('Service Worker registered:', registration);
             })
