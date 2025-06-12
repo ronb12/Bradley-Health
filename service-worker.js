@@ -2,20 +2,20 @@ const CACHE_NAME = 'bradley-health-v1';
 
 // Assets to cache
 const ASSETS_TO_CACHE = [
-    '/',
-    '/index.html',
-    '/login.html',
-    '/dashboard.html',
-    '/blood-pressure.html',
-    '/medications.html',
-    '/profile.html',
-    '/assets/style.css',
-    '/assets/blood-pressure.css',
-    '/assets/mobile.css',
-    '/assets/js/firebase-config.js',
-    '/assets/js/blood-pressure-manager.js',
-    '/assets/js/notification-manager.js',
-    '/assets/js/export-manager.js',
+    './',
+    'index.html',
+    'login.html',
+    'dashboard.html',
+    'blood-pressure.html',
+    'medications.html',
+    'profile.html',
+    'assets/style.css',
+    'assets/mobile.css',
+    'assets/js/firebase-config.js',
+    'assets/js/firebase-init.js',
+    'assets/js/blood-pressure-manager.js',
+    'assets/js/notification-manager.js',
+    'assets/js/export-manager.js',
     'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
     'https://cdn.jsdelivr.net/npm/chart.js'
 ];
@@ -27,6 +27,18 @@ self.addEventListener('install', event => {
             .then(cache => {
                 console.log('Opened cache');
                 return cache.addAll(ASSETS_TO_CACHE);
+            })
+            .catch(error => {
+                console.error('Error in cache.addAll():', error);
+                // Try adding one by one
+                return caches.open(CACHE_NAME).then(cache => {
+                    const addPromises = ASSETS_TO_CACHE.map(url => {
+                        return cache.add(url).catch(err => {
+                            console.error('Failed to cache:', url, err);
+                        });
+                    });
+                    return Promise.all(addPromises);
+                });
             })
     );
 });
@@ -102,7 +114,7 @@ async function syncReadings() {
 }
 
 async function syncReading(reading) {
-    const response = await fetch('/api/readings', {
+    const response = await fetch('api/readings', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

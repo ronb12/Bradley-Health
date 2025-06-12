@@ -9,24 +9,35 @@ if (!fs.existsSync(iconsDir)) {
 }
 
 // Generate icon function
-function generateIcon(size) {
-    const canvas = createCanvas(size, size);
-    const ctx = canvas.getContext('2d');
+function generateIcon(size, filename) {
+    // Calculate appropriate adjustments based on size
+    const radius = Math.round(size * 0.2); // 20% of size
+    const strokeWidth = Math.round(size * 0.08); // 8% of size for main strokes
+    const circleStrokeWidth = Math.round(size * 0.04); // 4% of size for circle
+    const circleRadius = Math.round(size * 0.3); // 30% of size
+    
+    // Calculate positions
+    const center = size / 2;
+    const start = Math.round(size * 0.28); // 28% from edge
+    const end = Math.round(size * 0.72); // 72% from edge
 
-    // Background
-    ctx.fillStyle = '#1a56db';
-    ctx.fillRect(0, 0, size, size);
+    // Create SVG content
+    const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+  <rect width="${size}" height="${size}" fill="#1a56db" rx="${radius}" ry="${radius}"/>
+  <path d="${center} ${start}v${end - start}M${start} ${center}h${end - start}" stroke="#ffffff" stroke-width="${strokeWidth}" stroke-linecap="round"/>
+  <circle cx="${center}" cy="${center}" r="${circleRadius}" stroke="#ffffff" stroke-width="${circleStrokeWidth}" fill="none"/>
+</svg>`;
 
-    // Draw "BH" text
-    ctx.fillStyle = '#ffffff';
-    ctx.font = `bold ${size * 0.4}px Inter`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('BH', size / 2, size / 2);
-
-    // Save to file
-    const buffer = canvas.toBuffer('image/png');
-    fs.writeFileSync(path.join(iconsDir, `icon-${size}.png`), buffer);
+    // Use fetch to save the file
+    fetch(filename, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'image/svg+xml'
+        },
+        body: svgContent
+    })
+    .then(() => console.log(`Generated ${filename}`))
+    .catch(err => console.error(`Error generating ${filename}:`, err));
 }
 
 // Generate favicon
@@ -51,8 +62,18 @@ function generateFavicon() {
 }
 
 // Generate all icons
-generateIcon(192);
-generateIcon(512);
-generateFavicon();
+function generateAllIcons() {
+    // Main app icons
+    const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+    sizes.forEach(size => {
+        generateIcon(size, `../icons/icon-${size}x${size}.svg`);
+    });
+    
+    // Specialized icons can be created separately
+    console.log('Icon generation complete!');
+}
+
+// Run the generation function
+// Uncomment to run: generateAllIcons();
 
 console.log('Icons generated successfully!'); 

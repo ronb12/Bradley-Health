@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
-  <rect width="192" height="192" fill="#38a169" rx="38.400000000000006" />
-  <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="96px" 
-    fill="white" text-anchor="middle" dominant-baseline="central" font-weight="bold">BH</text>
+  <rect width="192" height="192" fill="#059669" rx="32" ry="32"/>
+  <rect x="56" y="56" width="80" height="120" rx="8" ry="8" fill="#ffffff"/>
+  <rect x="76" y="36" width="40" height="30" rx="4" ry="4" fill="#ffffff"/>
+  <path d="M86 76h20M86 96h20M86 116h20M86 136h20" stroke="#059669" stroke-width="6" stroke-linecap="round"/>
 </svg>

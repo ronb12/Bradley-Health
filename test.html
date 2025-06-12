@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a56db">
+    <meta name="description" content="Bradley Health - Track and monitor your health metrics">
+    <link rel="manifest" href="manifest.json">
+    <title>Bradley Health Test</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Bradley Health Test Page</h1>
+        
+        <div class="card">
+            <h2>System Tests</h2>
+            <ul id="tests">
+                <li>Testing manifest.json... <span id="manifest-test">Running</span></li>
+                <li>Testing service worker... <span id="sw-test">Running</span></li>
+                <li>Testing Firebase config... <span id="firebase-test">Running</span></li>
+                <li>Testing icons... <span id="icons-test">Running</span></li>
+                <li>Testing stylesheet... <span id="stylesheet-test">Running</span></li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>Test Results</h2>
+            <pre id="results"></pre>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const results = document.getElementById('results');
+            
+            // Test manifest
+            const manifestTest = document.getElementById('manifest-test');
+            try {
+                const manifestResponse = await fetch('manifest.json');
+                if (manifestResponse.ok) {
+                    const manifest = await manifestResponse.json();
+                    manifestTest.textContent = '✅ Passed';
+                    manifestTest.classList.add('test-pass');
+                    
+                    // Log manifest details
+                    results.textContent += 'Manifest test passed:\n';
+                    results.textContent += `- Name: ${manifest.name}\n`;
+                    results.textContent += `- Short name: ${manifest.short_name}\n`;
+                    results.textContent += `- Icons: ${manifest.icons ? manifest.icons.length : 0} icons found\n\n`;
+                    
+                    // Test icons
+                    const iconsTest = document.getElementById('icons-test');
+                    const iconPromises = manifest.icons.map(icon => 
+                        fetch(icon.src)
+                        .then(resp => {
+                            if (!resp.ok) throw new Error(`Icon ${icon.src} not found`);
+                            return `✓ ${icon.src}`;
+                        })
+                        .catch(err => `✗ ${icon.src} (${err.message})`)
+                    );
+                    
+                    const iconResults = await Promise.all(iconPromises);
+                    if (iconResults.every(r => r.startsWith('✓'))) {
+                        iconsTest.textContent = '✅ Passed';
+                        iconsTest.classList.add('test-pass');
+                    } else {
+                        iconsTest.textContent = '❌ Failed';
+                        iconsTest.classList.add('test-fail');
+                    }
+                    
+                    results.textContent += 'Icon test results:\n';
+                    iconResults.forEach(r => {
+                        results.textContent += `- ${r}\n`;
+                    });
+                    results.textContent += '\n';
+                } else {
+                    throw new Error(`HTTP ${manifestResponse.status}: ${manifestResponse.statusText}`);
+                }
+            } catch (error) {
+                manifestTest.textContent = '❌ Failed';
+                manifestTest.classList.add('test-fail');
+                results.textContent += `Manifest test failed: ${error.message}\n\n`;
+            }
+            
+            // Test service worker
+            const swTest = document.getElementById('sw-test');
+            try {
+                if ('serviceWorker' in navigator) {
+                    const registration = await navigator.serviceWorker.register('service-worker.js');
+                    swTest.textContent = '✅ Passed';
+                    swTest.classList.add('test-pass');
+                    results.textContent += `Service worker test passed:\n- Registered with scope: ${registration.scope}\n\n`;
+                } else {
+                    throw new Error('Service Worker API not available in this browser');
+                }
+            } catch (error) {
+                swTest.textContent = '❌ Failed';
+                swTest.classList.add('test-fail');
+                results.textContent += `Service worker test failed: ${error.message}\n\n`;
+            }
+            
+            // Test Firebase configuration
+            const firebaseTest = document.getElementById('firebase-test');
+            try {
+                const configResponse = await fetch('assets/js/firebase-config.js');
+                if (configResponse.ok) {
+                    const configText = await configResponse.text();
+                    if (configText.includes('firebaseConfig') && configText.includes('apiKey')) {
+                        firebaseTest.textContent = '✅ Passed';
+                        firebaseTest.classList.add('test-pass');
+                        results.textContent += 'Firebase configuration test passed\n\n';
+                    } else {
+                        throw new Error('Firebase config appears to be missing required fields');
+                    }
+                } else {
+                    throw new Error(`HTTP ${configResponse.status}: ${configResponse.statusText}`);
+                }
+            } catch (error) {
+                firebaseTest.textContent = '❌ Failed';
+                firebaseTest.classList.add('test-fail');
+                results.textContent += `Firebase configuration test failed: ${error.message}\n\n`;
+            }
+            
+            // Test stylesheet
+            const stylesheetTest = document.getElementById('stylesheet-test');
+            try {
+                const link = document.querySelector('link[rel="stylesheet"]');
+                if (link && getComputedStyle(document.body).getPropertyValue('--primary')) {
+                    stylesheetTest.textContent = '✅ Passed';
+                    stylesheetTest.classList.add('test-pass');
+                    results.textContent += 'Stylesheet test passed\n';
+                    results.textContent += '- CSS Variables loaded correctly\n\n';
+                } else {
+                    throw new Error('CSS variables not loaded or stylesheet missing');
+                }
+            } catch (error) {
+                stylesheetTest.textContent = '❌ Failed';
+                stylesheetTest.classList.add('test-fail');
+                results.textContent += `Stylesheet test failed: ${error.message}\n\n`;
+            }
+        });
+    </script>
+    
+    <style>
+        .test-pass {
+            color: #38A169;
+            font-weight: bold;
+        }
+        
+        .test-fail {
+            color: #E53E3E;
+            font-weight: bold;
+        }
+        
+        pre {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        #tests {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        #tests li {
+            padding: 0.5rem 0;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</body>
+</html> 
