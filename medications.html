@@ -1,7 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a56db">
+<meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Medications - Bradley Health</title>
   <link rel="stylesheet" href="assets/style.css" />
@@ -10,12 +17,12 @@
   <meta name="theme-color" content="#2B6CB0">
   
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="firebase-init.js"></script>
-  <script src="assets/shared.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="assets/shared.js" defer></script>
 
   <style>
     .medication-form {
@@ -163,7 +170,7 @@
     </div>
   </div>
 
-  <main class="container">
+  <main class="container" role="main">
     <!-- Today's Schedule Card -->
     <div class="mobile-card">
       <div class="mobile-card-header">
@@ -183,12 +190,12 @@
       <form class="mobile-form" id="medicationForm">
         <div class="form-group">
           <label for="medName">Medication Name</label>
-          <input type="text" id="medName" class="mobile-input" placeholder="e.g., Lisinopril" required>
+          <input type="text" id="medName" class="mobile-input" placeholder="e.g., Lisinopril" required aria-required="true">
         </div>
         <div class="form-row">
           <div class="form-group">
             <label for="dosage">Dosage</label>
-            <input type="text" id="dosage" class="mobile-input" placeholder="e.g., 10mg" required>
+            <input type="text" id="dosage" class="mobile-input" placeholder="e.g., 10mg" required aria-required="true">
           </div>
           <div class="form-group">
             <label for="frequency">Frequency</label>
@@ -203,7 +210,7 @@
         </div>
         <div class="form-group">
           <label for="time">Time</label>
-          <input type="time" id="time" class="mobile-input" required>
+          <input type="time" id="time" class="mobile-input" required aria-required="true">
         </div>
         <div class="form-group">
           <label for="notes">Notes</label>
@@ -275,18 +282,18 @@
     <button class="back-button" onclick="window.location.href='index.html'">← Back to Home</button>
   </header>
 
-  <main>
+  <main role="main">
     <section class="medication-form">
       <h2>Add New Medication</h2>
       <form id="medForm" onsubmit="addMedication(event)">
         <div class="form-grid">
           <div class="input-group">
             <label for="medName">Medication Name</label>
-            <input type="text" id="medName" required placeholder="e.g., Lisinopril" />
+            <input type="text" id="medName" required placeholder="e.g., Lisinopril" / aria-required="true">
           </div>
           <div class="input-group">
             <label for="medDose">Dosage</label>
-            <input type="text" id="medDose" required placeholder="e.g., 10mg" />
+            <input type="text" id="medDose" required placeholder="e.g., 10mg" / aria-required="true">
           </div>
           <div class="input-group">
             <label for="medFrequency">Frequency</label>
@@ -301,14 +308,14 @@
           </div>
           <div class="input-group">
             <label for="medPurpose">Purpose</label>
-            <input type="text" id="medPurpose" required placeholder="e.g., Blood Pressure" />
+            <input type="text" id="medPurpose" required placeholder="e.g., Blood Pressure" / aria-required="true">
           </div>
         </div>
 
         <div class="form-grid">
           <div class="input-group">
             <label for="medStartDate">Start Date</label>
-            <input type="date" id="medStartDate" required />
+            <input type="date" id="medStartDate" required / aria-required="true">
           </div>
           <div class="input-group">
             <label for="medEndDate">End Date (if applicable)</label>
@@ -360,7 +367,7 @@
     </section>
   </main>
 
-  <script>
+  <script defer>
     let currentUser = null;
     let medications = [];
 

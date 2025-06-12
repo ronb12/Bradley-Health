@@ -1,7 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a56db">
+<meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>📊 Daily Health Summary - Bradley Health</title>
   <link rel="stylesheet" href="assets/style.css" />
@@ -10,12 +17,12 @@
   <meta name="theme-color" content="#2B6CB0">
   
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="firebase-init.js"></script>
-  <script src="assets/shared.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="assets/shared.js" defer></script>
 
   <style>
     .summary-grid {
@@ -156,7 +163,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="mobile-content">
+    <main class="mobile-content" role="main">
       <!-- Date Selector -->
       <div class="mobile-card">
         <div class="date-selector">
@@ -294,6 +301,6 @@
     </nav>
   </div>
 
-  <script src="assets/mobile.js"></script>
+  <script src="assets/mobile.js" defer></script>
 </body>
 </html>

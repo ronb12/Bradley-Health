@@ -9,77 +9,109 @@ const ACTIVITY_TYPES = {
 };
 
 // DOM Elements
-let elements = {
-    menuButton: null,
-    menu: null,
-    closeButton: null,
-    menuItems: null,
-    bottomNav: null,
-    header: null,
-    mainContent: null
-};
+let elements = {};
 
-// Initialize DOM elements
+// Initialize elements
 function initializeElements() {
     elements = {
-        menuButton: document.querySelector('.menu-button'),
+        menuButton: document.querySelector('.mobile-menu-button'),
         menu: document.querySelector('.mobile-menu'),
-        closeButton: document.querySelector('.menu-close'),
+        closeButton: document.querySelector('.mobile-menu-close'),
         menuItems: document.querySelectorAll('.mobile-menu-item'),
         bottomNav: document.querySelector('.bottom-nav'),
-        header: document.querySelector('.mobile-header'),
-        mainContent: document.querySelector('.main-content')
+        themeToggle: document.querySelector('.theme-toggle'),
+        userGreeting: document.querySelector('.user-greeting'),
+        installButton: document.querySelector('.install-button')
     };
 }
 
 // Event Listeners
 function setupEventListeners() {
-    if (elements.menuButton) {
-        elements.menuButton.addEventListener('click', toggleMenu);
+    if (elements.menuButton && elements.menu) {
+        elements.menuButton.addEventListener('click', () => {
+            elements.menu.classList.add('active');
+        });
     }
     
-    if (elements.closeButton) {
-        elements.closeButton.addEventListener('click', closeMenu);
+    if (elements.closeButton && elements.menu) {
+        elements.closeButton.addEventListener('click', () => {
+            elements.menu.classList.remove('active');
+        });
     }
     
     if (elements.menuItems) {
         elements.menuItems.forEach(item => {
-            item.addEventListener('click', closeMenu);
+            item.addEventListener('click', () => {
+                if (elements.menu) {
+                    elements.menu.classList.remove('active');
+                }
+            });
         });
     }
-    
-    // Handle bottom navigation
-    if (elements.bottomNav) {
-        elements.bottomNav.addEventListener('click', (e) => {
-            const navItem = e.target.closest('.nav-item');
-            if (navItem) {
-                const href = navItem.getAttribute('href');
-                if (href) {
-                    window.location.href = href;
+
+    if (elements.themeToggle) {
+        elements.themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    }
+
+    // Handle PWA installation
+    if (elements.installButton) {
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            elements.installButton.style.display = 'block';
+        });
+
+        elements.installButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
                 }
+                deferredPrompt = null;
+                elements.installButton.style.display = 'none';
             }
         });
     }
 }
 
-// Menu Functions
-function toggleMenu() {
-    if (elements.menu) {
-        elements.menu.classList.toggle('active');
+// Update user greeting
+function updateUserGreeting() {
+    if (elements.userGreeting) {
+        const user = firebase.auth().currentUser;
+        if (user) {
+            const displayName = user.displayName || user.email.split('@')[0];
+            elements.userGreeting.textContent = `Welcome back, ${displayName}!`;
+        }
     }
 }
 
-function closeMenu() {
-    if (elements.menu) {
-        elements.menu.classList.remove('active');
-    }
+// Initialize theme
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
 }
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     initializeElements();
     setupEventListeners();
-    
+    initializeTheme();
+    updateUserGreeting();
+
+    // Listen for auth state changes
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            updateUserGreeting();
+        }
+    });
+
     // Handle safe area insets
     const updateSafeAreaInsets = () => {
         const root = document.documentElement;
@@ -92,3 +124,19 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSafeAreaInsets();
     window.addEventListener('resize', updateSafeAreaInsets);
 }); 
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    button, 
+    .button,
+    .nav-item {
+        min-height: 44px;
+    }
+}

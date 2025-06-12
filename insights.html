@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health Insights - Bradley Health</title>
     <link rel="icon" href="assets/icons/icon.svg" />
@@ -10,7 +13,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon.svg">
     <meta name="theme-color" content="#2B6CB0">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 </head>
 <body>
     <div class="mobile-container">
@@ -23,7 +26,7 @@
         </header>
 
         <!-- Main Content -->
-        <main class="mobile-content">
+        <main class="mobile-content" role="main">
             <!-- Health Score -->
             <div class="mobile-card">
                 <h2>Health Score</h2>
@@ -174,7 +177,7 @@
         </nav>
     </div>
 
-    <script src="assets/mobile.js"></script>
-    <script src="assets/insights.js"></script>
+    <script src="assets/mobile.js" defer></script>
+    <script src="assets/insights.js" defer></script>
 </body>
 </html> 

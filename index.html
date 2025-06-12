@@ -1,7 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a56db">
+<meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bradley Health - Your Personal Health Companion</title>
   <link rel="manifest" href="./manifest.json" />
@@ -29,12 +36,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="firebase-init.js"></script>
-  <script src="./assets/shared.js"></script>
-  <script src="./assets/navigation-new.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
@@ -49,7 +56,7 @@
     <!-- Include Navigation Component -->
     <div id="navigation"></div>
 
-    <main>
+    <main role="main">
       <header class="hero-header">
         <nav class="main-nav">
           <div class="logo">
@@ -78,22 +85,22 @@
         <h2>Key Features</h2>
         <div class="features-grid">
           <div class="feature-card">
-            <i class="fas fa-heartbeat feature-icon"></i>
+            <i class="fa " aria-hidden="true"></i>
             <h3>Blood Pressure Tracking</h3>
             <p>Monitor your blood pressure readings and get insights into your cardiovascular health.</p>
           </div>
           <div class="feature-card">
-            <i class="fas fa-pills feature-icon"></i>
+            <i class="fa " aria-hidden="true"></i>
             <h3>Medication Management</h3>
             <p>Never miss a dose with smart medication reminders and tracking.</p>
           </div>
           <div class="feature-card">
-            <i class="fas fa-chart-line feature-icon"></i>
+            <i class="fa " aria-hidden="true"></i>
             <h3>Health Insights</h3>
             <p>Get detailed analytics and insights about your health trends.</p>
           </div>
           <div class="feature-card">
-            <i class="fas fa-bell feature-icon"></i>
+            <i class="fa " aria-hidden="true"></i>
             <h3>Smart Reminders</h3>
             <p>Receive timely reminders for medications, appointments, and health check-ups.</p>
           </div>
@@ -126,18 +133,18 @@
         <div class="contact-grid">
           <div class="contact-info">
             <h3>Contact Information</h3>
-            <p><i class="fas fa-envelope"></i> support@bradleyhealth.com</p>
-            <p><i class="fas fa-phone"></i> (555) 123-4567</p>
-            <p><i class="fas fa-map-marker-alt"></i> 123 Health Street, Medical City, MC 12345</p>
+            <p><i class="fa " aria-hidden="true"></i> support@bradleyhealth.com</p>
+            <p><i class="fa " aria-hidden="true"></i> (555) 123-4567</p>
+            <p><i class="fa " aria-hidden="true"></i> 123 Health Street, Medical City, MC 12345</p>
           </div>
           <form class="contact-form">
             <div class="form-group">
               <label for="name">Name</label>
-              <input type="text" id="name" name="name" required>
+              <input type="text" id="name" name="name" required aria-required="true">
             </div>
             <div class="form-group">
               <label for="email">Email</label>
-              <input type="email" id="email" name="email" required>
+              <input type="email" id="email" name="email" required aria-required="true">
             </div>
             <div class="form-group">
               <label for="message">Message</label>
@@ -167,10 +174,10 @@
       <div class="footer-section">
         <h3>Connect With Us</h3>
         <div class="social-links">
-          <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
-          <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-          <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
-          <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link"><i class="fa " aria-hidden="true"></i></a>
+          <a href="#" class="social-link"><i class="fa " aria-hidden="true"></i></a>
+          <a href="#" class="social-link"><i class="fa " aria-hidden="true"></i></a>
+          <a href="#" class="social-link"><i class="fa " aria-hidden="true"></i></a>
         </div>
       </div>
     </div>
@@ -187,7 +194,7 @@
       <form id="profileForm" onsubmit="saveProfile(event)">
         <div class="form-group">
           <label for="profileName">Full Name</label>
-          <input type="text" id="profileName" required>
+          <input type="text" id="profileName" required aria-required="true">
         </div>
         <div class="form-group">
           <label for="profileEmail">Email</label>
@@ -295,7 +302,7 @@
     </div>
   </div>
 
-  <script>
+  <script defer>
     let currentUser;
 
     firebase.auth().onAuthStateChanged(user => {
@@ -795,6 +802,6 @@
       box-shadow: 0 0 0 2px rgba(44, 122, 123, 0.2);
     }
   </style>
-  <script src="./assets/mobile.js"></script>
+  <script src="./assets/mobile.js" defer></script>
 </body>
 </html>

@@ -1,10 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="theme-color" content="#4a90e2">
-  <meta name="description" content="Track and manage your blood pressure readings with Bradley Health">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a56db">
+<meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Track and monitor your blood pressure readings">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Blood Pressure - Bradley Health</title>
   <link rel="icon" href="assets/icons/icon.svg" />
   <link rel="stylesheet" href="assets/style.css" />
@@ -16,288 +26,121 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js" defer></script>
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Application Scripts -->
-  <script src="assets/js/firebase-config.js"></script>
-  <script src="assets/js/notification-manager.js"></script>
-  <script src="assets/js/export-manager.js"></script>
-  <script src="assets/js/blood-pressure-manager.js"></script>
+  <script src="assets/js/firebase-config.js" defer></script>
+  <script src="assets/js/firebase-init.js" defer></script>
+  <script src="assets/js/auth.js" defer></script>
+  <script src="assets/js/blood-pressure.js" defer></script>
+  <script src="assets/js/pwa-install.js" defer></script>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>Blood Pressure</h1>
-      <div class="header-controls">
-        <button class="export-btn" onclick="bloodPressureManager.exportData()">
-          <i class="fas fa-download"></i> Export
-        </button>
-        <button class="settings-btn" onclick="showSettings()">
-          <i class="fas fa-cog"></i>
-        </button>
+    <header class="dashboard-header" role="banner">
+      <div class="header-content">
+        <h1>Blood Pressure</h1>
+        <div class="header-actions">
+          <button class="btn btn-secondary" aria-label="Open menu" onclick="toggleMenu()" aria-expanded="false">
+            <i class="fas fa-bars" aria-hidden="true"></i>
+          </button>
+        </div>
       </div>
     </header>
 
-    <main class="main-content">
-      <section class="card current-status">
-        <h2>Current Status</h2>
+    <main class="dashboard-main" role="main">
+      <section class="dashboard-section" aria-labelledby="current-status-title">
+        <h2 id="current-status-title">Current Status</h2>
         <div class="status-grid">
-          <div class="status-card" id="systolicCard">
+          <div class="status-card">
             <h3>Systolic</h3>
-            <div class="value" id="systolicValue">--</div>
-            <div class="category" id="systolicCategory">--</div>
+            <div class="value" id="systolicValue" aria-live="polite">Loading...</div>
+            <div class="category" id="systolicCategory">-</div>
           </div>
-          <div class="status-card" id="diastolicCard">
+          <div class="status-card">
             <h3>Diastolic</h3>
-            <div class="value" id="diastolicValue">--</div>
-            <div class="category" id="diastolicCategory">--</div>
+            <div class="value" id="diastolicValue" aria-live="polite">Loading...</div>
+            <div class="category" id="diastolicCategory">-</div>
           </div>
-          <div class="status-card" id="pulseCard">
+          <div class="status-card">
             <h3>Pulse</h3>
-            <div class="value" id="pulseValue">--</div>
-            <div class="category" id="pulseCategory">--</div>
-          </div>
-        </div>
-        <div class="health-score">
-          <h3>Health Score</h3>
-          <div class="score-circle" id="healthScore">
-            <span class="score-value">--</span>
+            <div class="value" id="pulseValue" aria-live="polite">Loading...</div>
+            <div class="category" id="pulseCategory">-</div>
           </div>
         </div>
       </section>
 
-      <section class="card add-reading">
-        <h2>Add Reading</h2>
-        <form id="readingForm">
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="systolic">Systolic (mmHg)</label>
-              <input type="number" id="systolic" name="systolic" required min="60" max="250">
-            </div>
-            <div class="form-group">
-              <label for="diastolic">Diastolic (mmHg)</label>
-              <input type="number" id="diastolic" name="diastolic" required min="40" max="150">
-            </div>
-            <div class="form-group">
-              <label for="pulse">Pulse (bpm)</label>
-              <input type="number" id="pulse" name="pulse" required min="40" max="200">
-            </div>
+      <section class="dashboard-section" aria-labelledby="add-reading-title">
+        <h2 id="add-reading-title">Add Reading</h2>
+        <form id="readingForm" class="form-grid" onsubmit="return handleSubmit(event)">
+          <div class="form-group">
+            <label for="systolic">Systolic (mmHg)</label>
+            <input type="number" id="systolic" name="systolic" required min="60" max="250" aria-required="true">
           </div>
           <div class="form-group">
-            <label for="notes">Notes</label>
-            <textarea id="notes" name="notes" rows="2"></textarea>
+            <label for="diastolic">Diastolic (mmHg)</label>
+            <input type="number" id="diastolic" name="diastolic" required min="40" max="150" aria-required="true">
+          </div>
+          <div class="form-group">
+            <label for="pulse">Pulse (bpm)</label>
+            <input type="number" id="pulse" name="pulse" required min="40" max="200" aria-required="true">
           </div>
           <div class="form-actions">
-            <button type="submit" class="primary-button">
-              <i class="fas fa-plus"></i> Add Reading
-            </button>
-            <button type="button" id="voiceInputBtn" class="secondary-button">
-              <i class="fas fa-microphone"></i> Voice Input
+            <button type="submit" class="btn btn-primary" aria-label="Save reading">
+              <i class="fas fa-save" aria-hidden="true"></i>
+              Save Reading
             </button>
           </div>
         </form>
       </section>
 
-      <section class="card statistics">
-        <h2>Statistics</h2>
-        <div class="range-selector">
-          <button class="range-btn active" data-range="7">7 Days</button>
-          <button class="range-btn" data-range="30">30 Days</button>
-          <button class="range-btn" data-range="90">90 Days</button>
-        </div>
-        <div class="chart-container">
-          <canvas id="bpChart"></canvas>
-        </div>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <h3>Average</h3>
-            <div class="stat-value" id="avgSystolic">--</div>
-            <div class="stat-value" id="avgDiastolic">--</div>
-          </div>
-          <div class="stat-card">
-            <h3>Morning</h3>
-            <div class="stat-value" id="morningSystolic">--</div>
-            <div class="stat-value" id="morningDiastolic">--</div>
-          </div>
-          <div class="stat-card">
-            <h3>Evening</h3>
-            <div class="stat-value" id="eveningSystolic">--</div>
-            <div class="stat-value" id="eveningDiastolic">--</div>
-          </div>
+      <section class="dashboard-section" aria-labelledby="recent-readings-title">
+        <h2 id="recent-readings-title">Recent Readings</h2>
+        <div class="readings-list" id="readingsList" role="list">
+          <!-- Readings will be dynamically added here -->
         </div>
       </section>
 
-      <section class="card recent-readings">
-        <div class="section-header">
-          <h2>Recent Readings</h2>
-          <button id="viewAllBtn" class="text-button">View All</button>
-        </div>
-        <div class="readings-list" id="readingsList">
-          <!-- Readings will be added here dynamically -->
-        </div>
-      </section>
-
-      <section class="card goals">
-        <h2>Health Goals</h2>
-        <div class="goals-grid">
-          <div class="goal-card">
-            <h3>Systolic</h3>
-            <div class="goal-value" id="systolicGoal">120</div>
-            <div class="goal-range">±10 mmHg</div>
-          </div>
-          <div class="goal-card">
-            <h3>Diastolic</h3>
-            <div class="goal-value" id="diastolicGoal">80</div>
-            <div class="goal-range">±10 mmHg</div>
-          </div>
-          <div class="goal-card">
-            <h3>Pulse</h3>
-            <div class="goal-value" id="pulseGoal">72</div>
-            <div class="goal-range">±15 bpm</div>
-          </div>
-        </div>
-        <button id="editGoalsBtn" class="secondary-button">
-          <i class="fas fa-edit"></i> Edit Goals
-        </button>
-      </section>
-
-      <section class="card reminders">
-        <h2>Reminders</h2>
-        <div class="reminders-list" id="remindersList">
-          <!-- Reminders will be added here dynamically -->
-        </div>
-        <button id="addReminderBtn" class="secondary-button">
-          <i class="fas fa-bell"></i> Add Reminder
-        </button>
-      </section>
-
-      <section class="card guide">
-        <h2>Measurement Guide</h2>
+      <section class="dashboard-section" aria-labelledby="measurement-guide-title">
+        <h2 id="measurement-guide-title">Measurement Guide</h2>
         <div class="guide-content">
           <div class="guide-step">
-            <i class="fas fa-1"></i>
-            <p>Rest for 5 minutes before measuring</p>
+            <i class="fas fa-1" aria-hidden="true"></i>
+            <p>Sit quietly for 5 minutes before measuring</p>
           </div>
           <div class="guide-step">
-            <i class="fas fa-2"></i>
-            <p>Sit with your back supported and feet flat</p>
+            <i class="fas fa-2" aria-hidden="true"></i>
+            <p>Place the cuff on your bare upper arm</p>
           </div>
           <div class="guide-step">
-            <i class="fas fa-3"></i>
-            <p>Place cuff on bare upper arm at heart level</p>
+            <i class="fas fa-3" aria-hidden="true"></i>
+            <p>Keep your arm supported at heart level</p>
           </div>
           <div class="guide-step">
-            <i class="fas fa-4"></i>
-            <p>Take multiple readings 1 minute apart</p>
+            <i class="fas fa-4" aria-hidden="true"></i>
+            <p>Take multiple readings and record the average</p>
           </div>
         </div>
       </section>
     </main>
-
-    <nav class="bottom-nav">
-      <a href="dashboard.html" class="nav-item">
-        <i class="fas fa-home"></i>
-        <span>Home</span>
-      </a>
-      <a href="blood-pressure.html" class="nav-item active">
-        <i class="fas fa-heartbeat"></i>
-        <span>BP</span>
-      </a>
-      <a href="medications.html" class="nav-item">
-        <i class="fas fa-pills"></i>
-        <span>Meds</span>
-      </a>
-      <a href="profile.html" class="nav-item">
-        <i class="fas fa-user"></i>
-        <span>Profile</span>
-      </a>
-    </nav>
   </div>
 
-  <div id="mobileToast" class="mobile-toast"></div>
-  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-    <div class="loading-spinner"></div>
-    <p>Loading...</p>
+  <div id="loadingOverlay" class="loading-overlay" style="display: none" role="alert" aria-busy="true" aria-label="Loading">
+    <div class="spinner" aria-hidden="true"></div>
   </div>
+
+  <div id="toastContainer" class="toast-container" role="alert" aria-live="polite"></div>
 
   <script>
-    // Initialize managers
-    let notificationManager, exportManager, bloodPressureManager;
-
-    // Wait for all scripts to load
-    window.addEventListener('load', async () => {
-      try {
-        // Check if Firebase is loaded
-        if (typeof firebase === 'undefined') {
-          throw new Error('Firebase SDK not loaded');
-        }
-
-        // Check if Firebase config is available
-        if (typeof firebaseConfig === 'undefined') {
-          throw new Error('Firebase configuration is missing');
-        }
-
-        // Initialize Firebase if not already initialized
-        if (!firebase.apps.length) {
-          firebase.initializeApp(firebaseConfig);
-          console.log('✅ Firebase initialized successfully');
-        }
-
-        // Initialize managers
-        notificationManager = new NotificationManager();
-        exportManager = new ExportManager();
-        bloodPressureManager = new BloodPressureManager(notificationManager, exportManager);
-
-        // Handle PWA installation
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-          e.preventDefault();
-          deferredPrompt = e;
-          
-          // Show custom install button if needed
-          const installButton = document.createElement('button');
-          installButton.textContent = 'Install App';
-          installButton.className = 'btn btn-primary';
-          installButton.onclick = async () => {
-            if (deferredPrompt) {
-              deferredPrompt.prompt();
-              const { outcome } = await deferredPrompt.userChoice;
-              console.log(`User response to the install prompt: ${outcome}`);
-              deferredPrompt = null;
-            }
-          };
-          document.querySelector('.header-controls').prepend(installButton);
-        });
-
-        // Initialize blood pressure manager
-        await bloodPressureManager.init();
-
-        // Register service worker
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => {
-              console.log('✅ ServiceWorker registration successful');
-            })
-            .catch(error => {
-              console.error('❌ ServiceWorker registration failed:', error);
-            });
-        }
-      } catch (error) {
-        console.error('❌ Initialization error:', error);
-        document.body.innerHTML = `
-          <div class="error-message">
-            <h2>Error Loading Application</h2>
-            <p>${error.message}</p>
-            <p>Please try refreshing the page or contact support if the problem persists.</p>
-          </div>
-        `;
-      }
+    // Initialize blood pressure page
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeBloodPressure();
     });
   </script>
 </body>

@@ -1,7 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a56db">
+<meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>Dashboard - Bradley Health</title>
   <link rel="manifest" href="manifest.json" />
@@ -15,15 +22,15 @@
   <meta name="theme-color" content="#2B6CB0">
 
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="firebase-init.js"></script>
-  <script src="assets/shared.js"></script>
-  <script src="assets/js/charts.js"></script>
-  <script src="assets/js/export.js"></script>
-  <script src="assets/js/insights.js"></script>
-  <script src="assets/js/medication-reminder.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="assets/shared.js" defer></script>
+  <script src="assets/js/charts.js" defer></script>
+  <script src="assets/js/export.js" defer></script>
+  <script src="assets/js/insights.js" defer></script>
+  <script src="assets/js/medication-reminder.js" defer></script>
 
   <style>
     /* Component-specific styles that extend global styles */
@@ -115,7 +122,7 @@
     <div id="navigation"></div>
 
     <!-- Main Content -->
-    <main class="mobile-content">
+    <main class="mobile-content" role="main">
       <!-- Quick Actions -->
       <div class="mobile-card">
         <h2>Quick Actions</h2>
@@ -199,7 +206,7 @@
     <div class="mobile-loading-spinner"></div>
   </div>
 
-  <script>
+  <script defer>
     // Initialize Firebase
     const auth = firebase.auth();
     const db = firebase.firestore();

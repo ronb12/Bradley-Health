@@ -2,12 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a56db">
+    <meta name="description" content="Manage your Bradley Health profile">
     <title>Profile - Bradley Health</title>
     
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#1a56db">
-    <meta name="description" content="Manage your Bradley Health profile">
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
     
@@ -22,488 +25,141 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js" defer></script>
     
     <!-- Application Scripts -->
-    <script src="assets/js/firebase-config.js"></script>
-    <script src="assets/js/firebase-init.js"></script>
-    <script src="assets/js/notification-manager.js"></script>
+    <script src="assets/js/firebase-config.js" defer></script>
+    <script src="assets/js/firebase-init.js" defer></script>
+    <script src="assets/js/auth.js" defer></script>
+    <script src="assets/js/profile.js" defer></script>
+    <script src="assets/js/pwa-install.js" defer></script>
 </head>
 <body>
     <div class="container">
-        <header class="profile-header">
+        <header class="dashboard-header" role="banner">
             <div class="header-content">
                 <h1>Profile</h1>
                 <div class="header-actions">
-                    <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'">
-                        <i class="fas fa-arrow-left"></i>
-                        Back to Dashboard
+                    <button class="btn btn-secondary" aria-label="Open menu" onclick="toggleMenu()" aria-expanded="false">
+                        <i class="fas fa-bars" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
         </header>
 
-        <main class="profile-main">
-            <div class="profile-grid">
-                <!-- Profile Overview -->
-                <section class="profile-overview">
-                    <div class="profile-card">
-                        <div class="profile-avatar">
-                            <img id="profileImage" src="assets/images/default-avatar.png" alt="Profile Picture">
-                            <button class="avatar-edit" onclick="document.getElementById('avatarInput').click()">
-                                <i class="fas fa-camera"></i>
-                            </button>
-                            <input type="file" id="avatarInput" accept="image/*" style="display: none" onchange="updateProfileImage(event)">
-                        </div>
-                        <div class="profile-info">
-                            <h2 id="userName">Loading...</h2>
-                            <p id="userEmail" class="text-muted">Loading...</p>
-                            <p id="userRole" class="text-muted">Loading...</p>
-                        </div>
+        <main class="dashboard-main" role="main">
+            <!-- Profile Information -->
+            <section class="dashboard-section" aria-labelledby="profile-info-title">
+                <h2 id="profile-info-title">Profile Information</h2>
+                <form id="profileForm" class="profile-form" onsubmit="return handleProfileUpdate(event)">
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" name="fullName" required aria-required="true">
                     </div>
-                </section>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required aria-required="true" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" aria-required="true">
+                    </div>
+                    <div class="form-group">
+                        <label for="dateOfBirth">Date of Birth</label>
+                        <input type="date" id="dateOfBirth" name="dateOfBirth" required aria-required="true">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" aria-label="Save profile changes">
+                            <i class="fas fa-save" aria-hidden="true"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </section>
 
-                <!-- Personal Information -->
-                <section class="profile-section">
-                    <div class="section-header">
-                        <h2>Personal Information</h2>
-                        <button class="btn btn-primary" onclick="toggleEditMode('personal')">
-                            <i class="fas fa-edit"></i>
-                            Edit
+            <!-- Health Information -->
+            <section class="dashboard-section" aria-labelledby="health-info-title">
+                <h2 id="health-info-title">Health Information</h2>
+                <form id="healthForm" class="health-form" onsubmit="return handleHealthUpdate(event)">
+                    <div class="form-group">
+                        <label for="height">Height (cm)</label>
+                        <input type="number" id="height" name="height" min="100" max="250" aria-required="true">
+                    </div>
+                    <div class="form-group">
+                        <label for="weight">Weight (kg)</label>
+                        <input type="number" id="weight" name="weight" min="20" max="300" step="0.1" aria-required="true">
+                    </div>
+                    <div class="form-group">
+                        <label for="bloodType">Blood Type</label>
+                        <select id="bloodType" name="bloodType" required aria-required="true">
+                            <option value="">Select blood type</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="allergies">Allergies</label>
+                        <textarea id="allergies" name="allergies" rows="3" aria-label="List any allergies"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" aria-label="Save health information">
+                            <i class="fas fa-save" aria-hidden="true"></i>
+                            Save Health Info
                         </button>
                     </div>
-                    <form id="personalForm" class="profile-form">
-                        <div class="form-group">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" id="fullName" class="form-input" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Date of Birth</label>
-                            <input type="date" id="dateOfBirth" class="form-input" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Gender</label>
-                            <select id="gender" class="form-input" disabled>
-                                <option value="">Select gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                                <option value="prefer-not-to-say">Prefer not to say</option>
-                            </select>
-                        </div>
-                        <div class="form-actions" style="display: none">
-                            <button type="button" class="btn btn-secondary" onclick="cancelEdit('personal')">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                        </div>
-                    </form>
-                </section>
+                </form>
+            </section>
 
-                <!-- Contact Information -->
-                <section class="profile-section">
-                    <div class="section-header">
-                        <h2>Contact Information</h2>
-                        <button class="btn btn-primary" onclick="toggleEditMode('contact')">
-                            <i class="fas fa-edit"></i>
-                            Edit
-                        </button>
-                    </div>
-                    <form id="contactForm" class="profile-form">
-                        <div class="form-group">
-                            <label class="form-label">Email</label>
-                            <input type="email" id="email" class="form-input" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Phone Number</label>
-                            <input type="tel" id="phone" class="form-input" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Emergency Contact</label>
-                            <input type="text" id="emergencyContact" class="form-input" disabled>
-                        </div>
-                        <div class="form-actions" style="display: none">
-                            <button type="button" class="btn btn-secondary" onclick="cancelEdit('contact')">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                        </div>
-                    </form>
-                </section>
-
-                <!-- Health Information -->
-                <section class="profile-section">
-                    <div class="section-header">
-                        <h2>Health Information</h2>
-                        <button class="btn btn-primary" onclick="toggleEditMode('health')">
-                            <i class="fas fa-edit"></i>
-                            Edit
-                        </button>
-                    </div>
-                    <form id="healthForm" class="profile-form">
-                        <div class="form-group">
-                            <label class="form-label">Blood Type</label>
-                            <select id="bloodType" class="form-input" disabled>
-                                <option value="">Select blood type</option>
-                                <option value="A+">A+</option>
-                                <option value="A-">A-</option>
-                                <option value="B+">B+</option>
-                                <option value="B-">B-</option>
-                                <option value="AB+">AB+</option>
-                                <option value="AB-">AB-</option>
-                                <option value="O+">O+</option>
-                                <option value="O-">O-</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Allergies</label>
-                            <textarea id="allergies" class="form-input" rows="3" disabled></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Medical Conditions</label>
-                            <textarea id="medicalConditions" class="form-input" rows="3" disabled></textarea>
-                        </div>
-                        <div class="form-actions" style="display: none">
-                            <button type="button" class="btn btn-secondary" onclick="cancelEdit('health')">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                        </div>
-                    </form>
-                </section>
-
-                <!-- Account Settings -->
-                <section class="profile-section">
-                    <div class="section-header">
-                        <h2>Account Settings</h2>
-                    </div>
-                    <div class="settings-list">
-                        <button class="settings-item" onclick="changePassword()">
-                            <i class="fas fa-key"></i>
-                            <span>Change Password</span>
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                        <button class="settings-item" onclick="toggleNotifications()">
-                            <i class="fas fa-bell"></i>
-                            <span>Notification Settings</span>
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                        <button class="settings-item" onclick="exportData()">
-                            <i class="fas fa-download"></i>
-                            <span>Export Data</span>
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                        <button class="settings-item text-danger" onclick="deleteAccount()">
-                            <i class="fas fa-trash-alt"></i>
-                            <span>Delete Account</span>
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                </section>
-            </div>
+            <!-- Account Settings -->
+            <section class="dashboard-section" aria-labelledby="account-settings-title">
+                <h2 id="account-settings-title">Account Settings</h2>
+                <div class="settings-list">
+                    <button class="settings-item" onclick="changePassword()" aria-label="Change password">
+                        <i class="fas fa-key" aria-hidden="true"></i>
+                        <span>Change Password</span>
+                        <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                    <button class="settings-item" onclick="manageNotifications()" aria-label="Manage notifications">
+                        <i class="fas fa-bell" aria-hidden="true"></i>
+                        <span>Notification Settings</span>
+                        <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                    <button class="settings-item" onclick="exportData()" aria-label="Export health data">
+                        <i class="fas fa-download" aria-hidden="true"></i>
+                        <span>Export Health Data</span>
+                        <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                    <button class="settings-item danger" onclick="deleteAccount()" aria-label="Delete account">
+                        <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                        <span>Delete Account</span>
+                        <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </section>
         </main>
-
-        <nav class="bottom-nav">
-            <a href="dashboard.html" class="nav-item">
-                <i class="fas fa-home"></i>
-                <span>Home</span>
-            </a>
-            <a href="blood-pressure.html" class="nav-item">
-                <i class="fas fa-heartbeat"></i>
-                <span>BP</span>
-            </a>
-            <a href="medications.html" class="nav-item">
-                <i class="fas fa-pills"></i>
-                <span>Meds</span>
-            </a>
-            <a href="profile.html" class="nav-item active">
-                <i class="fas fa-user"></i>
-                <span>Profile</span>
-            </a>
-        </nav>
     </div>
 
-    <div id="mobileToast" class="mobile-toast"></div>
-    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-        <div class="loading-spinner"></div>
-        <p>Loading...</p>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none" role="alert" aria-busy="true" aria-label="Loading">
+        <div class="spinner" aria-hidden="true"></div>
     </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container" role="alert" aria-live="polite"></div>
 
     <script>
-        let notificationManager;
-        let currentUser;
-        let userData = {};
-
-        // Wait for all scripts to load
-        window.addEventListener('load', async () => {
-            try {
-                // Initialize Firebase
-                await window.initializeFirebase();
-                
-                // Initialize notification manager
-                notificationManager = new NotificationManager();
-
-                // Check authentication
-                firebase.auth().onAuthStateChanged(async (user) => {
-                    if (user) {
-                        currentUser = user;
-                        await loadUserData();
-                    } else {
-                        window.location.href = 'login.html';
-                    }
-                });
-
-                // Set up form submissions
-                setupFormSubmissions();
-            } catch (error) {
-                console.error('❌ Initialization error:', error);
-                document.body.innerHTML = `
-                    <div class="error-message">
-                        <h2>Error Loading Application</h2>
-                        <p>${error.message}</p>
-                        <p>Please try refreshing the page or contact support if the problem persists.</p>
-                    </div>
-                `;
-            }
+        // Initialize profile page
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeProfile();
         });
-
-        async function loadUserData() {
-            try {
-                showLoading();
-                const doc = await firebase.firestore().collection('users').doc(currentUser.uid).get();
-                
-                if (doc.exists) {
-                    userData = doc.data();
-                    updateUI();
-                } else {
-                    // Create new user document
-                    userData = {
-                        email: currentUser.email,
-                        displayName: currentUser.displayName || '',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    };
-                    await firebase.firestore().collection('users').doc(currentUser.uid).set(userData);
-                    updateUI();
-                }
-            } catch (error) {
-                console.error('❌ Error loading user data:', error);
-                notificationManager.showToast('Error loading profile data', 'error');
-            } finally {
-                hideLoading();
-            }
-        }
-
-        function updateUI() {
-            // Update profile overview
-            document.getElementById('userName').textContent = userData.displayName || 'No name set';
-            document.getElementById('userEmail').textContent = userData.email;
-            document.getElementById('userRole').textContent = 'Patient';
-
-            // Update personal information
-            document.getElementById('fullName').value = userData.displayName || '';
-            document.getElementById('dateOfBirth').value = userData.dateOfBirth || '';
-            document.getElementById('gender').value = userData.gender || '';
-
-            // Update contact information
-            document.getElementById('email').value = userData.email || '';
-            document.getElementById('phone').value = userData.phone || '';
-            document.getElementById('emergencyContact').value = userData.emergencyContact || '';
-
-            // Update health information
-            document.getElementById('bloodType').value = userData.bloodType || '';
-            document.getElementById('allergies').value = userData.allergies || '';
-            document.getElementById('medicalConditions').value = userData.medicalConditions || '';
-
-            // Update profile image if exists
-            if (userData.photoURL) {
-                document.getElementById('profileImage').src = userData.photoURL;
-            }
-        }
-
-        function setupFormSubmissions() {
-            // Personal Information Form
-            document.getElementById('personalForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await updateUserData('personal');
-            });
-
-            // Contact Information Form
-            document.getElementById('contactForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await updateUserData('contact');
-            });
-
-            // Health Information Form
-            document.getElementById('healthForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await updateUserData('health');
-            });
-        }
-
-        async function updateUserData(section) {
-            try {
-                showLoading();
-                const updates = {};
-
-                switch (section) {
-                    case 'personal':
-                        updates.displayName = document.getElementById('fullName').value;
-                        updates.dateOfBirth = document.getElementById('dateOfBirth').value;
-                        updates.gender = document.getElementById('gender').value;
-                        break;
-                    case 'contact':
-                        updates.phone = document.getElementById('phone').value;
-                        updates.emergencyContact = document.getElementById('emergencyContact').value;
-                        break;
-                    case 'health':
-                        updates.bloodType = document.getElementById('bloodType').value;
-                        updates.allergies = document.getElementById('allergies').value;
-                        updates.medicalConditions = document.getElementById('medicalConditions').value;
-                        break;
-                }
-
-                await firebase.firestore().collection('users').doc(currentUser.uid).update(updates);
-                Object.assign(userData, updates);
-                
-                notificationManager.showToast('Profile updated successfully', 'success');
-                toggleEditMode(section);
-            } catch (error) {
-                console.error('❌ Error updating profile:', error);
-                notificationManager.showToast('Error updating profile', 'error');
-            } finally {
-                hideLoading();
-            }
-        }
-
-        async function updateProfileImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            try {
-                showLoading();
-                const storageRef = firebase.storage().ref();
-                const fileRef = storageRef.child(`profile_images/${currentUser.uid}`);
-                
-                await fileRef.put(file);
-                const photoURL = await fileRef.getDownloadURL();
-                
-                await firebase.firestore().collection('users').doc(currentUser.uid).update({ photoURL });
-                await currentUser.updateProfile({ photoURL });
-                
-                document.getElementById('profileImage').src = photoURL;
-                notificationManager.showToast('Profile picture updated successfully', 'success');
-            } catch (error) {
-                console.error('❌ Error updating profile picture:', error);
-                notificationManager.showToast('Error updating profile picture', 'error');
-            } finally {
-                hideLoading();
-            }
-        }
-
-        function toggleEditMode(section) {
-            const form = document.getElementById(`${section}Form`);
-            const inputs = form.querySelectorAll('input, select, textarea');
-            const actions = form.querySelector('.form-actions');
-            const editButton = form.previousElementSibling.querySelector('button');
-
-            if (inputs[0].disabled) {
-                // Enable editing
-                inputs.forEach(input => input.disabled = false);
-                actions.style.display = 'flex';
-                editButton.style.display = 'none';
-            } else {
-                // Disable editing
-                inputs.forEach(input => input.disabled = true);
-                actions.style.display = 'none';
-                editButton.style.display = 'block';
-            }
-        }
-
-        function cancelEdit(section) {
-            const form = document.getElementById(`${section}Form`);
-            const inputs = form.querySelectorAll('input, select, textarea');
-            const actions = form.querySelector('.form-actions');
-            const editButton = form.previousElementSibling.querySelector('button');
-
-            // Reset form values
-            inputs.forEach(input => {
-                input.value = userData[input.id] || '';
-                input.disabled = true;
-            });
-
-            actions.style.display = 'none';
-            editButton.style.display = 'block';
-        }
-
-        async function changePassword() {
-            const newPassword = prompt('Enter new password:');
-            if (!newPassword) return;
-
-            try {
-                showLoading();
-                await currentUser.updatePassword(newPassword);
-                notificationManager.showToast('Password updated successfully', 'success');
-            } catch (error) {
-                console.error('❌ Error changing password:', error);
-                notificationManager.showToast('Error changing password', 'error');
-            } finally {
-                hideLoading();
-            }
-        }
-
-        function toggleNotifications() {
-            // Implement notification settings
-            notificationManager.showToast('Notification settings coming soon', 'info');
-        }
-
-        async function exportData() {
-            try {
-                showLoading();
-                const doc = await firebase.firestore().collection('users').doc(currentUser.uid).get();
-                const data = doc.data();
-                
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'profile-data.json';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                notificationManager.showToast('Data exported successfully', 'success');
-            } catch (error) {
-                console.error('❌ Error exporting data:', error);
-                notificationManager.showToast('Error exporting data', 'error');
-            } finally {
-                hideLoading();
-            }
-        }
-
-        async function deleteAccount() {
-            if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-                return;
-            }
-
-            try {
-                showLoading();
-                await firebase.firestore().collection('users').doc(currentUser.uid).delete();
-                await currentUser.delete();
-                window.location.href = 'login.html';
-            } catch (error) {
-                console.error('❌ Error deleting account:', error);
-                notificationManager.showToast('Error deleting account', 'error');
-            } finally {
-                hideLoading();
-            }
-        }
-
-        function showLoading() {
-            document.getElementById('loadingOverlay').style.display = 'flex';
-        }
-
-        function hideLoading() {
-            document.getElementById('loadingOverlay').style.display = 'none';
-        }
     </script>
 </body>
 </html>

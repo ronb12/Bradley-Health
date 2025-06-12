@@ -2,9 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="theme-color" content="#1a56db">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy - Bradley Health</title>
-    <link rel="stylesheet" href="assets/style.css">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+    <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+<link rel="stylesheet" href="assets/style.css">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Bradley Health">
@@ -16,7 +26,7 @@
         <p>Bradley Health - Your Personal Health Companion</p>
     </header>
 
-    <main>
+    <main role="main">
         <section class="card">
             <h2>Introduction</h2>
             <p>Bradley Health ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application.</p>
@@ -91,7 +101,13 @@
         </section>
     </main>
 
-    <script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script defer>
         document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString();
     </script>
 </body>

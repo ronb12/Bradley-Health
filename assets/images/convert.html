@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Convert SVG to PNG</title>
+    <style>
+        body { margin: 0; padding: 20px; font-family: system-ui, -apple-system, sans-serif; }
+        .icon { margin: 20px; }
+        canvas { border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>Icon Preview</h1>
+    <div class="icon">
+        <h2>512x512</h2>
+        <canvas id="canvas512" width="512" height="512"></canvas>
+        <button onclick="downloadIcon(512)">Download 512x512</button>
+    </div>
+    <div class="icon">
+        <h2>192x192</h2>
+        <canvas id="canvas192" width="192" height="192"></canvas>
+        <button onclick="downloadIcon(192)">Download 192x192</button>
+    </div>
+    <div class="icon">
+        <h2>32x32 (Favicon)</h2>
+        <canvas id="canvas32" width="32" height="32"></canvas>
+        <button onclick="downloadIcon(32)">Download 32x32</button>
+    </div>
+
+    <script>
+        const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <rect width="512" height="512" fill="#1a56db"/>
+    <text x="256" y="256" font-family="Inter, sans-serif" font-size="200" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">BH</text>
+</svg>`;
+
+        function drawIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            const blob = new Blob([svg], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, size, size);
+                URL.revokeObjectURL(url);
+            };
+            img.src = url;
+        }
+
+        function downloadIcon(size) {
+            const canvas = document.getElementById(`canvas${size}`);
+            const link = document.createElement('a');
+            link.download = `icon-${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Draw icons on load
+        window.onload = () => {
+            drawIcon(document.getElementById('canvas512'), 512);
+            drawIcon(document.getElementById('canvas192'), 192);
+            drawIcon(document.getElementById('canvas32'), 32);
+        };
+    </script>
+</body>
+</html> 

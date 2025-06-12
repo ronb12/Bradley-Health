@@ -2,12 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a56db">
+    <meta name="description" content="Bradley Health Dashboard - Monitor your health metrics">
     <title>Dashboard - Bradley Health</title>
     
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#1a56db">
-    <meta name="description" content="Your personal health dashboard">
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
     
@@ -17,196 +20,103 @@
     
     <!-- Stylesheets -->
     <link rel="stylesheet" href="assets/style.css">
-    <link rel="stylesheet" href="assets/dashboard.css">
     <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js" defer></script>
     
     <!-- Application Scripts -->
-    <script src="assets/js/firebase-config.js"></script>
-    <script src="assets/js/firebase-init.js"></script>
-    <script src="assets/js/notification-manager.js"></script>
-    <script src="assets/js/export-manager.js"></script>
-    <script src="assets/js/dashboard.js"></script>
+    <script src="assets/js/firebase-config.js" defer></script>
+    <script src="assets/js/firebase-init.js" defer></script>
+    <script src="assets/js/auth.js" defer></script>
+    <script src="assets/js/dashboard.js" defer></script>
+    <script src="assets/js/pwa-install.js" defer></script>
 </head>
 <body>
     <div class="container">
-        <header class="dashboard-header">
+        <header class="dashboard-header" role="banner">
             <div class="header-content">
                 <h1>Dashboard</h1>
-                <div class="header-controls">
-                    <button class="export-btn" onclick="dashboard.exportHealthData()">
-                        <i class="fas fa-download"></i> Export
-                    </button>
-                    <button class="settings-btn" onclick="showSettings()">
-                        <i class="fas fa-cog"></i>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" aria-label="Open menu" onclick="toggleMenu()" aria-expanded="false">
+                        <i class="fas fa-bars" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
         </header>
 
-        <main class="dashboard-main">
-            <section class="welcome-section">
-                <div class="user-greeting">
-                    <h2>Welcome back, <span id="userName">User</span>!</h2>
-                    <p class="date-display" id="currentDate"></p>
-                </div>
-                <div class="quick-stats">
-                    <div class="stat-card">
-                        <i class="fas fa-heartbeat"></i>
-                        <div class="stat-info">
-                            <span class="stat-value" id="bpValue">--/--</span>
-                            <span class="stat-label">Blood Pressure</span>
-                        </div>
+        <main class="dashboard-main" role="main">
+            <!-- Health Overview -->
+            <section class="dashboard-section" aria-labelledby="health-overview-title">
+                <h2 id="health-overview-title">Health Overview</h2>
+                <div class="health-grid">
+                    <div class="health-card">
+                        <h3>Blood Pressure</h3>
+                        <div class="health-value" id="bpValue" aria-live="polite">Loading...</div>
+                        <a href="blood-pressure.html" class="btn btn-primary" aria-label="View blood pressure details">View Details</a>
                     </div>
-                    <div class="stat-card">
-                        <i class="fas fa-pills"></i>
-                        <div class="stat-info">
-                            <span class="stat-value" id="medCount">--</span>
-                            <span class="stat-label">Medications</span>
-                        </div>
+                    <div class="health-card">
+                        <h3>Medications</h3>
+                        <div class="health-value" id="medValue" aria-live="polite">Loading...</div>
+                        <a href="medications.html" class="btn btn-primary" aria-label="View medication details">View Details</a>
                     </div>
-                    <div class="stat-card">
-                        <i class="fas fa-calendar-check"></i>
-                        <div class="stat-info">
-                            <span class="stat-value" id="apptCount">--</span>
-                            <span class="stat-label">Appointments</span>
-                        </div>
+                    <div class="health-card">
+                        <h3>Activity</h3>
+                        <div class="health-value" id="activityValue" aria-live="polite">Loading...</div>
+                        <a href="activity.html" class="btn btn-primary" aria-label="View activity details">View Details</a>
                     </div>
                 </div>
             </section>
 
-            <div class="dashboard-grid">
-                <section class="health-chart">
-                    <div class="section-header">
-                        <h2>Health Overview</h2>
-                        <div class="chart-controls">
-                            <button class="active" data-range="7">7D</button>
-                            <button data-range="30">30D</button>
-                            <button data-range="90">90D</button>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="healthChart"></canvas>
-                    </div>
-                </section>
+            <!-- Recent Activity -->
+            <section class="dashboard-section" aria-labelledby="recent-activity-title">
+                <h2 id="recent-activity-title">Recent Activity</h2>
+                <div class="activity-list" id="activityList" role="list">
+                    <!-- Activity items will be dynamically added here -->
+                </div>
+            </section>
 
-                <section class="upcoming-section">
-                    <div class="section-header">
-                        <h2>Upcoming</h2>
-                        <button class="view-all-btn">View All</button>
-                    </div>
-                    <div class="upcoming-list" id="upcomingList">
-                        <!-- Upcoming items will be inserted here -->
-                    </div>
-                </section>
-
-                <section class="activity-section">
-                    <div class="section-header">
-                        <h2>Recent Activity</h2>
-                        <button class="view-all-btn">View All</button>
-                    </div>
-                    <div class="activity-list" id="activityList">
-                        <!-- Activity items will be inserted here -->
-                    </div>
-                </section>
-
-                <section class="quick-actions">
-                    <h2>Quick Actions</h2>
-                    <div class="action-grid">
-                        <a href="blood-pressure.html" class="action-card">
-                            <i class="fas fa-heartbeat"></i>
-                            <span>Log Blood Pressure</span>
-                        </a>
-                        <a href="medications.html" class="action-card">
-                            <i class="fas fa-pills"></i>
-                            <span>Log Medication</span>
-                        </a>
-                        <a href="mood-tracker.html" class="action-card">
-                            <i class="fas fa-smile"></i>
-                            <span>Track Mood</span>
-                        </a>
-                        <a href="appointments.html" class="action-card">
-                            <i class="fas fa-calendar-plus"></i>
-                            <span>Add Appointment</span>
-                        </a>
-                    </div>
-                </section>
-            </div>
+            <!-- Quick Actions -->
+            <section class="dashboard-section" aria-labelledby="quick-actions-title">
+                <h2 id="quick-actions-title">Quick Actions</h2>
+                <div class="quick-actions-grid">
+                    <button class="action-card" onclick="addReading()" aria-label="Add new reading">
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                        <span>Add Reading</span>
+                    </button>
+                    <button class="action-card" onclick="scheduleReminder()" aria-label="Schedule reminder">
+                        <i class="fas fa-bell" aria-hidden="true"></i>
+                        <span>Schedule Reminder</span>
+                    </button>
+                    <button class="action-card" onclick="exportData()" aria-label="Export health data">
+                        <i class="fas fa-download" aria-hidden="true"></i>
+                        <span>Export Data</span>
+                    </button>
+                    <button class="action-card" onclick="viewReports()" aria-label="View health reports">
+                        <i class="fas fa-chart-bar" aria-hidden="true"></i>
+                        <span>View Reports</span>
+                    </button>
+                </div>
+            </section>
         </main>
-
-        <nav class="bottom-nav">
-            <a href="dashboard.html" class="nav-item active">
-                <i class="fas fa-home"></i>
-                <span>Home</span>
-            </a>
-            <a href="blood-pressure.html" class="nav-item">
-                <i class="fas fa-heartbeat"></i>
-                <span>BP</span>
-            </a>
-            <a href="medications.html" class="nav-item">
-                <i class="fas fa-pills"></i>
-                <span>Meds</span>
-            </a>
-            <a href="profile.html" class="nav-item">
-                <i class="fas fa-user"></i>
-                <span>Profile</span>
-            </a>
-        </nav>
     </div>
 
-    <div id="mobileToast" class="mobile-toast"></div>
-    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-        <div class="loading-spinner"></div>
-        <p>Loading...</p>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none" role="alert" aria-busy="true" aria-label="Loading">
+        <div class="spinner" aria-hidden="true"></div>
     </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container" role="alert" aria-live="polite"></div>
 
     <script>
-        // Initialize managers
-        let notificationManager, exportManager, dashboard;
-
-        // Wait for all scripts to load
-        window.addEventListener('load', async () => {
-            try {
-                // Initialize Firebase
-                await window.initializeFirebase();
-                
-                // Initialize managers
-                notificationManager = new NotificationManager();
-                exportManager = new ExportManager();
-                dashboard = new DashboardManager(notificationManager, exportManager);
-
-                // Initialize dashboard
-                await dashboard.init();
-
-                // Register service worker
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('/service-worker.js')
-                        .then(registration => {
-                            console.log('✅ ServiceWorker registration successful');
-                        })
-                        .catch(error => {
-                            console.error('❌ ServiceWorker registration failed:', error);
-                        });
-                }
-            } catch (error) {
-                console.error('❌ Initialization error:', error);
-                document.body.innerHTML = `
-                    <div class="error-message">
-                        <h2>Error Loading Application</h2>
-                        <p>${error.message}</p>
-                        <p>Please try refreshing the page or contact support if the problem persists.</p>
-                    </div>
-                `;
-            }
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeDashboard();
         });
     </script>
 </body>

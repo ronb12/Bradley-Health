@@ -1,7 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a56db">
+<meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mood Tracker - Bradley Health</title>
   <link rel="icon" href="assets/icons/icon.svg" />
@@ -12,12 +19,12 @@
   <meta name="theme-color" content="#2B6CB0">
 
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="firebase-init.js"></script>
-  <script src="assets/shared.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="assets/shared.js" defer></script>
 </head>
 <body>
   <header>
@@ -25,7 +32,7 @@
     <button id="darkToggle" class="toggle-dark" aria-label="Toggle dark mode">🌓</button>
   </header>
 
-  <main>
+  <main role="main">
     <section class="mood-input">
       <h2>Log Your Mood</h2>
       <form id="moodForm" onsubmit="logMood(event)">
@@ -38,7 +45,7 @@
             <button type="button" data-rating="4" onclick="setRating(4)">🙂</button>
             <button type="button" data-rating="5" onclick="setRating(5)">😃</button>
           </div>
-          <input type="hidden" id="rating" required />
+          <input type="hidden" id="rating" required / aria-required="true">
         </div>
 
         <div class="mood-factors">
@@ -230,7 +237,7 @@
             <button type="button" data-rating="4" onclick="setEditRating(4)">🙂</button>
             <button type="button" data-rating="5" onclick="setEditRating(5)">😃</button>
           </div>
-          <input type="hidden" id="editRating" required />
+          <input type="hidden" id="editRating" required / aria-required="true">
         </div>
 
         <div class="mood-factors">
@@ -291,7 +298,7 @@
     </div>
   </div>
 
-  <script>
+  <script defer>
     let currentUser;
     let moods = [];
     let currentRating = 0;
