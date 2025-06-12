@@ -15,7 +15,10 @@
     "stylelint": "stylelint \"**/*.css\"",
     "stylelint:fix": "stylelint \"**/*.css\" --fix",
     "css:build": "postcss assets/style.css -o dist/style.min.css",
-    "css:watch": "postcss assets/style.css -o dist/style.min.css --watch"
+    "css:watch": "postcss assets/style.css -o dist/style.min.css --watch",
+    "a11y": "pa11y-ci",
+    "check": "node scripts/fix-errors.js",
+    "fix": "node scripts/fix-errors.js --fix"
   },
   "dependencies": {
     "chart.js": "^4.4.1",
@@ -24,7 +27,9 @@
     "firebase-functions": "^4.7.0",
     "moment": "^2.30.1",
     "node-fetch": "^2.7.0",
-    "sweetalert2": "^11.10.5"
+    "sweetalert2": "^11.10.5",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.1"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",
@@ -42,7 +47,8 @@
     "postcss-preset-env": "^10.2.2",
     "prettier": "^3.5.3",
     "stylelint": "^16.20.0",
-    "stylelint-config-standard": "^38.0.0"
+    "stylelint-config-standard": "^38.0.0",
+    "pa11y-ci": "^3.1.0"
   },
   "engines": {
     "node": ">=18.0.0"

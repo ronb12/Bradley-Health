@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>Dashboard - Bradley Health</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="assets/icon-512.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="assets/mobile.css" />
+  <meta name="theme-color" content="#2B6CB0">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-init.js"></script>
+  <script src="assets/shared.js"></script>
+  <script src="assets/js/charts.js"></script>
+  <script src="assets/js/export.js"></script>
+  <script src="assets/js/insights.js"></script>
+  <script src="assets/js/medication-reminder.js"></script>
+
+  <style>
+    /* Component-specific styles that extend global styles */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-md);
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-md);
+    }
+
+    .action-card {
+      text-decoration: none;
+      color: var(--primary);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .action-card:hover {
+      color: var(--primary-dark);
+    }
+
+    .action-card .emoji {
+      font-size: 2.5em;
+    }
+
+    .action-card .label {
+      font-weight: 500;
+      font-size: 1.1em;
+    }
+
+    .header-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-sm);
+    }
+
+    .settings-btn {
+      background: none;
+      border: none;
+      color: var(--white);
+      cursor: pointer;
+      font-size: 1.2em;
+      padding: var(--spacing-xs);
+      transition: transform var(--transition-normal);
+    }
+
+    .settings-btn:hover {
+      transform: rotate(30deg);
+    }
+
+    .chart-container {
+      height: 300px;
+      margin-top: var(--spacing-md);
+    }
+
+    .export-btn {
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      font-size: var(--font-size-sm);
+    }
+
+    .export-btn:hover {
+      background: var(--primary-dark);
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-container">
+    <!-- Include Navigation Component -->
+    <div id="navigation"></div>
+
+    <!-- Main Content -->
+    <main class="mobile-content">
+      <!-- Quick Actions -->
+      <div class="mobile-card">
+        <h2>Quick Actions</h2>
+        <div class="quick-actions">
+          <button class="action-btn" onclick="location.href='blood-pressure.html'">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+            <span>Log BP</span>
+          </button>
+          <button class="action-btn" onclick="location.href='mood.html'">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>Log Mood</span>
+          </button>
+          <button class="action-btn" onclick="location.href='medications.html'">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+            </svg>
+            <span>Log Meds</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Health Summary -->
+      <div class="mobile-card">
+        <h2>Health Summary</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Blood Pressure</span>
+              <span class="status-badge status-normal">Normal</span>
+            </div>
+            <div class="stat-value">120/80</div>
+            <div class="stat-details">Last reading: 9:30 AM</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Mood</span>
+              <span class="status-badge status-good">Good</span>
+            </div>
+            <div class="stat-value">😄</div>
+            <div class="stat-details">Sleep: Good, Stress: Moderate</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="healthChart"></canvas>
+        </div>
+        <button class="export-btn" onclick="exportHealthData()">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          Export Data
+        </button>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="mobile-card">
+        <h2>Recent Activity</h2>
+        <div id="activityList" class="activity-list">
+          <!-- Activity items will be loaded dynamically -->
+        </div>
+      </div>
+
+      <!-- Upcoming -->
+      <div class="mobile-card">
+        <h2>Upcoming</h2>
+        <div id="upcomingList" class="upcoming-list">
+          <!-- Upcoming items will be loaded dynamically -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Mobile Toast -->
+  <div id="mobile-toast" class="mobile-toast"></div>
+
+  <!-- Mobile Loading -->
+  <div id="mobile-loading" class="mobile-loading" style="display: none;">
+    <div class="mobile-loading-spinner"></div>
+  </div>
+
+  <script>
+    // Initialize Firebase
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Initialize managers
+    const insightsManager = new HealthInsightsManager();
+    const medicationReminder = new MedicationReminder();
+    medicationReminder.init();
+
+    // Check authentication state
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = 'login.html';
+      } else {
+        // Load user data
+        loadUserData(user);
+        // Load activity feed
+        loadActivityFeed(user);
+        // Load upcoming reminders
+        loadUpcomingReminders(user);
+        // Initialize health chart
+        initializeHealthChart(user);
+      }
+    });
+
+    // Load user data
+    async function loadUserData(user) {
+      try {
+        const doc = await db.collection('users').doc(user.uid).get();
+        if (doc.exists) {
+          const data = doc.data();
+          document.getElementById('userName').textContent = data.displayName || 'User';
+          document.getElementById('displayName').value = data.displayName || '';
+          document.getElementById('email').value = user.email;
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        showToast('Error loading user data', 'error');
+      }
+    }
+
+    // Load activity feed
+    async function loadActivityFeed(user) {
+      const activityList = document.getElementById('activityList');
+      
+      try {
+        const snapshot = await db.collection('users').doc(user.uid)
+          .collection('activity')
+          .orderBy('timestamp', 'desc')
+          .limit(5)
+          .get();
+        
+        if (snapshot.empty) {
+          activityList.innerHTML = '<p>No recent activity</p>';
+          return;
+        }
+
+        activityList.innerHTML = '';
+        snapshot.forEach(doc => {
+          const activity = doc.data();
+          const item = createActivityItem(activity);
+          activityList.appendChild(item);
+        });
+      } catch (error) {
+        console.error('Error loading activity feed:', error);
+        showToast('Error loading activity feed', 'error');
+      }
+    }
+
+    // Create activity item
+    function createActivityItem(activity) {
+      const div = document.createElement('div');
+      div.className = 'activity-item';
+      div.innerHTML = `
+        <div class="activity-icon">${activity.icon || '📝'}</div>
+        <div class="activity-info">
+          <div class="activity-name">${activity.type}</div>
+          <div class="activity-details">${activity.details}</div>
+        </div>
+        <div class="activity-time">${formatTime(activity.timestamp)}</div>
+      `;
+      return div;
+    }
+
+    // Load upcoming reminders
+    async function loadUpcomingReminders(user) {
+      const upcomingList = document.getElementById('upcomingList');
+      
+      try {
+        const reminders = medicationReminder.getUpcomingReminders();
+        if (reminders.length === 0) {
+          upcomingList.innerHTML = '<p>No upcoming reminders</p>';
+          return;
+        }
+
+        upcomingList.innerHTML = '';
+        reminders.forEach(reminder => {
+          const item = createUpcomingItem(reminder);
+          upcomingList.appendChild(item);
+        });
+      } catch (error) {
+        console.error('Error loading upcoming reminders:', error);
+        showToast('Error loading upcoming reminders', 'error');
+      }
+    }
+
+    // Create upcoming item
+    function createUpcomingItem(reminder) {
+      const div = document.createElement('div');
+      div.className = 'upcoming-item';
+      div.innerHTML = `
+        <div class="upcoming-icon">💊</div>
+        <div class="upcoming-info">
+          <div class="upcoming-name">${reminder.name}</div>
+          <div class="upcoming-details">${medicationReminder.formatTime(reminder.nextDose)}</div>
+        </div>
+        <div class="upcoming-status">${getTimeUntil(reminder.nextDose)}</div>
+      `;
+      return div;
+    }
+
+    // Initialize health chart
+    async function initializeHealthChart(user) {
+      try {
+        const snapshot = await db.collection('users').doc(user.uid)
+          .collection('bloodPressure')
+          .orderBy('timestamp', 'desc')
+          .limit(30)
+          .get();
+
+        const readings = [];
+        snapshot.forEach(doc => {
+          readings.push(doc.data());
+        });
+
+        const ctx = document.getElementById('healthChart').getContext('2d');
+        const chart = chartManager.createLineChart(ctx, {
+          labels: readings.map(r => formatDate(r.timestamp)),
+          datasets: [
+            {
+              label: 'Systolic',
+              data: readings.map(r => r.systolic),
+              borderColor: '#1a56db',
+              tension: 0.4
+            },
+            {
+              label: 'Diastolic',
+              data: readings.map(r => r.diastolic),
+              borderColor: '#059669',
+              tension: 0.4
+            }
+          ]
+        });
+      } catch (error) {
+        console.error('Error initializing health chart:', error);
+        showToast('Error loading health data', 'error');
+      }
+    }
+
+    // Export health data
+    async function exportHealthData() {
+      try {
+        const user = auth.currentUser;
+        const snapshot = await db.collection('users').doc(user.uid)
+          .collection('bloodPressure')
+          .orderBy('timestamp', 'desc')
+          .get();
+
+        const readings = [];
+        snapshot.forEach(doc => {
+          readings.push(doc.data());
+        });
+
+        const formattedData = exportManager.formatDataForExport(readings, {
+          dateFormat: 'MM/DD/YYYY',
+          numberFormat: '0',
+          excludeFields: ['userId']
+        });
+
+        await exportManager.exportData(formattedData, 'csv', 'health-data');
+        showToast('Data exported successfully', 'success');
+      } catch (error) {
+        console.error('Error exporting data:', error);
+        showToast('Error exporting data', 'error');
+      }
+    }
+
+    // Helper functions
+    function formatTime(timestamp) {
+      return new Date(timestamp).toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit'
+      });
+    }
+
+    function formatDate(timestamp) {
+      return new Date(timestamp).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    function getTimeUntil(date) {
+      const now = new Date();
+      const diff = new Date(date) - now;
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      
+      if (hours < 24) {
+        return `In ${hours} hours`;
+      } else if (hours < 48) {
+        return 'Tomorrow';
+      } else {
+        return formatDate(date);
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('mobile-toast');
+      toast.textContent = message;
+      toast.className = `mobile-toast mobile-toast-${type}`;
+      toast.style.display = 'block';
+      
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3000);
+    }
+  </script>
+</body>
+</html> 

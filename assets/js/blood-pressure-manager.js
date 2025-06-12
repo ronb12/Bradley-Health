@@ -13,6 +13,22 @@ class BloodPressureManager {
     this.readings = [];
     this.chart = null;
     this.currentRange = 7; // Default to 7 days
+    
+    // BP Categories
+    this.bpCategories = {
+      normal: { min: 0, max: 120, color: '#51cf66', label: 'Normal' },
+      elevated: { min: 121, max: 129, color: '#ffd43b', label: 'Elevated' },
+      hypertension1: { min: 130, max: 139, color: '#ff922b', label: 'Stage 1' },
+      hypertension2: { min: 140, max: 180, color: '#fa5252', label: 'Stage 2' },
+      crisis: { min: 181, max: 999, color: '#e03131', label: 'Crisis' }
+    };
+
+    // Health Goals
+    this.healthGoals = {
+      systolic: { target: 120, range: 10 },
+      diastolic: { target: 80, range: 10 },
+      pulse: { target: 72, range: 15 }
+    };
   }
 
   async init() {
@@ -404,6 +420,172 @@ class BloodPressureManager {
 
   hideLoading() {
     document.getElementById('loadingOverlay').style.display = 'none';
+  }
+
+  getBPCategory(systolic, diastolic) {
+    if (systolic >= 180 || diastolic >= 120) return 'crisis';
+    if (systolic >= 140 || diastolic >= 90) return 'hypertension2';
+    if (systolic >= 130 || diastolic >= 80) return 'hypertension1';
+    if (systolic >= 120 && diastolic < 80) return 'elevated';
+    return 'normal';
+  }
+
+  getBPColor(systolic, diastolic) {
+    const category = this.getBPCategory(systolic, diastolic);
+    return this.bpCategories[category].color;
+  }
+
+  async setReminder(time, frequency) {
+    try {
+      await this.db
+        .collection('users')
+        .doc(this.currentUser.uid)
+        .collection('reminders')
+        .add({
+          time,
+          frequency,
+          type: 'bloodPressure',
+          active: true,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+      this.notificationManager.showToast('Reminder set successfully');
+    } catch (error) {
+      console.error('Error setting reminder:', error);
+      this.notificationManager.showToast('Error setting reminder', 'error');
+    }
+  }
+
+  calculateHealthScore(readings) {
+    if (readings.length === 0) return 0;
+
+    const recentReadings = readings.slice(0, 7); // Last 7 readings
+    let score = 100;
+
+    recentReadings.forEach(reading => {
+      const category = this.getBPCategory(reading.systolic, reading.diastolic);
+      switch (category) {
+        case 'crisis': score -= 20; break;
+        case 'hypertension2': score -= 15; break;
+        case 'hypertension1': score -= 10; break;
+        case 'elevated': score -= 5; break;
+      }
+    });
+
+    return Math.max(0, Math.round(score / recentReadings.length));
+  }
+
+  async generateDoctorReport() {
+    const readings = await this.getReadingsForReport();
+    const stats = this.calculateDetailedStats(readings);
+    const trends = this.analyzeTrends(readings);
+    
+    return {
+      patientInfo: {
+        name: this.currentUser.displayName,
+        email: this.currentUser.email,
+        lastUpdated: new Date().toISOString()
+      },
+      readings: readings,
+      statistics: stats,
+      trends: trends,
+      recommendations: this.generateRecommendations(stats, trends)
+    };
+  }
+
+  calculateDetailedStats(readings) {
+    if (readings.length === 0) return null;
+
+    const morningReadings = readings.filter(r => {
+      const hour = r.timestamp.toDate().getHours();
+      return hour >= 6 && hour < 12;
+    });
+
+    const eveningReadings = readings.filter(r => {
+      const hour = r.timestamp.toDate().getHours();
+      return hour >= 18 && hour < 22;
+    });
+
+    return {
+      overall: {
+        systolic: this.calculateAverage(readings.map(r => r.systolic)),
+        diastolic: this.calculateAverage(readings.map(r => r.diastolic)),
+        pulse: this.calculateAverage(readings.map(r => r.pulse))
+      },
+      morning: {
+        systolic: this.calculateAverage(morningReadings.map(r => r.systolic)),
+        diastolic: this.calculateAverage(morningReadings.map(r => r.diastolic)),
+        pulse: this.calculateAverage(morningReadings.map(r => r.pulse))
+      },
+      evening: {
+        systolic: this.calculateAverage(eveningReadings.map(r => r.systolic)),
+        diastolic: this.calculateAverage(eveningReadings.map(r => r.diastolic)),
+        pulse: this.calculateAverage(eveningReadings.map(r => r.pulse))
+      }
+    };
+  }
+
+  analyzeTrends(readings) {
+    if (readings.length < 2) return null;
+
+    const sortedReadings = [...readings].sort((a, b) => 
+      a.timestamp.toDate() - b.timestamp.toDate()
+    );
+
+    return {
+      systolic: this.calculateTrend(sortedReadings.map(r => r.systolic)),
+      diastolic: this.calculateTrend(sortedReadings.map(r => r.diastolic)),
+      pulse: this.calculateTrend(sortedReadings.map(r => r.pulse))
+    };
+  }
+
+  calculateTrend(values) {
+    const n = values.length;
+    const sumX = (n * (n - 1)) / 2;
+    const sumY = values.reduce((a, b) => a + b, 0);
+    const sumXY = values.reduce((sum, y, x) => sum + x * y, 0);
+    const sumXX = (n * (n - 1) * (2 * n - 1)) / 6;
+
+    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+    return {
+      direction: slope > 0 ? 'increasing' : slope < 0 ? 'decreasing' : 'stable',
+      rate: Math.abs(slope)
+    };
+  }
+
+  generateRecommendations(stats, trends) {
+    const recommendations = [];
+
+    // Check overall BP
+    if (stats.overall.systolic > 140 || stats.overall.diastolic > 90) {
+      recommendations.push({
+        type: 'warning',
+        message: 'Your blood pressure is consistently high. Please consult your doctor.'
+      });
+    }
+
+    // Check morning-evening difference
+    const morningEveningDiff = {
+      systolic: Math.abs(stats.morning.systolic - stats.evening.systolic),
+      diastolic: Math.abs(stats.morning.diastolic - stats.evening.diastolic)
+    };
+
+    if (morningEveningDiff.systolic > 20 || morningEveningDiff.diastolic > 10) {
+      recommendations.push({
+        type: 'info',
+        message: 'Consider taking readings at the same time each day for more consistent results.'
+      });
+    }
+
+    // Check trends
+    if (trends.systolic.direction === 'increasing' && trends.systolic.rate > 5) {
+      recommendations.push({
+        type: 'warning',
+        message: 'Your systolic pressure is trending upward. Consider lifestyle changes.'
+      });
+    }
+
+    return recommendations;
   }
 }
 

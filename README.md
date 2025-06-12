@@ -86,4 +86,74 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Support
 
-For support, email support@bradleyhealth.com or open an issue in the repository. 
+For support, email support@bradleyhealth.com or open an issue in the repository.
+
+## Firebase Setup
+
+To set up Firebase for this project:
+
+1. Go to the [Firebase Console](https://console.firebase.google.com/)
+2. Create a new project or select an existing one
+3. In Project Settings:
+   - Click on the web app icon (</>)
+   - Register your app if you haven't already
+   - Copy the configuration values
+
+4. Update `assets/js/firebase-config.js` with your Firebase configuration:
+```javascript
+const firebaseConfig = {
+    apiKey: "your_api_key",
+    authDomain: "your_project_id.firebaseapp.com",
+    projectId: "your_project_id",
+    storageBucket: "your_project_id.appspot.com",
+    messagingSenderId: "your_sender_id",
+    appId: "your_app_id",
+    measurementId: "your_measurement_id"
+};
+```
+
+5. Enable Authentication in Firebase Console:
+   - Go to Authentication > Sign-in method
+   - Enable Email/Password authentication
+   - Enable Google authentication
+   - Enable Apple authentication (requires Apple Developer account)
+
+6. Set up Firestore Database:
+   - Go to Firestore Database
+   - Create database in production mode
+   - Start in test mode for development
+
+7. Set up Storage:
+   - Go to Storage
+   - Initialize storage
+   - Set up security rules
+
+## Security Rules
+
+Make sure to set up proper security rules in Firebase Console:
+
+### Firestore Rules
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+```
+
+### Storage Rules
+```javascript
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /users/{userId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+``` 

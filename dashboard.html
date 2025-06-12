@@ -1,212 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <title>Dashboard - Bradley Health</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" sizes="192x192" href="assets/icon-192.png" />
-  <link rel="apple-touch-icon" sizes="512x512" href="assets/icon-512.png" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="stylesheet" href="assets/style.css" />
-  <link rel="stylesheet" href="assets/mobile.css" />
-  <link rel="stylesheet" href="assets/dashboard.css" />
-  <meta name="theme-color" content="#2B6CB0">
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="firebase-init.js"></script>
-  <script src="assets/shared.js"></script>
-  <script src="assets/js/charts.js"></script>
-  <script src="assets/js/export.js"></script>
-  <script src="assets/js/insights.js"></script>
-  <script src="assets/js/medication-reminder.js"></script>
-  <script src="assets/js/dashboard.js"></script>
-
-  <style>
-    /* Component-specific styles that extend global styles */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: var(--spacing-md);
-      margin-top: var(--spacing-md);
-    }
-
-    .action-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: var(--spacing-md);
-      margin-top: var(--spacing-md);
-    }
-
-    .action-card {
-      text-decoration: none;
-      color: var(--primary);
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: var(--spacing-sm);
-    }
-
-    .action-card:hover {
-      color: var(--primary-dark);
-    }
-
-    .action-card .emoji {
-      font-size: 2.5em;
-    }
-
-    .action-card .label {
-      font-weight: 500;
-      font-size: 1.1em;
-    }
-
-    .header-controls {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: var(--spacing-md);
-      margin-top: var(--spacing-sm);
-    }
-
-    .settings-btn {
-      background: none;
-      border: none;
-      color: var(--white);
-      cursor: pointer;
-      font-size: 1.2em;
-      padding: var(--spacing-xs);
-      transition: transform var(--transition-normal);
-    }
-
-    .settings-btn:hover {
-      transform: rotate(30deg);
-    }
-
-    .chart-container {
-      height: 300px;
-      margin-top: var(--spacing-md);
-    }
-
-    .export-btn {
-      background: var(--primary);
-      color: var(--white);
-      border: none;
-      padding: var(--spacing-sm) var(--spacing-md);
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-      font-size: var(--font-size-sm);
-    }
-
-    .export-btn:hover {
-      background: var(--primary-dark);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Bradley Health</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1a56db">
+    <meta name="description" content="Your personal health dashboard">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/dashboard.css">
+    <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/firebase-init.js"></script>
+    <script src="assets/js/notification-manager.js"></script>
+    <script src="assets/js/export-manager.js"></script>
+    <script src="assets/js/dashboard.js"></script>
 </head>
 <body>
-  <div class="mobile-container">
-    <!-- Include Navigation Component -->
-    <div id="navigation"></div>
-
-    <!-- Main Content -->
-    <main class="mobile-content">
-      <!-- Quick Actions -->
-      <div class="mobile-card">
-        <h2>Quick Actions</h2>
-        <div class="quick-actions">
-          <button class="action-btn" onclick="location.href='blood-pressure.html'">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-            </svg>
-            <span>Log BP</span>
-          </button>
-          <button class="action-btn" onclick="location.href='mood.html'">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <span>Log Mood</span>
-          </button>
-          <button class="action-btn" onclick="location.href='medications.html'">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-            </svg>
-            <span>Log Meds</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Health Summary -->
-      <div class="mobile-card">
-        <h2>Health Summary</h2>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-header">
-              <span class="stat-label">Blood Pressure</span>
-              <span class="status-badge status-normal">Normal</span>
+    <div class="container">
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1>Dashboard</h1>
+                <div class="header-controls">
+                    <button class="export-btn" onclick="dashboard.exportHealthData()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="settings-btn" onclick="showSettings()">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
             </div>
-            <div class="stat-value">120/80</div>
-            <div class="stat-details">Last reading: 9:30 AM</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-header">
-              <span class="stat-label">Mood</span>
-              <span class="status-badge status-good">Good</span>
+        </header>
+
+        <main class="dashboard-main">
+            <section class="welcome-section">
+                <div class="user-greeting">
+                    <h2>Welcome back, <span id="userName">User</span>!</h2>
+                    <p class="date-display" id="currentDate"></p>
+                </div>
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-heartbeat"></i>
+                        <div class="stat-info">
+                            <span class="stat-value" id="bpValue">--/--</span>
+                            <span class="stat-label">Blood Pressure</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-pills"></i>
+                        <div class="stat-info">
+                            <span class="stat-value" id="medCount">--</span>
+                            <span class="stat-label">Medications</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-calendar-check"></i>
+                        <div class="stat-info">
+                            <span class="stat-value" id="apptCount">--</span>
+                            <span class="stat-label">Appointments</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="dashboard-grid">
+                <section class="health-chart">
+                    <div class="section-header">
+                        <h2>Health Overview</h2>
+                        <div class="chart-controls">
+                            <button class="active" data-range="7">7D</button>
+                            <button data-range="30">30D</button>
+                            <button data-range="90">90D</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="healthChart"></canvas>
+                    </div>
+                </section>
+
+                <section class="upcoming-section">
+                    <div class="section-header">
+                        <h2>Upcoming</h2>
+                        <button class="view-all-btn">View All</button>
+                    </div>
+                    <div class="upcoming-list" id="upcomingList">
+                        <!-- Upcoming items will be inserted here -->
+                    </div>
+                </section>
+
+                <section class="activity-section">
+                    <div class="section-header">
+                        <h2>Recent Activity</h2>
+                        <button class="view-all-btn">View All</button>
+                    </div>
+                    <div class="activity-list" id="activityList">
+                        <!-- Activity items will be inserted here -->
+                    </div>
+                </section>
+
+                <section class="quick-actions">
+                    <h2>Quick Actions</h2>
+                    <div class="action-grid">
+                        <a href="blood-pressure.html" class="action-card">
+                            <i class="fas fa-heartbeat"></i>
+                            <span>Log Blood Pressure</span>
+                        </a>
+                        <a href="medications.html" class="action-card">
+                            <i class="fas fa-pills"></i>
+                            <span>Log Medication</span>
+                        </a>
+                        <a href="mood-tracker.html" class="action-card">
+                            <i class="fas fa-smile"></i>
+                            <span>Track Mood</span>
+                        </a>
+                        <a href="appointments.html" class="action-card">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span>Add Appointment</span>
+                        </a>
+                    </div>
+                </section>
             </div>
-            <div class="stat-value">😄</div>
-            <div class="stat-details">Sleep: Good, Stress: Moderate</div>
-          </div>
-        </div>
-        <div class="chart-container">
-          <canvas id="healthChart"></canvas>
-        </div>
-        <button class="export-btn" onclick="dashboard.exportHealthData()">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-          </svg>
-          Export Data
-        </button>
-      </div>
+        </main>
 
-      <!-- Recent Activity -->
-      <div class="mobile-card">
-        <h2>Recent Activity</h2>
-        <div id="activityList" class="activity-list">
-          <!-- Activity items will be loaded dynamically -->
-        </div>
-      </div>
+        <nav class="bottom-nav">
+            <a href="dashboard.html" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="blood-pressure.html" class="nav-item">
+                <i class="fas fa-heartbeat"></i>
+                <span>BP</span>
+            </a>
+            <a href="medications.html" class="nav-item">
+                <i class="fas fa-pills"></i>
+                <span>Meds</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </div>
 
-      <!-- Upcoming -->
-      <div class="mobile-card">
-        <h2>Upcoming</h2>
-        <div id="upcomingList" class="upcoming-list">
-          <!-- Upcoming items will be loaded dynamically -->
-        </div>
-      </div>
-    </main>
-  </div>
+    <div id="mobileToast" class="mobile-toast"></div>
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>Loading...</p>
+    </div>
 
-  <!-- Mobile Toast -->
-  <div id="mobile-toast" class="mobile-toast"></div>
+    <script>
+        // Initialize managers
+        let notificationManager, exportManager, dashboard;
 
-  <!-- Mobile Loading -->
-  <div id="mobile-loading" class="mobile-loading" style="display: none;">
-    <div class="mobile-loading-spinner"></div>
-  </div>
+        // Wait for all scripts to load
+        window.addEventListener('load', async () => {
+            try {
+                // Initialize Firebase
+                await window.initializeFirebase();
+                
+                // Initialize managers
+                notificationManager = new NotificationManager();
+                exportManager = new ExportManager();
+                dashboard = new DashboardManager(notificationManager, exportManager);
 
-  <script>
-    // Initialize dashboard when DOM is loaded
-    document.addEventListener('DOMContentLoaded', () => {
-      window.dashboard = new DashboardManager();
-      dashboard.init();
-    });
-  </script>
+                // Initialize dashboard
+                await dashboard.init();
+
+                // Register service worker
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/service-worker.js')
+                        .then(registration => {
+                            console.log('✅ ServiceWorker registration successful');
+                        })
+                        .catch(error => {
+                            console.error('❌ ServiceWorker registration failed:', error);
+                        });
+                }
+            } catch (error) {
+                console.error('❌ Initialization error:', error);
+                document.body.innerHTML = `
+                    <div class="error-message">
+                        <h2>Error Loading Application</h2>
+                        <p>${error.message}</p>
+                        <p>Please try refreshing the page or contact support if the problem persists.</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
 </body>
 </html>
