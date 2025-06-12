@@ -65,46 +65,104 @@ function fixHtmlFiles() {
       modified = true;
     }
     
-    // Add meta tags if missing
-    if (!content.includes('<meta charset="UTF-8">')) {
-      content = content.replace(/<head>\s*/i, '<head>\n' + META_TAGS);
-      modified = true;
-    } else {
-      // Check each meta tag and add if missing
-      const metaTags = META_TAGS.trim().split('\n');
-      for (const tag of metaTags) {
-        const tagName = tag.match(/name="([^"]+)"/);
-        if (tagName && !content.includes(tagName[0])) {
-          content = content.replace(/<head>[\s\S]*?<meta charset="UTF-8">/i, '$&\n' + tag);
+    // Handle special case where we have critical meta tag errors
+    // Force overwrite the <head> section completely if needed
+    if (!content.includes('<meta name="viewport"') || 
+        !content.includes('<meta name="theme-color"')) {
+      
+      // Find the head section
+      const headStartMatch = content.match(/<head[^>]*>/i);
+      const headEndMatch = content.match(/<\/head>/i);
+      
+      if (headStartMatch && headEndMatch) {
+        const headStartIndex = headStartMatch.index + headStartMatch[0].length;
+        const headEndIndex = headEndMatch.index;
+        
+        // Extract title if it exists
+        let title = 'Bradley Health';
+        const titleMatch = content.match(/<title[^>]*>(.*?)<\/title>/i);
+        if (titleMatch) {
+          title = titleMatch[1];
+        }
+        
+        // Extract description if it exists
+        let description = 'Your personal health companion';
+        const descMatch = content.match(/<meta[^>]*name="description"[^>]*content="([^"]+)"/i);
+        if (descMatch) {
+          description = descMatch[1];
+        }
+        
+        // New head content
+        const newHeadContent = `
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a56db">
+    <meta name="description" content="${description}">
+    <title>${title}</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+    <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">`;
+
+        // Replace the head content
+        content = content.slice(0, headStartIndex) + newHeadContent + content.slice(headEndIndex);
+        modified = true;
+      } else {
+        // Add meta tags if missing
+        if (!content.includes('<meta charset="UTF-8">')) {
+          content = content.replace(/<head>\s*/i, '<head>\n' + META_TAGS);
+          modified = true;
+        } else {
+          // Check each meta tag and add if missing
+          const metaTags = META_TAGS.trim().split('\n');
+          for (const tag of metaTags) {
+            const tagName = tag.match(/name="([^"]+)"/);
+            if (tagName && !content.includes(tagName[0])) {
+              content = content.replace(/<head>[\s\S]*?<meta charset="UTF-8">/i, '$&\n' + tag);
+              modified = true;
+            }
+          }
+        }
+        
+        // Add PWA links if missing
+        if (!content.includes('manifest.json')) {
+          // Insert after meta tags or before stylesheets
+          const insertPoint = content.includes('<link rel="stylesheet"') 
+            ? content.indexOf('<link rel="stylesheet"')
+            : content.indexOf('</head>');
+            
+          content = content.slice(0, insertPoint) + 
+                    PWA_LINKS + 
+                    content.slice(insertPoint);
+          modified = true;
+        }
+        
+        // Add mobile stylesheet if missing
+        if (!content.includes('mobile.css')) {
+          // Insert before closing head tag or before first script
+          const insertPoint = content.includes('<script') 
+            ? content.indexOf('<script')
+            : content.indexOf('</head>');
+            
+          content = content.slice(0, insertPoint) + 
+                    STYLESHEET_LINKS + 
+                    content.slice(insertPoint);
           modified = true;
         }
       }
-    }
-    
-    // Add PWA links if missing
-    if (!content.includes('manifest.json')) {
-      // Insert after meta tags or before stylesheets
-      const insertPoint = content.includes('<link rel="stylesheet"') 
-        ? content.indexOf('<link rel="stylesheet"')
-        : content.indexOf('</head>');
-        
-      content = content.slice(0, insertPoint) + 
-                PWA_LINKS + 
-                content.slice(insertPoint);
-      modified = true;
-    }
-    
-    // Add mobile stylesheet if missing
-    if (!content.includes('mobile.css')) {
-      // Insert before closing head tag or before first script
-      const insertPoint = content.includes('<script') 
-        ? content.indexOf('<script')
-        : content.indexOf('</head>');
-        
-      content = content.slice(0, insertPoint) + 
-                STYLESHEET_LINKS + 
-                content.slice(insertPoint);
-      modified = true;
     }
     
     // Add defer to scripts

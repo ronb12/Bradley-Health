@@ -2,18 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a56db">
+    <meta name="description" content="Health insights and analysis">
     <title>Health Insights - Bradley Health</title>
-    <link rel="icon" href="assets/icons/icon.svg" />
-    <link rel="stylesheet" href="assets/style.css">
-    <link rel="stylesheet" href="assets/mobile.css">
+    
+    <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="assets/icons/icon.svg">
-    <meta name="theme-color" content="#2B6CB0">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+    <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Application Scripts -->
+    <script src="assets/js/firebase-config.js" defer></script>
+    <script src="assets/js/firebase-init.js" defer></script>
+    <script src="assets/js/auth.js" defer></script>
+    <script src="assets/js/insights.js" defer></script>
+    <script src="assets/js/pwa-install.js" defer></script>
 </head>
 <body>
     <div class="mobile-container">
