@@ -3,54 +3,70 @@ global.fetch = require('node-fetch');
 
 // Mock Firebase Auth
 const mockUser = {
-  uid: 'test-user-id',
-  email: 'test@example.com',
-  isAnonymous: false
+  uid: 'test-user-123',
+  email: 'test@bradleyhealth.com',
+  emailVerified: true
 };
 
-const mockAuth = {
-  currentUser: mockUser,
-  onAuthStateChanged: jest.fn((callback) => callback(mockUser))
+const mockUserCredential = {
+  user: mockUser,
+  credential: {
+    accessToken: 'mock-access-token'
+  }
 };
-
-jest.mock('firebase/auth', () => ({
-  getAuth: jest.fn(() => mockAuth),
-  signInWithEmailAndPassword: jest.fn((auth, email, password) => {
-    if (email === 'test@example.com' && password === 'testpassword123') {
-      return Promise.resolve({ user: mockUser });
-    }
-    return Promise.reject({ code: 'auth/user-not-found' });
-  }),
-  signOut: jest.fn(() => {
-    mockAuth.currentUser = null;
-    return Promise.resolve();
-  })
-}));
 
 // Mock Firestore
 const mockDocRef = {
   id: 'test-doc-id',
   data: () => ({
-    dosage: '20mg',
-    notes: 'Updated dosage'
+    name: 'Test Medication',
+    dosage: '10mg',
+    frequency: 'daily',
+    userId: mockUser.uid
   })
 };
 
 const mockQuerySnapshot = {
   size: 1,
-  docs: [mockDocRef]
+  docs: [mockDocRef],
+  forEach: (callback) => callback(mockDocRef)
 };
 
+// Mock Firebase Auth
+jest.mock('firebase/auth', () => ({
+  getAuth: jest.fn(() => ({
+    currentUser: mockUser
+  })),
+  signInWithEmailAndPassword: jest.fn(() => Promise.resolve(mockUserCredential)),
+  signOut: jest.fn(() => Promise.resolve()),
+  onAuthStateChanged: jest.fn((callback) => {
+    callback(mockUser);
+    return () => {};
+  })
+}));
+
+// Mock Firestore
 jest.mock('firebase/firestore', () => ({
   getFirestore: jest.fn(),
   collection: jest.fn(() => 'mock-collection'),
-  addDoc: jest.fn(() => Promise.resolve({ id: 'test-doc-id' })),
-  getDocs: jest.fn(() => Promise.resolve(mockQuerySnapshot)),
+  doc: jest.fn(() => 'mock-doc'),
+  addDoc: jest.fn(() => Promise.resolve(mockDocRef)),
   getDoc: jest.fn(() => Promise.resolve(mockDocRef)),
-  query: jest.fn(() => 'mock-query'),
-  where: jest.fn(() => 'mock-where'),
+  getDocs: jest.fn(() => Promise.resolve(mockQuerySnapshot)),
   updateDoc: jest.fn(() => Promise.resolve()),
-  doc: jest.fn(() => 'mock-doc')
+  deleteDoc: jest.fn(() => Promise.resolve()),
+  query: jest.fn(() => 'mock-query'),
+  where: jest.fn(() => 'mock-query'),
+  orderBy: jest.fn(() => 'mock-query'),
+  limit: jest.fn(() => 'mock-query')
+}));
+
+// Mock Firebase App
+jest.mock('firebase/app', () => ({
+  initializeApp: jest.fn(() => ({
+    name: 'test-app',
+    options: {}
+  }))
 }));
 
 // Set test timeout

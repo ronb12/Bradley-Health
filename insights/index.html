@@ -1,53 +1,2053 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health Insights - Bradley Health</title>
-    <link rel="stylesheet" href="../assets/style.css">
-    <link rel="stylesheet" href="../assets/mobile.css">
-    <link rel="manifest" href="../manifest.json">
-    <meta name="theme-color" content="#2B6CB0">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <div class="mobile-container">
-        <!-- Mobile Header -->
-        <header class="mobile-header">
-            <h1>Health Insights</h1>
-            <button class="menu-btn" aria-label="Menu">
-                <span></span>
-            </button>
-        </header>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
 
-        <!-- Main Content -->
-        <main class="mobile-content">
-            <!-- Health Score -->
-            <div class="mobile-card">
-                <h2>Health Score</h2>
-                <div class="health-score">
-                    <div class="score-circle">
-                        <span class="score-value">85</span>
-                        <span class="score-label">Good</span>
-                    </div>
-                    <div class="score-factors">
-                        <div class="score-factor">
-                            <span class="factor-label">Blood Pressure</span>
-                            <div class="factor-bar">
-                                <div class="factor-progress" style="width: 90%"></div>
-                            </div>
-                        </div>
-                        <div class="score-factor">
-                            <span class="factor-label">Medication Adherence</span>
-                            <div class="factor-bar">
-                                <div class="factor-progress" style="width: 85%"></div>
-                            </div>
-                        </div>
-                        <div class="score-factor">
-                            <span class="factor-label">Mood</span>
-                            <div class="factor-bar">
-                                <div class="factor-progress" style="width: 80%"></div>
-                            </div>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700<!DOCTYPE html>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700<html lang="en">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700<head>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700    <meta charset="UTF-8">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700    <meta name="viewport" content="width=device-width, initial-scale=1.0">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700    <title>Health Insights - Bradley Health</title>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700    <link rel="stylesheet" href="../assets/style.css">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700    <link rel="stylesheet" href="../assets/mobile.css">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700    <link rel="manifest" href="../manifest.json">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700    <meta name="theme-color" content="#2B6CB0">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700</head>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700<body>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700    <div class="mobile-container">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700        <!-- Mobile Header -->display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700        <header class="mobile-header">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700            <h1>Health Insights</h1>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700            <button class="menu-btn" aria-label="Menu">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                <span></span>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700            </button>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700        </header>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700        <!-- Main Content -->display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700        <main class="mobile-content">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700            <!-- Health Score -->display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700            <div class="mobile-card">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                <h2>Health Score</h2>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                <div class="health-score">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                    <div class="score-circle">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                        <span class="score-value">85</span>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                        <span class="score-label">Good</span>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                    </div>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                    <div class="score-factors">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                        <div class="score-factor">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                            <span class="factor-label">Blood Pressure</span>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                            <div class="factor-bar">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                                <div class="factor-progress" style="width: 90%"></div>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                            </div>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                        </div>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                        <div class="score-factor">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                            <span class="factor-label">Medication Adherence</span>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                            <div class="factor-bar">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                                <div class="factor-progress" style="width: 85%"></div>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                            </div>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                        </div>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                        <div class="score-factor">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                            <span class="factor-label">Mood</span>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                            <div class="factor-bar">display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                                <div class="factor-progress" style="width: 80%"></div>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="description" content="Bradley Health - Your Personal Health Companion">
+  <title>Bradley Health - Your Personal Health Companion</title>
+  
+  <!-- PWA Assets -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="assets/icons/favicon-32x32.svg">
+  <link rel="icon" type="image/svg+xml" sizes="16x16" href="assets/icons/favicon-16x16.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700                            </div>display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/mobile.css" media="(max-width: 480px)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js" defer></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="./assets/shared.js" defer></script>
+  <script src="./assets/navigation-new.js" defer></script>
+</head>
                         </div>
                     </div>
                 </div>

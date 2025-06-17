@@ -1,0 +1,196 @@
+/* Bradley Health Layout */
+
+/* Base Layout */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: var(--line-height-normal);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: var(--spacing-6);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Grid System */
+.grid {
+  display: grid;
+  gap: var(--spacing-6);
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-4);
+}
+
+/* Section */
+.section {
+  margin-bottom: var(--spacing-8);
+}
+
+.section-header {
+  margin-bottom: var(--spacing-6);
+}
+
+.section-title {
+  font-size: var(--font-size-2xl);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-2);
+}
+
+.section-description {
+  font-size: var(--font-size-lg);
+  color: var(--text-light);
+}
+
+/* Header */
+.header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: var(--spacing-4) 0;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-40);
+  box-shadow: var(--shadow);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--spacing-4);
+}
+
+/* Navigation */
+.nav {
+  display: flex;
+  gap: var(--spacing-6);
+}
+
+.nav-link {
+  color: var(--text);
+  text-decoration: none;
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-md);
+  transition: var(--transition-normal);
+}
+
+.nav-link:hover {
+  background: var(--background-secondary);
+  color: var(--primary);
+}
+
+.nav-link.active {
+  background: var(--primary);
+  color: var(--white);
+}
+
+/* Footer */
+.footer {
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  padding: var(--spacing-6) 0;
+  margin-top: auto;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 var(--spacing-4);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .grid-4 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: var(--spacing-4);
+  }
+  
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .header-content {
+    flex-direction: column;
+    gap: var(--spacing-4);
+  }
+  
+  .nav {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    gap: var(--spacing-4);
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+  
+  .nav {
+    display: none;
+  }
+  
+  .mobile-nav {
+    display: flex;
+  }
+}
+
+/* Print Layout */
+@media print {
+  .header,
+  .footer,
+  .nav {
+    display: none;
+  }
+  
+  .main-content {
+    padding: 0;
+  }
+  
+  .container {
+    max-width: none;
+  }
+  
+  body {
+    background: var(--white);
+  }
+}
