@@ -1,12 +1,12 @@
 // Firebase Configuration for Bradley Health
 const firebaseConfig = {
-  apiKey: "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  apiKey: "AIzaSyC--9xnMW4s8UPOJUnQbKjMpXgJvoh6ITw",
   authDomain: "bradley-health.firebaseapp.com",
   projectId: "bradley-health",
   storageBucket: "bradley-health.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdefghijklmnop",
-  measurementId: "G-XXXXXXXXXX"
+  messagingSenderId: "294249919277",
+  appId: "1:294249919277:web:df003e4c6f2b19c350d9a4",
+  measurementId: "G-R5KQLJZNS4"
 };
 
 // Initialize Firebase services
