@@ -90,7 +90,10 @@ class ChartManager {
               borderColor: '#4f46e5',
               backgroundColor: 'rgba(79, 70, 229, 0.1)',
               tension: 0.4,
-              yAxisID: 'y'
+              yAxisID: 'y',
+              borderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6
             },
             {
               label: 'Diastolic BP',
@@ -98,7 +101,10 @@ class ChartManager {
               borderColor: '#7c3aed',
               backgroundColor: 'rgba(124, 58, 237, 0.1)',
               tension: 0.4,
-              yAxisID: 'y'
+              yAxisID: 'y',
+              borderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6
             },
             {
               label: 'Mood Score',
@@ -106,7 +112,10 @@ class ChartManager {
               borderColor: '#ec4899',
               backgroundColor: 'rgba(236, 72, 153, 0.1)',
               tension: 0.4,
-              yAxisID: 'y1'
+              yAxisID: 'y1',
+              borderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6
             }
           ]
         },
@@ -123,6 +132,10 @@ class ChartManager {
               title: {
                 display: true,
                 text: 'Date'
+              },
+              grid: {
+                display: true,
+                color: 'rgba(0,0,0,0.1)'
               }
             },
             y: {
@@ -134,7 +147,11 @@ class ChartManager {
                 text: 'Blood Pressure (mmHg)'
               },
               min: 60,
-              max: 140
+              max: 140,
+              grid: {
+                display: true,
+                color: 'rgba(0,0,0,0.1)'
+              }
             },
             y1: {
               type: 'linear',
@@ -148,16 +165,29 @@ class ChartManager {
               max: 10,
               grid: {
                 drawOnChartArea: false,
+                color: 'rgba(0,0,0,0.1)'
               },
             }
           },
           plugins: {
             title: {
               display: true,
-              text: 'Health Overview - Last 7 Days'
+              text: 'Health Overview - Last 7 Days',
+              font: {
+                size: 16,
+                weight: 'bold'
+              }
             },
             legend: {
-              position: 'top'
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                padding: 20
+              }
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false
             }
           }
         }
@@ -210,7 +240,10 @@ class ChartManager {
                 borderColor: '#ec4899',
                 backgroundColor: 'rgba(236, 72, 153, 0.2)',
                 tension: 0.4,
-                fill: true
+                fill: true,
+                borderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
               },
               {
                 label: 'Energy',
@@ -218,7 +251,10 @@ class ChartManager {
                 borderColor: '#f59e0b',
                 backgroundColor: 'rgba(245, 158, 11, 0.2)',
                 tension: 0.4,
-                fill: true
+                fill: true,
+                borderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
               },
               {
                 label: 'Stress',
@@ -226,7 +262,10 @@ class ChartManager {
                 borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.2)',
                 tension: 0.4,
-                fill: true
+                fill: true,
+                borderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
               }
             ]
           },
@@ -240,16 +279,38 @@ class ChartManager {
                 title: {
                   display: true,
                   text: 'Level (1-10)'
+                },
+                grid: {
+                  display: true,
+                  color: 'rgba(0,0,0,0.1)'
+                }
+              },
+              x: {
+                grid: {
+                  display: true,
+                  color: 'rgba(0,0,0,0.1)'
                 }
               }
             },
             plugins: {
               title: {
                 display: true,
-                text: 'Mood Trends - Last 7 Days'
+                text: 'Mood Trends - Last 7 Days',
+                font: {
+                  size: 16,
+                  weight: 'bold'
+                }
               },
               legend: {
-                position: 'top'
+                position: 'top',
+                labels: {
+                  usePointStyle: true,
+                  padding: 20
+                }
+              },
+              tooltip: {
+                mode: 'index',
+                intersect: false
               }
             }
           }
@@ -287,14 +348,20 @@ class ChartManager {
               data: [120, 118, 122, 119, 121, 117, 120],
               borderColor: '#4f46e5',
               backgroundColor: 'rgba(79, 70, 229, 0.1)',
-              tension: 0.4
+              tension: 0.4,
+              borderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6
             },
             {
               label: 'Diastolic',
               data: [80, 78, 82, 79, 81, 77, 80],
               borderColor: '#7c3aed',
               backgroundColor: 'rgba(124, 58, 237, 0.1)',
-              tension: 0.4
+              tension: 0.4,
+              borderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6
             }
           ]
         },
@@ -309,16 +376,38 @@ class ChartManager {
               title: {
                 display: true,
                 text: 'Blood Pressure (mmHg)'
+              },
+              grid: {
+                display: true,
+                color: 'rgba(0,0,0,0.1)'
+              }
+            },
+            x: {
+              grid: {
+                display: true,
+                color: 'rgba(0,0,0,0.1)'
               }
             }
           },
           plugins: {
             title: {
               display: true,
-              text: 'Blood Pressure Trends - Last 7 Days'
+              text: 'Blood Pressure Trends - Last 7 Days',
+              font: {
+                size: 16,
+                weight: 'bold'
+              }
             },
             legend: {
-              position: 'top'
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                padding: 20
+              }
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false
             }
           }
         }
@@ -357,7 +446,8 @@ class ChartManager {
               '#f59e0b'
             ],
             borderWidth: 2,
-            borderColor: '#ffffff'
+            borderColor: '#ffffff',
+            hoverOffset: 4
           }]
         },
         options: {
@@ -366,10 +456,29 @@ class ChartManager {
           plugins: {
             title: {
               display: true,
-              text: 'Medication Adherence - This Week'
+              text: 'Medication Adherence - This Week',
+              font: {
+                size: 16,
+                weight: 'bold'
+              }
             },
             legend: {
-              position: 'bottom'
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                padding: 20
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((value / total) * 100).toFixed(1);
+                  return `${label}: ${value} (${percentage}%)`;
+                }
+              }
             }
           }
         }
