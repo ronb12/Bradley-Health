@@ -299,7 +299,7 @@ self.addEventListener('unhandledrejection', (event) => {
 });
 
 // Periodic background sync (if supported)
-if ('periodicSync' in self.registration) {
+if ('periodicSync' in navigator) {
   self.addEventListener('periodicsync', (event) => {
     console.log('Service Worker: Periodic sync event:', event.tag);
     

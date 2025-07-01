@@ -36,15 +36,16 @@ try {
   storage = firebase.storage();
   messaging = firebase.messaging();
 
-  // Enable offline persistence
-  db.enablePersistence()
-    .catch((err) => {
-      if (err.code == 'failed-precondition') {
-        console.log('Multiple tabs open, persistence can only be enabled in one tab at a time.');
-      } else if (err.code == 'unimplemented') {
-        console.log('The current browser does not support persistence.');
-      }
-    });
+  // Enable offline persistence with newer settings
+  db.enablePersistence({
+    synchronizeTabs: true
+  }).catch((err) => {
+    if (err.code == 'failed-precondition') {
+      console.log('Multiple tabs open, persistence can only be enabled in one tab at a time.');
+    } else if (err.code == 'unimplemented') {
+      console.log('The current browser does not support persistence.');
+    }
+  });
 
   firebaseInitialized = true;
   console.log('Firebase initialized successfully');

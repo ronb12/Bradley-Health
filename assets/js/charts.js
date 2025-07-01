@@ -10,6 +10,15 @@ class ChartManager {
   }
 
   setupCharts() {
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this.createCharts());
+    } else {
+      this.createCharts();
+    }
+  }
+
+  createCharts() {
     // Health Overview Chart
     this.createHealthChart();
     
@@ -27,71 +36,46 @@ class ChartManager {
     const ctx = document.getElementById('healthChart');
     if (!ctx) return;
 
+    // Destroy existing chart if it exists
+    if (this.charts.health) {
+      this.charts.health.destroy();
+    }
+
     this.charts.health = new Chart(ctx, {
       type: 'line',
       data: {
         labels: this.getLast7Days(),
         datasets: [{
-          label: 'Blood Pressure (Systolic)',
+          label: 'Systolic',
           data: [120, 118, 122, 119, 121, 117, 120],
-          borderColor: '#667eea',
-          backgroundColor: 'rgba(102, 126, 234, 0.1)',
-          tension: 0.4,
-          yAxisID: 'y'
+          borderColor: '#4f46e5',
+          backgroundColor: 'rgba(79, 70, 229, 0.1)',
+          tension: 0.4
         }, {
-          label: 'Blood Pressure (Diastolic)',
+          label: 'Diastolic',
           data: [80, 78, 82, 79, 81, 77, 80],
-          borderColor: '#764ba2',
-          backgroundColor: 'rgba(118, 75, 162, 0.1)',
-          tension: 0.4,
-          yAxisID: 'y'
+          borderColor: '#7c3aed',
+          backgroundColor: 'rgba(124, 58, 237, 0.1)',
+          tension: 0.4
         }, {
-          label: 'Mood Level',
+          label: 'Mood',
           data: [7, 8, 6, 9, 7, 8, 7],
-          borderColor: '#f093fb',
-          backgroundColor: 'rgba(240, 147, 251, 0.1)',
-          tension: 0.4,
-          yAxisID: 'y1'
+          borderColor: '#ec4899',
+          backgroundColor: 'rgba(236, 72, 153, 0.1)',
+          tension: 0.4
         }]
       },
       options: {
         responsive: true,
-        interaction: {
-          mode: 'index',
-          intersect: false,
-        },
+        maintainAspectRatio: false,
         scales: {
-          x: {
-            display: true,
-            title: {
-              display: true,
-              text: 'Date'
-            }
-          },
           y: {
-            type: 'linear',
-            display: true,
-            position: 'left',
+            beginAtZero: true,
+            max: 140,
             title: {
               display: true,
-              text: 'Blood Pressure (mmHg)'
-            },
-            min: 60,
-            max: 140
-          },
-          y1: {
-            type: 'linear',
-            display: true,
-            position: 'right',
-            title: {
-              display: true,
-              text: 'Mood Level (1-10)'
-            },
-            min: 0,
-            max: 10,
-            grid: {
-              drawOnChartArea: false,
-            },
+              text: 'Values'
+            }
           }
         },
         plugins: {
@@ -111,6 +95,11 @@ class ChartManager {
     const ctx = document.getElementById('moodChart');
     if (!ctx) return;
 
+    // Destroy existing chart if it exists
+    if (this.charts.mood) {
+      this.charts.mood.destroy();
+    }
+
     this.charts.mood = new Chart(ctx, {
       type: 'line',
       data: {
@@ -118,28 +107,29 @@ class ChartManager {
         datasets: [{
           label: 'Mood',
           data: [7, 8, 6, 9, 7, 8, 7],
-          borderColor: '#f093fb',
-          backgroundColor: 'rgba(240, 147, 251, 0.1)',
+          borderColor: '#ec4899',
+          backgroundColor: 'rgba(236, 72, 153, 0.1)',
           tension: 0.4,
           fill: true
         }, {
           label: 'Energy',
           data: [6, 7, 5, 8, 6, 7, 6],
-          borderColor: '#f5576c',
-          backgroundColor: 'rgba(245, 87, 108, 0.1)',
+          borderColor: '#f59e0b',
+          backgroundColor: 'rgba(245, 158, 11, 0.1)',
           tension: 0.4,
           fill: true
         }, {
           label: 'Stress',
           data: [4, 3, 6, 2, 4, 3, 4],
-          borderColor: '#4facfe',
-          backgroundColor: 'rgba(79, 172, 254, 0.1)',
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
           tension: 0.4,
           fill: true
         }]
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         scales: {
           y: {
             beginAtZero: true,
@@ -167,6 +157,11 @@ class ChartManager {
     const ctx = document.getElementById('bpChart');
     if (!ctx) return;
 
+    // Destroy existing chart if it exists
+    if (this.charts.bp) {
+      this.charts.bp.destroy();
+    }
+
     this.charts.bp = new Chart(ctx, {
       type: 'line',
       data: {
@@ -174,19 +169,20 @@ class ChartManager {
         datasets: [{
           label: 'Systolic',
           data: [120, 118, 122, 119, 121, 117, 120],
-          borderColor: '#667eea',
-          backgroundColor: 'rgba(102, 126, 234, 0.1)',
+          borderColor: '#4f46e5',
+          backgroundColor: 'rgba(79, 70, 229, 0.1)',
           tension: 0.4
         }, {
           label: 'Diastolic',
           data: [80, 78, 82, 79, 81, 77, 80],
-          borderColor: '#764ba2',
-          backgroundColor: 'rgba(118, 75, 162, 0.1)',
+          borderColor: '#7c3aed',
+          backgroundColor: 'rgba(124, 58, 237, 0.1)',
           tension: 0.4
         }]
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         scales: {
           y: {
             beginAtZero: false,
@@ -215,6 +211,11 @@ class ChartManager {
     const ctx = document.getElementById('medicationChart');
     if (!ctx) return;
 
+    // Destroy existing chart if it exists
+    if (this.charts.medication) {
+      this.charts.medication.destroy();
+    }
+
     this.charts.medication = new Chart(ctx, {
       type: 'doughnut',
       data: {
@@ -232,6 +233,7 @@ class ChartManager {
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           title: {
             display: true,
@@ -297,6 +299,11 @@ class ChartManager {
     const ctx = document.getElementById(elementId);
     if (!ctx) return null;
 
+    // Destroy existing chart if it exists
+    if (this.charts[elementId]) {
+      this.charts[elementId].destroy();
+    }
+
     const chart = new Chart(ctx, config);
     this.charts[elementId] = chart;
     return chart;
@@ -310,20 +317,23 @@ class ChartManager {
     }
   }
 
+  // Destroy all charts
+  destroyAllCharts() {
+    Object.keys(this.charts).forEach(chartId => {
+      this.destroyChart(chartId);
+    });
+  }
+
   // Export chart as image
   exportChart(chartId, format = 'png') {
-    if (this.charts[chartId]) {
-      return this.charts[chartId].toBase64Image();
-    }
-    return null;
+    if (!this.charts[chartId]) return null;
+    return this.charts[chartId].toBase64Image();
   }
 
   // Get chart data
   getChartData(chartId) {
-    if (this.charts[chartId]) {
-      return this.charts[chartId].data;
-    }
-    return null;
+    if (!this.charts[chartId]) return null;
+    return this.charts[chartId].data;
   }
 }
 

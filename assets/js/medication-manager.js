@@ -316,7 +316,7 @@ class MedicationManager {
   checkDueMedications() {
     const now = new Date();
     const currentTime = now.toTimeString().slice(0, 5);
-    const currentDay = now.toLocaleDateString('en-US', { weekday: 'lowercase' });
+    const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
 
     this.reminders.forEach(reminder => {
       if (reminder.enabled && 
