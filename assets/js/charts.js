@@ -183,68 +183,84 @@ class ChartManager {
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
     
-    try {
-      const chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: this.getLast7Days(),
-          datasets: [
-            {
-              label: 'Mood',
-              data: [7, 8, 6, 9, 7, 8, 7],
-              borderColor: '#ec4899',
-              backgroundColor: 'rgba(236, 72, 153, 0.2)',
-              tension: 0.4,
-              fill: true
-            },
-            {
-              label: 'Energy',
-              data: [6, 7, 5, 8, 6, 7, 6],
-              borderColor: '#f59e0b',
-              backgroundColor: 'rgba(245, 158, 11, 0.2)',
-              tension: 0.4,
-              fill: true
-            },
-            {
-              label: 'Stress',
-              data: [4, 3, 6, 2, 4, 3, 4],
-              borderColor: '#3b82f6',
-              backgroundColor: 'rgba(59, 130, 246, 0.2)',
-              tension: 0.4,
-              fill: true
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 10,
-              title: {
-                display: true,
-                text: 'Level (1-10)'
-              }
-            }
-          },
-          plugins: {
-            title: {
-              display: true,
-              text: 'Mood Trends - Last 7 Days'
-            },
-            legend: {
-              position: 'top'
-            }
+    // Force clear any existing Chart.js instances on this canvas
+    if (Chart.instances) {
+      Chart.instances.forEach((chart, key) => {
+        if (chart.ctx && chart.ctx.canvas && chart.ctx.canvas.id === 'moodChart') {
+          try {
+            chart.destroy();
+          } catch (e) {
+            // Ignore errors
           }
         }
       });
-
-      this.charts.set('moodChart', chart);
-      console.log('Mood chart created successfully');
-    } catch (error) {
-      console.error('Error creating mood trends chart:', error);
     }
+    
+    // Additional delay to ensure cleanup
+    setTimeout(() => {
+      try {
+        const chart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: this.getLast7Days(),
+            datasets: [
+              {
+                label: 'Mood',
+                data: [7, 8, 6, 9, 7, 8, 7],
+                borderColor: '#ec4899',
+                backgroundColor: 'rgba(236, 72, 153, 0.2)',
+                tension: 0.4,
+                fill: true
+              },
+              {
+                label: 'Energy',
+                data: [6, 7, 5, 8, 6, 7, 6],
+                borderColor: '#f59e0b',
+                backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                tension: 0.4,
+                fill: true
+              },
+              {
+                label: 'Stress',
+                data: [4, 3, 6, 2, 4, 3, 4],
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                tension: 0.4,
+                fill: true
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 10,
+                title: {
+                  display: true,
+                  text: 'Level (1-10)'
+                }
+              }
+            },
+            plugins: {
+              title: {
+                display: true,
+                text: 'Mood Trends - Last 7 Days'
+              },
+              legend: {
+                position: 'top'
+              }
+            }
+          }
+        });
+
+        this.charts.set('moodChart', chart);
+        console.log('Mood chart created successfully');
+      } catch (error) {
+        console.error('Error creating mood trends chart:', error);
+      }
+    }, 100);
   }
 
   createBloodPressureChart() {
@@ -498,6 +514,8 @@ class ChartManager {
   // Destroy all charts
   destroyAllCharts() {
     console.log('Destroying all charts...');
+    
+    // Destroy our tracked charts
     this.charts.forEach((chart, chartId) => {
       try {
         chart.destroy();
@@ -506,6 +524,17 @@ class ChartManager {
       }
     });
     this.charts.clear();
+    
+    // Destroy all Chart.js instances globally
+    if (Chart.instances) {
+      Chart.instances.forEach((chart, key) => {
+        try {
+          chart.destroy();
+        } catch (error) {
+          // Chart already destroyed
+        }
+      });
+    }
     
     // Clear all canvases
     const canvases = document.querySelectorAll('canvas');
