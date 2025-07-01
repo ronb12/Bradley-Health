@@ -61,8 +61,22 @@ class NotificationManager {
     }
 
     try {
-      // Get FCM token
-      const token = await this.messaging.getToken();
+      // Check if we're in a supported environment for FCM
+      if (!('serviceWorker' in navigator)) {
+        console.log('Service workers not supported, skipping push notification setup');
+        return;
+      }
+
+      // Get FCM token with error handling
+      let token;
+      try {
+        token = await this.messaging.getToken({
+          vapidKey: 'YOUR_VAPID_KEY_HERE' // Replace with actual VAPID key
+        });
+      } catch (tokenError) {
+        console.log('FCM token not available:', tokenError.message);
+        return;
+      }
       
       if (token && this.currentUser) {
         // Save token to user's profile
@@ -88,7 +102,7 @@ class NotificationManager {
         this.setupPushNotifications();
       });
     } catch (error) {
-      console.error('Error setting up push notifications:', error);
+      console.log('Error setting up push notifications:', error.message);
     }
   }
 
