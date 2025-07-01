@@ -1,0 +1,166 @@
+{
+  "name": "Bradley Health",
+  "short_name": "Bradley Health",
+  "description": "Comprehensive health monitoring app for blood pressure, medications, mood tracking, and wellness goals",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["health", "medical", "lifestyle"],
+  "icons": [
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/screenshots/dashboard.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard view showing health overview and quick actions"
+    },
+    {
+      "src": "assets/screenshots/blood-pressure.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Blood pressure tracking with current reading and history"
+    },
+    {
+      "src": "assets/screenshots/medications.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Medication management with reminders and tracking"
+    },
+    {
+      "src": "assets/screenshots/mood.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Mood tracking with daily check-ins and trends"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Add BP Reading",
+      "short_name": "BP Reading",
+      "description": "Quickly add a new blood pressure reading",
+      "url": "/?tab=blood-pressure",
+      "icons": [
+        {
+          "src": "assets/icons/bp-icon.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Log Mood",
+      "short_name": "Mood",
+      "description": "Quickly log your current mood",
+      "url": "/?tab=mood",
+      "icons": [
+        {
+          "src": "assets/icons/icon.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Medications",
+      "short_name": "Meds",
+      "description": "View and manage medications",
+      "url": "/?tab=medications",
+      "icons": [
+        {
+          "src": "assets/icons/med-icon.svg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "handle_links": "preferred",
+  "protocol_handlers": [
+    {
+      "protocol": "web+health",
+      "url": "/?action=%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "application/json": [".json"],
+        "text/csv": [".csv"]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "permissions": [
+    "notifications",
+    "background-sync",
+    "periodic-background-sync"
+  ],
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
+  "features": [
+    "Cross Platform",
+    "Offline Support",
+    "Push Notifications",
+    "Health Data Tracking",
+    "Medication Reminders",
+    "Mood Monitoring",
+    "Goal Setting",
+    "Data Export"
+  ],
+  "developer": {
+    "name": "Bradley Health Team",
+    "url": "https://bradley-health.com"
+  },
+  "version": "1.0.0",
+  "minimum_version": "1.0.0"
+} 
