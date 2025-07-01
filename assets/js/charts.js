@@ -1,7 +1,7 @@
-// Charts and Data Visualization System
+// Chart Manager for Bradley Health
 class ChartManager {
   constructor() {
-    this.charts = {};
+    this.charts = new Map();
     this.initialized = false;
     this.init();
   }
@@ -9,99 +9,107 @@ class ChartManager {
   init() {
     if (this.initialized) return;
     this.initialized = true;
-    this.setupCharts();
-  }
-
-  setupCharts() {
+    
     // Wait for DOM to be ready
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => this.createCharts());
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => this.initializeCharts(), 100);
+      });
     } else {
-      // Longer delay to ensure all elements are rendered
-      setTimeout(() => this.createCharts(), 500);
+      setTimeout(() => this.initializeCharts(), 100);
     }
   }
 
-  createCharts() {
-    // Destroy any existing charts first
+  initializeCharts() {
+    // Clear any existing charts
     this.destroyAllCharts();
     
-    // Wait a bit more to ensure DOM is fully ready
-    setTimeout(() => {
-      // Create health overview chart
-      this.createHealthChart();
-      
-      // Create mood chart
-      this.createMoodChart();
-      
-      // Create blood pressure chart
-      this.createBPChart();
-      
-      // Create medication chart
-      this.createMedicationChart();
-    }, 300);
+    // Initialize each chart
+    this.createHealthOverviewChart();
+    this.createMoodTrendsChart();
+    this.createBloodPressureChart();
+    this.createMedicationAdherenceChart();
   }
 
-  createHealthChart() {
-    const ctx = document.getElementById('healthChart');
-    if (!ctx) return;
-
-    // Check if canvas is already in use
-    if (ctx.chart) {
-      try {
-        ctx.chart.destroy();
-      } catch (e) {
-        console.log('Chart already destroyed');
-      }
-      ctx.chart = null;
-    }
+  createHealthOverviewChart() {
+    const canvas = document.getElementById('healthChart');
+    if (!canvas) return;
 
     // Destroy existing chart if it exists
-    if (this.charts.health) {
-      try {
-        this.charts.health.destroy();
-      } catch (e) {
-        console.log('Health chart already destroyed');
-      }
-      this.charts.health = null;
-    }
+    this.destroyChart('healthChart');
 
     try {
-      this.charts.health = new Chart(ctx, {
+      const ctx = canvas.getContext('2d');
+      const chart = new Chart(ctx, {
         type: 'line',
         data: {
           labels: this.getLast7Days(),
-          datasets: [{
-            label: 'Systolic',
-            data: [120, 118, 122, 119, 121, 117, 120],
-            borderColor: '#4f46e5',
-            backgroundColor: 'rgba(79, 70, 229, 0.1)',
-            tension: 0.4
-          }, {
-            label: 'Diastolic',
-            data: [80, 78, 82, 79, 81, 77, 80],
-            borderColor: '#7c3aed',
-            backgroundColor: 'rgba(124, 58, 237, 0.1)',
-            tension: 0.4
-          }, {
-            label: 'Mood',
-            data: [7, 8, 6, 9, 7, 8, 7],
-            borderColor: '#ec4899',
-            backgroundColor: 'rgba(236, 72, 153, 0.1)',
-            tension: 0.4
-          }]
+          datasets: [
+            {
+              label: 'Systolic BP',
+              data: [120, 118, 122, 119, 121, 117, 120],
+              borderColor: '#4f46e5',
+              backgroundColor: 'rgba(79, 70, 229, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Diastolic BP',
+              data: [80, 78, 82, 79, 81, 77, 80],
+              borderColor: '#7c3aed',
+              backgroundColor: 'rgba(124, 58, 237, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Mood Score',
+              data: [7, 8, 6, 9, 7, 8, 7],
+              borderColor: '#ec4899',
+              backgroundColor: 'rgba(236, 72, 153, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y1'
+            }
+          ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
           scales: {
-            y: {
-              beginAtZero: true,
-              max: 140,
+            x: {
+              display: true,
               title: {
                 display: true,
-                text: 'Values'
+                text: 'Date'
               }
+            },
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              title: {
+                display: true,
+                text: 'Blood Pressure (mmHg)'
+              },
+              min: 60,
+              max: 140
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
+                display: true,
+                text: 'Mood Score (1-10)'
+              },
+              min: 0,
+              max: 10,
+              grid: {
+                drawOnChartArea: false,
+              },
             }
           },
           plugins: {
@@ -115,65 +123,52 @@ class ChartManager {
           }
         }
       });
-      
-      // Store reference on canvas
-      ctx.chart = this.charts.health;
+
+      this.charts.set('healthChart', chart);
     } catch (error) {
-      console.error('Error creating health chart:', error);
+      console.error('Error creating health overview chart:', error);
     }
   }
 
-  createMoodChart() {
-    const ctx = document.getElementById('moodChart');
-    if (!ctx) return;
-
-    // Check if canvas is already in use
-    if (ctx.chart) {
-      try {
-        ctx.chart.destroy();
-      } catch (e) {
-        console.log('Chart already destroyed');
-      }
-      ctx.chart = null;
-    }
+  createMoodTrendsChart() {
+    const canvas = document.getElementById('moodChart');
+    if (!canvas) return;
 
     // Destroy existing chart if it exists
-    if (this.charts.mood) {
-      try {
-        this.charts.mood.destroy();
-      } catch (e) {
-        console.log('Mood chart already destroyed');
-      }
-      this.charts.mood = null;
-    }
+    this.destroyChart('moodChart');
 
     try {
-      this.charts.mood = new Chart(ctx, {
+      const ctx = canvas.getContext('2d');
+      const chart = new Chart(ctx, {
         type: 'line',
         data: {
           labels: this.getLast7Days(),
-          datasets: [{
-            label: 'Mood',
-            data: [7, 8, 6, 9, 7, 8, 7],
-            borderColor: '#ec4899',
-            backgroundColor: 'rgba(236, 72, 153, 0.1)',
-            tension: 0.4,
-            fill: true
-          }, {
-            label: 'Energy',
-            data: [6, 7, 5, 8, 6, 7, 6],
-            borderColor: '#f59e0b',
-            backgroundColor: 'rgba(245, 158, 11, 0.1)',
-            tension: 0.4,
-            fill: true
-          }, {
-            label: 'Stress',
-            data: [4, 3, 6, 2, 4, 3, 4],
-            borderColor: '#3b82f6',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            tension: 0.4,
-            fill: true
-          }]
+          datasets: [
+            {
+              label: 'Mood',
+              data: [7, 8, 6, 9, 7, 8, 7],
+              borderColor: '#ec4899',
+              backgroundColor: 'rgba(236, 72, 153, 0.2)',
+              tension: 0.4,
+              fill: true
+            },
+            {
+              label: 'Energy',
+              data: [6, 7, 5, 8, 6, 7, 6],
+              borderColor: '#f59e0b',
+              backgroundColor: 'rgba(245, 158, 11, 0.2)',
+              tension: 0.4,
+              fill: true
+            },
+            {
+              label: 'Stress',
+              data: [4, 3, 6, 2, 4, 3, 4],
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.2)',
+              tension: 0.4,
+              fill: true
+            }
+          ]
         },
         options: {
           responsive: true,
@@ -199,56 +194,42 @@ class ChartManager {
           }
         }
       });
-      
-      // Store reference on canvas
-      ctx.chart = this.charts.mood;
+
+      this.charts.set('moodChart', chart);
     } catch (error) {
-      console.error('Error creating mood chart:', error);
+      console.error('Error creating mood trends chart:', error);
     }
   }
 
-  createBPChart() {
-    const ctx = document.getElementById('bpChart');
-    if (!ctx) return;
-
-    // Check if canvas is already in use
-    if (ctx.chart) {
-      try {
-        ctx.chart.destroy();
-      } catch (e) {
-        console.log('Chart already destroyed');
-      }
-      ctx.chart = null;
-    }
+  createBloodPressureChart() {
+    const canvas = document.getElementById('bpChart');
+    if (!canvas) return;
 
     // Destroy existing chart if it exists
-    if (this.charts.bp) {
-      try {
-        this.charts.bp.destroy();
-      } catch (e) {
-        console.log('BP chart already destroyed');
-      }
-      this.charts.bp = null;
-    }
+    this.destroyChart('bpChart');
 
     try {
-      this.charts.bp = new Chart(ctx, {
+      const ctx = canvas.getContext('2d');
+      const chart = new Chart(ctx, {
         type: 'line',
         data: {
           labels: this.getLast7Days(),
-          datasets: [{
-            label: 'Systolic',
-            data: [120, 118, 122, 119, 121, 117, 120],
-            borderColor: '#4f46e5',
-            backgroundColor: 'rgba(79, 70, 229, 0.1)',
-            tension: 0.4
-          }, {
-            label: 'Diastolic',
-            data: [80, 78, 82, 79, 81, 77, 80],
-            borderColor: '#7c3aed',
-            backgroundColor: 'rgba(124, 58, 237, 0.1)',
-            tension: 0.4
-          }]
+          datasets: [
+            {
+              label: 'Systolic',
+              data: [120, 118, 122, 119, 121, 117, 120],
+              borderColor: '#4f46e5',
+              backgroundColor: 'rgba(79, 70, 229, 0.1)',
+              tension: 0.4
+            },
+            {
+              label: 'Diastolic',
+              data: [80, 78, 82, 79, 81, 77, 80],
+              borderColor: '#7c3aed',
+              backgroundColor: 'rgba(124, 58, 237, 0.1)',
+              tension: 0.4
+            }
+          ]
         },
         options: {
           responsive: true,
@@ -275,40 +256,23 @@ class ChartManager {
           }
         }
       });
-      
-      // Store reference on canvas
-      ctx.chart = this.charts.bp;
+
+      this.charts.set('bpChart', chart);
     } catch (error) {
-      console.error('Error creating BP chart:', error);
+      console.error('Error creating blood pressure chart:', error);
     }
   }
 
-  createMedicationChart() {
-    const ctx = document.getElementById('medicationChart');
-    if (!ctx) return;
-
-    // Check if canvas is already in use
-    if (ctx.chart) {
-      try {
-        ctx.chart.destroy();
-      } catch (e) {
-        console.log('Chart already destroyed');
-      }
-      ctx.chart = null;
-    }
+  createMedicationAdherenceChart() {
+    const canvas = document.getElementById('medicationChart');
+    if (!canvas) return;
 
     // Destroy existing chart if it exists
-    if (this.charts.medication) {
-      try {
-        this.charts.medication.destroy();
-      } catch (e) {
-        console.log('Medication chart already destroyed');
-      }
-      this.charts.medication = null;
-    }
+    this.destroyChart('medicationChart');
 
     try {
-      this.charts.medication = new Chart(ctx, {
+      const ctx = canvas.getContext('2d');
+      const chart = new Chart(ctx, {
         type: 'doughnut',
         data: {
           labels: ['Taken', 'Missed', 'Skipped'],
@@ -337,11 +301,10 @@ class ChartManager {
           }
         }
       });
-      
-      // Store reference on canvas
-      ctx.chart = this.charts.medication;
+
+      this.charts.set('medicationChart', chart);
     } catch (error) {
-      console.error('Error creating medication chart:', error);
+      console.error('Error creating medication adherence chart:', error);
     }
   }
 
@@ -350,135 +313,182 @@ class ChartManager {
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+      dates.push(date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric' 
+      }));
     }
     return dates;
   }
 
-  updateHealthChart(data) {
-    if (!this.charts.health) return;
+  // Update chart data
+  updateChart(chartId, newData) {
+    const chart = this.charts.get(chartId);
+    if (!chart) return;
 
-    this.charts.health.data.datasets[0].data = data.systolic || [];
-    this.charts.health.data.datasets[1].data = data.diastolic || [];
-    this.charts.health.data.datasets[2].data = data.mood || [];
-    this.charts.health.update();
+    try {
+      if (newData.datasets) {
+        chart.data.datasets = newData.datasets;
+      }
+      if (newData.labels) {
+        chart.data.labels = newData.labels;
+      }
+      chart.update();
+    } catch (error) {
+      console.error(`Error updating chart ${chartId}:`, error);
+    }
+  }
+
+  // Update specific chart data
+  updateHealthChart(data) {
+    const chart = this.charts.get('healthChart');
+    if (!chart) return;
+
+    try {
+      if (data.systolic) {
+        chart.data.datasets[0].data = data.systolic;
+      }
+      if (data.diastolic) {
+        chart.data.datasets[1].data = data.diastolic;
+      }
+      if (data.mood) {
+        chart.data.datasets[2].data = data.mood;
+      }
+      chart.update();
+    } catch (error) {
+      console.error('Error updating health chart:', error);
+    }
   }
 
   updateMoodChart(data) {
-    if (!this.charts.mood) return;
+    const chart = this.charts.get('moodChart');
+    if (!chart) return;
 
-    this.charts.mood.data.datasets[0].data = data.mood || [];
-    this.charts.mood.data.datasets[1].data = data.energy || [];
-    this.charts.mood.data.datasets[2].data = data.stress || [];
-    this.charts.mood.update();
+    try {
+      if (data.mood) {
+        chart.data.datasets[0].data = data.mood;
+      }
+      if (data.energy) {
+        chart.data.datasets[1].data = data.energy;
+      }
+      if (data.stress) {
+        chart.data.datasets[2].data = data.stress;
+      }
+      chart.update();
+    } catch (error) {
+      console.error('Error updating mood chart:', error);
+    }
   }
 
   updateBPChart(data) {
-    if (!this.charts.bp) return;
+    const chart = this.charts.get('bpChart');
+    if (!chart) return;
 
-    this.charts.bp.data.datasets[0].data = data.systolic || [];
-    this.charts.bp.data.datasets[1].data = data.diastolic || [];
-    this.charts.bp.update();
+    try {
+      if (data.systolic) {
+        chart.data.datasets[0].data = data.systolic;
+      }
+      if (data.diastolic) {
+        chart.data.datasets[1].data = data.diastolic;
+      }
+      chart.update();
+    } catch (error) {
+      console.error('Error updating BP chart:', error);
+    }
   }
 
   updateMedicationChart(data) {
-    if (!this.charts.medication) return;
-
-    this.charts.medication.data.datasets[0].data = [
-      data.taken || 0,
-      data.missed || 0,
-      data.skipped || 0
-    ];
-    this.charts.medication.update();
-  }
-
-  // Create a new chart dynamically
-  createChart(elementId, config) {
-    const ctx = document.getElementById(elementId);
-    if (!ctx) return null;
-
-    // Check if canvas is already in use
-    if (ctx.chart) {
-      try {
-        ctx.chart.destroy();
-      } catch (e) {
-        console.log('Chart already destroyed');
-      }
-      ctx.chart = null;
-    }
-
-    // Destroy existing chart if it exists
-    if (this.charts[elementId]) {
-      try {
-        this.charts[elementId].destroy();
-      } catch (e) {
-        console.log('Chart already destroyed');
-      }
-      this.charts[elementId] = null;
-    }
+    const chart = this.charts.get('medicationChart');
+    if (!chart) return;
 
     try {
-      const chart = new Chart(ctx, config);
-      this.charts[elementId] = chart;
-      ctx.chart = chart;
-      return chart;
+      chart.data.datasets[0].data = [
+        data.taken || 0,
+        data.missed || 0,
+        data.skipped || 0
+      ];
+      chart.update();
     } catch (error) {
-      console.error(`Error creating chart ${elementId}:`, error);
-      return null;
+      console.error('Error updating medication chart:', error);
     }
   }
 
-  // Destroy a chart
+  // Destroy a specific chart
   destroyChart(chartId) {
-    if (this.charts[chartId]) {
+    const chart = this.charts.get(chartId);
+    if (chart) {
       try {
-        this.charts[chartId].destroy();
-      } catch (e) {
-        console.log('Chart already destroyed');
+        chart.destroy();
+      } catch (error) {
+        console.log(`Chart ${chartId} already destroyed`);
       }
-      this.charts[chartId] = null;
-    }
-    
-    // Also clear canvas reference
-    const ctx = document.getElementById(chartId);
-    if (ctx && ctx.chart) {
-      ctx.chart = null;
+      this.charts.delete(chartId);
     }
   }
 
   // Destroy all charts
   destroyAllCharts() {
-    Object.keys(this.charts).forEach(chartId => {
-      this.destroyChart(chartId);
-    });
-    
-    // Clear all canvas references
-    const canvases = document.querySelectorAll('canvas');
-    canvases.forEach(canvas => {
-      if (canvas.chart) {
-        canvas.chart = null;
+    this.charts.forEach((chart, chartId) => {
+      try {
+        chart.destroy();
+      } catch (error) {
+        console.log(`Chart ${chartId} already destroyed`);
       }
     });
+    this.charts.clear();
   }
 
   // Export chart as image
   exportChart(chartId, format = 'png') {
-    if (!this.charts[chartId]) return null;
-    return this.charts[chartId].toBase64Image();
+    const chart = this.charts.get(chartId);
+    if (!chart) return null;
+    
+    try {
+      return chart.toBase64Image();
+    } catch (error) {
+      console.error(`Error exporting chart ${chartId}:`, error);
+      return null;
+    }
   }
 
   // Get chart data
   getChartData(chartId) {
-    if (!this.charts[chartId]) return null;
-    return this.charts[chartId].data;
+    const chart = this.charts.get(chartId);
+    if (!chart) return null;
+    
+    try {
+      return chart.data;
+    } catch (error) {
+      console.error(`Error getting chart data for ${chartId}:`, error);
+      return null;
+    }
+  }
+
+  // Refresh all charts
+  refreshCharts() {
+    this.initializeCharts();
+  }
+
+  // Check if chart exists
+  hasChart(chartId) {
+    return this.charts.has(chartId);
+  }
+
+  // Get chart instance
+  getChart(chartId) {
+    return this.charts.get(chartId);
   }
 }
 
 // Initialize chart manager when DOM is loaded
 let chartManagerInstance = null;
+
 document.addEventListener('DOMContentLoaded', () => {
   if (!chartManagerInstance) {
     chartManagerInstance = new ChartManager();
     window.chartManager = chartManagerInstance;
   }
-}); 
+});
+
+// Export for global access
+window.ChartManager = ChartManager; 
