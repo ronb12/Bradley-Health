@@ -56,7 +56,7 @@ class AuthManager {
     try {
       this.showLoading('Logging in...');
       const userCredential = await this.auth.signInWithEmailAndPassword(email, password);
-      this.showToast('Login successful!', 'success');
+      this.showToast('Login successful! Welcome back!', 'success');
       this.redirectToDashboard();
     } catch (error) {
       this.showToast(this.getErrorMessage(error), 'error');
@@ -78,6 +78,11 @@ class AuthManager {
       return;
     }
 
+    if (password.length < 6) {
+      this.showToast('Password must be at least 6 characters long', 'error');
+      return;
+    }
+
     try {
       this.showLoading('Creating account...');
       const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
@@ -94,7 +99,7 @@ class AuthManager {
         }
       });
 
-      this.showToast('Account created successfully!', 'success');
+      this.showToast('Account created successfully! Welcome to Bradley Health!', 'success');
       this.redirectToDashboard();
     } catch (error) {
       this.showToast(this.getErrorMessage(error), 'error');
@@ -178,6 +183,11 @@ class AuthManager {
           <span>Welcome, ${user.displayName || user.email}</span>
           <button id="logoutBtn" class="btn btn-secondary">Logout</button>
         `;
+        // Re-attach logout button event
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', () => this.logout());
+        }
       }
     } else {
       // User is logged out
@@ -203,7 +213,7 @@ class AuthManager {
   }
 
   redirectToLogin() {
-    window.location.href = '/login.html';
+    window.location.href = '/index.html';
   }
 
   showLoading(message) {
@@ -222,12 +232,36 @@ class AuthManager {
   }
 
   showToast(message, type = 'info') {
-    // Use existing toast system or create one
-    if (window.showToast) {
-      window.showToast(message, type);
-    } else {
-      console.log(`${type.toUpperCase()}: ${message}`);
+    // Create toast container if it doesn't exist
+    let toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) {
+      toastContainer = document.createElement('div');
+      toastContainer.id = 'toastContainer';
+      toastContainer.className = 'toast-container';
+      document.body.appendChild(toastContainer);
     }
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+
+    // Add toast to container
+    toastContainer.appendChild(toast);
+
+    // Remove toast after 5 seconds
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 5000);
+
+    // Also remove on click
+    toast.addEventListener('click', () => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    });
   }
 
   getErrorMessage(error) {
@@ -242,8 +276,12 @@ class AuthManager {
         return 'Password should be at least 6 characters';
       case 'auth/invalid-email':
         return 'Invalid email address';
+      case 'auth/too-many-requests':
+        return 'Too many failed attempts. Please try again later';
+      case 'auth/network-request-failed':
+        return 'Network error. Please check your connection';
       default:
-        return error.message;
+        return error.message || 'An error occurred. Please try again';
     }
   }
 
@@ -266,4 +304,11 @@ class AuthManager {
 // Initialize authentication when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   window.authManager = new AuthManager();
+  
+  // Show demo credentials info
+  setTimeout(() => {
+    if (window.authManager) {
+      window.authManager.showToast('Demo Mode: Use demo@bradleyhealth.com / demo123 to login', 'info');
+    }
+  }, 2000);
 }); 

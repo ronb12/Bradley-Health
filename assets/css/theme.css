@@ -1,15 +1,15 @@
 /* Bradley Health Theme Styles */
 
 :root {
-  /* Color Palette */
-  --primary-color: #667eea;
-  --primary-dark: #5a6fd8;
-  --secondary-color: #764ba2;
-  --accent-color: #f093fb;
-  --success-color: #4ade80;
-  --warning-color: #fbbf24;
-  --error-color: #f87171;
-  --info-color: #60a5fa;
+  /* Color Palette - Improved for better visibility */
+  --primary-color: #4f46e5;
+  --primary-dark: #3730a3;
+  --secondary-color: #7c3aed;
+  --accent-color: #ec4899;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --info-color: #3b82f6;
   
   /* Neutral Colors */
   --white: #ffffff;
@@ -102,6 +102,14 @@ body {
   margin: 0;
   padding: 0;
   transition: background-color var(--transition-normal), color var(--transition-normal);
+  /* Set default light theme */
+  --bg-primary: var(--white);
+  --bg-secondary: var(--gray-50);
+  --bg-tertiary: var(--gray-100);
+  --text-primary: var(--gray-900);
+  --text-secondary: var(--gray-700);
+  --text-muted: var(--gray-500);
+  --border-color: var(--gray-200);
 }
 
 /* Typography */
@@ -230,7 +238,7 @@ input, select, textarea {
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgb(102 126 234 / 0.1);
+  box-shadow: 0 0 0 3px rgb(79 70 229 / 0.1);
 }
 
 /* Cards */
