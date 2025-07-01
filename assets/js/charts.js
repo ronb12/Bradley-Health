@@ -55,7 +55,20 @@ class ChartManager {
         console.log(`Creating ${chart.id}...`);
         this[chart.method]();
       } else {
-        console.log(`Canvas ${chart.id} not found, skipping...`);
+        console.log(`Canvas ${chart.id} not found, will retry...`);
+        // Retry after a short delay
+        setTimeout(() => {
+          const retryCanvas = document.getElementById(chart.id);
+          if (retryCanvas) {
+            console.log(`Canvas ${chart.id} found on retry, creating...`);
+            this[chart.method]();
+          } else {
+            console.log(`Canvas ${chart.id} still not found, skipping...`);
+          }
+          index++;
+          setTimeout(createNextChart, 100);
+        }, 500);
+        return;
       }
       
       index++;
