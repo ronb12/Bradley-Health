@@ -32,20 +32,17 @@ try {
   
   // Initialize Firebase services
   auth = firebase.auth();
+  
+  // Initialize Firestore with newer cache settings
   db = firebase.firestore();
+  db.settings({
+    cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
+    experimentalForceLongPolling: true,
+    useFetchStreams: false
+  });
+
   storage = firebase.storage();
   messaging = firebase.messaging();
-
-  // Enable offline persistence with newer settings
-  db.enablePersistence({
-    synchronizeTabs: true
-  }).catch((err) => {
-    if (err.code == 'failed-precondition') {
-      console.log('Multiple tabs open, persistence can only be enabled in one tab at a time.');
-    } else if (err.code == 'unimplemented') {
-      console.log('The current browser does not support persistence.');
-    }
-  });
 
   firebaseInitialized = true;
   console.log('Firebase initialized successfully');

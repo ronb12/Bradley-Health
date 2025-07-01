@@ -2,10 +2,13 @@
 class ChartManager {
   constructor() {
     this.charts = {};
+    this.initialized = false;
     this.init();
   }
 
   init() {
+    if (this.initialized) return;
+    this.initialized = true;
     this.setupCharts();
   }
 
@@ -14,21 +17,25 @@ class ChartManager {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.createCharts());
     } else {
-      this.createCharts();
+      // Small delay to ensure all elements are rendered
+      setTimeout(() => this.createCharts(), 100);
     }
   }
 
   createCharts() {
-    // Health Overview Chart
+    // Destroy any existing charts first
+    this.destroyAllCharts();
+    
+    // Create health overview chart
     this.createHealthChart();
     
-    // Mood Chart
+    // Create mood chart
     this.createMoodChart();
     
-    // Blood Pressure Chart
+    // Create blood pressure chart
     this.createBPChart();
     
-    // Medication Adherence Chart
+    // Create medication chart
     this.createMedicationChart();
   }
 
@@ -338,6 +345,10 @@ class ChartManager {
 }
 
 // Initialize chart manager when DOM is loaded
+let chartManagerInstance = null;
 document.addEventListener('DOMContentLoaded', () => {
-  window.chartManager = new ChartManager();
+  if (!chartManagerInstance) {
+    chartManagerInstance = new ChartManager();
+    window.chartManager = chartManagerInstance;
+  }
 }); 

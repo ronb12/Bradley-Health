@@ -2,7 +2,7 @@
 class NotificationManager {
   constructor() {
     this.db = firebase.firestore();
-    this.messaging = firebase.messaging();
+    this.messaging = null;
     this.currentUser = null;
     this.permission = 'default';
     this.init();
@@ -16,6 +16,21 @@ class NotificationManager {
     this.checkPermission();
     this.setupEventListeners();
     this.requestNotificationPermission();
+    this.setupMessaging();
+  }
+
+  setupMessaging() {
+    try {
+      // Try to initialize Firebase messaging
+      if (firebase.messaging) {
+        this.messaging = firebase.messaging();
+        this.setupPushNotifications();
+      } else {
+        console.log('Firebase messaging not available, using local notifications only');
+      }
+    } catch (error) {
+      console.log('Firebase messaging not available, using local notifications only:', error);
+    }
   }
 
   async checkPermission() {
@@ -40,6 +55,11 @@ class NotificationManager {
   }
 
   async setupPushNotifications() {
+    if (!this.messaging) {
+      console.log('Messaging not available, skipping push notification setup');
+      return;
+    }
+
     try {
       // Get FCM token
       const token = await this.messaging.getToken();
@@ -199,8 +219,9 @@ class NotificationManager {
       };
 
       await this.db.collection('reminders').add(reminder);
+      this.showToast('Blood pressure reminder scheduled!', 'success');
     } catch (error) {
-      console.error('Error scheduling BP reminder:', error);
+      this.showToast('Error scheduling reminder', 'error');
     }
   }
 
@@ -211,22 +232,22 @@ class NotificationManager {
     try {
       const reminder = {
         type: 'medication',
-        medicationId: medication.id,
-        medicationName: medication.name,
         title: 'Medication Reminder',
         body: `Time to take ${medication.name} - ${medication.dosage}`,
         scheduledTime: time,
+        medicationId: medication.id,
         userId: this.currentUser.uid,
         createdAt: new Date()
       };
 
       await this.db.collection('reminders').add(reminder);
+      this.showToast('Medication reminder scheduled!', 'success');
     } catch (error) {
-      console.error('Error scheduling medication reminder:', error);
+      this.showToast('Error scheduling medication reminder', 'error');
     }
   }
 
-  // Mood Tracking Reminders
+  // Mood Reminders
   async scheduleMoodReminder() {
     if (!this.currentUser) return;
 
@@ -234,15 +255,16 @@ class NotificationManager {
       const reminder = {
         type: 'mood',
         title: 'Mood Check-in',
-        body: 'How are you feeling today? Take a moment to log your mood',
+        body: 'How are you feeling today? Take a moment to log your mood.',
         scheduledTime: new Date(),
         userId: this.currentUser.uid,
         createdAt: new Date()
       };
 
       await this.db.collection('reminders').add(reminder);
+      this.showToast('Mood reminder scheduled!', 'success');
     } catch (error) {
-      console.error('Error scheduling mood reminder:', error);
+      this.showToast('Error scheduling mood reminder', 'error');
     }
   }
 
@@ -253,55 +275,61 @@ class NotificationManager {
     try {
       const reminder = {
         type: 'goal',
-        goalId: goal.id,
-        goalTitle: goal.title,
-        title: 'Goal Reminder',
+        title: 'Goal Check-in',
         body: `Don't forget about your goal: ${goal.title}`,
         scheduledTime: new Date(),
+        goalId: goal.id,
         userId: this.currentUser.uid,
         createdAt: new Date()
       };
 
       await this.db.collection('reminders').add(reminder);
+      this.showToast('Goal reminder scheduled!', 'success');
     } catch (error) {
-      console.error('Error scheduling goal reminder:', error);
+      this.showToast('Error scheduling goal reminder', 'error');
     }
   }
 
-  // Send test notification
   sendTestNotification() {
     this.showNotification(
       'Bradley Health',
-      'This is a test notification from Bradley Health!',
-      {
-        tag: 'test-notification',
-        requireInteraction: true
-      }
+      'This is a test notification! Your notification system is working.',
+      { tag: 'test-notification' }
     );
+    this.showToast('Test notification sent!', 'success');
   }
 
-  // Show toast notification
   showToast(message, type = 'info', duration = 5000) {
-    const toastContainer = document.getElementById('toastContainer');
-    if (!toastContainer) return;
+    // Create toast container if it doesn't exist
+    let toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) {
+      toastContainer = document.createElement('div');
+      toastContainer.id = 'toastContainer';
+      toastContainer.className = 'toast-container';
+      document.body.appendChild(toastContainer);
+    }
 
+    // Create toast element
     const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `
-      <div class="toast-content">
-        <span class="toast-message">${message}</span>
-        <button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
-      </div>
-    `;
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
 
+    // Add toast to container
     toastContainer.appendChild(toast);
 
-    // Auto remove after duration
+    // Remove toast after duration
     setTimeout(() => {
-      if (toast.parentElement) {
-        toast.remove();
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
       }
     }, duration);
+
+    // Also remove on click
+    toast.addEventListener('click', () => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    });
   }
 
   // Check for due reminders
@@ -314,18 +342,14 @@ class NotificationManager {
         .collection('reminders')
         .where('userId', '==', this.currentUser.uid)
         .where('scheduledTime', '<=', now)
-        .where('completed', '==', false)
         .get();
 
       snapshot.docs.forEach(doc => {
-        const reminder = doc.data();
+        const reminder = { id: doc.id, ...doc.data() };
         this.showReminderNotification(reminder);
         
-        // Mark as completed
-        this.db.collection('reminders').doc(doc.id).update({
-          completed: true,
-          completedAt: new Date()
-        });
+        // Delete the reminder after showing it
+        this.db.collection('reminders').doc(doc.id).delete();
       });
     } catch (error) {
       console.error('Error checking reminders:', error);
@@ -335,39 +359,39 @@ class NotificationManager {
   showReminderNotification(reminder) {
     this.showNotification(reminder.title, reminder.body, {
       tag: `${reminder.type}-reminder`,
-      requireInteraction: true,
-      data: reminder
+      requireInteraction: true
     });
   }
 
-  // Send push notification to user
+  // Send push notification to specific user
   async sendPushNotification(userId, title, body, data = {}) {
+    if (!this.messaging) {
+      console.log('Push notifications not available');
+      return;
+    }
+
     try {
-      const userDoc = await this.db.collection('users').doc(userId).get();
-      const userData = userDoc.data();
-      
-      if (userData && userData.fcmToken) {
-        // This would typically be done through a Cloud Function
-        // For now, we'll just show a local notification
-        this.showNotification(title, body, { data });
-      }
+      // This would typically send to Firebase Cloud Functions
+      // For now, just show a local notification
+      this.showNotification(title, body, data);
     } catch (error) {
       console.error('Error sending push notification:', error);
     }
   }
 
-  // Get notification settings
+  // Get notification settings for current user
   async getNotificationSettings() {
     if (!this.currentUser) return null;
 
     try {
       const doc = await this.db.collection('users').doc(this.currentUser.uid).get();
-      const userData = doc.data();
-      return userData?.notificationSettings || null;
+      if (doc.exists) {
+        return doc.data().notificationSettings || {};
+      }
     } catch (error) {
       console.error('Error getting notification settings:', error);
-      return null;
     }
+    return null;
   }
 
   // Update notification settings
@@ -376,13 +400,11 @@ class NotificationManager {
 
     try {
       await this.db.collection('users').doc(this.currentUser.uid).update({
-        notificationSettings: {
-          ...settings,
-          updatedAt: new Date()
-        }
+        notificationSettings: settings
       });
+      this.showToast('Settings updated successfully!', 'success');
     } catch (error) {
-      console.error('Error updating notification settings:', error);
+      this.showToast('Error updating settings', 'error');
     }
   }
 }
