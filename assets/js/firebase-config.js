@@ -58,4 +58,17 @@ window.firebase = {
   auth: () => window.firebaseServices.auth,
   firestore: () => window.firebaseServices.db,
   messaging: () => null // Always return null to prevent messaging errors
-}; 
+};
+
+// Add authentication error handler
+if (auth) {
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      console.log('User authenticated:', user.email);
+    } else {
+      console.log('User signed out');
+    }
+  }, (error) => {
+    console.log('Authentication error (non-critical):', error.message);
+  });
+} 

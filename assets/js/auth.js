@@ -53,12 +53,19 @@ class AuthManager {
     const email = formData.get('email');
     const password = formData.get('password');
 
+    // Check if Firebase auth is available
+    if (!this.auth) {
+      this.showToast('Authentication service not available. Please check your connection.', 'error');
+      return;
+    }
+
     try {
       this.showLoading('Logging in...');
       const userCredential = await this.auth.signInWithEmailAndPassword(email, password);
       this.showToast('Login successful! Welcome back!', 'success');
       this.redirectToDashboard();
     } catch (error) {
+      console.log('Login error:', error.message);
       this.showToast(this.getErrorMessage(error), 'error');
     } finally {
       this.hideLoading();
