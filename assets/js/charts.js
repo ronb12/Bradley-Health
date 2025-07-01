@@ -213,19 +213,6 @@ class ChartManager {
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
     
-    // Force clear any existing Chart.js instances on this canvas
-    if (Chart.instances) {
-      Chart.instances.forEach((chart, key) => {
-        if (chart.ctx && chart.ctx.canvas && chart.ctx.canvas.id === 'moodChart') {
-          try {
-            chart.destroy();
-          } catch (e) {
-            // Ignore errors
-          }
-        }
-      });
-    }
-    
     // Additional delay to ensure cleanup
     setTimeout(() => {
       try {
@@ -633,17 +620,6 @@ class ChartManager {
       }
     });
     this.charts.clear();
-    
-    // Destroy all Chart.js instances globally
-    if (Chart.instances) {
-      Chart.instances.forEach((chart, key) => {
-        try {
-          chart.destroy();
-        } catch (error) {
-          // Chart already destroyed
-        }
-      });
-    }
     
     // Clear all canvases
     const canvases = document.querySelectorAll('canvas');
