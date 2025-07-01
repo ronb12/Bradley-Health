@@ -207,15 +207,22 @@ class ChartManager {
     // Destroy existing chart
     this.destroyChart('moodChart');
     
-    // Clear canvas and reset dimensions
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    // Completely recreate the canvas element to prevent reuse
+    const parent = canvas.parentElement;
+    const newCanvas = document.createElement('canvas');
+    newCanvas.id = 'moodChart';
+    newCanvas.width = canvas.offsetWidth;
+    newCanvas.height = canvas.offsetHeight;
+    newCanvas.style.width = canvas.style.width;
+    newCanvas.style.height = canvas.style.height;
     
-    // Additional delay to ensure cleanup
+    // Replace the old canvas with the new one
+    parent.replaceChild(newCanvas, canvas);
+    
+    // Additional delay to ensure DOM update
     setTimeout(() => {
       try {
+        const ctx = newCanvas.getContext('2d');
         const chart = new Chart(ctx, {
           type: 'line',
           data: {
@@ -308,7 +315,7 @@ class ChartManager {
       } catch (error) {
         console.error('Error creating mood trends chart:', error);
       }
-    }, 100);
+    }, 200);
   }
 
   createBloodPressureChart() {
