@@ -146,6 +146,7 @@ body {
   align-items: center;
   min-height: 100vh;
   padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .auth-container {
@@ -155,6 +156,7 @@ body {
   padding: 40px;
   width: 100%;
   max-width: 400px;
+  margin: 0 auto;
 }
 
 .auth-header {
