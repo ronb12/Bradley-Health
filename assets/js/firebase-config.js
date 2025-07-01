@@ -24,7 +24,15 @@ try {
   db = firebase.firestore();
 
   storage = firebase.storage();
-  messaging = firebase.messaging();
+  
+  // Initialize messaging only if supported
+  try {
+    if (firebase.messaging && typeof firebase.messaging === 'function') {
+      messaging = firebase.messaging();
+    }
+  } catch (messagingError) {
+    console.log('Firebase messaging not available in this environment');
+  }
 
   firebaseInitialized = true;
   console.log('Firebase initialized successfully');
@@ -54,5 +62,6 @@ if (firebaseInitialized) {
 // Global Firebase reference for compatibility
 window.firebase = {
   auth: () => window.firebaseServices.auth,
-  firestore: () => window.firebaseServices.db
+  firestore: () => window.firebaseServices.db,
+  messaging: () => window.firebaseServices.messaging
 }; 

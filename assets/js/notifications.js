@@ -22,11 +22,11 @@ class NotificationManager {
   setupMessaging() {
     try {
       // Check if Firebase messaging is available
-      if (firebase.messaging && typeof firebase.messaging === 'function') {
-        this.messaging = firebase.messaging();
+      if (window.firebaseServices && window.firebaseServices.messaging) {
+        this.messaging = window.firebaseServices.messaging;
         this.setupPushNotifications();
       } else {
-        console.log('Firebase messaging not available');
+        console.log('Firebase messaging not available in this environment');
       }
     } catch (error) {
       console.log('Firebase messaging not available:', error);

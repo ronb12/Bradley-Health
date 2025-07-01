@@ -13,10 +13,10 @@ class ChartManager {
     // Wait for DOM to be ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => this.initializeCharts(), 100);
+        setTimeout(() => this.initializeCharts(), 200);
       });
     } else {
-      setTimeout(() => this.initializeCharts(), 100);
+      setTimeout(() => this.initializeCharts(), 200);
     }
   }
 
@@ -24,11 +24,14 @@ class ChartManager {
     // Clear any existing charts
     this.destroyAllCharts();
     
-    // Initialize each chart
-    this.createHealthOverviewChart();
-    this.createMoodTrendsChart();
-    this.createBloodPressureChart();
-    this.createMedicationAdherenceChart();
+    // Wait a bit more to ensure cleanup is complete
+    setTimeout(() => {
+      // Initialize each chart
+      this.createHealthOverviewChart();
+      this.createMoodTrendsChart();
+      this.createBloodPressureChart();
+      this.createMedicationAdherenceChart();
+    }, 100);
   }
 
   createHealthOverviewChart() {
@@ -39,7 +42,10 @@ class ChartManager {
     this.destroyChart('healthChart');
 
     try {
+      // Clear the canvas completely
       const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
       const chart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -138,7 +144,10 @@ class ChartManager {
     this.destroyChart('moodChart');
 
     try {
+      // Clear the canvas completely
       const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
       const chart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -209,7 +218,10 @@ class ChartManager {
     this.destroyChart('bpChart');
 
     try {
+      // Clear the canvas completely
       const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
       const chart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -271,7 +283,10 @@ class ChartManager {
     this.destroyChart('medicationChart');
 
     try {
+      // Clear the canvas completely
       const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
       const chart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -424,6 +439,17 @@ class ChartManager {
       }
       this.charts.delete(chartId);
     }
+    
+    // Also clear the canvas
+    const canvas = document.getElementById(chartId);
+    if (canvas) {
+      try {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      } catch (error) {
+        console.log(`Canvas ${chartId} already cleared`);
+      }
+    }
   }
 
   // Destroy all charts
@@ -436,6 +462,17 @@ class ChartManager {
       }
     });
     this.charts.clear();
+    
+    // Clear all canvases
+    const canvases = document.querySelectorAll('canvas');
+    canvases.forEach(canvas => {
+      try {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      } catch (error) {
+        console.log(`Canvas ${canvas.id} already cleared`);
+      }
+    });
   }
 
   // Export chart as image
