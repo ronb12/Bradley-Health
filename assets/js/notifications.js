@@ -21,15 +21,11 @@ class NotificationManager {
 
   setupMessaging() {
     try {
-      // Try to initialize Firebase messaging
-      if (firebase.messaging) {
-        this.messaging = firebase.messaging();
-        this.setupPushNotifications();
-      } else {
-        console.log('Firebase messaging not available, using local notifications only');
-      }
+      // Initialize Firebase messaging
+      this.messaging = firebase.messaging();
+      this.setupPushNotifications();
     } catch (error) {
-      console.log('Firebase messaging not available, using local notifications only:', error);
+      console.error('Error setting up Firebase messaging:', error);
     }
   }
 
@@ -55,11 +51,6 @@ class NotificationManager {
   }
 
   async setupPushNotifications() {
-    if (!this.messaging) {
-      console.log('Messaging not available, skipping push notification setup');
-      return;
-    }
-
     try {
       // Get FCM token
       const token = await this.messaging.getToken();
@@ -365,11 +356,6 @@ class NotificationManager {
 
   // Send push notification to specific user
   async sendPushNotification(userId, title, body, data = {}) {
-    if (!this.messaging) {
-      console.log('Push notifications not available');
-      return;
-    }
-
     try {
       // This would typically send to Firebase Cloud Functions
       // For now, just show a local notification

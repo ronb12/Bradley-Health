@@ -304,11 +304,4 @@ class AuthManager {
 // Initialize authentication when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   window.authManager = new AuthManager();
-  
-  // Show demo credentials info
-  setTimeout(() => {
-    if (window.authManager) {
-      window.authManager.showToast('Demo Mode: Use demo@bradleyhealth.com / demo123 to login', 'info');
-    }
-  }, 2000);
 }); 
