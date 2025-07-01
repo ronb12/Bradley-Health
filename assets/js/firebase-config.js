@@ -20,13 +20,8 @@ try {
   // Initialize Firebase services
   auth = firebase.auth();
   
-  // Initialize Firestore with proper settings for live app
+  // Initialize Firestore without settings to avoid warnings
   db = firebase.firestore();
-  db.settings({
-    cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
-    experimentalForceLongPolling: true,
-    useFetchStreams: false
-  }, { merge: true });
 
   storage = firebase.storage();
   messaging = firebase.messaging();

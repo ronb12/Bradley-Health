@@ -21,11 +21,15 @@ class NotificationManager {
 
   setupMessaging() {
     try {
-      // Initialize Firebase messaging
-      this.messaging = firebase.messaging();
-      this.setupPushNotifications();
+      // Check if Firebase messaging is available
+      if (firebase.messaging && typeof firebase.messaging === 'function') {
+        this.messaging = firebase.messaging();
+        this.setupPushNotifications();
+      } else {
+        console.log('Firebase messaging not available');
+      }
     } catch (error) {
-      console.error('Error setting up Firebase messaging:', error);
+      console.log('Firebase messaging not available:', error);
     }
   }
 
@@ -51,6 +55,11 @@ class NotificationManager {
   }
 
   async setupPushNotifications() {
+    if (!this.messaging) {
+      console.log('Messaging not available, skipping push notification setup');
+      return;
+    }
+
     try {
       // Get FCM token
       const token = await this.messaging.getToken();

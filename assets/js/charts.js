@@ -17,8 +17,8 @@ class ChartManager {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.createCharts());
     } else {
-      // Small delay to ensure all elements are rendered
-      setTimeout(() => this.createCharts(), 300);
+      // Longer delay to ensure all elements are rendered
+      setTimeout(() => this.createCharts(), 500);
     }
   }
 
@@ -39,7 +39,7 @@ class ChartManager {
       
       // Create medication chart
       this.createMedicationChart();
-    }, 200);
+    }, 300);
   }
 
   createHealthChart() {
