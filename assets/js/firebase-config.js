@@ -33,13 +33,8 @@ try {
   // Initialize Firebase services
   auth = firebase.auth();
   
-  // Initialize Firestore with newer cache settings
+  // Initialize Firestore (no settings in demo mode to avoid warnings)
   db = firebase.firestore();
-  db.settings({
-    cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
-    experimentalForceLongPolling: true,
-    useFetchStreams: false
-  }, { merge: true });
 
   storage = firebase.storage();
   messaging = firebase.messaging();

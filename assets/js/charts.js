@@ -18,7 +18,7 @@ class ChartManager {
       document.addEventListener('DOMContentLoaded', () => this.createCharts());
     } else {
       // Small delay to ensure all elements are rendered
-      setTimeout(() => this.createCharts(), 200);
+      setTimeout(() => this.createCharts(), 300);
     }
   }
 
@@ -39,7 +39,7 @@ class ChartManager {
       
       // Create medication chart
       this.createMedicationChart();
-    }, 100);
+    }, 200);
   }
 
   createHealthChart() {
@@ -48,13 +48,21 @@ class ChartManager {
 
     // Check if canvas is already in use
     if (ctx.chart) {
-      ctx.chart.destroy();
+      try {
+        ctx.chart.destroy();
+      } catch (e) {
+        console.log('Chart already destroyed');
+      }
       ctx.chart = null;
     }
 
     // Destroy existing chart if it exists
     if (this.charts.health) {
-      this.charts.health.destroy();
+      try {
+        this.charts.health.destroy();
+      } catch (e) {
+        console.log('Health chart already destroyed');
+      }
       this.charts.health = null;
     }
 
@@ -121,13 +129,21 @@ class ChartManager {
 
     // Check if canvas is already in use
     if (ctx.chart) {
-      ctx.chart.destroy();
+      try {
+        ctx.chart.destroy();
+      } catch (e) {
+        console.log('Chart already destroyed');
+      }
       ctx.chart = null;
     }
 
     // Destroy existing chart if it exists
     if (this.charts.mood) {
-      this.charts.mood.destroy();
+      try {
+        this.charts.mood.destroy();
+      } catch (e) {
+        console.log('Mood chart already destroyed');
+      }
       this.charts.mood = null;
     }
 
@@ -197,13 +213,21 @@ class ChartManager {
 
     // Check if canvas is already in use
     if (ctx.chart) {
-      ctx.chart.destroy();
+      try {
+        ctx.chart.destroy();
+      } catch (e) {
+        console.log('Chart already destroyed');
+      }
       ctx.chart = null;
     }
 
     // Destroy existing chart if it exists
     if (this.charts.bp) {
-      this.charts.bp.destroy();
+      try {
+        this.charts.bp.destroy();
+      } catch (e) {
+        console.log('BP chart already destroyed');
+      }
       this.charts.bp = null;
     }
 
@@ -265,13 +289,21 @@ class ChartManager {
 
     // Check if canvas is already in use
     if (ctx.chart) {
-      ctx.chart.destroy();
+      try {
+        ctx.chart.destroy();
+      } catch (e) {
+        console.log('Chart already destroyed');
+      }
       ctx.chart = null;
     }
 
     // Destroy existing chart if it exists
     if (this.charts.medication) {
-      this.charts.medication.destroy();
+      try {
+        this.charts.medication.destroy();
+      } catch (e) {
+        console.log('Medication chart already destroyed');
+      }
       this.charts.medication = null;
     }
 
@@ -367,13 +399,21 @@ class ChartManager {
 
     // Check if canvas is already in use
     if (ctx.chart) {
-      ctx.chart.destroy();
+      try {
+        ctx.chart.destroy();
+      } catch (e) {
+        console.log('Chart already destroyed');
+      }
       ctx.chart = null;
     }
 
     // Destroy existing chart if it exists
     if (this.charts[elementId]) {
-      this.charts[elementId].destroy();
+      try {
+        this.charts[elementId].destroy();
+      } catch (e) {
+        console.log('Chart already destroyed');
+      }
       this.charts[elementId] = null;
     }
 
@@ -391,7 +431,11 @@ class ChartManager {
   // Destroy a chart
   destroyChart(chartId) {
     if (this.charts[chartId]) {
-      this.charts[chartId].destroy();
+      try {
+        this.charts[chartId].destroy();
+      } catch (e) {
+        console.log('Chart already destroyed');
+      }
       this.charts[chartId] = null;
     }
     
