@@ -1,33 +1,25 @@
 // Bradley Health Service Worker
 const CACHE_NAME = 'bradley-health-v1.0.0';
-const STATIC_CACHE = 'bradley-health-static-v1.0.0';
-const DYNAMIC_CACHE = 'bradley-health-dynamic-v1.0.0';
+const STATIC_CACHE = 'bradley-health-static-v1';
+const DYNAMIC_CACHE = 'bradley-health-dynamic-v1';
 
 // Files to cache immediately
 const STATIC_FILES = [
   '/',
   '/index.html',
+  '/manifest.json',
+  '/assets/favicon.svg',
   '/assets/css/components.css',
-  '/assets/css/blood-pressure.css',
-  '/assets/css/theme.css',
   '/assets/css/layout.css',
-  '/assets/js/dashboard.js',
+  '/assets/css/theme.css',
+  '/assets/js/firebase-config.js',
   '/assets/js/auth.js',
-  '/assets/js/blood-pressure.js',
+  '/assets/js/dashboard.js',
+  '/assets/js/charts.js',
   '/assets/js/medication-manager.js',
   '/assets/js/mood-tracker.js',
-  '/assets/js/charts.js',
-  '/assets/js/export.js',
   '/assets/js/notifications.js',
-  '/assets/js/firebase-config.js',
-  '/assets/favicon.svg',
-  '/manifest.json',
-  'https://cdn.jsdelivr.net/npm/chart.js',
-  'https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js',
-  'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js',
-  'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js',
-  'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js',
-  'https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js'
+  '/assets/js/export.js'
 ];
 
 // Install event - cache static files
@@ -41,7 +33,7 @@ self.addEventListener('install', (event) => {
         return cache.addAll(STATIC_FILES);
       })
       .then(() => {
-        console.log('Service Worker: Static files cached');
+        console.log('Service Worker: Static files cached successfully');
         return self.skipWaiting();
       })
       .catch((error) => {
@@ -67,13 +59,16 @@ self.addEventListener('activate', (event) => {
         );
       })
       .then(() => {
-        console.log('Service Worker: Activated');
+        console.log('Service Worker: Old caches cleaned up');
         return self.clients.claim();
+      })
+      .catch((error) => {
+        console.error('Service Worker: Error during activation:', error);
       })
   );
 });
 
-// Fetch event - serve from cache or network
+// Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -85,44 +80,50 @@ self.addEventListener('fetch', (event) => {
 
   // Handle different types of requests
   if (url.origin === self.location.origin) {
-    // Same origin requests
+    // Same-origin requests
     event.respondWith(handleSameOriginRequest(request));
-  } else if (url.origin.includes('firebase') || url.origin.includes('gstatic')) {
-    // Firebase requests - always go to network first
+  } else if (url.hostname.includes('firebase')) {
+    // Firebase requests - always go to network
     event.respondWith(handleFirebaseRequest(request));
-  } else if (url.origin.includes('cdn.jsdelivr.net')) {
-    // CDN requests - cache first, then network
+  } else if (url.hostname.includes('cdn') || url.hostname.includes('unpkg')) {
+    // CDN requests - cache and serve
     event.respondWith(handleCDNRequest(request));
   } else {
-    // Other external requests - network first
+    // External requests - network first
     event.respondWith(handleExternalRequest(request));
   }
 });
 
-// Handle same origin requests
+// Handle same-origin requests
 async function handleSameOriginRequest(request) {
   try {
-    // Try network first
+    // Try cache first
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    // Fallback to network
     const networkResponse = await fetch(request);
     
+    // Cache successful responses
     if (networkResponse.ok) {
-      // Cache the response for future use
       const cache = await caches.open(DYNAMIC_CACHE);
       cache.put(request, networkResponse.clone());
-      return networkResponse;
     }
+    
+    return networkResponse;
   } catch (error) {
-    console.log('Network failed, trying cache:', error);
+    console.error('Service Worker: Error handling same-origin request:', error);
+    
+    // Return offline page if available
+    const offlineResponse = await caches.match('/offline.html');
+    if (offlineResponse) {
+      return offlineResponse;
+    }
+    
+    throw error;
   }
-
-  // Fallback to cache
-  const cachedResponse = await caches.match(request);
-  if (cachedResponse) {
-    return cachedResponse;
-  }
-
-  // If not in cache, return offline page
-  return caches.match('/offline.html');
 }
 
 // Handle Firebase requests
@@ -130,30 +131,32 @@ async function handleFirebaseRequest(request) {
   try {
     return await fetch(request);
   } catch (error) {
-    console.error('Firebase request failed:', error);
+    console.error('Service Worker: Firebase request failed:', error);
     throw error;
   }
 }
 
 // Handle CDN requests
 async function handleCDNRequest(request) {
-  // Check cache first
-  const cachedResponse = await caches.match(request);
-  if (cachedResponse) {
-    return cachedResponse;
-  }
-
   try {
-    // Try network
+    // Try cache first
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    // Fallback to network
     const networkResponse = await fetch(request);
+    
+    // Cache successful responses
     if (networkResponse.ok) {
-      // Cache for future use
       const cache = await caches.open(DYNAMIC_CACHE);
       cache.put(request, networkResponse.clone());
     }
+    
     return networkResponse;
   } catch (error) {
-    console.error('CDN request failed:', error);
+    console.error('Service Worker: CDN request failed:', error);
     throw error;
   }
 }
@@ -163,7 +166,7 @@ async function handleExternalRequest(request) {
   try {
     return await fetch(request);
   } catch (error) {
-    console.error('External request failed:', error);
+    console.error('Service Worker: External request failed:', error);
     throw error;
   }
 }
@@ -188,12 +191,15 @@ self.addEventListener('push', (event) => {
       const data = event.data.json();
       notificationData = { ...notificationData, ...data };
     } catch (error) {
-      console.error('Error parsing push data:', error);
+      console.error('Service Worker: Error parsing push data:', error);
     }
   }
 
   event.waitUntil(
     self.registration.showNotification(notificationData.title, notificationData)
+      .catch((error) => {
+        console.error('Service Worker: Error showing notification:', error);
+      })
   );
 });
 
@@ -201,9 +207,11 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   console.log('Service Worker: Notification clicked');
   
-  event.notification.close();
+  if (event.notification) {
+    event.notification.close();
+  }
 
-  const urlToOpen = event.notification.data?.url || '/';
+  const urlToOpen = event.notification?.data?.url || '/';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true })
@@ -219,6 +227,9 @@ self.addEventListener('notificationclick', (event) => {
         if (clients.openWindow) {
           return clients.openWindow(urlToOpen);
         }
+      })
+      .catch((error) => {
+        console.error('Service Worker: Error handling notification click:', error);
       })
   );
 });
@@ -239,19 +250,19 @@ async function syncOfflineData() {
     const offlineData = await getOfflineData();
     
     if (offlineData.length > 0) {
-      console.log('Syncing offline data:', offlineData.length, 'items');
+      console.log('Service Worker: Syncing offline data:', offlineData.length, 'items');
       
       for (const data of offlineData) {
         try {
           await syncDataItem(data);
           await removeOfflineData(data.id);
         } catch (error) {
-          console.error('Error syncing data item:', error);
+          console.error('Service Worker: Error syncing data item:', error);
         }
       }
     }
   } catch (error) {
-    console.error('Error during background sync:', error);
+    console.error('Service Worker: Error during background sync:', error);
   }
 }
 
@@ -266,13 +277,13 @@ async function getOfflineData() {
 async function syncDataItem(data) {
   // This would sync data to Firebase
   // Implementation depends on the data type
-  console.log('Syncing data item:', data);
+  console.log('Service Worker: Syncing data item:', data);
 }
 
 // Remove synced data from offline storage
 async function removeOfflineData(id) {
   // This would remove data from IndexedDB
-  console.log('Removing offline data:', id);
+  console.log('Service Worker: Removing offline data:', id);
 }
 
 // Message event for communication with main thread
@@ -284,18 +295,20 @@ self.addEventListener('message', (event) => {
   }
   
   if (event.data && event.data.type === 'GET_VERSION') {
-    event.ports[0].postMessage({ version: CACHE_NAME });
+    if (event.ports && event.ports[0]) {
+      event.ports[0].postMessage({ version: CACHE_NAME });
+    }
   }
 });
 
 // Error event
 self.addEventListener('error', (event) => {
-  console.error('Service Worker: Error:', event.error);
+  console.error('Service Worker: Error:', event.error || 'Unknown error');
 });
 
 // Unhandled rejection event
 self.addEventListener('unhandledrejection', (event) => {
-  console.error('Service Worker: Unhandled rejection:', event.reason);
+  console.error('Service Worker: Unhandled rejection:', event.reason || 'Unknown reason');
 });
 
 // Periodic background sync (if supported)
@@ -312,43 +325,53 @@ if ('periodicSync' in navigator) {
 // Sync health data periodically
 async function syncHealthData() {
   try {
-    console.log('Syncing health data...');
+    console.log('Service Worker: Syncing health data...');
     // Implementation for periodic health data sync
   } catch (error) {
-    console.error('Error during periodic sync:', error);
+    console.error('Service Worker: Error during periodic sync:', error);
   }
 }
 
 // Cache management utilities
 async function clearOldCaches() {
-  const cacheNames = await caches.keys();
-  const oldCaches = cacheNames.filter(name => 
-    name !== STATIC_CACHE && name !== DYNAMIC_CACHE
-  );
-  
-  return Promise.all(
-    oldCaches.map(name => caches.delete(name))
-  );
+  try {
+    const cacheNames = await caches.keys();
+    const oldCaches = cacheNames.filter(name => 
+      name !== STATIC_CACHE && name !== DYNAMIC_CACHE
+    );
+    
+    return Promise.all(
+      oldCaches.map(name => caches.delete(name))
+    );
+  } catch (error) {
+    console.error('Service Worker: Error clearing old caches:', error);
+    return [];
+  }
 }
 
 async function getCacheSize() {
-  const cacheNames = await caches.keys();
-  let totalSize = 0;
-  
-  for (const cacheName of cacheNames) {
-    const cache = await caches.open(cacheName);
-    const keys = await cache.keys();
+  try {
+    const cacheNames = await caches.keys();
+    let totalSize = 0;
     
-    for (const request of keys) {
-      const response = await cache.match(request);
-      if (response) {
-        const blob = await response.blob();
-        totalSize += blob.size;
+    for (const cacheName of cacheNames) {
+      const cache = await caches.open(cacheName);
+      const keys = await cache.keys();
+      
+      for (const request of keys) {
+        const response = await cache.match(request);
+        if (response) {
+          const blob = await response.blob();
+          totalSize += blob.size;
+        }
       }
     }
+    
+    return totalSize;
+  } catch (error) {
+    console.error('Service Worker: Error getting cache size:', error);
+    return 0;
   }
-  
-  return totalSize;
 }
 
 // Export utilities for use in main thread

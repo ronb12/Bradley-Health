@@ -39,7 +39,7 @@ try {
     cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
     experimentalForceLongPolling: true,
     useFetchStreams: false
-  });
+  }, { merge: true });
 
   storage = firebase.storage();
   messaging = firebase.messaging();
