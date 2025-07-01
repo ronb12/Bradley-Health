@@ -3,6 +3,7 @@ class ChartManager {
   constructor() {
     this.charts = new Map();
     this.initialized = false;
+    this.chartCounter = 0;
     this.init();
   }
 
@@ -10,334 +11,363 @@ class ChartManager {
     if (this.initialized) return;
     this.initialized = true;
     
-    // Wait for DOM to be ready and ensure all elements are loaded
+    // Wait for DOM to be completely ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => this.initializeCharts(), 500);
+        setTimeout(() => this.initializeCharts(), 1000);
       });
     } else {
-      setTimeout(() => this.initializeCharts(), 500);
+      setTimeout(() => this.initializeCharts(), 1000);
     }
   }
 
   initializeCharts() {
+    console.log('Initializing charts...');
+    
     // First, destroy all existing charts
     this.destroyAllCharts();
     
-    // Wait longer to ensure complete cleanup
+    // Wait for complete cleanup
     setTimeout(() => {
-      // Check if all canvas elements exist before creating charts
-      const healthCanvas = document.getElementById('healthChart');
-      const moodCanvas = document.getElementById('moodChart');
-      const bpCanvas = document.getElementById('bpChart');
-      const medicationCanvas = document.getElementById('medicationChart');
+      this.createChartsSequentially();
+    }, 500);
+  }
+
+  createChartsSequentially() {
+    const charts = [
+      { id: 'healthChart', method: 'createHealthOverviewChart' },
+      { id: 'moodChart', method: 'createMoodTrendsChart' },
+      { id: 'bpChart', method: 'createBloodPressureChart' },
+      { id: 'medicationChart', method: 'createMedicationAdherenceChart' }
+    ];
+
+    let index = 0;
+    const createNextChart = () => {
+      if (index >= charts.length) {
+        console.log('All charts initialized successfully');
+        return;
+      }
+
+      const chart = charts[index];
+      const canvas = document.getElementById(chart.id);
       
-      if (healthCanvas) this.createHealthOverviewChart();
-      if (moodCanvas) this.createMoodTrendsChart();
-      if (bpCanvas) this.createBloodPressureChart();
-      if (medicationCanvas) this.createMedicationAdherenceChart();
-    }, 300);
+      if (canvas) {
+        console.log(`Creating ${chart.id}...`);
+        this[chart.method]();
+      } else {
+        console.log(`Canvas ${chart.id} not found, skipping...`);
+      }
+      
+      index++;
+      setTimeout(createNextChart, 200);
+    };
+
+    createNextChart();
   }
 
   createHealthOverviewChart() {
     const canvas = document.getElementById('healthChart');
     if (!canvas) return;
 
-    // Ensure chart is destroyed and canvas is cleared
+    // Destroy existing chart
     this.destroyChart('healthChart');
     
-    // Wait a bit more for cleanup
-    setTimeout(() => {
-      try {
-        // Clear the canvas completely
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        const chart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: this.getLast7Days(),
-            datasets: [
-              {
-                label: 'Systolic BP',
-                data: [120, 118, 122, 119, 121, 117, 120],
-                borderColor: '#4f46e5',
-                backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                tension: 0.4,
-                yAxisID: 'y'
-              },
-              {
-                label: 'Diastolic BP',
-                data: [80, 78, 82, 79, 81, 77, 80],
-                borderColor: '#7c3aed',
-                backgroundColor: 'rgba(124, 58, 237, 0.1)',
-                tension: 0.4,
-                yAxisID: 'y'
-              },
-              {
-                label: 'Mood Score',
-                data: [7, 8, 6, 9, 7, 8, 7],
-                borderColor: '#ec4899',
-                backgroundColor: 'rgba(236, 72, 153, 0.1)',
-                tension: 0.4,
-                yAxisID: 'y1'
-              }
-            ]
+    // Clear canvas
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Create new chart with unique ID
+    const chartId = `healthChart_${++this.chartCounter}`;
+    
+    try {
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: this.getLast7Days(),
+          datasets: [
+            {
+              label: 'Systolic BP',
+              data: [120, 118, 122, 119, 121, 117, 120],
+              borderColor: '#4f46e5',
+              backgroundColor: 'rgba(79, 70, 229, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Diastolic BP',
+              data: [80, 78, 82, 79, 81, 77, 80],
+              borderColor: '#7c3aed',
+              backgroundColor: 'rgba(124, 58, 237, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Mood Score',
+              data: [7, 8, 6, 9, 7, 8, 7],
+              borderColor: '#ec4899',
+              backgroundColor: 'rgba(236, 72, 153, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
           },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-              mode: 'index',
-              intersect: false,
-            },
-            scales: {
-              x: {
-                display: true,
-                title: {
-                  display: true,
-                  text: 'Date'
-                }
-              },
-              y: {
-                type: 'linear',
-                display: true,
-                position: 'left',
-                title: {
-                  display: true,
-                  text: 'Blood Pressure (mmHg)'
-                },
-                min: 60,
-                max: 140
-              },
-              y1: {
-                type: 'linear',
-                display: true,
-                position: 'right',
-                title: {
-                  display: true,
-                  text: 'Mood Score (1-10)'
-                },
-                min: 0,
-                max: 10,
-                grid: {
-                  drawOnChartArea: false,
-                },
-              }
-            },
-            plugins: {
+          scales: {
+            x: {
+              display: true,
               title: {
                 display: true,
-                text: 'Health Overview - Last 7 Days'
-              },
-              legend: {
-                position: 'top'
+                text: 'Date'
               }
+            },
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              title: {
+                display: true,
+                text: 'Blood Pressure (mmHg)'
+              },
+              min: 60,
+              max: 140
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
+                display: true,
+                text: 'Mood Score (1-10)'
+              },
+              min: 0,
+              max: 10,
+              grid: {
+                drawOnChartArea: false,
+              },
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Health Overview - Last 7 Days'
+            },
+            legend: {
+              position: 'top'
             }
           }
-        });
+        }
+      });
 
-        this.charts.set('healthChart', chart);
-      } catch (error) {
-        console.error('Error creating health overview chart:', error);
-      }
-    }, 100);
+      this.charts.set('healthChart', chart);
+      console.log('Health chart created successfully');
+    } catch (error) {
+      console.error('Error creating health overview chart:', error);
+    }
   }
 
   createMoodTrendsChart() {
     const canvas = document.getElementById('moodChart');
     if (!canvas) return;
 
-    // Ensure chart is destroyed and canvas is cleared
+    // Destroy existing chart
     this.destroyChart('moodChart');
     
-    // Wait a bit more for cleanup
-    setTimeout(() => {
-      try {
-        // Clear the canvas completely
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        const chart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: this.getLast7Days(),
-            datasets: [
-              {
-                label: 'Mood',
-                data: [7, 8, 6, 9, 7, 8, 7],
-                borderColor: '#ec4899',
-                backgroundColor: 'rgba(236, 72, 153, 0.2)',
-                tension: 0.4,
-                fill: true
-              },
-              {
-                label: 'Energy',
-                data: [6, 7, 5, 8, 6, 7, 6],
-                borderColor: '#f59e0b',
-                backgroundColor: 'rgba(245, 158, 11, 0.2)',
-                tension: 0.4,
-                fill: true
-              },
-              {
-                label: 'Stress',
-                data: [4, 3, 6, 2, 4, 3, 4],
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                tension: 0.4,
-                fill: true
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: 10,
-                title: {
-                  display: true,
-                  text: 'Level (1-10)'
-                }
-              }
+    // Clear canvas
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Create new chart with unique ID
+    const chartId = `moodChart_${++this.chartCounter}`;
+    
+    try {
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: this.getLast7Days(),
+          datasets: [
+            {
+              label: 'Mood',
+              data: [7, 8, 6, 9, 7, 8, 7],
+              borderColor: '#ec4899',
+              backgroundColor: 'rgba(236, 72, 153, 0.2)',
+              tension: 0.4,
+              fill: true
             },
-            plugins: {
+            {
+              label: 'Energy',
+              data: [6, 7, 5, 8, 6, 7, 6],
+              borderColor: '#f59e0b',
+              backgroundColor: 'rgba(245, 158, 11, 0.2)',
+              tension: 0.4,
+              fill: true
+            },
+            {
+              label: 'Stress',
+              data: [4, 3, 6, 2, 4, 3, 4],
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.2)',
+              tension: 0.4,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 10,
               title: {
                 display: true,
-                text: 'Mood Trends - Last 7 Days'
-              },
-              legend: {
-                position: 'top'
+                text: 'Level (1-10)'
               }
             }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Mood Trends - Last 7 Days'
+            },
+            legend: {
+              position: 'top'
+            }
           }
-        });
+        }
+      });
 
-        this.charts.set('moodChart', chart);
-      } catch (error) {
-        console.error('Error creating mood trends chart:', error);
-      }
-    }, 100);
+      this.charts.set('moodChart', chart);
+      console.log('Mood chart created successfully');
+    } catch (error) {
+      console.error('Error creating mood trends chart:', error);
+    }
   }
 
   createBloodPressureChart() {
     const canvas = document.getElementById('bpChart');
     if (!canvas) return;
 
-    // Ensure chart is destroyed and canvas is cleared
+    // Destroy existing chart
     this.destroyChart('bpChart');
     
-    // Wait a bit more for cleanup
-    setTimeout(() => {
-      try {
-        // Clear the canvas completely
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        const chart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: this.getLast7Days(),
-            datasets: [
-              {
-                label: 'Systolic',
-                data: [120, 118, 122, 119, 121, 117, 120],
-                borderColor: '#4f46e5',
-                backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                tension: 0.4
-              },
-              {
-                label: 'Diastolic',
-                data: [80, 78, 82, 79, 81, 77, 80],
-                borderColor: '#7c3aed',
-                backgroundColor: 'rgba(124, 58, 237, 0.1)',
-                tension: 0.4
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: false,
-                min: 60,
-                max: 140,
-                title: {
-                  display: true,
-                  text: 'Blood Pressure (mmHg)'
-                }
-              }
+    // Clear canvas
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Create new chart with unique ID
+    const chartId = `bpChart_${++this.chartCounter}`;
+    
+    try {
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: this.getLast7Days(),
+          datasets: [
+            {
+              label: 'Systolic',
+              data: [120, 118, 122, 119, 121, 117, 120],
+              borderColor: '#4f46e5',
+              backgroundColor: 'rgba(79, 70, 229, 0.1)',
+              tension: 0.4
             },
-            plugins: {
+            {
+              label: 'Diastolic',
+              data: [80, 78, 82, 79, 81, 77, 80],
+              borderColor: '#7c3aed',
+              backgroundColor: 'rgba(124, 58, 237, 0.1)',
+              tension: 0.4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 60,
+              max: 140,
               title: {
                 display: true,
-                text: 'Blood Pressure Trends - Last 7 Days'
-              },
-              legend: {
-                position: 'top'
+                text: 'Blood Pressure (mmHg)'
               }
             }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Blood Pressure Trends - Last 7 Days'
+            },
+            legend: {
+              position: 'top'
+            }
           }
-        });
+        }
+      });
 
-        this.charts.set('bpChart', chart);
-      } catch (error) {
-        console.error('Error creating blood pressure chart:', error);
-      }
-    }, 100);
+      this.charts.set('bpChart', chart);
+      console.log('Blood pressure chart created successfully');
+    } catch (error) {
+      console.error('Error creating blood pressure chart:', error);
+    }
   }
 
   createMedicationAdherenceChart() {
     const canvas = document.getElementById('medicationChart');
     if (!canvas) return;
 
-    // Ensure chart is destroyed and canvas is cleared
+    // Destroy existing chart
     this.destroyChart('medicationChart');
     
-    // Wait a bit more for cleanup
-    setTimeout(() => {
-      try {
-        // Clear the canvas completely
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        const chart = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-            labels: ['Taken', 'Missed', 'Skipped'],
-            datasets: [{
-              data: [85, 10, 5],
-              backgroundColor: [
-                '#10b981',
-                '#ef4444',
-                '#f59e0b'
-              ],
-              borderWidth: 2,
-              borderColor: '#ffffff'
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              title: {
-                display: true,
-                text: 'Medication Adherence - This Week'
-              },
-              legend: {
-                position: 'bottom'
-              }
+    // Clear canvas
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Create new chart with unique ID
+    const chartId = `medicationChart_${++this.chartCounter}`;
+    
+    try {
+      const chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Taken', 'Missed', 'Skipped'],
+          datasets: [{
+            data: [85, 10, 5],
+            backgroundColor: [
+              '#10b981',
+              '#ef4444',
+              '#f59e0b'
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Medication Adherence - This Week'
+            },
+            legend: {
+              position: 'bottom'
             }
           }
-        });
+        }
+      });
 
-        this.charts.set('medicationChart', chart);
-      } catch (error) {
-        console.error('Error creating medication adherence chart:', error);
-      }
-    }, 100);
+      this.charts.set('medicationChart', chart);
+      console.log('Medication chart created successfully');
+    } catch (error) {
+      console.error('Error creating medication adherence chart:', error);
+    }
   }
 
   getLast7Days() {
@@ -471,6 +501,7 @@ class ChartManager {
 
   // Destroy all charts
   destroyAllCharts() {
+    console.log('Destroying all charts...');
     this.charts.forEach((chart, chartId) => {
       try {
         chart.destroy();
@@ -490,6 +521,7 @@ class ChartManager {
         // Canvas already cleared
       }
     });
+    console.log('All charts destroyed');
   }
 
   // Export chart as image

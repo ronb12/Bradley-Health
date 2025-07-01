@@ -20,17 +20,9 @@ class NotificationManager {
   }
 
   setupMessaging() {
-    try {
-      // Check if Firebase messaging is available
-      if (window.firebaseServices && window.firebaseServices.messaging) {
-        this.messaging = window.firebaseServices.messaging;
-        this.setupPushNotifications();
-      } else {
-        console.log('Firebase messaging not available in this environment');
-      }
-    } catch (error) {
-      console.log('Firebase messaging not available:', error);
-    }
+    // Disable Firebase messaging for now to avoid service worker errors
+    console.log('Firebase messaging disabled - using local notifications only');
+    this.messaging = null;
   }
 
   async checkPermission() {
