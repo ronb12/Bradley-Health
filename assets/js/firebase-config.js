@@ -25,17 +25,11 @@ try {
 
   storage = firebase.storage();
   
-  // Initialize messaging only if supported
-  try {
-    if (firebase.messaging && typeof firebase.messaging === 'function') {
-      messaging = firebase.messaging();
-    }
-  } catch (messagingError) {
-    console.log('Firebase messaging not available in this environment');
-  }
+  // Completely disable messaging to avoid service worker errors
+  messaging = null;
 
   firebaseInitialized = true;
-  console.log('Firebase initialized successfully');
+  console.log('Firebase initialized successfully (messaging disabled)');
 } catch (error) {
   console.error('Firebase initialization failed:', error);
   firebaseInitialized = false;
@@ -47,7 +41,7 @@ if (firebaseInitialized) {
     auth,
     db,
     storage,
-    messaging
+    messaging: null // Always null to prevent messaging errors
   };
 } else {
   console.error('Firebase services not available');
@@ -63,5 +57,5 @@ if (firebaseInitialized) {
 window.firebase = {
   auth: () => window.firebaseServices.auth,
   firestore: () => window.firebaseServices.db,
-  messaging: () => window.firebaseServices.messaging
+  messaging: () => null // Always return null to prevent messaging errors
 }; 

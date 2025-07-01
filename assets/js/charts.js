@@ -14,10 +14,10 @@ class ChartManager {
     // Wait for DOM to be completely ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => this.initializeCharts(), 1000);
+        setTimeout(() => this.initializeCharts(), 1500);
       });
     } else {
-      setTimeout(() => this.initializeCharts(), 1000);
+      setTimeout(() => this.initializeCharts(), 1500);
     }
   }
 
@@ -30,7 +30,7 @@ class ChartManager {
     // Wait for complete cleanup
     setTimeout(() => {
       this.createChartsSequentially();
-    }, 500);
+    }, 800);
   }
 
   createChartsSequentially() {
@@ -59,7 +59,7 @@ class ChartManager {
       }
       
       index++;
-      setTimeout(createNextChart, 200);
+      setTimeout(createNextChart, 300);
     };
 
     createNextChart();
@@ -72,12 +72,11 @@ class ChartManager {
     // Destroy existing chart
     this.destroyChart('healthChart');
     
-    // Clear canvas
+    // Clear canvas and reset dimensions
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Create new chart with unique ID
-    const chartId = `healthChart_${++this.chartCounter}`;
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
     
     try {
       const chart = new Chart(ctx, {
@@ -178,12 +177,11 @@ class ChartManager {
     // Destroy existing chart
     this.destroyChart('moodChart');
     
-    // Clear canvas
+    // Clear canvas and reset dimensions
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Create new chart with unique ID
-    const chartId = `moodChart_${++this.chartCounter}`;
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
     
     try {
       const chart = new Chart(ctx, {
@@ -256,12 +254,11 @@ class ChartManager {
     // Destroy existing chart
     this.destroyChart('bpChart');
     
-    // Clear canvas
+    // Clear canvas and reset dimensions
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Create new chart with unique ID
-    const chartId = `bpChart_${++this.chartCounter}`;
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
     
     try {
       const chart = new Chart(ctx, {
@@ -325,12 +322,11 @@ class ChartManager {
     // Destroy existing chart
     this.destroyChart('medicationChart');
     
-    // Clear canvas
+    // Clear canvas and reset dimensions
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Create new chart with unique ID
-    const chartId = `medicationChart_${++this.chartCounter}`;
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
     
     try {
       const chart = new Chart(ctx, {
