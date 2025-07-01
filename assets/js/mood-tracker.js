@@ -96,6 +96,12 @@ class MoodTracker {
 
   async loadMoodEntries() {
     try {
+      // Check if user is authenticated
+      if (!this.currentUser || !this.currentUser.uid) {
+        console.log('User not authenticated yet, skipping mood entries load');
+        return;
+      }
+
       const snapshot = await this.db
         .collection('moodEntries')
         .where('userId', '==', this.currentUser.uid)

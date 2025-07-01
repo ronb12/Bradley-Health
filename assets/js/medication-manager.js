@@ -77,6 +77,12 @@ class MedicationManager {
 
   async loadMedications() {
     try {
+      // Check if user is authenticated
+      if (!this.currentUser || !this.currentUser.uid) {
+        console.log('User not authenticated yet, skipping medication load');
+        return;
+      }
+
       const snapshot = await this.db
         .collection('medications')
         .where('userId', '==', this.currentUser.uid)

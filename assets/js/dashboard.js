@@ -242,6 +242,13 @@ class DashboardManager {
   }
 
   loadMedicationData() {
+    // Check if user is authenticated before loading data
+    const userId = window.authManager?.getUserId();
+    if (!userId) {
+      console.log('User not authenticated yet, skipping medication data load');
+      return;
+    }
+    
     // This will be handled by the medication-manager.js module
     if (window.medicationManager) {
       window.medicationManager.loadMedications();
@@ -249,6 +256,13 @@ class DashboardManager {
   }
 
   loadMoodData() {
+    // Check if user is authenticated before loading data
+    const userId = window.authManager?.getUserId();
+    if (!userId) {
+      console.log('User not authenticated yet, skipping mood data load');
+      return;
+    }
+    
     // This will be handled by the mood-tracker.js module
     if (window.moodTracker) {
       window.moodTracker.loadMoodEntries();
