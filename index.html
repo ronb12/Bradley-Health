@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bradley Health - Blood Pressure Tracker</title>
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/blood-pressure.css">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+</head>
+<body>
+  <header class="app-header">
+    <h1>Bradley Health</h1>
+    <p>Blood Pressure Tracker</p>
+  </header>
+
+  <div class="tab-container">
+    <nav class="tab-navigation" id="tabNav">
+      <button class="tab-button active" data-tab="dashboard">
+        <span class="tab-icon">📊</span>
+        <span class="tab-text">Dashboard</span>
+      </button>
+      <button class="tab-button" data-tab="add-reading">
+        <span class="tab-icon">➕</span>
+        <span class="tab-text">Add Reading</span>
+      </button>
+      <button class="tab-button" data-tab="history">
+        <span class="tab-icon">📈</span>
+        <span class="tab-text">History</span>
+      </button>
+      <button class="tab-button" data-tab="insights">
+        <span class="tab-icon">💡</span>
+        <span class="tab-text">Insights</span>
+      </button>
+      <button class="tab-button" data-tab="settings">
+        <span class="tab-icon">⚙️</span>
+        <span class="tab-text">Settings</span>
+      </button>
+    </nav>
+
+    <!-- Dashboard Tab -->
+    <section class="tab-content active" id="dashboard">
+      <div class="dashboard-grid">
+        <div class="card current-reading">
+          <h2>Current Reading</h2>
+          <div class="bp-display">
+            <div class="bp-value">
+              <span class="systolic">120</span>
+              <span class="separator">/</span>
+              <span class="diastolic">80</span>
+            </div>
+            <div class="bp-unit">mmHg</div>
+            <div class="bp-status normal">Normal</div>
+          </div>
+          <p class="reading-time">Last updated: 2 hours ago</p>
+        </div>
+
+        <div class="card quick-stats">
+          <h2>Quick Stats</h2>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">Today</span>
+              <span class="stat-value">2 readings</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">This Week</span>
+              <span class="stat-value">12 readings</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Average</span>
+              <span class="stat-value">118/78</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card trends">
+          <h2>7-Day Trend</h2>
+          <div class="trend-chart" id="trendChart">
+            <!-- Chart will be rendered here -->
+          </div>
+        </div>
+
+        <div class="card alerts">
+          <h2>Alerts</h2>
+          <div class="alert-list">
+            <div class="alert-item normal">
+              <span class="alert-icon">✅</span>
+              <span class="alert-text">All readings within normal range</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Add Reading Tab -->
+    <section class="tab-content" id="add-reading">
+      <div class="add-reading-form">
+        <h2>Add New Reading</h2>
+        <form id="bpForm">
+          <div class="form-group">
+            <label for="systolic">Systolic (Top Number)</label>
+            <input type="number" id="systolic" name="systolic" min="70" max="200" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="diastolic">Diastolic (Bottom Number)</label>
+            <input type="number" id="diastolic" name="diastolic" min="40" max="130" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="pulse">Pulse Rate (Optional)</label>
+            <input type="number" id="pulse" name="pulse" min="40" max="200">
+          </div>
+          
+          <div class="form-group">
+            <label for="notes">Notes (Optional)</label>
+            <textarea id="notes" name="notes" rows="3" placeholder="How are you feeling? Any symptoms?"></textarea>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Reading</button>
+            <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- History Tab -->
+    <section class="tab-content" id="history">
+      <div class="history-container">
+        <div class="history-header">
+          <h2>Reading History</h2>
+          <div class="history-filters">
+            <select id="timeFilter">
+              <option value="7">Last 7 days</option>
+              <option value="30">Last 30 days</option>
+              <option value="90">Last 3 months</option>
+              <option value="all">All time</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="readings-list" id="readingsList">
+          <!-- Readings will be populated here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Insights Tab -->
+    <section class="tab-content" id="insights">
+      <div class="insights-container">
+        <h2>Health Insights</h2>
+        
+        <div class="insight-card">
+          <h3>Blood Pressure Category</h3>
+          <div class="insight-content">
+            <div class="category-indicator normal">Normal</div>
+            <p>Your blood pressure is within the healthy range. Keep up the good work!</p>
+          </div>
+        </div>
+        
+        <div class="insight-card">
+          <h3>Trend Analysis</h3>
+          <div class="insight-content">
+            <p>Your readings have been stable over the past week with minimal variation.</p>
+          </div>
+        </div>
+        
+        <div class="insight-card">
+          <h3>Recommendations</h3>
+          <div class="insight-content">
+            <ul class="recommendations">
+              <li>Continue monitoring twice daily</li>
+              <li>Maintain regular exercise routine</li>
+              <li>Follow low-sodium diet</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings Tab -->
+    <section class="tab-content" id="settings">
+      <div class="settings-container">
+        <h2>Settings</h2>
+        
+        <div class="setting-group">
+          <h3>Reminders</h3>
+          <div class="setting-item">
+            <label>
+              <input type="checkbox" id="enableReminders" checked>
+              Enable daily reminders
+            </label>
+          </div>
+          <div class="setting-item">
+            <label>Reminder Time:</label>
+            <input type="time" id="reminderTime" value="08:00">
+          </div>
+        </div>
+        
+        <div class="setting-group">
+          <h3>Units</h3>
+          <div class="setting-item">
+            <label>
+              <input type="radio" name="units" value="mmHg" checked>
+              mmHg
+            </label>
+            <label>
+              <input type="radio" name="units" value="kPa">
+              kPa
+            </label>
+          </div>
+        </div>
+        
+        <div class="setting-group">
+          <h3>Data Export</h3>
+          <button class="btn btn-secondary" id="exportData">Export Data</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="assets/js/dashboard.js"></script>
+  <script src="assets/js/blood-pressure.js"></script>
+</body>
+</html> 
