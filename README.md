@@ -1,8 +1,6 @@
-# Bradley Health - Comprehensive Health Monitoring App
+# Bradley Health - Comprehensive Health Monitoring
 
-![Bradley Health](assets/favicon.svg)
-
-A comprehensive Progressive Web App (PWA) for health monitoring, designed to help users track blood pressure, manage medications, monitor mood, and achieve wellness goals.
+A modern web application for comprehensive health monitoring, including blood pressure tracking, medication management, mood tracking, and goal setting.
 
 ## 🌟 Features
 
@@ -64,6 +62,10 @@ A comprehensive Progressive Web App (PWA) for health monitoring, designed to hel
 - **Data Export**: Multiple format export options
 - **Backup & Restore**: Automatic data backup and recovery
 
+## 🌐 Live Demo
+
+**GitHub Pages URL**: https://ronb12.github.io/Bradley-Health/
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -75,8 +77,8 @@ A comprehensive Progressive Web App (PWA) for health monitoring, designed to hel
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/bradley-health.git
-   cd bradley-health
+   git clone https://github.com/ronb12/Bradley-Health.git
+   cd Bradley-Health
    ```
 
 2. **Set up Firebase**
@@ -305,4 +307,32 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Bradley Health** - Empowering better health through technology.
 
-*Built with ❤️ for better health outcomes* 
+*Built with ❤️ for better health outcomes*
+
+## 📈 Future Enhancements
+
+- [ ] Push notifications for reminders
+- [ ] Data export functionality
+- [ ] Integration with health devices
+- [ ] Advanced analytics
+- [ ] Family member sharing
+- [ ] Emergency contact integration
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🆘 Support
+
+If you encounter any issues or have questions, please open an issue on GitHub.
+
+---
+
+**Note**: This is a health monitoring application. Always consult with healthcare professionals for medical advice. 
