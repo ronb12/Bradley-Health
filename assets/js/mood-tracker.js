@@ -20,6 +20,27 @@ class MoodTracker {
 
     this.setupEventListeners();
     this.setupMoodChart();
+    
+    // Listen for authentication state changes
+    this.setupAuthListener();
+  }
+
+  setupAuthListener() {
+    // Listen for auth state changes
+    firebase.auth().onAuthStateChanged((user) => {
+      this.currentUser = user;
+      if (user) {
+        console.log('MoodTracker: User authenticated, loading data...');
+        this.loadMoodEntries();
+        this.loadMoodFactors();
+      } else {
+        console.log('MoodTracker: User signed out, clearing data...');
+        this.moodEntries = [];
+        this.moodFactors = [];
+        this.renderMoodEntries();
+        this.renderMoodFactors();
+      }
+    });
   }
 
   setupEventListeners() {
@@ -44,6 +65,13 @@ class MoodTracker {
 
   async addMoodEntry(e) {
     e.preventDefault();
+    
+    // Check if user is authenticated
+    if (!this.currentUser || !this.currentUser.uid) {
+      this.showToast('Please sign in to save mood entries', 'error');
+      return;
+    }
+    
     const formData = new FormData(e.target);
     
     const moodEntry = {
@@ -72,6 +100,12 @@ class MoodTracker {
   }
 
   async quickMoodEntry(e) {
+    // Check if user is authenticated
+    if (!this.currentUser || !this.currentUser.uid) {
+      this.showToast('Please sign in to save mood entries', 'error');
+      return;
+    }
+    
     const mood = parseInt(e.target.dataset.mood);
     const moodEntry = {
       mood,
@@ -375,6 +409,13 @@ class MoodTracker {
 
   async addMoodFactor(e) {
     e.preventDefault();
+    
+    // Check if user is authenticated
+    if (!this.currentUser || !this.currentUser.uid) {
+      this.showToast('Please sign in to save mood factors', 'error');
+      return;
+    }
+    
     const formData = new FormData(e.target);
     
     const factor = {
@@ -401,6 +442,12 @@ class MoodTracker {
 
   async loadMoodFactors() {
     try {
+      // Check if user is authenticated
+      if (!this.currentUser || !this.currentUser.uid) {
+        console.log('User not authenticated yet, skipping mood factors load');
+        return;
+      }
+      
       const snapshot = await this.db
         .collection('moodFactors')
         .where('userId', '==', this.currentUser.uid)
