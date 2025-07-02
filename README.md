@@ -64,7 +64,9 @@ A modern web application for comprehensive health monitoring, including blood pr
 
 ## 🌐 Live Demo
 
-**GitHub Pages URL**: https://ronb12.github.io/Bradley-Health/
+**✅ Correct URL**: https://ronb12.github.io/Bradley-Health/
+
+> **Note**: If you're redirected from `https://ronb12.github.io/index.html`, you'll be automatically taken to the correct Bradley Health app URL.
 
 ## 🚀 Getting Started
 
