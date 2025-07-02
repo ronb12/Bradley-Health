@@ -128,27 +128,42 @@ class BloodPressureManager {
       return;
     }
 
-    historyList.innerHTML = this.readings.map(reading => `
-      <div class="history-item ${reading.status.toLowerCase()}">
-        <div class="reading-values">
-          <span class="systolic">${reading.systolic}</span>
-          <span class="separator">/</span>
-          <span class="diastolic">${reading.diastolic}</span>
-          <span class="unit">mmHg</span>
-          ${reading.pulse ? `<span class="pulse">Pulse: ${reading.pulse}</span>` : ''}
+    historyList.innerHTML = this.readings.map(reading => {
+      // Handle different timestamp formats (Firestore Timestamp vs JavaScript Date)
+      let timestamp;
+      if (reading.timestamp && reading.timestamp.toDate) {
+        // Firestore Timestamp
+        timestamp = reading.timestamp.toDate();
+      } else if (reading.timestamp) {
+        // JavaScript Date or timestamp number
+        timestamp = new Date(reading.timestamp);
+      } else {
+        // Fallback to current time
+        timestamp = new Date();
+      }
+
+      return `
+        <div class="history-item ${reading.status.toLowerCase()}">
+          <div class="reading-values">
+            <span class="systolic">${reading.systolic}</span>
+            <span class="separator">/</span>
+            <span class="diastolic">${reading.diastolic}</span>
+            <span class="unit">mmHg</span>
+            ${reading.pulse ? `<span class="pulse">Pulse: ${reading.pulse}</span>` : ''}
+          </div>
+          <div class="reading-details">
+            <span class="status ${reading.status.toLowerCase()}">${reading.status}</span>
+            <span class="date">${timestamp.toLocaleDateString()}</span>
+            <span class="time">${timestamp.toLocaleTimeString()}</span>
+          </div>
+          ${reading.notes ? `<div class="notes">${reading.notes}</div>` : ''}
+          <div class="actions">
+            <button class="btn btn-small" onclick="window.bpManager.editReading('${reading.id}')">Edit</button>
+            <button class="btn btn-small btn-danger" onclick="window.bpManager.deleteReading('${reading.id}')">Delete</button>
+          </div>
         </div>
-        <div class="reading-details">
-          <span class="status ${reading.status.toLowerCase()}">${reading.status}</span>
-          <span class="date">${new Date(reading.timestamp).toLocaleDateString()}</span>
-          <span class="time">${new Date(reading.timestamp).toLocaleTimeString()}</span>
-        </div>
-        ${reading.notes ? `<div class="notes">${reading.notes}</div>` : ''}
-        <div class="actions">
-          <button class="btn btn-small" onclick="window.bpManager.editReading('${reading.id}')">Edit</button>
-          <button class="btn btn-small btn-danger" onclick="window.bpManager.deleteReading('${reading.id}')">Delete</button>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   updateCurrentReading() {
@@ -175,7 +190,20 @@ class BloodPressureManager {
     if (currentDiastolic) currentDiastolic.textContent = latest.diastolic;
     if (currentStatus) currentStatus.textContent = latest.status;
     if (lastReadingTime) {
-      lastReadingTime.textContent = `Last reading: ${new Date(latest.timestamp).toLocaleDateString()} at ${new Date(latest.timestamp).toLocaleTimeString()}`;
+      // Handle different timestamp formats
+      let timestamp;
+      if (latest.timestamp && latest.timestamp.toDate) {
+        // Firestore Timestamp
+        timestamp = latest.timestamp.toDate();
+      } else if (latest.timestamp) {
+        // JavaScript Date or timestamp number
+        timestamp = new Date(latest.timestamp);
+      } else {
+        // Fallback to current time
+        timestamp = new Date();
+      }
+      
+      lastReadingTime.textContent = `Last reading: ${timestamp.toLocaleDateString()} at ${timestamp.toLocaleTimeString()}`;
     }
   }
 
