@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="#ffffff" stroke="#4f46e5" stroke-width="12"/>
+  
+  <!-- Red heart with better shape -->
+  <path d="M256 340c-25-25-70-70-70-110 0-38 32-70 70-70s70 32 70 70c0 40-45 85-70 110z" fill="#ef4444"/>
+  
+  <!-- Lifeline (ECG-style line) going through heart -->
+  <path d="M140 220 L180 220 L200 200 L220 240 L240 180 L260 260 L280 220 L300 220 L340 220" 
+        stroke="#4f46e5" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Bradley Health text -->
+  <text x="256" y="450" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#4f46e5">Bradley Health</text>
+</svg> 

@@ -1,0 +1,19 @@
+{
+  "name": "bradley-health-scripts",
+  "version": "1.0.0",
+  "description": "Utility scripts for Bradley Health Firebase management",
+  "main": "delete-anonymous-users.js",
+  "scripts": {
+    "delete-anonymous": "node delete-anonymous-users.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.11.0"
+  },
+  "keywords": [
+    "firebase",
+    "admin",
+    "user-management"
+  ],
+  "author": "Bradley Health",
+  "license": "MIT"
+} 
