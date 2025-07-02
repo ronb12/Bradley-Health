@@ -217,112 +217,254 @@ class ChartManager {
     const canvas = document.getElementById('moodChart');
     if (!canvas) return;
 
-    // Destroy existing chart
-    this.destroyChart('moodChart');
+    // Hide the canvas and create a mood insights dashboard instead
+    canvas.style.display = 'none';
     
-    // Completely recreate the canvas element to prevent reuse
+    // Get the parent container
     const parent = canvas.parentElement;
-    const newCanvas = document.createElement('canvas');
-    newCanvas.id = 'moodChart';
-    newCanvas.width = canvas.offsetWidth;
-    newCanvas.height = canvas.offsetHeight;
-    newCanvas.style.width = canvas.style.width;
-    newCanvas.style.height = canvas.style.height;
     
-    // Replace the old canvas with the new one
-    parent.replaceChild(newCanvas, canvas);
+    // Create mood insights dashboard
+    const moodDashboard = document.createElement('div');
+    moodDashboard.id = 'moodInsightsDashboard';
+    moodDashboard.className = 'mood-insights-dashboard';
+    moodDashboard.innerHTML = `
+      <div class="mood-overview">
+        <h3>Mood Overview</h3>
+        <div class="mood-stats-grid">
+          <div class="mood-stat-card">
+            <div class="stat-icon">😊</div>
+            <div class="stat-label">Average Mood</div>
+            <div class="stat-value" id="avgMoodValue">7.2</div>
+            <div class="stat-trend positive">+0.3</div>
+          </div>
+          <div class="mood-stat-card">
+            <div class="stat-icon">⚡</div>
+            <div class="stat-label">Energy Level</div>
+            <div class="stat-value" id="avgEnergyValue">6.8</div>
+            <div class="stat-trend neutral">0.0</div>
+          </div>
+          <div class="mood-stat-card">
+            <div class="stat-icon">😰</div>
+            <div class="stat-label">Stress Level</div>
+            <div class="stat-value" id="avgStressValue">3.5</div>
+            <div class="stat-trend negative">-0.2</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mood-progress">
+        <h3>Weekly Progress</h3>
+        <div class="progress-bars">
+          <div class="progress-item">
+            <div class="progress-label">Mood Stability</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 85%"></div>
+            </div>
+            <div class="progress-value">85%</div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-label">Positive Days</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 71%"></div>
+            </div>
+            <div class="progress-value">5/7 days</div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-label">Goal Achievement</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 60%"></div>
+            </div>
+            <div class="progress-value">60%</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mood-insights">
+        <h3>Insights</h3>
+        <div class="insights-list">
+          <div class="insight-item positive">
+            <span class="insight-icon">📈</span>
+            <span class="insight-text">Your mood has improved by 15% this week</span>
+          </div>
+          <div class="insight-item info">
+            <span class="insight-icon">💡</span>
+            <span class="insight-text">Exercise days show 20% better mood scores</span>
+          </div>
+          <div class="insight-item warning">
+            <span class="insight-icon">⚠️</span>
+            <span class="insight-text">Stress tends to spike on Mondays</span>
+          </div>
+        </div>
+      </div>
+    `;
     
-    // Additional delay to ensure DOM update
-    setTimeout(() => {
-      try {
-        const ctx = newCanvas.getContext('2d');
-        const chart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: this.getLast7Days(),
-            datasets: [
-              {
-                label: 'Mood',
-                data: [7, 8, 6, 9, 7, 8, 7],
-                backgroundColor: 'rgba(236, 72, 153, 0.8)',
-                borderColor: '#ec4899',
-                borderWidth: 1,
-                borderRadius: 4,
-                borderSkipped: false
-              },
-              {
-                label: 'Energy',
-                data: [6, 7, 5, 8, 6, 7, 6],
-                backgroundColor: 'rgba(245, 158, 11, 0.8)',
-                borderColor: '#f59e0b',
-                borderWidth: 1,
-                borderRadius: 4,
-                borderSkipped: false
-              },
-              {
-                label: 'Stress',
-                data: [4, 3, 6, 2, 4, 3, 4],
-                backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                borderColor: '#3b82f6',
-                borderWidth: 1,
-                borderRadius: 4,
-                borderSkipped: false
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: 10,
-                title: {
-                  display: true,
-                  text: 'Level (1-10)'
-                },
-                grid: {
-                  display: true,
-                  color: 'rgba(0,0,0,0.1)'
-                }
-              },
-              x: {
-                grid: {
-                  display: true,
-                  color: 'rgba(0,0,0,0.1)'
-                }
-              }
-            },
-            plugins: {
-              title: {
-                display: true,
-                text: 'Mood Trends - Last 7 Days',
-                font: {
-                  size: 16,
-                  weight: 'bold'
-                }
-              },
-              legend: {
-                position: 'top',
-                labels: {
-                  usePointStyle: true,
-                  padding: 20
-                }
-              },
-              tooltip: {
-                mode: 'index',
-                intersect: false
-              }
-            }
-          }
-        });
+    // Add the dashboard to the parent container
+    parent.appendChild(moodDashboard);
+    
+    // Add CSS styles for the mood dashboard
+    this.addMoodDashboardStyles();
+    
+    console.log('Mood insights dashboard created successfully');
+  }
 
-        this.charts.set('moodChart', chart);
-        console.log('Mood chart created successfully');
-      } catch (error) {
-        console.error('Error creating mood trends chart:', error);
+  addMoodDashboardStyles() {
+    // Check if styles already exist
+    if (document.getElementById('moodDashboardStyles')) return;
+    
+    const style = document.createElement('style');
+    style.id = 'moodDashboardStyles';
+    style.textContent = `
+      .mood-insights-dashboard {
+        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       }
-    }, 200);
+      
+      .mood-overview h3, .mood-progress h3, .mood-insights h3 {
+        margin: 0 0 20px 0;
+        color: #374151;
+        font-size: 18px;
+        font-weight: 600;
+      }
+      
+      .mood-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+      
+      .mood-stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      }
+      
+      .stat-icon {
+        font-size: 32px;
+        margin-bottom: 10px;
+      }
+      
+      .stat-label {
+        font-size: 14px;
+        opacity: 0.9;
+        margin-bottom: 8px;
+      }
+      
+      .stat-value {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      
+      .stat-trend {
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 12px;
+        display: inline-block;
+      }
+      
+      .stat-trend.positive {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+      }
+      
+      .stat-trend.negative {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+      }
+      
+      .stat-trend.neutral {
+        background: rgba(107, 114, 128, 0.2);
+        color: #6b7280;
+      }
+      
+      .progress-bars {
+        margin-bottom: 30px;
+      }
+      
+      .progress-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        gap: 15px;
+      }
+      
+      .progress-label {
+        flex: 1;
+        font-size: 14px;
+        color: #374151;
+        font-weight: 500;
+      }
+      
+      .progress-bar {
+        flex: 2;
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+      
+      .progress-value {
+        flex: 0 0 60px;
+        text-align: right;
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+      }
+      
+      .insights-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .insight-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+      
+      .insight-item.positive {
+        background: rgba(34, 197, 94, 0.1);
+        border-left: 4px solid #22c55e;
+      }
+      
+      .insight-item.info {
+        background: rgba(59, 130, 246, 0.1);
+        border-left: 4px solid #3b82f6;
+      }
+      
+      .insight-item.warning {
+        background: rgba(245, 158, 11, 0.1);
+        border-left: 4px solid #f59e0b;
+      }
+      
+      .insight-icon {
+        font-size: 18px;
+      }
+      
+      .insight-text {
+        flex: 1;
+        color: #374151;
+      }
+    `;
+    
+    document.head.appendChild(style);
   }
 
   createBloodPressureChart() {
