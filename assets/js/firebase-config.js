@@ -23,22 +23,13 @@ try {
   // Initialize Firestore with settings before any other operations
   db = firebase.firestore();
   
-  // Set Firestore settings using the newer API
+  // Set Firestore settings using the newer API with cache configuration
   db.settings({
     cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
-    merge: true // Use merge to avoid overriding existing settings
-  });
-
-  // Enable offline persistence after settings
-  db.enablePersistence({
-    synchronizeTabs: true
-  }).catch((err) => {
-    if (err.code === 'failed-precondition') {
-      // Multiple tabs open, persistence can only be enabled in one tab at a time
-      console.log('Persistence failed - multiple tabs open');
-    } else if (err.code === 'unimplemented') {
-      // Browser doesn't support persistence
-      console.log('Persistence not supported by browser');
+    merge: true, // Use merge to avoid overriding existing settings
+    // Use the newer cache configuration instead of enablePersistence
+    cache: {
+      tabManager: firebase.firestore.TabManager
     }
   });
 
