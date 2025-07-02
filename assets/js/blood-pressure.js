@@ -26,12 +26,6 @@ class BloodPressureManager {
     if (bpForm) {
       bpForm.addEventListener('submit', (e) => this.addReading(e));
     }
-
-    // Quick mood buttons (if they exist in blood pressure context)
-    const moodButtons = document.querySelectorAll('.mood-btn');
-    moodButtons.forEach(button => {
-      button.addEventListener('click', (e) => this.quickMoodEntry(e));
-    });
   }
 
   async addReading(e) {
