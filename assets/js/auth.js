@@ -1,13 +1,27 @@
 // Authentication System for Bradley Health
 class AuthManager {
   constructor() {
-    this.auth = firebase.auth();
-    this.db = firebase.firestore();
-    this.currentUser = null;
-    this.init();
+    // Check if Firebase services are available
+    if (window.firebaseServices && window.firebaseServices.auth && window.firebaseServices.db) {
+      this.auth = window.firebaseServices.auth;
+      this.db = window.firebaseServices.db;
+      this.currentUser = null;
+      this.init();
+    } else {
+      console.error('Firebase services not available - authentication disabled');
+      this.auth = null;
+      this.db = null;
+      this.currentUser = null;
+    }
   }
 
   init() {
+    // Check if auth is available
+    if (!this.auth) {
+      console.error('Authentication not available');
+      return;
+    }
+
     // Listen for auth state changes
     this.auth.onAuthStateChanged((user) => {
       this.currentUser = user;
@@ -85,6 +99,12 @@ class AuthManager {
     const confirmPassword = formData.get('confirmPassword');
     const name = formData.get('name');
 
+    // Check if Firebase auth is available
+    if (!this.auth) {
+      this.showToast('Authentication service not available. Please check your connection.', 'error');
+      return;
+    }
+
     if (password !== confirmPassword) {
       this.showToast('Passwords do not match', 'error');
       return;
@@ -121,6 +141,11 @@ class AuthManager {
   }
 
   async createUserProfile(uid, profileData) {
+    if (!this.db) {
+      console.error('Firestore not available');
+      return;
+    }
+    
     try {
       await this.db.collection('users').doc(uid).set(profileData);
     } catch (error) {
@@ -129,6 +154,11 @@ class AuthManager {
   }
 
   async loadUserProfile(uid) {
+    if (!this.db) {
+      console.error('Firestore not available');
+      return null;
+    }
+    
     try {
       // Check if we're online
       if (!navigator.onLine) {
@@ -189,6 +219,11 @@ class AuthManager {
       updatedAt: new Date()
     };
 
+    if (!this.db) {
+      this.showToast('Database not available. Please check your connection.', 'error');
+      return;
+    }
+
     try {
       this.showLoading('Updating profile...');
       await this.db.collection('users').doc(this.currentUser.uid).update(profileData);
@@ -201,6 +236,11 @@ class AuthManager {
   }
 
   async logout() {
+    if (!this.auth) {
+      this.showToast('Authentication not available', 'error');
+      return;
+    }
+    
     try {
       await this.auth.signOut();
       this.showToast('Logged out successfully', 'success');

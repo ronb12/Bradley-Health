@@ -20,10 +20,16 @@ try {
   // Initialize Firebase services
   auth = firebase.auth();
   
-  // Initialize Firestore with offline persistence enabled
+  // Initialize Firestore with settings before any other operations
   db = firebase.firestore();
   
-  // Enable offline persistence
+  // Set Firestore settings using the newer API
+  db.settings({
+    cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
+    merge: true // Use merge to avoid overriding existing settings
+  });
+
+  // Enable offline persistence after settings
   db.enablePersistence({
     synchronizeTabs: true
   }).catch((err) => {
@@ -34,11 +40,6 @@ try {
       // Browser doesn't support persistence
       console.log('Persistence not supported by browser');
     }
-  });
-
-  // Set Firestore settings for better offline support
-  db.settings({
-    cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
   });
 
   storage = firebase.storage();
