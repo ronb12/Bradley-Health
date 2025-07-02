@@ -31,11 +31,20 @@ class AuthManager {
         // Add a small delay to ensure Firebase is fully ready
         setTimeout(() => {
           this.loadUserProfile(user.uid);
-          // Trigger dashboard data loading
-          if (window.dashboardManager) {
+          // Trigger dashboard data loading only once
+          if (window.dashboardManager && !window.dashboardManager.dataLoaded) {
             window.dashboardManager.loadDashboardData();
+            window.dashboardManager.dataLoaded = true;
           }
         }, 1000);
+      } else {
+        console.log('User signed out, resetting dashboard state');
+        // Reset dashboard state when user signs out
+        if (window.dashboardManager) {
+          window.dashboardManager.dataLoaded = false;
+          window.dashboardManager.authRetryCount = 0;
+          window.dashboardManager.tabRetryCount = 0;
+        }
       }
     }, (error) => {
       console.log('Auth state change error (non-critical):', error.message);
@@ -239,11 +248,17 @@ class AuthManager {
           logoutBtn.addEventListener('click', () => this.logout());
         }
       }
+      
+      // Show welcome message
+      this.showToast(`Welcome back, ${user.displayName || user.email}!`, 'success');
     } else {
       // User is logged out
       if (authSection) authSection.style.display = 'block';
       if (userSection) userSection.style.display = 'none';
       if (userInfo) userInfo.innerHTML = '';
+      
+      // Show sign-in prompt
+      this.showToast('Please sign in to access your health dashboard', 'info');
     }
   }
 

@@ -83,10 +83,22 @@ class DashboardManager {
     const userId = window.authManager?.getUserId();
     if (!userId) {
       console.log('User not authenticated yet, will retry loading tab data');
-      // Retry after authentication
-      setTimeout(() => this.loadTabData(tabName), 1000);
+      // Only retry a few times to avoid infinite loops
+      if (!this.tabRetryCount) {
+        this.tabRetryCount = 0;
+      }
+      if (this.tabRetryCount < 3) {
+        this.tabRetryCount++;
+        setTimeout(() => this.loadTabData(tabName), 1000);
+      } else {
+        console.log('Max tab data retries reached, stopping tab load');
+        this.tabRetryCount = 0;
+      }
       return;
     }
+    
+    // Reset retry count on successful authentication
+    this.tabRetryCount = 0;
     
     console.log('Loading data for tab:', tabName);
     
@@ -117,10 +129,22 @@ class DashboardManager {
     const userId = window.authManager?.getUserId();
     if (!userId) {
       console.log('Waiting for user authentication...');
-      // Retry after a short delay
-      setTimeout(() => this.loadDashboardData(), 1000);
+      // Only retry a few times to avoid infinite loops
+      if (!this.authRetryCount) {
+        this.authRetryCount = 0;
+      }
+      if (this.authRetryCount < 5) {
+        this.authRetryCount++;
+        setTimeout(() => this.loadDashboardData(), 1000);
+      } else {
+        console.log('Max authentication retries reached, stopping dashboard load');
+        this.authRetryCount = 0;
+      }
       return;
     }
+    
+    // Reset retry count on successful authentication
+    this.authRetryCount = 0;
 
     console.log('Loading dashboard data for user:', userId);
     
