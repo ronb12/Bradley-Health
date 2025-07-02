@@ -159,7 +159,8 @@ class ProfileManager {
 
     try {
       this.showLoading('Updating profile...');
-      await this.db.collection('users').doc(this.currentUser.uid).update(profileData);
+      // Use set with merge to create or update the document
+      await this.db.collection('users').doc(this.currentUser.uid).set(profileData, { merge: true });
       this.showToast('Profile updated successfully!', 'success');
       this.loadProfile(); // Reload to get updated data
     } catch (error) {
@@ -190,7 +191,8 @@ class ProfileManager {
 
     try {
       this.showLoading('Updating emergency contact...');
-      await this.db.collection('users').doc(this.currentUser.uid).update(emergencyData);
+      // Use set with merge to create or update the document
+      await this.db.collection('users').doc(this.currentUser.uid).set(emergencyData, { merge: true });
       this.showToast('Emergency contact updated successfully!', 'success');
       this.loadProfile(); // Reload to get updated data
     } catch (error) {
@@ -205,10 +207,10 @@ class ProfileManager {
     const enabled = e.target.checked;
     
     try {
-      await this.db.collection('users').doc(this.currentUser.uid).update({
+      await this.db.collection('users').doc(this.currentUser.uid).set({
         'notificationSettings.enabled': enabled,
         updatedAt: new Date()
-      });
+      }, { merge: true });
       this.showToast(`Notifications ${enabled ? 'enabled' : 'disabled'}`, 'success');
     } catch (error) {
       console.error('Error updating notification settings:', error);
@@ -220,10 +222,10 @@ class ProfileManager {
     const time = e.target.value;
     
     try {
-      await this.db.collection('users').doc(this.currentUser.uid).update({
+      await this.db.collection('users').doc(this.currentUser.uid).set({
         'notificationSettings.reminderTime': time,
         updatedAt: new Date()
-      });
+      }, { merge: true });
       this.showToast('Reminder time updated', 'success');
     } catch (error) {
       console.error('Error updating reminder time:', error);
