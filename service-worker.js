@@ -9,9 +9,6 @@ const STATIC_FILES = [
   '/index.html',
   '/manifest.json',
   '/assets/favicon.svg',
-  '/assets/icon-72.png',
-  '/assets/icon-96.png',
-  '/assets/icon-144.png',
   '/assets/icon-192.png',
   '/assets/icon-512.png',
   '/assets/apple-touch-icon.png',
@@ -28,7 +25,9 @@ const STATIC_FILES = [
   '/assets/js/mood-tracker.js',
   '/assets/js/notifications.js',
   '/assets/js/export.js',
-  '/assets/js/profile-manager.js'
+  '/assets/js/profile-manager.js',
+  '/assets/js/legal.js',
+  '/assets/js/pwa-install.js'
 ];
 
 // Install event - cache static files

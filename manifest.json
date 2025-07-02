@@ -18,38 +18,20 @@
       "purpose": "any maskable"
     },
     {
-      "src": "assets/icon-192.png",
+      "src": "assets/icon-192.png?v=1.1.1",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "assets/icon-512.png",
+      "src": "assets/icon-512.png?v=1.1.1",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "assets/apple-touch-icon.png",
+      "src": "assets/apple-touch-icon.png?v=1.1.1",
       "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "assets/icon-72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "assets/icon-96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "assets/icon-144.png",
-      "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     }
@@ -191,6 +173,6 @@
     "name": "Bradley Health Team",
     "url": "https://bradley-health.com"
   },
-  "version": "1.1.0",
+  "version": "1.1.1",
   "minimum_version": "1.0.0"
 } 
