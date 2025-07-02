@@ -228,49 +228,67 @@ class ChartManager {
     moodDashboard.id = 'moodInsightsDashboard';
     moodDashboard.className = 'mood-insights-dashboard';
     moodDashboard.innerHTML = `
+      <div class="dashboard-header">
+        <h2>📊 Your Mood Summary</h2>
+        <p class="dashboard-subtitle">Here's how you've been feeling this week</p>
+      </div>
+      
       <div class="mood-overview">
-        <h3>Mood Overview</h3>
+        <h3>🎯 Key Metrics</h3>
         <div class="mood-stats-grid">
           <div class="mood-stat-card">
             <div class="stat-icon">😊</div>
-            <div class="stat-label">Average Mood</div>
+            <div class="stat-label">Overall Mood</div>
             <div class="stat-value" id="avgMoodValue">7.2</div>
-            <div class="stat-trend positive">+0.3</div>
+            <div class="stat-scale">out of 10</div>
+            <div class="stat-trend positive">↗️ +0.3 from last week</div>
           </div>
           <div class="mood-stat-card">
             <div class="stat-icon">⚡</div>
             <div class="stat-label">Energy Level</div>
             <div class="stat-value" id="avgEnergyValue">6.8</div>
-            <div class="stat-trend neutral">0.0</div>
+            <div class="stat-scale">out of 10</div>
+            <div class="stat-trend neutral">→ Same as last week</div>
           </div>
           <div class="mood-stat-card">
             <div class="stat-icon">😰</div>
             <div class="stat-label">Stress Level</div>
             <div class="stat-value" id="avgStressValue">3.5</div>
-            <div class="stat-trend negative">-0.2</div>
+            <div class="stat-scale">out of 10</div>
+            <div class="stat-trend negative">↘️ -0.2 from last week</div>
           </div>
         </div>
       </div>
       
       <div class="mood-progress">
-        <h3>Weekly Progress</h3>
+        <h3>📈 Weekly Progress</h3>
+        <p class="section-description">How you're doing compared to your goals</p>
         <div class="progress-bars">
           <div class="progress-item">
-            <div class="progress-label">Mood Stability</div>
+            <div class="progress-info">
+              <div class="progress-label">Mood Consistency</div>
+              <div class="progress-description">How stable your mood has been</div>
+            </div>
             <div class="progress-bar">
               <div class="progress-fill" style="width: 85%"></div>
             </div>
             <div class="progress-value">85%</div>
           </div>
           <div class="progress-item">
-            <div class="progress-label">Positive Days</div>
+            <div class="progress-info">
+              <div class="progress-label">Good Days</div>
+              <div class="progress-description">Days you felt positive</div>
+            </div>
             <div class="progress-bar">
               <div class="progress-fill" style="width: 71%"></div>
             </div>
-            <div class="progress-value">5/7 days</div>
+            <div class="progress-value">5 of 7 days</div>
           </div>
           <div class="progress-item">
-            <div class="progress-label">Goal Achievement</div>
+            <div class="progress-info">
+              <div class="progress-label">Goal Progress</div>
+              <div class="progress-description">Working towards your targets</div>
+            </div>
             <div class="progress-bar">
               <div class="progress-fill" style="width: 60%"></div>
             </div>
@@ -280,19 +298,47 @@ class ChartManager {
       </div>
       
       <div class="mood-insights">
-        <h3>Insights</h3>
+        <h3>💡 What This Means</h3>
+        <p class="section-description">Insights to help you understand your patterns</p>
         <div class="insights-list">
           <div class="insight-item positive">
             <span class="insight-icon">📈</span>
-            <span class="insight-text">Your mood has improved by 15% this week</span>
+            <div class="insight-content">
+              <span class="insight-title">Great Progress!</span>
+              <span class="insight-text">Your mood has improved by 15% this week. Keep up the good work!</span>
+            </div>
           </div>
           <div class="insight-item info">
-            <span class="insight-icon">💡</span>
-            <span class="insight-text">Exercise days show 20% better mood scores</span>
+            <span class="insight-icon">💪</span>
+            <div class="insight-content">
+              <span class="insight-title">Exercise Helps</span>
+              <span class="insight-text">On days when you exercise, your mood scores are 20% higher.</span>
+            </div>
           </div>
           <div class="insight-item warning">
             <span class="insight-icon">⚠️</span>
-            <span class="insight-text">Stress tends to spike on Mondays</span>
+            <div class="insight-content">
+              <span class="insight-title">Monday Blues</span>
+              <span class="insight-text">Stress tends to be higher on Mondays. Try starting your week with something you enjoy.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quick-tips">
+        <h3>💭 Quick Tips</h3>
+        <div class="tips-grid">
+          <div class="tip-card">
+            <span class="tip-icon">🌅</span>
+            <span class="tip-text">Start your day with 5 minutes of gratitude</span>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">🚶</span>
+            <span class="tip-text">Take a 10-minute walk when stressed</span>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">📱</span>
+            <span class="tip-text">Limit social media to 30 minutes daily</span>
           </div>
         </div>
       </div>
@@ -315,57 +361,102 @@ class ChartManager {
     style.id = 'moodDashboardStyles';
     style.textContent = `
       .mood-insights-dashboard {
-        padding: 20px;
+        padding: 24px;
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       }
       
-      .mood-overview h3, .mood-progress h3, .mood-insights h3 {
-        margin: 0 0 20px 0;
-        color: #374151;
-        font-size: 18px;
+      .dashboard-header {
+        text-align: center;
+        margin-bottom: 32px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #f3f4f6;
+      }
+      
+      .dashboard-header h2 {
+        margin: 0 0 8px 0;
+        color: #1f2937;
+        font-size: 24px;
+        font-weight: 700;
+      }
+      
+      .dashboard-subtitle {
+        margin: 0;
+        color: #6b7280;
+        font-size: 16px;
+      }
+      
+      .mood-overview h3, .mood-progress h3, .mood-insights h3, .quick-tips h3 {
+        margin: 0 0 12px 0;
+        color: #1f2937;
+        font-size: 20px;
         font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .section-description {
+        margin: 0 0 20px 0;
+        color: #6b7280;
+        font-size: 14px;
+        line-height: 1.5;
       }
       
       .mood-stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 20px;
-        margin-bottom: 30px;
+        margin-bottom: 32px;
       }
       
       .mood-stat-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        padding: 20px;
-        border-radius: 12px;
+        padding: 24px 20px;
+        border-radius: 16px;
         text-align: center;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.25);
+        transition: transform 0.2s ease;
+      }
+      
+      .mood-stat-card:hover {
+        transform: translateY(-2px);
       }
       
       .stat-icon {
-        font-size: 32px;
-        margin-bottom: 10px;
+        font-size: 36px;
+        margin-bottom: 12px;
+        display: block;
       }
       
       .stat-label {
-        font-size: 14px;
-        opacity: 0.9;
+        font-size: 16px;
+        opacity: 0.95;
         margin-bottom: 8px;
+        font-weight: 500;
       }
       
       .stat-value {
-        font-size: 28px;
-        font-weight: bold;
-        margin-bottom: 5px;
+        font-size: 32px;
+        font-weight: 800;
+        margin-bottom: 4px;
+      }
+      
+      .stat-scale {
+        font-size: 12px;
+        opacity: 0.8;
+        margin-bottom: 8px;
       }
       
       .stat-trend {
-        font-size: 12px;
-        padding: 4px 8px;
-        border-radius: 12px;
+        font-size: 13px;
+        padding: 6px 12px;
+        border-radius: 20px;
         display: inline-block;
+        font-weight: 500;
       }
       
       .stat-trend.positive {
@@ -384,83 +475,174 @@ class ChartManager {
       }
       
       .progress-bars {
-        margin-bottom: 30px;
+        margin-bottom: 32px;
       }
       
       .progress-item {
         display: flex;
         align-items: center;
-        margin-bottom: 15px;
-        gap: 15px;
+        margin-bottom: 20px;
+        gap: 16px;
+        padding: 16px;
+        background: #f9fafb;
+        border-radius: 12px;
+      }
+      
+      .progress-info {
+        flex: 1;
+        min-width: 0;
       }
       
       .progress-label {
-        flex: 1;
-        font-size: 14px;
-        color: #374151;
-        font-weight: 500;
+        font-size: 16px;
+        color: #1f2937;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      
+      .progress-description {
+        font-size: 13px;
+        color: #6b7280;
+        line-height: 1.4;
       }
       
       .progress-bar {
-        flex: 2;
-        height: 8px;
+        flex: 1;
+        height: 12px;
         background: #e5e7eb;
-        border-radius: 4px;
+        border-radius: 6px;
         overflow: hidden;
+        min-width: 120px;
       }
       
       .progress-fill {
         height: 100%;
         background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        border-radius: 4px;
-        transition: width 0.3s ease;
+        border-radius: 6px;
+        transition: width 0.6s ease;
       }
       
       .progress-value {
-        flex: 0 0 60px;
+        flex: 0 0 80px;
         text-align: right;
-        font-size: 14px;
-        font-weight: 600;
-        color: #374151;
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
       }
       
       .insights-list {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 16px;
+        margin-bottom: 32px;
       }
       
       .insight-item {
         display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 16px;
-        border-radius: 8px;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 20px;
+        border-radius: 12px;
         font-size: 14px;
+        line-height: 1.5;
       }
       
       .insight-item.positive {
-        background: rgba(34, 197, 94, 0.1);
+        background: rgba(34, 197, 94, 0.08);
         border-left: 4px solid #22c55e;
       }
       
       .insight-item.info {
-        background: rgba(59, 130, 246, 0.1);
+        background: rgba(59, 130, 246, 0.08);
         border-left: 4px solid #3b82f6;
       }
       
       .insight-item.warning {
-        background: rgba(245, 158, 11, 0.1);
+        background: rgba(245, 158, 11, 0.08);
         border-left: 4px solid #f59e0b;
       }
       
       .insight-icon {
-        font-size: 18px;
+        font-size: 24px;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      
+      .insight-content {
+        flex: 1;
+      }
+      
+      .insight-title {
+        display: block;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 4px;
+        font-size: 15px;
       }
       
       .insight-text {
-        flex: 1;
+        color: #4b5563;
+        line-height: 1.5;
+      }
+      
+      .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+      }
+      
+      .tip-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+      }
+      
+      .tip-card:hover {
+        background: #f1f5f9;
+        transform: translateY(-1px);
+      }
+      
+      .tip-icon {
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+      
+      .tip-text {
+        font-size: 14px;
         color: #374151;
+        font-weight: 500;
+        line-height: 1.4;
+      }
+      
+      @media (max-width: 768px) {
+        .mood-insights-dashboard {
+          padding: 16px;
+        }
+        
+        .mood-stats-grid {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+        
+        .progress-item {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 12px;
+        }
+        
+        .progress-value {
+          text-align: left;
+          flex: none;
+        }
+        
+        .tips-grid {
+          grid-template-columns: 1fr;
+        }
       }
     `;
     
