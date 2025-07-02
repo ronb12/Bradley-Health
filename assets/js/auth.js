@@ -64,11 +64,7 @@ class AuthManager {
       logoutBtn.addEventListener('click', () => this.logout());
     }
 
-    // Profile form
-    const profileForm = document.getElementById('profileForm');
-    if (profileForm) {
-      profileForm.addEventListener('submit', (e) => this.updateProfile(e));
-    }
+
   }
 
   async handleLogin(e) {
@@ -206,39 +202,7 @@ class AuthManager {
     return null;
   }
 
-  async updateProfile(e) {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const profileData = {
-      name: formData.get('name'),
-      age: parseInt(formData.get('age')),
-      weight: parseFloat(formData.get('weight')),
-      height: parseFloat(formData.get('height')),
-      emergencyContact: {
-        name: formData.get('emergencyName'),
-        phone: formData.get('emergencyPhone'),
-        relationship: formData.get('emergencyRelationship')
-      },
-      medicalConditions: formData.get('medicalConditions'),
-      medications: formData.get('medications'),
-      updatedAt: new Date()
-    };
 
-    if (!this.db) {
-      this.showToast('Database not available. Please check your connection.', 'error');
-      return;
-    }
-
-    try {
-      this.showLoading('Updating profile...');
-      await this.db.collection('users').doc(this.currentUser.uid).update(profileData);
-      this.showToast('Profile updated successfully!', 'success');
-    } catch (error) {
-      this.showToast('Error updating profile', 'error');
-    } finally {
-      this.hideLoading();
-    }
-  }
 
   async logout() {
     if (!this.auth) {
