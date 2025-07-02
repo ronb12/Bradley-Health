@@ -13,8 +13,13 @@ class AuthManager {
       this.currentUser = user;
       this.updateUI(user);
       if (user) {
-        this.loadUserProfile(user.uid);
+        // Add a small delay to ensure Firebase is fully ready
+        setTimeout(() => {
+          this.loadUserProfile(user.uid);
+        }, 1000);
       }
+    }, (error) => {
+      console.log('Auth state change error (non-critical):', error.message);
     });
 
     // Setup auth event listeners
@@ -125,7 +130,21 @@ class AuthManager {
 
   async loadUserProfile(uid) {
     try {
-      const doc = await this.db.collection('users').doc(uid).get();
+      // Check if we're online
+      if (!navigator.onLine) {
+        console.log('Offline - using cached profile data');
+        // Try to get from cache first
+        const doc = await this.db.collection('users').doc(uid).get({ source: 'cache' });
+        if (doc.exists) {
+          const profile = doc.data();
+          this.updateProfileUI(profile);
+          return profile;
+        }
+        return null;
+      }
+
+      // Online - try to get from server with fallback to cache
+      const doc = await this.db.collection('users').doc(uid).get({ source: 'default' });
       if (doc.exists) {
         const profile = doc.data();
         this.updateProfileUI(profile);
@@ -133,6 +152,21 @@ class AuthManager {
       }
     } catch (error) {
       console.error('Error loading user profile:', error);
+      
+      // If server request failed, try cache
+      if (error.code === 'unavailable' || error.message.includes('offline')) {
+        try {
+          console.log('Trying to load profile from cache...');
+          const doc = await this.db.collection('users').doc(uid).get({ source: 'cache' });
+          if (doc.exists) {
+            const profile = doc.data();
+            this.updateProfileUI(profile);
+            return profile;
+          }
+        } catch (cacheError) {
+          console.log('Cache also failed:', cacheError.message);
+        }
+      }
     }
     return null;
   }
