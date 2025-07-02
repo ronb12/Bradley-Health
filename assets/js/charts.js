@@ -237,42 +237,36 @@ class ChartManager {
       try {
         const ctx = newCanvas.getContext('2d');
         const chart = new Chart(ctx, {
-          type: 'line',
+          type: 'bar',
           data: {
             labels: this.getLast7Days(),
             datasets: [
               {
                 label: 'Mood',
                 data: [7, 8, 6, 9, 7, 8, 7],
+                backgroundColor: 'rgba(236, 72, 153, 0.8)',
                 borderColor: '#ec4899',
-                backgroundColor: 'rgba(236, 72, 153, 0.2)',
-                tension: 0.4,
-                fill: true,
-                borderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6
+                borderWidth: 1,
+                borderRadius: 4,
+                borderSkipped: false
               },
               {
                 label: 'Energy',
                 data: [6, 7, 5, 8, 6, 7, 6],
+                backgroundColor: 'rgba(245, 158, 11, 0.8)',
                 borderColor: '#f59e0b',
-                backgroundColor: 'rgba(245, 158, 11, 0.2)',
-                tension: 0.4,
-                fill: true,
-                borderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6
+                borderWidth: 1,
+                borderRadius: 4,
+                borderSkipped: false
               },
               {
                 label: 'Stress',
                 data: [4, 3, 6, 2, 4, 3, 4],
+                backgroundColor: 'rgba(59, 130, 246, 0.8)',
                 borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                tension: 0.4,
-                fill: true,
-                borderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6
+                borderWidth: 1,
+                borderRadius: 4,
+                borderSkipped: false
               }
             ]
           },
