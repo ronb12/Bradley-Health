@@ -12,9 +12,13 @@ class LimbCareManager {
     if (typeof firebase !== 'undefined' && firebase.firestore) {
       this.db = firebase.firestore();
       this.currentUser = null;
-      this.setupEventListeners();
-      this.setupPainLevelSlider();
       this.setupAuthListener();
+      
+      // Wait a bit for DOM to be ready, then setup event listeners
+      setTimeout(() => {
+        this.setupEventListeners();
+        this.setupPainLevelSlider();
+      }, 100);
     } else {
       console.log('LimbCareManager: Waiting for Firebase...');
       setTimeout(() => this.init(), 1000);
@@ -54,6 +58,14 @@ class LimbCareManager {
     const prostheticForm = document.getElementById('prostheticForm');
     if (prostheticForm) {
       prostheticForm.addEventListener('submit', (e) => this.handleProstheticCare(e));
+    }
+
+    // Prosthetic limb dropdown change
+    const prostheticLimbSelect = document.getElementById('prostheticLimb');
+    if (prostheticLimbSelect) {
+      prostheticLimbSelect.addEventListener('change', (e) => {
+        console.log('Prosthetic limb selected:', e.target.value, 'Options:', e.target.options);
+      });
     }
 
     // Pain Tracking Form
@@ -171,12 +183,13 @@ class LimbCareManager {
     
     let html = '<div class="limb-types-grid">';
     for (let i = 0; i < count; i++) {
+      const currentType = this.userLimbs[i]?.type || '';
       html += `
         <div class="form-group">
           <label for="limbType${i}">Limb ${i + 1} Type</label>
           <select id="limbType${i}" name="limbType${i}" required onchange="limbCareManager.updateLimbConfiguration(${i}, this.value)">
             <option value="">Select type</option>
-            ${limbTypes.map(type => `<option value="${type}">${this.formatLimbType(type)}</option>`).join('')}
+            ${limbTypes.map(type => `<option value="${type}" ${type === currentType ? 'selected' : ''}>${this.formatLimbType(type)}</option>`).join('')}
           </select>
         </div>
       `;
@@ -190,9 +203,10 @@ class LimbCareManager {
     
     let html = '';
     for (let i = 0; i < count; i++) {
+      const limbName = this.userLimbs[i]?.name || `Limb ${i + 1}`;
       html += `
         <div class="limb-section" id="limbSection${i}">
-          <h3>Limb ${i + 1} Assessment</h3>
+          <h3>${limbName} Assessment</h3>
           <div class="form-row">
             <div class="form-group">
               <label for="skinCondition${i}">Skin Condition</label>
@@ -259,15 +273,21 @@ class LimbCareManager {
     
     prostheticLimbSelect.innerHTML = '<option value="">Select limb</option>';
     
+    console.log('Updating prosthetic limb options:', this.userLimbs);
+    
     // Add configured limbs
     this.userLimbs.forEach((limb, index) => {
       if (limb.type) {
-        prostheticLimbSelect.innerHTML += `<option value="${index}">${limb.name}</option>`;
+        const option = `<option value="${index}">${limb.name}</option>`;
+        prostheticLimbSelect.innerHTML += option;
+        console.log(`Added option: ${option}`);
       }
     });
     
     // Check if any limbs are configured
     const hasConfiguredLimbs = this.userLimbs.length > 0 && this.userLimbs.some(limb => limb.type);
+    
+    console.log('Has configured limbs:', hasConfiguredLimbs);
     
     // Show/hide setup message and form
     if (prostheticSetupMessage) {
@@ -301,6 +321,21 @@ class LimbCareManager {
     if (limbAssessmentsContainer) limbAssessmentsContainer.innerHTML = '';
   }
 
+  resetAssessmentFieldsOnly() {
+    // Reset only the assessment fields, not the limb configuration
+    const limbCount = this.userLimbs.length;
+    
+    for (let i = 0; i < limbCount; i++) {
+      const skinConditionSelect = document.getElementById(`skinCondition${i}`);
+      const sensationSelect = document.getElementById(`sensation${i}`);
+      const notesTextarea = document.getElementById(`notes${i}`);
+      
+      if (skinConditionSelect) skinConditionSelect.value = '';
+      if (sensationSelect) sensationSelect.value = '';
+      if (notesTextarea) notesTextarea.value = '';
+    }
+  }
+
   async handleLimbAssessment(event) {
     event.preventDefault();
     
@@ -315,6 +350,24 @@ class LimbCareManager {
     if (!limbCount || limbCount === 0) {
       this.showToast('Please select the number of limbs', 'error');
       return;
+    }
+
+    // Validate that all limbs are configured
+    const configuredLimbs = this.userLimbs.filter(limb => limb.type);
+    if (configuredLimbs.length !== limbCount) {
+      this.showToast(`Please configure all ${limbCount} limbs before saving assessment`, 'error');
+      return;
+    }
+
+    // Validate required fields for each limb
+    for (let i = 0; i < limbCount; i++) {
+      const skinCondition = formData.get(`skinCondition${i}`);
+      const sensation = formData.get(`sensation${i}`);
+      
+      if (!skinCondition || !sensation) {
+        this.showToast(`Please fill in all required fields for ${this.userLimbs[i]?.name || `Limb ${i + 1}`}`, 'error');
+        return;
+      }
     }
 
     const assessment = {
@@ -342,7 +395,10 @@ class LimbCareManager {
     try {
       await this.db.collection('limbAssessments').add(assessment);
       this.showToast('Limb assessment saved successfully', 'success');
-      event.target.reset();
+      
+      // Don't reset the form - keep the limb configuration
+      // Only reset the assessment fields, not the configuration
+      this.resetAssessmentFieldsOnly();
       this.setDefaultDateTime();
       this.loadLimbHistory();
     } catch (error) {
@@ -366,10 +422,35 @@ class LimbCareManager {
     }
 
     const formData = new FormData(event.target);
-    const limbIndex = parseInt(formData.get('limb'));
+    const limbValue = formData.get('limb');
+    const limbIndex = parseInt(limbValue);
     
-    if (isNaN(limbIndex) || !this.userLimbs[limbIndex] || !this.userLimbs[limbIndex].type) {
+    console.log('Prosthetic care form data:', {
+      limbValue,
+      limbIndex,
+      userLimbs: this.userLimbs,
+      selectedLimb: this.userLimbs[limbIndex]
+    });
+    
+    if (limbValue === '' || limbValue === null) {
+      this.showToast('Please select a limb', 'error');
+      return;
+    }
+    
+    if (isNaN(limbIndex) || limbIndex < 0 || limbIndex >= this.userLimbs.length) {
       this.showToast('Please select a valid limb', 'error');
+      return;
+    }
+    
+    if (!this.userLimbs[limbIndex] || !this.userLimbs[limbIndex].type) {
+      this.showToast('Selected limb is not properly configured', 'error');
+      return;
+    }
+
+    // Validate other required fields
+    const fit = formData.get('fit');
+    if (!fit) {
+      this.showToast('Please select fit quality', 'error');
       return;
     }
 
@@ -388,7 +469,18 @@ class LimbCareManager {
     try {
       await this.db.collection('prostheticCare').add(prostheticCare);
       this.showToast('Prosthetic care logged successfully', 'success');
-      event.target.reset();
+      
+      // Reset form but keep the limb selection
+      const prostheticForm = event.target;
+      const selectedLimb = prostheticForm.querySelector('#prostheticLimb').value;
+      
+      prostheticForm.reset();
+      
+      // Restore the limb selection
+      if (selectedLimb) {
+        prostheticForm.querySelector('#prostheticLimb').value = selectedLimb;
+      }
+      
       this.loadLimbHistory();
     } catch (error) {
       console.error('Error saving prosthetic care:', error);
@@ -418,7 +510,6 @@ class LimbCareManager {
       await this.db.collection('painTracking').add(painEntry);
       this.showToast('Pain entry logged successfully', 'success');
       event.target.reset();
-      this.setDefaultDateTime();
       this.loadLimbHistory();
     } catch (error) {
       console.error('Error saving pain entry:', error);
