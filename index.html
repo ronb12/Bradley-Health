@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bradley Health - Comprehensive Health Monitoring</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Bradley Health">
+  <meta name="application-name" content="Bradley Health">
+  <meta name="msapplication-TileColor" content="#4f46e5">
+  <meta name="msapplication-config" content="none">
+  
+  <!-- Apple Store Compliance -->
+  <meta name="apple-itunes-app" content="app-argument=health-monitoring">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  
+  <!-- Security and Privacy -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+  
+  <!-- Description and Keywords -->
+  <meta name="description" content="Bradley Health - Comprehensive health monitoring app for tracking blood pressure, medications, mood, and wellness goals">
+  <meta name="keywords" content="health, monitoring, blood pressure, medications, mood tracking, wellness, fitness">
+  <meta name="author" content="Bradley Health">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Bradley Health">
+  <meta property="og:description" content="Comprehensive health monitoring app">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bradley-health.web.app">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bradley Health">
+  <meta name="twitter:description" content="Comprehensive health monitoring app">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  
+  <!-- Icons -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+  
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js"></script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Pull-to-Refresh Indicator -->
+  <div id="pullToRefresh" style="display:none;position:fixed;top:0;left:0;width:100vw;height:60px;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg-secondary);color:var(--primary-color);font-size:1.5rem;transition:opacity 0.2s;opacity:0;">
+    <span id="ptrIcon">↓</span> <span id="ptrText" style="margin-left:10px;font-size:1rem;">Pull to refresh</span>
+  </div>
+
+  <!-- Loading Screen -->
+  <div id="loading" class="loading-screen" style="display: none;">
+    <div class="loading-spinner"></div>
+    <p id="loadingMessage">Loading...</p>
+  </div>
+
+  <!-- Authentication Section -->
+  <div id="authSection" class="auth-section">
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Bradley Health</h1>
+        <p>Sign in to access your health dashboard</p>
+      </div>
+      
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Login</button>
+        <button class="auth-tab" data-tab="register">Register</button>
+      </div>
+      
+      <!-- Login Form -->
+      <form id="loginForm" class="auth-form active">
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Sign In</button>
+      </form>
+      
+      <!-- Registration Form -->
+      <form id="registerForm" class="auth-form">
+        <div class="form-group">
+          <label for="registerName">Full Name</label>
+          <input type="text" id="registerName" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="registerEmail">Email</label>
+          <input type="email" id="registerEmail" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="registerPassword">Password</label>
+          <input type="password" id="registerPassword" name="password" required>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main App Section -->
+  <div id="userSection" class="app-container" style="display: none;">
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="header-content">
+        <div class="header-left">
+          <h1>Bradley Health</h1>
+          <p>Comprehensive Health Monitoring</p>
+        </div>
+        <div id="userInfo" class="user-info">
+          <!-- User info will be populated by auth manager -->
+        </div>
+      </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <div class="tab-container">
+      <nav class="tab-navigation" id="tabNav">
+        <button class="tab-button active" data-tab="dashboard">
+          <span class="tab-icon">📊</span>
+          <span class="tab-text">Dashboard</span>
+        </button>
+        <button class="tab-button" data-tab="blood-pressure">
+          <span class="tab-icon">❤️</span>
+          <span class="tab-text">Blood Pressure</span>
+        </button>
+        <button class="tab-button" data-tab="medications">
+          <span class="tab-icon">💊</span>
+          <span class="tab-text">Medications</span>
+        </button>
+        <button class="tab-button" data-tab="mood">
+          <span class="tab-icon">😊</span>
+          <span class="tab-text">Mood</span>
+        </button>
+        <button class="tab-button" data-tab="goals">
+          <span class="tab-icon">🎯</span>
+          <span class="tab-text">Goals</span>
+        </button>
+        <button class="tab-button" data-tab="profile">
+          <span class="tab-icon">👤</span>
+          <span class="tab-text">Profile</span>
+        </button>
+      </nav>
+
+      <!-- Dashboard Tab -->
+      <section class="tab-content active" id="dashboard">
+        <div class="dashboard-grid">
+          <!-- Health Overview Card -->
+          <div class="card health-overview">
+            <h2>Health Overview</h2>
+            <div class="health-metrics">
+              <div class="metric">
+                <span class="metric-icon">❤️</span>
+                <span class="metric-label">Blood Pressure</span>
+                <span class="metric-value" id="bpOverview">--/--</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">💊</span>
+                <span class="metric-label">Medications</span>
+                <span class="metric-value" id="medOverview">0</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">😊</span>
+                <span class="metric-label">Mood</span>
+                <span class="metric-value" id="moodOverview">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions Card -->
+          <div class="card quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="action-buttons">
+              <button class="action-btn" onclick="switchToTab('blood-pressure')">
+                <span class="action-icon">➕</span>
+                <span>Add BP Reading</span>
+              </button>
+              <button class="action-btn" onclick="switchToTab('medications')">
+                <span class="action-icon">💊</span>
+                <span>Add Medication</span>
+              </button>
+              <button class="action-btn" onclick="switchToTab('mood')">
+                <span class="action-icon">😊</span>
+                <span>Log Mood</span>
+              </button>
+              <button class="action-btn" onclick="switchToTab('goals')">
+                <span class="action-icon">🎯</span>
+                <span>Set Goal</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Charts Card -->
+          <div class="card charts-section">
+            <h2>Health Trends</h2>
+            <div class="chart-container">
+              <canvas id="healthChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Blood Pressure Chart Card -->
+          <div class="card bp-chart-section">
+            <h2>Blood Pressure Trends</h2>
+            <div class="chart-container">
+              <canvas id="bpChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Medication Adherence Chart Card -->
+          <div class="card medication-chart-section">
+            <h2>Medication Adherence</h2>
+            <div class="chart-container">
+              <canvas id="medicationChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Alerts Card -->
+          <div class="card alerts-section">
+            <h2>Alerts & Reminders</h2>
+            <div id="alertsList" class="alerts-list">
+              <!-- Alerts will be populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Blood Pressure Tab -->
+      <section class="tab-content" id="blood-pressure">
+        <div class="bp-container">
+          <!-- Current Reading -->
+          <div class="card current-reading">
+            <h2>Current Reading</h2>
+            <div class="bp-display">
+              <div class="bp-value">
+                <span class="systolic" id="currentSystolic">--</span>
+                <span class="separator">/</span>
+                <span class="diastolic" id="currentDiastolic">--</span>
+              </div>
+              <div class="bp-unit">mmHg</div>
+              <div class="bp-status" id="currentStatus">--</div>
+            </div>
+            <p class="reading-time" id="lastReadingTime">No readings yet</p>
+          </div>
+
+          <!-- Add Reading Form -->
+          <div class="card add-reading">
+            <h2>Add New Reading</h2>
+            <form id="bpForm" class="bp-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="systolic">Systolic</label>
+                  <input type="number" id="systolic" name="systolic" min="70" max="200" required>
+                </div>
+                <div class="form-group">
+                  <label for="diastolic">Diastolic</label>
+                  <input type="number" id="diastolic" name="diastolic" min="40" max="130" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="pulse">Pulse Rate (Optional)</label>
+                <input type="number" id="pulse" name="pulse" min="40" max="200">
+              </div>
+              <div class="form-group">
+                <label for="bpNotes">Notes</label>
+                <textarea id="bpNotes" name="notes" rows="3"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Reading</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- BP History -->
+          <div class="card bp-history">
+            <h2>Reading History</h2>
+            <div id="bpHistoryList" class="history-list">
+              <!-- History will be populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Medications Tab -->
+      <section class="tab-content" id="medications">
+        <div class="medications-container">
+          <!-- Add Medication -->
+          <div class="card add-medication">
+            <h2>Add Medication</h2>
+            <form id="addMedicationForm" class="med-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="medName">Medication Name</label>
+                  <input type="text" id="medName" name="name" required>
+                </div>
+                <div class="form-group">
+                  <label for="medDosage">Dosage</label>
+                  <input type="text" id="medDosage" name="dosage" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="medFrequency">Frequency</label>
+                  <select id="medFrequency" name="frequency" required>
+                    <option value="">Select frequency</option>
+                    <option value="daily">Daily</option>
+                    <option value="twice-daily">Twice Daily</option>
+                    <option value="three-times-daily">Three Times Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="as-needed">As Needed</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="medTime">Time of Day</label>
+                  <input type="time" id="medTime" name="timeOfDay">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="medInstructions">Instructions</label>
+                <textarea id="medInstructions" name="instructions" rows="3"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Add Medication</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Medication List -->
+          <div class="card medication-list">
+            <h2>Current Medications</h2>
+            <div id="medicationList" class="med-list">
+              <!-- Medications will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Reminders -->
+          <div class="card reminders-section">
+            <h2>Medication Reminders</h2>
+            <div id="reminderList" class="reminder-list">
+              <!-- Reminders will be populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mood Tab -->
+      <section class="tab-content" id="mood">
+        <div class="mood-container">
+          <!-- Quick Mood Entry -->
+          <div class="card quick-mood">
+            <h2>How are you feeling?</h2>
+            <div class="mood-buttons">
+              <button class="mood-btn" data-mood="1">😢</button>
+              <button class="mood-btn" data-mood="3">😔</button>
+              <button class="mood-btn" data-mood="5">😐</button>
+              <button class="mood-btn" data-mood="7">🙂</button>
+              <button class="mood-btn" data-mood="9">😊</button>
+            </div>
+          </div>
+
+          <!-- Detailed Mood Entry -->
+          <div class="card detailed-mood">
+            <h2>Detailed Mood Entry</h2>
+            <form id="moodEntryForm" class="mood-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="moodLevel">Mood Level (1-10)</label>
+                  <input type="range" id="moodLevel" name="mood" min="1" max="10" value="5">
+                  <span id="moodValue">5</span>
+                </div>
+                <div class="form-group">
+                  <label for="energyLevel">Energy Level (1-10)</label>
+                  <input type="range" id="energyLevel" name="energy" min="1" max="10" value="5">
+                  <span id="energyValue">5</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="moodNotes">How are you feeling today?</label>
+                <textarea id="moodNotes" name="notes" rows="3"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Mood</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Mood History -->
+          <div class="card mood-history">
+            <h2>Mood History</h2>
+            <div id="moodEntriesList" class="mood-list">
+              <!-- Mood entries will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Mood Chart -->
+          <div class="card mood-chart">
+            <h2>Mood Trends</h2>
+            <canvas id="moodChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Goals Tab -->
+      <section class="tab-content" id="goals">
+        <div class="goals-container">
+          <!-- Add Goal -->
+          <div class="card add-goal">
+            <h2>Set New Goal</h2>
+            <form id="addGoalForm" class="goal-form">
+              <div class="form-group">
+                <label for="goalTitle">Goal Title</label>
+                <input type="text" id="goalTitle" name="title" required>
+              </div>
+              <div class="form-group">
+                <label for="goalCategory">Category</label>
+                <select id="goalCategory" name="category" required>
+                  <option value="">Select category</option>
+                  <option value="blood-pressure">Blood Pressure</option>
+                  <option value="medication">Medication</option>
+                  <option value="exercise">Exercise</option>
+                  <option value="diet">Diet</option>
+                  <option value="mental-health">Mental Health</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="goalTarget">Target</label>
+                <input type="text" id="goalTarget" name="target" required>
+              </div>
+              <div class="form-group">
+                <label for="goalDeadline">Deadline</label>
+                <input type="date" id="goalDeadline" name="deadline" required>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Set Goal</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Goals List -->
+          <div class="card goals-list">
+            <h2>Your Goals</h2>
+            <div id="goalsList" class="goal-list">
+              <!-- Goals will be populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Profile Tab -->
+      <section class="tab-content" id="profile">
+        <div class="profile-container">
+          <!-- Profile Information -->
+          <div class="card profile-info">
+            <h2>Profile Information</h2>
+            <form id="profileForm" class="profile-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="profileName">Full Name</label>
+                  <input type="text" id="profileName" name="name" required>
+                </div>
+                <div class="form-group">
+                  <label for="profileAge">Age</label>
+                  <input type="number" id="profileAge" name="age" min="1" max="120">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="profileWeight">Weight (kg)</label>
+                  <input type="number" id="profileWeight" name="weight" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label for="profileHeight">Height (cm)</label>
+                  <input type="number" id="profileHeight" name="height">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="profileConditions">Medical Conditions</label>
+                <textarea id="profileConditions" name="medicalConditions" rows="3"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Update Profile</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Emergency Contact -->
+          <div class="card emergency-contact">
+            <h2>Emergency Contact</h2>
+            <form id="emergencyForm" class="emergency-form">
+              <div class="form-group">
+                <label for="emergencyName">Contact Name</label>
+                <input type="text" id="emergencyName" name="emergencyName">
+              </div>
+              <div class="form-group">
+                <label for="emergencyPhone">Phone Number</label>
+                <input type="tel" id="emergencyPhone" name="emergencyPhone">
+              </div>
+              <div class="form-group">
+                <label for="emergencyRelationship">Relationship</label>
+                <input type="text" id="emergencyRelationship" name="emergencyRelationship">
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Contact</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Settings -->
+          <div class="card settings">
+            <h2>App Settings</h2>
+            <div class="settings-options">
+              <div class="setting-item">
+                <label for="themeToggle">Dark Mode</label>
+                <input type="checkbox" id="themeToggle" class="toggle">
+              </div>
+              <div class="setting-item">
+                <label for="notificationsToggle">Notifications</label>
+                <input type="checkbox" id="notificationsToggle" class="toggle" checked>
+              </div>
+              <div class="setting-item">
+                <label for="unitsToggle">Units (Metric/Imperial)</label>
+                <select id="unitsToggle">
+                  <option value="metric">Metric</option>
+                  <option value="imperial">Imperial</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Legal Links -->
+          <div class="card legal-links">
+            <h2>Legal</h2>
+            <div class="legal-options">
+              <a href="#" class="legal-link" onclick="showPrivacyPolicy()">Privacy Policy</a>
+              <a href="#" class="legal-link" onclick="showTermsOfService()">Terms of Service</a>
+              <a href="#" class="legal-link" onclick="showDataUsage()">Data Usage</a>
+            </div>
+          </div>
+          
+          <!-- Data Export -->
+          <div class="card data-export">
+            <h2>Data Export</h2>
+            <div class="setting-group">
+              <p>Export all your health data for backup or transfer.</p>
+              <button class="btn btn-secondary" id="exportData">Export All Data</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- PWA Installation Prompt -->
+  <div id="pwaInstallPrompt" class="pwa-install-prompt" style="display: none;">
+    <div class="pwa-prompt-content">
+      <div class="pwa-prompt-icon">
+        <img src="assets/favicon.svg" alt="Bradley Health" width="48" height="48">
+      </div>
+      <div class="pwa-prompt-text">
+        <h3>Install Bradley Health</h3>
+        <p>Add to your home screen for quick access</p>
+      </div>
+      <div class="pwa-prompt-actions">
+        <button id="pwaInstallBtn" class="btn btn-primary">Install</button>
+        <button id="pwaDismissBtn" class="btn btn-secondary">Not Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/theme-manager.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/dashboard.js"></script>
+  <script src="assets/js/blood-pressure.js"></script>
+  <script src="assets/js/medication-manager.js"></script>
+  <script src="assets/js/mood-tracker.js"></script>
+  <script src="assets/js/goals-manager.js"></script>
+  <script src="assets/js/profile-manager.js"></script>
+  <script src="assets/js/charts.js"></script>
+  <script src="assets/js/export.js"></script>
+  <script src="assets/js/notifications.js"></script>
+  <script src="assets/js/legal.js"></script>
+  <script src="assets/js/pwa-install.js"></script>
+  <script src="assets/js/pull-to-refresh.js"></script>
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then((registration) => {
+            console.log('Service Worker registered successfully:', registration);
+          })
+          .catch((error) => {
+            console.error('Service Worker registration failed:', error);
+          });
+      });
+    }
+    
+    // Global error handler
+    window.addEventListener('error', (event) => {
+      console.error('Global error:', event.error);
+    });
+    
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('Unhandled promise rejection:', event.reason);
+    });
+  </script>
+</body>
+</html> 
