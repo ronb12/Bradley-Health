@@ -410,12 +410,14 @@
     justify-content: flex-start;
     overflow-x: auto;
     padding: 0 var(--spacing-2);
+    white-space: nowrap;
   }
 
   .tab-button {
     min-width: 70px;
     padding: var(--spacing-3) var(--spacing-2);
     flex-shrink: 0;
+    white-space: normal;
   }
 
   .tab-icon {
@@ -428,6 +430,8 @@
     line-height: 1.2;
     text-align: center;
     word-break: break-word;
+    white-space: normal;
+    max-width: 80px;
   }
 
   .tab-content {
@@ -480,6 +484,7 @@
     min-width: 60px;
     padding: var(--spacing-2) var(--spacing-2);
     flex-shrink: 0;
+    white-space: normal;
   }
 
   .tab-icon {
@@ -492,7 +497,8 @@
     line-height: 1.1;
     text-align: center;
     word-break: break-word;
-    max-width: 100%;
+    max-width: 60px;
+    white-space: normal;
   }
 
   .header-left h1 {
