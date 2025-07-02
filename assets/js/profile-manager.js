@@ -131,6 +131,13 @@ class ProfileManager {
 
   async updateProfile(e) {
     e.preventDefault();
+    
+    // Check if user is authenticated
+    if (!this.currentUser || !this.currentUser.uid) {
+      this.showToast('Please sign in to update your profile', 'error');
+      return;
+    }
+    
     const formData = new FormData(e.target);
     
     const profileData = {
@@ -163,6 +170,13 @@ class ProfileManager {
 
   async updateEmergencyContact(e) {
     e.preventDefault();
+    
+    // Check if user is authenticated
+    if (!this.currentUser || !this.currentUser.uid) {
+      this.showToast('Please sign in to update emergency contact', 'error');
+      return;
+    }
+    
     const formData = new FormData(e.target);
     
     const emergencyData = {

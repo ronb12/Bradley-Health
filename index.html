@@ -555,23 +555,12 @@
               <a href="#" class="legal-link" onclick="showDataUsage()">Data Usage</a>
             </div>
           </div>
-          <div class="card settings">
-            <h2>Settings</h2>
+          
+          <!-- Data Export -->
+          <div class="card data-export">
+            <h2>Data Export</h2>
             <div class="setting-group">
-              <h3>Notifications</h3>
-              <div class="setting-item">
-                <label>
-                  <input type="checkbox" id="enableNotifications" checked>
-                  Enable notifications
-                </label>
-              </div>
-              <div class="setting-item">
-                <label>Reminder Time:</label>
-                <input type="time" id="reminderTime" value="08:00">
-              </div>
-            </div>
-            <div class="setting-group">
-              <h3>Data Export</h3>
+              <p>Export all your health data for backup or transfer.</p>
               <button class="btn btn-secondary" id="exportData">Export All Data</button>
             </div>
           </div>
@@ -612,12 +601,13 @@
   <script src="assets/js/charts.js"></script>
   <script src="assets/js/export.js"></script>
   <script src="assets/js/notifications.js"></script>
+  <script src="assets/js/legal.js"></script>
   <script src="assets/js/pwa-install.js"></script>
   <script>
     // Register Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
+        navigator.serviceWorker.register('./service-worker.js')
           .then((registration) => {
             console.log('Service Worker registered successfully:', registration);
           })
@@ -626,6 +616,15 @@
           });
       });
     }
+    
+    // Global error handler
+    window.addEventListener('error', (event) => {
+      console.error('Global error:', event.error);
+    });
+    
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('Unhandled promise rejection:', event.reason);
+    });
   </script>
 </body>
 </html> 

@@ -2,12 +2,12 @@
   "name": "Bradley Health",
   "short_name": "Bradley Health",
   "description": "Comprehensive health monitoring app for blood pressure, medications, mood tracking, and wellness goals",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4f46e5",
   "orientation": "portrait-primary",
-  "scope": "/",
+  "scope": "./",
   "lang": "en",
   "categories": ["health", "medical", "lifestyle"],
   "icons": [
@@ -89,7 +89,7 @@
       "name": "Add BP Reading",
       "short_name": "BP Reading",
       "description": "Quickly add a new blood pressure reading",
-      "url": "/?tab=blood-pressure",
+      "url": "./?tab=blood-pressure",
       "icons": [
         {
           "src": "assets/favicon.svg",
@@ -101,7 +101,7 @@
       "name": "Log Mood",
       "short_name": "Mood",
       "description": "Quickly log your current mood",
-      "url": "/?tab=mood",
+      "url": "./?tab=mood",
       "icons": [
         {
           "src": "assets/favicon.svg",
@@ -113,7 +113,7 @@
       "name": "Medications",
       "short_name": "Meds",
       "description": "View and manage medications",
-      "url": "/?tab=medications",
+      "url": "./?tab=medications",
       "icons": [
         {
           "src": "assets/favicon.svg",
@@ -125,7 +125,7 @@
       "name": "Dashboard",
       "short_name": "Dashboard",
       "description": "View your health overview",
-      "url": "/?tab=dashboard",
+      "url": "./?tab=dashboard",
       "icons": [
         {
           "src": "assets/favicon.svg",
@@ -146,12 +146,12 @@
   "protocol_handlers": [
     {
       "protocol": "web+health",
-      "url": "/?action=%s"
+      "url": "./?action=%s"
     }
   ],
   "file_handlers": [
     {
-      "action": "/",
+      "action": "./",
       "accept": {
         "application/json": [".json"],
         "text/csv": [".csv"]
@@ -159,7 +159,7 @@
     }
   ],
   "share_target": {
-    "action": "/share",
+    "action": "./share",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {

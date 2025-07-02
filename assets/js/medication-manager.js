@@ -43,6 +43,13 @@ class MedicationManager {
 
   async addMedication(e) {
     e.preventDefault();
+    
+    // Check if user is authenticated
+    if (!this.currentUser || !this.currentUser.uid) {
+      this.showToast('Please sign in to add medications', 'error');
+      return;
+    }
+    
     const formData = new FormData(e.target);
     
     const medication = {

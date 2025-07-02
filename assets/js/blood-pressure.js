@@ -30,6 +30,13 @@ class BloodPressureManager {
 
   async addReading(e) {
     e.preventDefault();
+    
+    // Check if user is authenticated
+    if (!this.currentUser || !this.currentUser.uid) {
+      this.showToast('Please sign in to save blood pressure readings', 'error');
+      return;
+    }
+    
     const formData = new FormData(e.target);
     
     const reading = {
