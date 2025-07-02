@@ -836,6 +836,146 @@ body {
   transition: width 0.3s ease;
 }
 
+/* ===== LIMB CARE STYLES ===== */
+.limb-care-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.limb-section {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #e9ecef;
+}
+
+.limb-section h3 {
+  color: #495057;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.limb-summary {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border-left: 4px solid #007bff;
+}
+
+.limb-summary strong {
+  color: #495057;
+}
+
+.limb-summary em {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.history-item {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #007bff;
+  transition: transform 0.2s ease;
+}
+
+.history-item:hover {
+  transform: translateY(-2px);
+}
+
+.history-item.assessment {
+  border-left-color: #28a745;
+}
+
+.history-item.prosthetic {
+  border-left-color: #ffc107;
+}
+
+.history-item.pain {
+  border-left-color: #dc3545;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.history-type {
+  font-weight: 600;
+  color: #495057;
+}
+
+.history-date {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.history-content {
+  color: #495057;
+}
+
+.history-content div {
+  margin-bottom: 6px;
+}
+
+.history-content strong {
+  color: #495057;
+}
+
+.history-content em {
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Pain level slider styling */
+input[type="range"] {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #e9ecef;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #007bff;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #007bff;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#painLevelValue {
+  display: inline-block;
+  margin-left: 10px;
+  font-weight: 600;
+  color: #007bff;
+  min-width: 20px;
+}
+
 /* ===== PROFILE STYLES ===== */
 .profile-container {
   display: grid;
@@ -967,6 +1107,7 @@ body {
   .medications-container,
   .mood-container,
   .goals-container,
+  .limb-care-container,
   .profile-container {
     grid-template-columns: 1fr;
   }

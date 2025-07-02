@@ -118,6 +118,9 @@ class DashboardManager {
       case 'goals':
         this.loadGoalsData();
         break;
+      case 'limb-care':
+        this.loadLimbCareData();
+        break;
       case 'profile':
         this.loadProfileData();
         break;
@@ -201,6 +204,34 @@ class DashboardManager {
         const moodOverview = document.getElementById('moodOverview');
         if (moodOverview) {
           moodOverview.textContent = latestMood.mood;
+        }
+      }
+
+      // Get latest limb assessment
+      const limbSnapshot = await firebase.firestore()
+        .collection('limbAssessments')
+        .where('userId', '==', userId)
+        .orderBy('timestamp', 'desc')
+        .limit(1)
+        .get();
+
+      if (!limbSnapshot.empty) {
+        const latestLimb = limbSnapshot.docs[0].data();
+        const limbOverview = document.getElementById('limbOverview');
+        if (limbOverview) {
+          // Determine overall limb health status
+          const leftCondition = latestLimb.leftLimb.skinCondition;
+          const rightCondition = latestLimb.rightLimb.skinCondition;
+          
+          let overallStatus = 'Good';
+          if (leftCondition === 'concerning' || rightCondition === 'concerning' || 
+              leftCondition === 'poor' || rightCondition === 'poor') {
+            overallStatus = '⚠️';
+          } else if (leftCondition === 'fair' || rightCondition === 'fair') {
+            overallStatus = 'Fair';
+          }
+          
+          limbOverview.textContent = overallStatus;
         }
       }
     } catch (error) {
@@ -332,6 +363,13 @@ class DashboardManager {
 
     // This would load goals from Firestore
     console.log('Loading goals data...');
+  }
+
+  loadLimbCareData() {
+    // Limb care data loading is handled by LimbCareManager
+    if (window.limbCareManager) {
+      window.limbCareManager.loadLimbHistory();
+    }
   }
 
   loadProfileData() {

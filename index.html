@@ -161,6 +161,10 @@
           <span class="tab-icon">🎯</span>
           <span class="tab-text">Goals</span>
         </button>
+        <button class="tab-button" data-tab="limb-care">
+          <span class="tab-icon">🦵</span>
+          <span class="tab-text">Limb Care</span>
+        </button>
         <button class="tab-button" data-tab="profile">
           <span class="tab-icon">👤</span>
           <span class="tab-text">Profile</span>
@@ -189,6 +193,11 @@
                 <span class="metric-label">Mood</span>
                 <span class="metric-value" id="moodOverview">--</span>
               </div>
+              <div class="metric">
+                <span class="metric-icon">🦵</span>
+                <span class="metric-label">Limb Health</span>
+                <span class="metric-value" id="limbOverview">--</span>
+              </div>
             </div>
           </div>
 
@@ -211,6 +220,10 @@
               <button class="action-btn" onclick="switchToTab('goals')">
                 <span class="action-icon">🎯</span>
                 <span>Set Goal</span>
+              </button>
+              <button class="action-btn" onclick="switchToTab('limb-care')">
+                <span class="action-icon">🦵</span>
+                <span>Limb Assessment</span>
               </button>
             </div>
           </div>
@@ -470,6 +483,237 @@
         </div>
       </section>
 
+      <!-- Limb Care Tab -->
+      <section class="tab-content" id="limb-care">
+        <div class="limb-care-container">
+          <!-- Daily Limb Assessment -->
+          <div class="card daily-assessment">
+            <h2>Daily Limb Assessment</h2>
+            <form id="limbAssessmentForm" class="limb-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="assessmentDate">Date</label>
+                  <input type="date" id="assessmentDate" name="date" required>
+                </div>
+                <div class="form-group">
+                  <label for="assessmentTime">Time</label>
+                  <input type="time" id="assessmentTime" name="time" required>
+                </div>
+              </div>
+              
+              <!-- Left Limb Assessment -->
+              <div class="limb-section">
+                <h3>Left Limb</h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="leftSkinCondition">Skin Condition</label>
+                    <select id="leftSkinCondition" name="leftSkinCondition" required>
+                      <option value="">Select condition</option>
+                      <option value="excellent">Excellent</option>
+                      <option value="good">Good</option>
+                      <option value="fair">Fair</option>
+                      <option value="poor">Poor</option>
+                      <option value="concerning">Concerning</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="leftSensation">Sensation</label>
+                    <select id="leftSensation" name="leftSensation" required>
+                      <option value="">Select sensation</option>
+                      <option value="normal">Normal</option>
+                      <option value="tingling">Tingling</option>
+                      <option value="numbness">Numbness</option>
+                      <option value="phantom-pain">Phantom Pain</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="leftNotes">Left Limb Notes</label>
+                  <textarea id="leftNotes" name="leftNotes" rows="2" placeholder="Describe any issues, pain, or observations"></textarea>
+                </div>
+              </div>
+
+              <!-- Right Limb Assessment -->
+              <div class="limb-section">
+                <h3>Right Limb</h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="rightSkinCondition">Skin Condition</label>
+                    <select id="rightSkinCondition" name="rightSkinCondition" required>
+                      <option value="">Select condition</option>
+                      <option value="excellent">Excellent</option>
+                      <option value="good">Good</option>
+                      <option value="fair">Fair</option>
+                      <option value="poor">Poor</option>
+                      <option value="concerning">Concerning</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="rightSensation">Sensation</label>
+                    <select id="rightSensation" name="rightSensation" required>
+                      <option value="">Select sensation</option>
+                      <option value="normal">Normal</option>
+                      <option value="tingling">Tingling</option>
+                      <option value="numbness">Numbness</option>
+                      <option value="phantom-pain">Phantom Pain</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="rightNotes">Right Limb Notes</label>
+                  <textarea id="rightNotes" name="rightNotes" rows="2" placeholder="Describe any issues, pain, or observations"></textarea>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Assessment</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Prosthetic Care -->
+          <div class="card prosthetic-care">
+            <h2>Prosthetic Care</h2>
+            <form id="prostheticForm" class="prosthetic-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="prostheticType">Prosthetic Type</label>
+                  <select id="prostheticType" name="type" required>
+                    <option value="">Select type</option>
+                    <option value="left-lower">Left Lower Limb</option>
+                    <option value="right-lower">Right Lower Limb</option>
+                    <option value="left-upper">Left Upper Limb</option>
+                    <option value="right-upper">Right Upper Limb</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="prostheticFit">Fit Quality</label>
+                  <select id="prostheticFit" name="fit" required>
+                    <option value="">Select fit</option>
+                    <option value="excellent">Excellent</option>
+                    <option value="good">Good</option>
+                    <option value="fair">Fair</option>
+                    <option value="poor">Poor</option>
+                    <option value="uncomfortable">Uncomfortable</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="wearTime">Wear Time (hours)</label>
+                  <input type="number" id="wearTime" name="wearTime" min="0" max="24" step="0.5">
+                </div>
+                <div class="form-group">
+                  <label for="cleaningDone">Cleaning Done</label>
+                  <select id="cleaningDone" name="cleaningDone">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                    <option value="partial">Partial</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="prostheticNotes">Prosthetic Notes</label>
+                <textarea id="prostheticNotes" name="notes" rows="3" placeholder="Describe any issues, adjustments needed, or maintenance"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Log Prosthetic Care</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Pain & Comfort Tracking -->
+          <div class="card pain-tracking">
+            <h2>Pain & Comfort Tracking</h2>
+            <form id="painForm" class="pain-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="painLevel">Pain Level (1-10)</label>
+                  <input type="range" id="painLevel" name="painLevel" min="1" max="10" value="1">
+                  <span id="painLevelValue">1</span>
+                </div>
+                <div class="form-group">
+                  <label for="painType">Pain Type</label>
+                  <select id="painType" name="painType">
+                    <option value="">Select type</option>
+                    <option value="phantom">Phantom Pain</option>
+                    <option value="residual">Residual Limb Pain</option>
+                    <option value="prosthetic">Prosthetic Discomfort</option>
+                    <option value="back">Back Pain</option>
+                    <option value="shoulder">Shoulder Pain</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="painLocation">Pain Location</label>
+                <input type="text" id="painLocation" name="painLocation" placeholder="e.g., left residual limb, right shoulder">
+              </div>
+              <div class="form-group">
+                <label for="painNotes">Pain Notes</label>
+                <textarea id="painNotes" name="notes" rows="3" placeholder="Describe the pain, triggers, or relief methods"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Log Pain</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Care Reminders -->
+          <div class="card care-reminders">
+            <h2>Care Reminders</h2>
+            <form id="reminderForm" class="reminder-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="reminderType">Reminder Type</label>
+                  <select id="reminderType" name="type" required>
+                    <option value="">Select type</option>
+                    <option value="limb-inspection">Limb Inspection</option>
+                    <option value="prosthetic-cleaning">Prosthetic Cleaning</option>
+                    <option value="pressure-relief">Pressure Relief</option>
+                    <option value="stretching">Stretching Exercise</option>
+                    <option value="massage">Massage/Desensitization</option>
+                    <option value="appointment">Medical Appointment</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="reminderFrequency">Frequency</label>
+                  <select id="reminderFrequency" name="frequency" required>
+                    <option value="">Select frequency</option>
+                    <option value="daily">Daily</option>
+                    <option value="twice-daily">Twice Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="reminderTime">Time</label>
+                <input type="time" id="reminderTime" name="time" required>
+              </div>
+              <div class="form-group">
+                <label for="reminderNotes">Notes</label>
+                <textarea id="reminderNotes" name="notes" rows="2" placeholder="Additional details about the reminder"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Set Reminder</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Limb Care History -->
+          <div class="card limb-history">
+            <h2>Limb Care History</h2>
+            <div id="limbHistoryList" class="history-list">
+              <!-- History will be populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Profile Tab -->
       <section class="tab-content" id="profile">
         <div class="profile-container">
@@ -603,6 +847,7 @@
   <script src="assets/js/medication-manager.js"></script>
   <script src="assets/js/mood-tracker.js"></script>
   <script src="assets/js/goals-manager.js"></script>
+  <script src="assets/js/limb-care.js"></script>
   <script src="assets/js/profile-manager.js"></script>
   <script src="assets/js/charts.js"></script>
   <script src="assets/js/export.js"></script>
