@@ -52,6 +52,14 @@ service cloud.firestore {
         isRequestOwner(request.resource.data.userId);
     }
     
+    // Mood factors - users can only access their own mood factors
+    match /moodFactors/{factorId} {
+      allow read, write, update, delete: if isAuthenticated() && 
+        (resource == null || isResourceOwner(resource.data.userId));
+      allow create: if isAuthenticated() && 
+        isRequestOwner(request.resource.data.userId);
+    }
+    
     // Goals - users can only access their own goals
     match /goals/{goalId} {
       allow read, write, update, delete: if isAuthenticated() && 
@@ -62,6 +70,14 @@ service cloud.firestore {
     
     // Notification settings - users can only access their own settings
     match /notifications/{notificationId} {
+      allow read, write, update, delete: if isAuthenticated() && 
+        (resource == null || isResourceOwner(resource.data.userId));
+      allow create: if isAuthenticated() && 
+        isRequestOwner(request.resource.data.userId);
+    }
+    
+    // Reminders - users can only access their own reminders
+    match /reminders/{reminderId} {
       allow read, write, update, delete: if isAuthenticated() && 
         (resource == null || isResourceOwner(resource.data.userId));
       allow create: if isAuthenticated() && 
