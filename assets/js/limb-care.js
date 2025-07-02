@@ -150,11 +150,18 @@ class LimbCareManager {
       // Generate assessment forms
       this.generateLimbAssessmentForms(count);
       
+      // Initialize userLimbs array if needed
+      while (this.userLimbs.length < count) {
+        this.userLimbs.push({});
+      }
+      
       // Update prosthetic limb options
       this.updateProstheticLimbOptions();
     } else {
       limbTypesContainer.style.display = 'none';
       limbAssessmentsContainer.innerHTML = '';
+      this.userLimbs = [];
+      this.updateProstheticLimbOptions();
     }
   }
 
@@ -236,20 +243,44 @@ class LimbCareManager {
       }
     }
     
+    // Update prosthetic limb options
+    this.updateProstheticLimbOptions();
+    
     // Save configuration
     this.saveUserLimbConfiguration();
   }
 
   updateProstheticLimbOptions() {
     const prostheticLimbSelect = document.getElementById('prostheticLimb');
+    const prostheticForm = document.getElementById('prostheticForm');
+    const prostheticSetupMessage = document.getElementById('prostheticSetupMessage');
+    
     if (!prostheticLimbSelect) return;
     
     prostheticLimbSelect.innerHTML = '<option value="">Select limb</option>';
+    
+    // Add configured limbs
     this.userLimbs.forEach((limb, index) => {
       if (limb.type) {
         prostheticLimbSelect.innerHTML += `<option value="${index}">${limb.name}</option>`;
       }
     });
+    
+    // Check if any limbs are configured
+    const hasConfiguredLimbs = this.userLimbs.length > 0 && this.userLimbs.some(limb => limb.type);
+    
+    // Show/hide setup message and form
+    if (prostheticSetupMessage) {
+      prostheticSetupMessage.style.display = hasConfiguredLimbs ? 'none' : 'block';
+    }
+    if (prostheticForm) {
+      prostheticForm.style.display = hasConfiguredLimbs ? 'block' : 'none';
+    }
+    
+    // If no limbs are configured, add a message to dropdown
+    if (!hasConfiguredLimbs) {
+      prostheticLimbSelect.innerHTML += '<option value="" disabled>Please configure your limbs first</option>';
+    }
   }
 
   formatLimbType(type) {
@@ -328,10 +359,16 @@ class LimbCareManager {
       return;
     }
 
+    // Check if limbs are configured
+    if (this.userLimbs.length === 0 || !this.userLimbs.some(limb => limb.type)) {
+      this.showToast('Please configure your limbs first in the Daily Assessment section', 'error');
+      return;
+    }
+
     const formData = new FormData(event.target);
     const limbIndex = parseInt(formData.get('limb'));
     
-    if (isNaN(limbIndex) || !this.userLimbs[limbIndex]) {
+    if (isNaN(limbIndex) || !this.userLimbs[limbIndex] || !this.userLimbs[limbIndex].type) {
       this.showToast('Please select a valid limb', 'error');
       return;
     }

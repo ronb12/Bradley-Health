@@ -1005,6 +1005,20 @@ input[type="range"]::-moz-range-thumb {
   min-width: 20px;
 }
 
+.setup-message {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  color: #856404;
+}
+
+.setup-message p {
+  margin: 0;
+  font-weight: 500;
+}
+
 /* ===== PROFILE STYLES ===== */
 .profile-container {
   display: grid;
