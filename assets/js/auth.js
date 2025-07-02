@@ -216,11 +216,13 @@ class AuthManager {
   }
 
   redirectToDashboard() {
-    window.location.href = '/index.html';
+    // Use relative path for GitHub Pages compatibility
+    window.location.href = './';
   }
 
   redirectToLogin() {
-    window.location.href = '/index.html';
+    // Use relative path for GitHub Pages compatibility
+    window.location.href = './';
   }
 
   showLoading(message) {
