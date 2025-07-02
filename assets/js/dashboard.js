@@ -79,6 +79,17 @@ class DashboardManager {
   }
 
   loadTabData(tabName) {
+    // Check if user is authenticated
+    const userId = window.authManager?.getUserId();
+    if (!userId) {
+      console.log('User not authenticated yet, will retry loading tab data');
+      // Retry after authentication
+      setTimeout(() => this.loadTabData(tabName), 1000);
+      return;
+    }
+    
+    console.log('Loading data for tab:', tabName);
+    
     switch (tabName) {
       case 'dashboard':
         this.loadDashboardData();
@@ -102,17 +113,20 @@ class DashboardManager {
   }
 
   async loadDashboardData() {
+    // Wait for user to be fully authenticated
+    const userId = window.authManager?.getUserId();
+    if (!userId) {
+      console.log('Waiting for user authentication...');
+      // Retry after a short delay
+      setTimeout(() => this.loadDashboardData(), 1000);
+      return;
+    }
+
+    console.log('Loading dashboard data for user:', userId);
+    
     try {
-      // Load health overview data
       await this.updateHealthOverview();
-      
-      // Load alerts
       await this.loadAlerts();
-      
-      // Initialize charts
-      if (window.chartManager) {
-        window.chartManager.createHealthOverviewChart();
-      }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     }

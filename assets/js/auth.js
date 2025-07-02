@@ -27,9 +27,14 @@ class AuthManager {
       this.currentUser = user;
       this.updateUI(user);
       if (user) {
+        console.log('User authenticated, loading profile and dashboard data...');
         // Add a small delay to ensure Firebase is fully ready
         setTimeout(() => {
           this.loadUserProfile(user.uid);
+          // Trigger dashboard data loading
+          if (window.dashboardManager) {
+            window.dashboardManager.loadDashboardData();
+          }
         }, 1000);
       }
     }, (error) => {
