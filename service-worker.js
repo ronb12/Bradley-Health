@@ -1,7 +1,7 @@
 // Bradley Health Service Worker
-const CACHE_NAME = 'bradley-health-v1.0.0';
-const STATIC_CACHE = 'bradley-health-static-v1';
-const DYNAMIC_CACHE = 'bradley-health-dynamic-v1';
+const CACHE_NAME = 'bradley-health-v1.1.0';
+const STATIC_CACHE = 'bradley-health-static-v1.1';
+const DYNAMIC_CACHE = 'bradley-health-dynamic-v1.1';
 
 // Files to cache immediately
 const STATIC_FILES = [
@@ -9,17 +9,26 @@ const STATIC_FILES = [
   '/index.html',
   '/manifest.json',
   '/assets/favicon.svg',
+  '/assets/icon-72.png',
+  '/assets/icon-96.png',
+  '/assets/icon-144.png',
+  '/assets/icon-192.png',
+  '/assets/icon-512.png',
+  '/assets/apple-touch-icon.png',
   '/assets/css/components.css',
   '/assets/css/layout.css',
   '/assets/css/theme.css',
   '/assets/js/firebase-config.js',
   '/assets/js/auth.js',
   '/assets/js/dashboard.js',
+  '/assets/js/blood-pressure.js',
+  '/assets/js/goals-manager.js',
   '/assets/js/charts.js',
   '/assets/js/medication-manager.js',
   '/assets/js/mood-tracker.js',
   '/assets/js/notifications.js',
-  '/assets/js/export.js'
+  '/assets/js/export.js',
+  '/assets/js/profile-manager.js'
 ];
 
 // Install event - cache static files

@@ -4,8 +4,8 @@
   "description": "Comprehensive health monitoring app for blood pressure, medications, mood tracking, and wellness goals",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#667eea",
-  "theme_color": "#667eea",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en",
@@ -21,17 +21,35 @@
       "src": "assets/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "assets/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "assets/apple-touch-icon.png",
       "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-144.png",
+      "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     }
@@ -74,7 +92,7 @@
       "url": "/?tab=blood-pressure",
       "icons": [
         {
-          "src": "assets/icons/bp-icon.svg",
+          "src": "assets/favicon.svg",
           "sizes": "96x96"
         }
       ]
@@ -86,7 +104,7 @@
       "url": "/?tab=mood",
       "icons": [
         {
-          "src": "assets/icons/icon.svg",
+          "src": "assets/favicon.svg",
           "sizes": "96x96"
         }
       ]
@@ -98,7 +116,19 @@
       "url": "/?tab=medications",
       "icons": [
         {
-          "src": "assets/icons/med-icon.svg",
+          "src": "assets/favicon.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your health overview",
+      "url": "/?tab=dashboard",
+      "icons": [
+        {
+          "src": "assets/favicon.svg",
           "sizes": "96x96"
         }
       ]
@@ -161,6 +191,6 @@
     "name": "Bradley Health Team",
     "url": "https://bradley-health.com"
   },
-  "version": "1.0.0",
+  "version": "1.1.0",
   "minimum_version": "1.0.0"
 } 
