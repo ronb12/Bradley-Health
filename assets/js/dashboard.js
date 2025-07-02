@@ -111,7 +111,7 @@ class DashboardManager {
       
       // Initialize charts
       if (window.chartManager) {
-        window.chartManager.createHealthChart();
+        window.chartManager.createHealthOverviewChart();
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -166,7 +166,20 @@ class DashboardManager {
         }
       }
     } catch (error) {
-      console.error('Error updating health overview:', error);
+      // Handle Firestore permissions error gracefully
+      if (error.code === 'permission-denied') {
+        console.log('Firestore permissions not set up yet - this is normal for new users');
+        // Set default values for new users
+        const bpOverview = document.getElementById('bpOverview');
+        const medOverview = document.getElementById('medOverview');
+        const moodOverview = document.getElementById('moodOverview');
+        
+        if (bpOverview) bpOverview.textContent = '--/--';
+        if (medOverview) medOverview.textContent = '0';
+        if (moodOverview) moodOverview.textContent = '--';
+      } else {
+        console.error('Error updating health overview:', error);
+      }
     }
   }
 
@@ -212,7 +225,12 @@ class DashboardManager {
           });
         }
       } catch (error) {
-        console.error('Error loading alerts:', error);
+        // Handle Firestore permissions error gracefully
+        if (error.code === 'permission-denied') {
+          console.log('Firestore permissions not set up yet - this is normal for new users');
+        } else {
+          console.error('Error loading alerts:', error);
+        }
       }
     }
 
