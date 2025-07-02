@@ -384,4 +384,181 @@ input:focus, select:focus, textarea:focus {
 .rounded-xl { border-radius: var(--radius-xl); }
 
 .shadow { box-shadow: var(--shadow-md); }
-.shadow-lg { box-shadow: var(--shadow-lg); } 
+.shadow-lg { box-shadow: var(--shadow-lg); }
+
+/* Toggle Switch Styles */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+  background-color: var(--gray-300);
+  border-radius: 34px;
+  transition: background-color var(--transition-fast);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.toggle:checked {
+  background-color: var(--primary-color);
+}
+
+.toggle::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 30px;
+  height: 30px;
+  background-color: var(--white);
+  border-radius: 50%;
+  transition: transform var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.toggle:checked::before {
+  transform: translateX(26px);
+}
+
+/* Settings Styles */
+.settings-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-4);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+.setting-item label {
+  margin-bottom: 0;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* Tab Navigation Dark Mode */
+.tab-nav {
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tab-nav button {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: none;
+  padding: var(--spacing-4) var(--spacing-6);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border-bottom: 2px solid transparent;
+}
+
+.tab-nav button:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
+}
+
+.tab-nav button.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  background-color: var(--bg-primary);
+}
+
+/* Header Dark Mode */
+.app-header {
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.app-header h1 {
+  color: var(--text-primary);
+}
+
+/* Chart Container Dark Mode */
+.chart-container {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+}
+
+/* Mood Buttons Dark Mode */
+.mood-buttons {
+  display: flex;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+.mood-btn {
+  padding: var(--spacing-2) var(--spacing-4);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-weight: 500;
+}
+
+.mood-btn:hover {
+  border-color: var(--primary-color);
+  background-color: var(--bg-tertiary);
+}
+
+.mood-btn.selected {
+  border-color: var(--primary-color);
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+/* Progress Bars Dark Mode */
+.progress-bar {
+  background-color: var(--bg-tertiary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.progress-fill {
+  background-color: var(--primary-color);
+  height: 100%;
+  transition: width var(--transition-normal);
+}
+
+/* PWA Install Prompt Dark Mode */
+.pwa-install-prompt {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.pwa-prompt-content {
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-lg);
+}
+
+/* Legal Links Dark Mode */
+.legal-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.legal-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  padding: var(--spacing-2) 0;
+  transition: color var(--transition-fast);
+}
+
+.legal-link:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+} 

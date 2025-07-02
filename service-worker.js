@@ -16,6 +16,7 @@ const STATIC_FILES = [
   '/assets/css/layout.css',
   '/assets/css/theme.css',
   '/assets/js/firebase-config.js',
+  '/assets/js/theme-manager.js',
   '/assets/js/auth.js',
   '/assets/js/dashboard.js',
   '/assets/js/blood-pressure.js',
