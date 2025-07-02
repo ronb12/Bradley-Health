@@ -116,6 +116,12 @@ class LimbCareManager {
       }
     } catch (error) {
       console.error('Error loading user limb configuration:', error);
+      
+      // Handle Firestore permissions error gracefully
+      if (error.code === 'permission-denied') {
+        console.log('Firestore permissions not set up yet - this is normal for new users');
+        // User will need to configure their limbs for the first time
+      }
     }
   }
 
@@ -481,6 +487,15 @@ class LimbCareManager {
       this.displayLimbHistory(allEntries);
     } catch (error) {
       console.error('Error loading limb history:', error);
+      
+      // Handle Firestore permissions error gracefully
+      if (error.code === 'permission-denied') {
+        console.log('Firestore permissions not set up yet - this is normal for new users');
+        const historyList = document.getElementById('limbHistoryList');
+        if (historyList) {
+          historyList.innerHTML = '<p class="no-data">No limb care history yet. Start by configuring your limbs and adding your first assessment!</p>';
+        }
+      }
     }
   }
 
