@@ -64,14 +64,19 @@ class BloodPressureManager {
       e.target.reset();
     } catch (error) {
       console.error('Error saving blood pressure reading:', error);
+      console.log('Error code:', error.code);
       if (error.code === 'permission-denied') {
+        console.log('Permission denied - saving BP reading locally');
         this.showToast('Firestore permissions not set up yet. Data will be saved locally.', 'warning');
         // Store locally for now
-        this.readings.unshift({ id: Date.now().toString(), ...reading });
+        const localReading = { id: Date.now().toString(), ...reading };
+        this.readings.unshift(localReading);
+        console.log('BP reading saved locally:', localReading);
         this.renderReadings();
         this.updateCurrentReading();
         e.target.reset();
       } else {
+        console.log('Non-permission error - showing error toast');
         this.showToast('Error saving blood pressure reading', 'error');
       }
     } finally {
