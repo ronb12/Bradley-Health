@@ -48,15 +48,32 @@ class BloodPressureManager {
       status: this.getBPStatus(parseInt(formData.get('systolic')), parseInt(formData.get('diastolic')))
     };
 
+    console.log('Attempting to save BP reading:', reading);
+
+    if (!this.db) {
+      this.showToast('Database not available. Please check your connection.', 'error');
+      return;
+    }
+
     try {
       this.showLoading('Saving blood pressure reading...');
-      await this.db.collection('bloodPressure').add(reading);
+      const docRef = await this.db.collection('bloodPressure').add(reading);
+      console.log('BP reading saved successfully with ID:', docRef.id);
       this.showToast('Blood pressure reading saved successfully!', 'success');
       this.loadReadings();
       e.target.reset();
     } catch (error) {
       console.error('Error saving blood pressure reading:', error);
-      this.showToast('Error saving blood pressure reading', 'error');
+      if (error.code === 'permission-denied') {
+        this.showToast('Firestore permissions not set up yet. Data will be saved locally.', 'warning');
+        // Store locally for now
+        this.readings.unshift({ id: Date.now().toString(), ...reading });
+        this.renderReadings();
+        this.updateCurrentReading();
+        e.target.reset();
+      } else {
+        this.showToast('Error saving blood pressure reading', 'error');
+      }
     } finally {
       this.hideLoading();
     }
