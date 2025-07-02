@@ -4,24 +4,19 @@ class ProfileManager {
     this.db = firebase.firestore();
     this.currentUser = null;
     this.userProfile = null;
-    console.log('ProfileManager initialized');
     this.init();
   }
 
   init() {
-    console.log('ProfileManager: Setting up auth listener...');
     // Wait for authentication
     if (window.authManager) {
       window.authManager.auth.onAuthStateChanged((user) => {
         this.currentUser = user;
         if (user) {
-          console.log('ProfileManager: User authenticated, setting up forms...');
           this.setupEventListeners();
           this.loadProfile();
         }
       });
-    } else {
-      console.log('ProfileManager: AuthManager not available yet');
     }
   }
 
@@ -58,26 +53,21 @@ class ProfileManager {
 
   async loadProfile() {
     if (!this.currentUser) {
-      console.log('ProfileManager: User not authenticated yet, skipping profile load');
       return;
     }
 
-    console.log('ProfileManager: Loading profile for user:', this.currentUser.uid);
     try {
       const doc = await this.db.collection('users').doc(this.currentUser.uid).get();
       if (doc.exists) {
         this.userProfile = doc.data();
-        console.log('ProfileManager: Profile loaded successfully');
         this.populateProfileForms();
         this.updateProfileDisplay();
-      } else {
-        console.log('ProfileManager: No profile found for user');
       }
     } catch (error) {
-      console.error('ProfileManager: Error loading profile:', error);
+      console.error('Error loading profile:', error);
       // Handle Firestore permissions error gracefully
       if (error.code === 'permission-denied') {
-        console.log('ProfileManager: Firestore permissions not set up yet - this is normal for new users');
+        console.log('Firestore permissions not set up yet - this is normal for new users');
       }
     }
   }
