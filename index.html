@@ -501,70 +501,29 @@
                 </div>
               </div>
               
-              <!-- Left Limb Assessment -->
-              <div class="limb-section">
-                <h3>Left Limb</h3>
-                <div class="form-row">
+              <!-- Limb Configuration -->
+              <div class="limb-config-section">
+                <h3>Configure Your Limbs</h3>
+                <div class="limb-config">
                   <div class="form-group">
-                    <label for="leftSkinCondition">Skin Condition</label>
-                    <select id="leftSkinCondition" name="leftSkinCondition" required>
-                      <option value="">Select condition</option>
-                      <option value="excellent">Excellent</option>
-                      <option value="good">Good</option>
-                      <option value="fair">Fair</option>
-                      <option value="poor">Poor</option>
-                      <option value="concerning">Concerning</option>
+                    <label for="limbCount">Number of Amputated Limbs</label>
+                    <select id="limbCount" name="limbCount" required>
+                      <option value="">Select count</option>
+                      <option value="1">1 Limb</option>
+                      <option value="2">2 Limbs</option>
+                      <option value="3">3 Limbs</option>
+                      <option value="4">4 Limbs</option>
                     </select>
                   </div>
-                  <div class="form-group">
-                    <label for="leftSensation">Sensation</label>
-                    <select id="leftSensation" name="leftSensation" required>
-                      <option value="">Select sensation</option>
-                      <option value="normal">Normal</option>
-                      <option value="tingling">Tingling</option>
-                      <option value="numbness">Numbness</option>
-                      <option value="phantom-pain">Phantom Pain</option>
-                      <option value="other">Other</option>
-                    </select>
+                  <div id="limbTypesContainer" class="limb-types-container" style="display: none;">
+                    <!-- Limb type selections will be generated here -->
                   </div>
-                </div>
-                <div class="form-group">
-                  <label for="leftNotes">Left Limb Notes</label>
-                  <textarea id="leftNotes" name="leftNotes" rows="2" placeholder="Describe any issues, pain, or observations"></textarea>
                 </div>
               </div>
 
-              <!-- Right Limb Assessment -->
-              <div class="limb-section">
-                <h3>Right Limb</h3>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="rightSkinCondition">Skin Condition</label>
-                    <select id="rightSkinCondition" name="rightSkinCondition" required>
-                      <option value="">Select condition</option>
-                      <option value="excellent">Excellent</option>
-                      <option value="good">Good</option>
-                      <option value="fair">Fair</option>
-                      <option value="poor">Poor</option>
-                      <option value="concerning">Concerning</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label for="rightSensation">Sensation</label>
-                    <select id="rightSensation" name="rightSensation" required>
-                      <option value="">Select sensation</option>
-                      <option value="normal">Normal</option>
-                      <option value="tingling">Tingling</option>
-                      <option value="numbness">Numbness</option>
-                      <option value="phantom-pain">Phantom Pain</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="rightNotes">Right Limb Notes</label>
-                  <textarea id="rightNotes" name="rightNotes" rows="2" placeholder="Describe any issues, pain, or observations"></textarea>
-                </div>
+              <!-- Dynamic Limb Assessments -->
+              <div id="limbAssessmentsContainer" class="limb-assessments-container">
+                <!-- Individual limb assessments will be generated here -->
               </div>
 
               <div class="form-actions">
@@ -579,13 +538,10 @@
             <form id="prostheticForm" class="prosthetic-form">
               <div class="form-row">
                 <div class="form-group">
-                  <label for="prostheticType">Prosthetic Type</label>
-                  <select id="prostheticType" name="type" required>
-                    <option value="">Select type</option>
-                    <option value="left-lower">Left Lower Limb</option>
-                    <option value="right-lower">Right Lower Limb</option>
-                    <option value="left-upper">Left Upper Limb</option>
-                    <option value="right-upper">Right Upper Limb</option>
+                  <label for="prostheticLimb">Limb</label>
+                  <select id="prostheticLimb" name="limb" required>
+                    <option value="">Select limb</option>
+                    <!-- Options will be populated dynamically -->
                   </select>
                 </div>
                 <div class="form-group">

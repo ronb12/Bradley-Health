@@ -843,6 +843,35 @@ body {
   padding: 20px;
 }
 
+.limb-config-section {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #e9ecef;
+}
+
+.limb-config-section h3 {
+  color: #495057;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.limb-types-container {
+  margin-top: 15px;
+}
+
+.limb-types-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.limb-assessments-container {
+  margin-top: 20px;
+}
+
 .limb-section {
   background: #f8f9fa;
   border-radius: 12px;

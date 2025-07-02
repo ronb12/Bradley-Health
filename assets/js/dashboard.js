@@ -219,16 +219,25 @@ class DashboardManager {
         const latestLimb = limbSnapshot.docs[0].data();
         const limbOverview = document.getElementById('limbOverview');
         if (limbOverview) {
-          // Determine overall limb health status
-          const leftCondition = latestLimb.leftLimb.skinCondition;
-          const rightCondition = latestLimb.rightLimb.skinCondition;
-          
+          // Determine overall limb health status for multiple limbs
           let overallStatus = 'Good';
-          if (leftCondition === 'concerning' || rightCondition === 'concerning' || 
-              leftCondition === 'poor' || rightCondition === 'poor') {
-            overallStatus = '⚠️';
-          } else if (leftCondition === 'fair' || rightCondition === 'fair') {
-            overallStatus = 'Fair';
+          let hasConcerning = false;
+          let hasFair = false;
+          
+          if (latestLimb.limbs && latestLimb.limbs.length > 0) {
+            latestLimb.limbs.forEach(limb => {
+              if (limb.skinCondition === 'concerning' || limb.skinCondition === 'poor') {
+                hasConcerning = true;
+              } else if (limb.skinCondition === 'fair') {
+                hasFair = true;
+              }
+            });
+            
+            if (hasConcerning) {
+              overallStatus = '⚠️';
+            } else if (hasFair) {
+              overallStatus = 'Fair';
+            }
           }
           
           limbOverview.textContent = overallStatus;
