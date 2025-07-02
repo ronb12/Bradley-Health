@@ -12,6 +12,12 @@
   "categories": ["health", "medical", "lifestyle"],
   "icons": [
     {
+      "src": "assets/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "assets/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
@@ -28,12 +34,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    },
-    {
-      "src": "assets/apple-touch-icon.png?v=1.1.1",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
     }
   ],
   "screenshots": [
