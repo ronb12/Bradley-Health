@@ -57,7 +57,13 @@ class LimbCareManager {
     // Prosthetic Care Form
     const prostheticForm = document.getElementById('prostheticForm');
     if (prostheticForm) {
-      prostheticForm.addEventListener('submit', (e) => this.handleProstheticCare(e));
+      console.log('Setting up prosthetic form event listener');
+      prostheticForm.addEventListener('submit', (e) => {
+        console.log('Prosthetic form submitted!');
+        this.handleProstheticCare(e);
+      });
+    } else {
+      console.error('Prosthetic form not found!');
     }
 
     // Prosthetic limb dropdown change
@@ -82,6 +88,17 @@ class LimbCareManager {
 
     // Set default date and time
     this.setDefaultDateTime();
+    
+    // Test prosthetic form button
+    const prostheticButton = document.querySelector('#prostheticForm button[type="submit"]');
+    if (prostheticButton) {
+      console.log('Prosthetic button found:', prostheticButton);
+      prostheticButton.addEventListener('click', (e) => {
+        console.log('Prosthetic button clicked!');
+      });
+    } else {
+      console.error('Prosthetic button not found!');
+    }
   }
 
   setupPainLevelSlider() {
@@ -248,6 +265,8 @@ class LimbCareManager {
     this.userLimbs[index].type = limbType;
     this.userLimbs[index].name = this.formatLimbType(limbType);
     
+    console.log(`Updated limb configuration: index ${index}, type ${limbType}, name ${this.userLimbs[index].name}`);
+    
     // Update section title
     const section = document.getElementById(`limbSection${index}`);
     if (section) {
@@ -269,7 +288,15 @@ class LimbCareManager {
     const prostheticForm = document.getElementById('prostheticForm');
     const prostheticSetupMessage = document.getElementById('prostheticSetupMessage');
     
-    if (!prostheticLimbSelect) return;
+    console.log('updateProstheticLimbOptions called');
+    console.log('prostheticLimbSelect:', prostheticLimbSelect);
+    console.log('prostheticForm:', prostheticForm);
+    console.log('prostheticSetupMessage:', prostheticSetupMessage);
+    
+    if (!prostheticLimbSelect) {
+      console.error('Prosthetic limb select not found!');
+      return;
+    }
     
     prostheticLimbSelect.innerHTML = '<option value="">Select limb</option>';
     
@@ -277,7 +304,7 @@ class LimbCareManager {
     
     // Add configured limbs
     this.userLimbs.forEach((limb, index) => {
-      if (limb.type) {
+      if (limb && limb.type && limb.name) {
         const option = `<option value="${index}">${limb.name}</option>`;
         prostheticLimbSelect.innerHTML += option;
         console.log(`Added option: ${option}`);
@@ -292,9 +319,11 @@ class LimbCareManager {
     // Show/hide setup message and form
     if (prostheticSetupMessage) {
       prostheticSetupMessage.style.display = hasConfiguredLimbs ? 'none' : 'block';
+      console.log('Setup message display:', prostheticSetupMessage.style.display);
     }
     if (prostheticForm) {
       prostheticForm.style.display = hasConfiguredLimbs ? 'block' : 'none';
+      console.log('Prosthetic form display:', prostheticForm.style.display);
     }
     
     // If no limbs are configured, add a message to dropdown
@@ -437,12 +466,19 @@ class LimbCareManager {
       return;
     }
     
-    if (isNaN(limbIndex) || limbIndex < 0 || limbIndex >= this.userLimbs.length) {
+    if (isNaN(limbIndex) || limbIndex < 0) {
       this.showToast('Please select a valid limb', 'error');
       return;
     }
     
-    if (!this.userLimbs[limbIndex] || !this.userLimbs[limbIndex].type) {
+    // Check if the selected limb exists and is properly configured
+    const selectedLimb = this.userLimbs[limbIndex];
+    if (!selectedLimb || !selectedLimb.type) {
+      console.log('Selected limb validation failed:', {
+        limbIndex,
+        selectedLimb,
+        userLimbs: this.userLimbs
+      });
       this.showToast('Selected limb is not properly configured', 'error');
       return;
     }
@@ -718,4 +754,26 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Export for global access
-window.limbCareManager = limbCareManager; 
+window.limbCareManager = limbCareManager;
+
+// Debug function to check limb configuration
+window.debugLimbConfiguration = function() {
+  if (window.limbCareManager) {
+    console.log('=== Limb Configuration Debug ===');
+    console.log('User limbs:', window.limbCareManager.userLimbs);
+    console.log('Configured limbs:', window.limbCareManager.userLimbs.filter(limb => limb && limb.type));
+    
+    const prostheticLimbSelect = document.getElementById('prostheticLimb');
+    if (prostheticLimbSelect) {
+      console.log('Prosthetic dropdown options:');
+      for (let i = 0; i < prostheticLimbSelect.options.length; i++) {
+        const option = prostheticLimbSelect.options[i];
+        console.log(`  Option ${i}: value="${option.value}", text="${option.text}"`);
+      }
+    }
+    
+    console.log('=== End Debug ===');
+  } else {
+    console.log('Limb care manager not found');
+  }
+}; 
