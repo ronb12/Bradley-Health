@@ -1,7 +1,7 @@
 // Bradley Health Service Worker
-const CACHE_NAME = 'bradley-health-v1.1.0';
-const STATIC_CACHE = 'bradley-health-static-v1.1';
-const DYNAMIC_CACHE = 'bradley-health-dynamic-v1.1';
+const CACHE_NAME = 'bradley-health-v1.1.1';
+const STATIC_CACHE = 'bradley-health-static-v1.1.1';
+const DYNAMIC_CACHE = 'bradley-health-dynamic-v1.1.1';
 
 // Files to cache immediately
 const STATIC_FILES = [
