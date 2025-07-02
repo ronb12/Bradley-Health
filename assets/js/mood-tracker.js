@@ -51,7 +51,7 @@ class MoodTracker {
     }
 
     // Quick mood buttons
-    const quickMoodBtns = document.querySelectorAll('.quick-mood-btn');
+    const quickMoodBtns = document.querySelectorAll('.mood-btn');
     quickMoodBtns.forEach(btn => {
       btn.addEventListener('click', (e) => this.quickMoodEntry(e));
     });
@@ -106,6 +106,14 @@ class MoodTracker {
       return;
     }
     
+    // Remove previous selection
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+      btn.classList.remove('selected');
+    });
+    
+    // Add selection to clicked button
+    e.target.classList.add('selected');
+    
     const mood = parseInt(e.target.dataset.mood);
     const moodEntry = {
       mood,
@@ -120,11 +128,20 @@ class MoodTracker {
     };
 
     try {
+      this.showLoading('Saving mood...');
       await this.db.collection('moodEntries').add(moodEntry);
-      this.showToast('Quick mood entry saved!', 'success');
+      this.showToast('Mood saved!', 'success');
       this.loadMoodEntries();
+      
+      // Remove selection after a short delay
+      setTimeout(() => {
+        e.target.classList.remove('selected');
+      }, 2000);
     } catch (error) {
       this.showToast('Error saving mood entry', 'error');
+      e.target.classList.remove('selected');
+    } finally {
+      this.hideLoading();
     }
   }
 
@@ -451,13 +468,17 @@ class MoodTracker {
       const snapshot = await this.db
         .collection('moodFactors')
         .where('userId', '==', this.currentUser.uid)
-        .orderBy('createdAt', 'desc')
         .get();
 
       this.moodFactors = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      }));
+      })).sort((a, b) => {
+        // Sort by createdAt in descending order (newest first)
+        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+        return dateB - dateA;
+      });
 
       this.renderMoodFactors();
     } catch (error) {

@@ -12,6 +12,32 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Bradley Health">
   
+  <!-- Apple Store Compliance -->
+  <meta name="apple-itunes-app" content="app-argument=health-monitoring">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  
+  <!-- Security and Privacy -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+  
+  <!-- Description and Keywords -->
+  <meta name="description" content="Bradley Health - Comprehensive health monitoring app for tracking blood pressure, medications, mood, and wellness goals">
+  <meta name="keywords" content="health, monitoring, blood pressure, medications, mood tracking, wellness, fitness">
+  <meta name="author" content="Bradley Health">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Bradley Health">
+  <meta property="og:description" content="Comprehensive health monitoring app">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bradley-health.web.app">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bradley Health">
+  <meta name="twitter:description" content="Comprehensive health monitoring app">
+  
   <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/theme.css">
@@ -497,6 +523,36 @@
           </div>
 
           <!-- Settings -->
+          <div class="card settings">
+            <h2>App Settings</h2>
+            <div class="settings-options">
+              <div class="setting-item">
+                <label for="themeToggle">Dark Mode</label>
+                <input type="checkbox" id="themeToggle" class="toggle">
+              </div>
+              <div class="setting-item">
+                <label for="notificationsToggle">Notifications</label>
+                <input type="checkbox" id="notificationsToggle" class="toggle" checked>
+              </div>
+              <div class="setting-item">
+                <label for="unitsToggle">Units (Metric/Imperial)</label>
+                <select id="unitsToggle">
+                  <option value="metric">Metric</option>
+                  <option value="imperial">Imperial</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Legal Links -->
+          <div class="card legal-links">
+            <h2>Legal</h2>
+            <div class="legal-options">
+              <a href="#" class="legal-link" onclick="showPrivacyPolicy()">Privacy Policy</a>
+              <a href="#" class="legal-link" onclick="showTermsOfService()">Terms of Service</a>
+              <a href="#" class="legal-link" onclick="showDataUsage()">Data Usage</a>
+            </div>
+          </div>
           <div class="card settings">
             <h2>Settings</h2>
             <div class="setting-group">
