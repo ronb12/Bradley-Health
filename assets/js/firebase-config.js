@@ -72,7 +72,10 @@ window.firebase = {
 
 // Add Timestamp class to firebase.firestore for compatibility
 if (window.firebaseServices && window.firebaseServices.db) {
-  window.firebase.firestore.Timestamp = window.firebaseServices.db.Timestamp;
+  // Create a firestore object that includes both the function and Timestamp
+  const firestoreFunction = () => window.firebaseServices.db;
+  firestoreFunction.Timestamp = window.firebaseServices.db.Timestamp;
+  window.firebase.firestore = firestoreFunction;
 }
 
 // Add authentication error handler with better offline handling
