@@ -43,6 +43,18 @@ class NutritionTracker {
           this.renderCholesterolHistory();
         }
       });
+    } else {
+      // Wait for authManager to be available
+      console.log('Nutrition Tracker: Waiting for authManager...');
+      const checkAuthManager = () => {
+        if (window.authManager) {
+          console.log('Nutrition Tracker: authManager found, initializing...');
+          this.init();
+        } else {
+          setTimeout(checkAuthManager, 100);
+        }
+      };
+      checkAuthManager();
     }
   }
 
@@ -976,4 +988,5 @@ class NutritionTracker {
 }
 
 // Initialize Nutrition Tracker
-window.nutritionTracker = new NutritionTracker(); 
+window.nutritionTracker = new NutritionTracker();
+window.nutritionTracker.init(); 
