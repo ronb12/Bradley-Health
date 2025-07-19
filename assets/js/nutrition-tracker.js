@@ -403,13 +403,16 @@ class NutritionTracker {
   // Enhanced meal logging with automatic nutrition calculation
   async addMeal(e) {
     e.preventDefault();
+    console.log('Add meal form submitted');
     
     if (!this.currentUser || !this.currentUser.uid) {
+      console.log('No current user found');
       this.showToast('Please sign in to save meals', 'error');
       return;
     }
 
     const formData = new FormData(e.target);
+    console.log('Form data collected');
     
     // Create timestamp from date and time
     const date = formData.get('date');
@@ -419,8 +422,11 @@ class NutritionTracker {
     const mealName = formData.get('name');
     const mealNotes = formData.get('notes');
     
+    console.log('Meal data:', { mealName, mealType: formData.get('type'), date, time, mealNotes });
+    
     // Calculate estimated nutrition
     const nutrition = this.calculateCholesterolFromMeal(mealName, mealNotes);
+    console.log('Nutrition calculated:', nutrition);
 
     const meal = {
       name: mealName,
@@ -439,7 +445,9 @@ class NutritionTracker {
     };
 
     try {
+      console.log('Saving meal to database...');
       await this.db.collection('meals').add(meal);
+      console.log('Meal saved successfully');
       
       // Show nutrition summary if data was found
       if (nutrition.hasData) {
@@ -766,16 +774,26 @@ class NutritionTracker {
   }
 
   setupEventListeners() {
+    console.log('Setting up nutrition tracker event listeners');
+    
     // Meal form
-    const mealForm = document.getElementById('mealForm');
+    const mealForm = document.getElementById('addMealForm');
+    console.log('Meal form found:', mealForm);
     if (mealForm) {
       mealForm.addEventListener('submit', (e) => this.addMeal(e));
+      console.log('Meal form event listener attached');
+    } else {
+      console.error('Meal form not found!');
     }
 
     // Cholesterol form
     const cholesterolForm = document.getElementById('cholesterolForm');
+    console.log('Cholesterol form found:', cholesterolForm);
     if (cholesterolForm) {
       cholesterolForm.addEventListener('submit', (e) => this.addCholesterolEntry(e));
+      console.log('Cholesterol form event listener attached');
+    } else {
+      console.error('Cholesterol form not found!');
     }
 
     // Set default date and time
