@@ -594,35 +594,13 @@ class NutritionTracker {
       return 0;
     }
 
-    try {
-      // Try to use the optimized query with index
-      const startOfDay = new Date(date);
-      startOfDay.setHours(0, 0, 0, 0);
-      
-      const endOfDay = new Date(date);
-      endOfDay.setHours(23, 59, 59, 999);
-
-      const mealsSnapshot = await this.db.collection('meals')
-        .where('userId', '==', this.currentUser.uid)
-        .where('timestamp', '>=', startOfDay)
-        .where('timestamp', '<=', endOfDay)
-        .get();
-
-      let totalCholesterol = 0;
-      mealsSnapshot.docs.forEach(doc => {
-        const meal = doc.data();
-        if (meal.hasNutritionData) {
-          totalCholesterol += meal.estimatedCholesterol || 0;
-        }
-      });
-
-      return totalCholesterol;
-    } catch (error) {
-      console.log('Firebase index error, using fallback calculation method:', error.message);
-      
-      // Fallback: Calculate from local meals array
-      return this.calculateDailyCholesterolFromLocalData(date);
-    }
+    console.log('Calculating daily cholesterol intake for date:', date);
+    
+    // Always use the fallback calculation method since it handles different timestamp formats better
+    // and is more reliable than the Firebase query which can have index issues
+    const result = this.calculateDailyCholesterolFromLocalData(date);
+    console.log('Daily cholesterol calculation result:', result);
+    return result;
   }
 
   // Fallback method to calculate daily cholesterol from local data
