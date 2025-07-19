@@ -695,63 +695,360 @@ class HealthInsights {
 
   generateRecommendations() {
     this.recommendations = [];
+    
+    console.log('Health Insights: Generating AI-driven personalized recommendations');
 
-    // Generate personalized recommendations based on insights
-    const hasBPIssues = this.insights.some(i => i.type === 'blood-pressure' && i.severity !== 'success');
-    const hasMoodIssues = this.insights.some(i => i.type === 'mood' && i.severity !== 'success');
-    const hasSleepIssues = this.insights.some(i => i.type === 'sleep');
-    const hasMedicationIssues = this.insights.some(i => i.type === 'medication');
+    // Analyze specific patterns from insights to generate targeted recommendations
+    this.analyzeInsightPatterns();
+    
+    // Generate data-driven recommendations based on actual health metrics
+    this.generateDataDrivenRecommendations();
+    
+    // Add contextual recommendations based on user's health profile
+    this.generateContextualRecommendations();
+    
+    // Sort recommendations by priority and relevance
+    this.sortRecommendations();
+    
+    console.log('Health Insights: Generated', this.recommendations.length, 'personalized recommendations');
+  }
 
-    if (hasBPIssues) {
+  analyzeInsightPatterns() {
+    // Analyze blood pressure patterns
+    const bpInsights = this.insights.filter(i => i.type === 'blood-pressure');
+    if (bpInsights.length > 0) {
+      const hasHighReadings = bpInsights.some(i => i.severity === 'alert');
+      const hasTrendingUp = bpInsights.some(i => i.title.includes('Trending') || i.title.includes('Rising'));
+      const hasOptimalControl = bpInsights.some(i => i.severity === 'success');
+
+      if (hasHighReadings) {
+        this.recommendations.push({
+          category: 'Cardiovascular Health',
+          title: 'Immediate Blood Pressure Management',
+          description: 'Your blood pressure readings are consistently high. Consider: reducing salt intake to <2,300mg daily, increasing physical activity, managing stress through meditation or deep breathing, and consulting your healthcare provider.',
+          priority: 'high',
+          dataDriven: true,
+          metric: 'blood-pressure',
+          severity: 'alert'
+        });
+      } else if (hasTrendingUp) {
+        this.recommendations.push({
+          category: 'Cardiovascular Health',
+          title: 'Preventive Blood Pressure Care',
+          description: 'Your blood pressure is trending upward. Focus on: daily monitoring, DASH diet principles, 30 minutes of moderate exercise, and stress reduction techniques.',
+          priority: 'high',
+          dataDriven: true,
+          metric: 'blood-pressure',
+          severity: 'warning'
+        });
+      } else if (hasOptimalControl) {
+        this.recommendations.push({
+          category: 'Cardiovascular Health',
+          title: 'Maintain Excellent BP Control',
+          description: 'Your blood pressure is well-controlled! Continue your healthy habits and consider sharing your success strategies with your healthcare team.',
+          priority: 'low',
+          dataDriven: true,
+          metric: 'blood-pressure',
+          severity: 'success'
+        });
+      }
+    }
+
+    // Analyze mood and mental health patterns
+    const moodInsights = this.insights.filter(i => i.type === 'mood');
+    if (moodInsights.length > 0) {
+      const hasLowMood = moodInsights.some(i => i.title.includes('Low Mood'));
+      const hasHighStress = moodInsights.some(i => i.title.includes('High Stress'));
+      const hasPoorSleep = moodInsights.some(i => i.title.includes('Sleep'));
+      const hasLowEnergy = moodInsights.some(i => i.title.includes('Energy'));
+
+      if (hasLowMood) {
+        this.recommendations.push({
+          category: 'Mental Health',
+          title: 'Mood Enhancement Strategy',
+          description: 'Your mood has been consistently low. Try: daily gratitude journaling, social activities with friends/family, regular exercise (releases endorphins), and consider talking to a mental health professional.',
+          priority: 'high',
+          dataDriven: true,
+          metric: 'mood',
+          severity: 'warning'
+        });
+      }
+
+      if (hasHighStress) {
+        this.recommendations.push({
+          category: 'Mental Health',
+          title: 'Stress Management Plan',
+          description: 'High stress levels detected. Implement: daily 10-minute meditation, progressive muscle relaxation, regular exercise, time management techniques, and consider stress-reduction apps.',
+          priority: 'high',
+          dataDriven: true,
+          metric: 'stress',
+          severity: 'warning'
+        });
+      }
+
+      if (hasPoorSleep) {
+        this.recommendations.push({
+          category: 'Sleep Hygiene',
+          title: 'Sleep Quality Improvement',
+          description: 'Poor sleep quality affects overall health. Establish: consistent 8-hour sleep schedule, screen-free hour before bed, cool/dark bedroom environment, and avoid caffeine after 2 PM.',
+          priority: 'medium',
+          dataDriven: true,
+          metric: 'sleep',
+          severity: 'warning'
+        });
+      }
+
+      if (hasLowEnergy) {
+        this.recommendations.push({
+          category: 'Energy Management',
+          title: 'Boost Energy Levels',
+          description: 'Low energy levels detected. Focus on: improving sleep quality, regular exercise, balanced nutrition with protein, staying hydrated, and managing stress levels.',
+          priority: 'medium',
+          dataDriven: true,
+          metric: 'energy',
+          severity: 'info'
+        });
+      }
+    }
+
+    // Analyze medication patterns
+    const medInsights = this.insights.filter(i => i.type === 'medication');
+    if (medInsights.length > 0) {
+      const hasAdherenceIssues = medInsights.some(i => i.severity === 'warning');
+      
+      if (hasAdherenceIssues) {
+        this.recommendations.push({
+          category: 'Medication Management',
+          title: 'Improve Medication Adherence',
+          description: 'Medication tracking gaps detected. Set up: daily reminders, pill organizer, routine medication times, and track any side effects to discuss with your doctor.',
+          priority: 'high',
+          dataDriven: true,
+          metric: 'medication',
+          severity: 'warning'
+        });
+      }
+    }
+
+    // Analyze limb care patterns
+    const limbInsights = this.insights.filter(i => i.type === 'limb-care');
+    if (limbInsights.length > 0) {
+      const hasIssues = limbInsights.some(i => i.severity === 'warning');
+      
+      if (hasIssues) {
+        this.recommendations.push({
+          category: 'Limb Care',
+          title: 'Limb Health Monitoring',
+          description: 'Limb care concerns detected. Schedule: regular assessments, monitor for skin changes, maintain proper fit of prosthetics/orthotics, and contact your provider for any worsening symptoms.',
+          priority: 'high',
+          dataDriven: true,
+          metric: 'limb-care',
+          severity: 'warning'
+        });
+      }
+    }
+
+    // Analyze DME patterns
+    const dmeInsights = this.insights.filter(i => i.type === 'dme');
+    if (dmeInsights.length > 0) {
+      const hasEquipmentIssues = dmeInsights.some(i => i.severity === 'warning');
+      
+      if (hasEquipmentIssues) {
+        this.recommendations.push({
+          category: 'Equipment Management',
+          title: 'Equipment Maintenance',
+          description: 'Equipment needs attention. Contact: your equipment provider for repairs, schedule regular maintenance, and keep backup equipment if possible.',
+          priority: 'medium',
+          dataDriven: true,
+          metric: 'dme',
+          severity: 'warning'
+        });
+      }
+    }
+  }
+
+  generateDataDrivenRecommendations() {
+    // Calculate specific metrics for personalized recommendations
+    const bpInsights = this.insights.filter(i => i.type === 'blood-pressure');
+    const moodInsights = this.insights.filter(i => i.type === 'mood');
+    const sleepInsights = this.insights.filter(i => i.type === 'sleep');
+    
+    // Blood pressure specific recommendations
+    if (bpInsights.length > 0) {
+      const highReadings = bpInsights.filter(i => i.severity === 'alert').length;
+      if (highReadings > 0) {
+        this.recommendations.push({
+          category: 'Cardiovascular Health',
+          title: `Address ${highReadings} High BP Readings`,
+          description: `You've had ${highReadings} high blood pressure readings recently. Immediate actions: reduce sodium intake, increase potassium-rich foods, practice daily relaxation, and schedule a doctor visit within 1 week.`,
+          priority: 'high',
+          dataDriven: true,
+          metric: 'blood-pressure',
+          severity: 'alert',
+          specificCount: highReadings
+        });
+      }
+    }
+
+    // Sleep quality recommendations
+    if (sleepInsights.length > 0) {
+      const poorSleepDays = sleepInsights.filter(i => i.severity === 'warning').length;
+      if (poorSleepDays > 0) {
+        this.recommendations.push({
+          category: 'Sleep Hygiene',
+          title: `Improve Sleep Quality (${poorSleepDays} poor nights)`,
+          description: `You've had ${poorSleepDays} nights of poor sleep quality. Create: a relaxing bedtime routine, optimal sleep environment (65-68°F, dark, quiet), and avoid screens 1 hour before bed.`,
+          priority: 'medium',
+          dataDriven: true,
+          metric: 'sleep',
+          severity: 'warning',
+          specificCount: poorSleepDays
+        });
+      }
+    }
+
+    // Stress management recommendations
+    if (moodInsights.length > 0) {
+      const highStressDays = moodInsights.filter(i => i.title.includes('High Stress')).length;
+      if (highStressDays > 0) {
+        this.recommendations.push({
+          category: 'Mental Health',
+          title: `Manage High Stress (${highStressDays} days)`,
+          description: `You've experienced ${highStressDays} high-stress days recently. Techniques: deep breathing exercises, progressive muscle relaxation, regular physical activity, and consider stress management counseling.`,
+          priority: 'medium',
+          dataDriven: true,
+          metric: 'stress',
+          severity: 'warning',
+          specificCount: highStressDays
+        });
+      }
+    }
+  }
+
+  generateContextualRecommendations() {
+    // Add recommendations based on overall health profile and patterns
+    
+    // Calculate overall health trends
+    const alertCount = this.insights.filter(i => i.severity === 'alert').length;
+    const warningCount = this.insights.filter(i => i.severity === 'warning').length;
+    const successCount = this.insights.filter(i => i.severity === 'success').length;
+
+    // Health score based recommendations
+    if (this.healthScore < 40) {
       this.recommendations.push({
-        category: 'Cardiovascular Health',
-        title: 'Monitor Blood Pressure',
-        description: 'Track your blood pressure regularly and consider lifestyle changes.',
-        priority: 'high'
+        category: 'Overall Health',
+        title: 'Comprehensive Health Review',
+        description: `Your health score is ${this.healthScore}/100, indicating multiple areas need attention. Consider: scheduling a comprehensive health checkup, working with a health coach, and developing a multi-faceted wellness plan.`,
+        priority: 'high',
+        dataDriven: true,
+        metric: 'health-score',
+        severity: 'alert'
+      });
+    } else if (this.healthScore < 60) {
+      this.recommendations.push({
+        category: 'Overall Health',
+        title: 'Health Improvement Plan',
+        description: `Your health score is ${this.healthScore}/100. Focus on: addressing the ${warningCount} warning areas identified, establishing healthy routines, and regular health monitoring.`,
+        priority: 'medium',
+        dataDriven: true,
+        metric: 'health-score',
+        severity: 'warning'
+      });
+    } else if (this.healthScore >= 80) {
+      this.recommendations.push({
+        category: 'Overall Health',
+        title: 'Maintain Excellent Health',
+        description: `Excellent health score of ${this.healthScore}/100! Continue your healthy habits and consider: sharing your strategies with others, setting new wellness goals, and regular health maintenance.`,
+        priority: 'low',
+        dataDriven: true,
+        metric: 'health-score',
+        severity: 'success'
       });
     }
 
-    if (hasMoodIssues) {
+    // Data completeness recommendations
+    const dataInsights = this.insights.filter(i => i.type === 'data');
+    if (dataInsights.length > 0 && dataInsights[0].severity === 'info') {
       this.recommendations.push({
-        category: 'Mental Health',
-        title: 'Focus on Mood Management',
-        description: 'Practice stress-reduction techniques and engage in mood-boosting activities.',
-        priority: 'medium'
+        category: 'Health Tracking',
+        title: 'Expand Health Data Collection',
+        description: 'Start tracking more health metrics to get better insights. Begin with: daily mood entries, weekly blood pressure readings, and medication adherence logging.',
+        priority: 'medium',
+        dataDriven: true,
+        metric: 'data-completeness',
+        severity: 'info'
       });
     }
 
-    if (hasSleepIssues) {
-      this.recommendations.push({
-        category: 'Sleep Hygiene',
-        title: 'Improve Sleep Quality',
-        description: 'Establish a consistent sleep schedule and create a relaxing bedtime routine.',
-        priority: 'medium'
+    // Cross-correlation recommendations
+    const correlationInsights = this.insights.filter(i => i.type === 'correlation');
+    if (correlationInsights.length > 0) {
+      correlationInsights.forEach(insight => {
+        if (insight.title.includes('Stress-Health')) {
+          this.recommendations.push({
+            category: 'Stress Management',
+            title: 'Stress-Health Connection',
+            description: 'High stress is affecting your health metrics. Implement: daily stress monitoring, relaxation techniques, and stress-reduction activities to protect your overall health.',
+            priority: 'high',
+            dataDriven: true,
+            metric: 'stress-correlation',
+            severity: 'warning'
+          });
+        }
       });
     }
 
-    if (hasMedicationIssues) {
+    // Add preventive recommendations based on patterns
+    if (alertCount > 0) {
       this.recommendations.push({
-        category: 'Medication Management',
-        title: 'Track Medication Adherence',
-        description: 'Log your medication intake regularly to ensure proper adherence.',
-        priority: 'high'
+        category: 'Preventive Care',
+        title: 'Address Health Alerts',
+        description: `You have ${alertCount} health alerts requiring immediate attention. Prioritize: addressing the most critical issues first, consulting healthcare providers, and implementing recommended interventions.`,
+        priority: 'high',
+        dataDriven: true,
+        metric: 'alerts',
+        severity: 'alert',
+        specificCount: alertCount
       });
     }
 
-    // Add general wellness recommendations
-    this.recommendations.push({
-      category: 'General Wellness',
-      title: 'Stay Active',
-      description: 'Aim for at least 30 minutes of moderate exercise most days of the week.',
-      priority: 'medium'
+    // Success reinforcement
+    if (successCount > 0) {
+      this.recommendations.push({
+        category: 'Wellness',
+        title: 'Celebrate Health Successes',
+        description: `You have ${successCount} positive health indicators! Continue: your successful strategies, share what's working with your healthcare team, and set new wellness goals.`,
+        priority: 'low',
+        dataDriven: true,
+        metric: 'successes',
+        severity: 'success',
+        specificCount: successCount
+      });
+    }
+  }
+
+  sortRecommendations() {
+    // Sort recommendations by priority and relevance
+    const priorityOrder = { 'high': 3, 'medium': 2, 'low': 1 };
+    const severityOrder = { 'alert': 4, 'warning': 3, 'info': 2, 'success': 1 };
+    
+    this.recommendations.sort((a, b) => {
+      // First by priority
+      const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
+      if (priorityDiff !== 0) return priorityDiff;
+      
+      // Then by severity
+      const severityDiff = severityOrder[b.severity] - severityOrder[a.severity];
+      if (severityDiff !== 0) return severityDiff;
+      
+      // Then by data-driven vs general
+      if (a.dataDriven && !b.dataDriven) return -1;
+      if (!a.dataDriven && b.dataDriven) return 1;
+      
+      return 0;
     });
 
-    this.recommendations.push({
-      category: 'General Wellness',
-      title: 'Stay Hydrated',
-      description: 'Drink plenty of water throughout the day to maintain good health.',
-      priority: 'low'
-    });
+    // Limit to top 8 most relevant recommendations
+    this.recommendations = this.recommendations.slice(0, 8);
   }
 
   displayInsights() {
@@ -827,19 +1124,64 @@ class HealthInsights {
       return;
     }
 
-    this.recommendations.forEach(rec => {
+    // Add AI-driven header
+    const aiHeader = document.createElement('div');
+    aiHeader.className = 'ai-recommendations-header';
+    aiHeader.innerHTML = `
+      <div class="ai-header-content">
+        <span class="ai-icon">🤖</span>
+        <div class="ai-header-text">
+          <h4>AI-Powered Recommendations</h4>
+          <p>Personalized suggestions based on your health data patterns</p>
+        </div>
+      </div>
+    `;
+    recommendationsContainer.appendChild(aiHeader);
+
+    this.recommendations.forEach((rec, index) => {
       const recElement = document.createElement('div');
-      recElement.className = `recommendation-item ${rec.priority}`;
+      recElement.className = `recommendation-item ${rec.priority} ${rec.dataDriven ? 'data-driven' : 'general'}`;
+      
+      const aiBadge = rec.dataDriven ? '<span class="ai-badge">AI</span>' : '';
+      const metricIcon = this.getMetricIcon(rec.metric);
+      const specificCount = rec.specificCount ? ` (${rec.specificCount})` : '';
+      
       recElement.innerHTML = `
         <div class="recommendation-header">
-          <span class="recommendation-category">${rec.category}</span>
-          <span class="recommendation-priority ${rec.priority}">${rec.priority}</span>
+          <div class="recommendation-meta">
+            <span class="recommendation-category">${rec.category}</span>
+            ${aiBadge}
+          </div>
+          <div class="recommendation-indicators">
+            <span class="metric-icon">${metricIcon}</span>
+            <span class="recommendation-priority ${rec.priority}">${rec.priority}</span>
+          </div>
         </div>
-        <h4>${rec.title}</h4>
+        <h4>${rec.title}${specificCount}</h4>
         <p>${rec.description}</p>
+        ${rec.dataDriven ? '<div class="data-source">Based on your health data analysis</div>' : ''}
       `;
       recommendationsContainer.appendChild(recElement);
     });
+  }
+
+  getMetricIcon(metric) {
+    const icons = {
+      'blood-pressure': '❤️',
+      'mood': '😊',
+      'stress': '😰',
+      'sleep': '😴',
+      'energy': '🔋',
+      'medication': '💊',
+      'limb-care': '🦵',
+      'dme': '🦽',
+      'health-score': '📊',
+      'data-completeness': '📈',
+      'stress-correlation': '🧠',
+      'alerts': '⚠️',
+      'successes': '🏆'
+    };
+    return icons[metric] || '📋';
   }
 
   displayHealthScore() {
