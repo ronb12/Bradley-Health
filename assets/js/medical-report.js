@@ -65,14 +65,45 @@ class MedicalReportGenerator {
     const startDate = this.calculateStartDate(dateRange);
 
     try {
-      // Collect all health data
-      await this.collectProfileData(userId);
-      await this.collectBloodPressureData(userId, startDate, endDate);
-      await this.collectMedicationData(userId);
-      await this.collectMoodData(userId, startDate, endDate);
-      await this.collectGoalsData(userId);
-      await this.collectLimbCareData(userId, startDate, endDate);
-      await this.collectHealthInsights(userId);
+      // Initialize report data
+      this.reportData = {
+        profile: {},
+        bloodPressure: { readings: [], summary: { message: 'No data available' } },
+        medications: { current: [], summary: { message: 'No data available' } },
+        mood: { entries: [], summary: { message: 'No data available' } },
+        goals: { all: [], summary: { message: 'No data available' } },
+        limbCare: { assessments: [], summary: { message: 'No data available' } },
+        insights: []
+      };
+
+      // Collect all health data with individual error handling
+      await this.collectProfileData(userId).catch(error => {
+        console.error('Error collecting profile data:', error);
+      });
+      
+      await this.collectBloodPressureData(userId, startDate, endDate).catch(error => {
+        console.error('Error collecting blood pressure data:', error);
+      });
+      
+      await this.collectMedicationData(userId).catch(error => {
+        console.error('Error collecting medication data:', error);
+      });
+      
+      await this.collectMoodData(userId, startDate, endDate).catch(error => {
+        console.error('Error collecting mood data:', error);
+      });
+      
+      await this.collectGoalsData(userId).catch(error => {
+        console.error('Error collecting goals data:', error);
+      });
+      
+      await this.collectLimbCareData(userId, startDate, endDate).catch(error => {
+        console.error('Error collecting limb care data:', error);
+      });
+      
+      await this.collectHealthInsights(userId).catch(error => {
+        console.error('Error collecting health insights:', error);
+      });
 
       // Generate the report
       const report = this.formatReport(reportDate, startDate, endDate);
@@ -129,10 +160,15 @@ class MedicalReportGenerator {
       this.reportData.bloodPressure = {
         readings: readings,
         summary: this.analyzeBloodPressure(readings),
-        trends: this.calculateBPTrends(readings)
+        trends: readings.length > 0 ? this.calculateTrend(readings.map(r => r.systolic)) : 'no data'
       };
     } catch (error) {
       console.error('Error collecting blood pressure data:', error);
+      this.reportData.bloodPressure = {
+        readings: [],
+        summary: { message: 'Error loading blood pressure data' },
+        trends: 'error'
+      };
     }
   }
 
@@ -174,10 +210,15 @@ class MedicalReportGenerator {
       this.reportData.mood = {
         entries: moodEntries,
         summary: this.analyzeMoodData(moodEntries),
-        trends: this.calculateMoodTrends(moodEntries)
+        trends: moodEntries.length > 0 ? this.calculateTrend(moodEntries.map(e => e.mood)) : 'no data'
       };
     } catch (error) {
       console.error('Error collecting mood data:', error);
+      this.reportData.mood = {
+        entries: [],
+        summary: { message: 'Error loading mood data' },
+        trends: 'error'
+      };
     }
   }
 
@@ -228,11 +269,16 @@ class MedicalReportGenerator {
   async collectHealthInsights(userId) {
     try {
       if (window.healthInsights) {
+        // Ensure health insights has the current user
+        if (!window.healthInsights.currentUser) {
+          window.healthInsights.currentUser = this.currentUser;
+        }
         await window.healthInsights.analyzeHealthData();
         this.reportData.insights = window.healthInsights.insights;
       }
     } catch (error) {
       console.error('Error collecting health insights:', error);
+      this.reportData.insights = [];
     }
   }
 
