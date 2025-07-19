@@ -1036,7 +1036,7 @@ class WeightLossManager {
       const printSmoothiesButton = document.createElement('button');
       printSmoothiesButton.className = 'btn btn-primary print-smoothies-btn';
       printSmoothiesButton.innerHTML = '🥤 Print Smoothies Only';
-      printSmoothiesButton.onclick = () => this.printSmoothiesOnly(mealPlan);
+      printSmoothiesButton.onclick = () => this.printSmoothiesOnly(this.mealPlan);
       mealPlanCard.appendChild(printSmoothiesButton);
     }
   }
@@ -1875,7 +1875,10 @@ class WeightLossManager {
                 <span>${exercise.calories} calories</span>
               </div>
               <div><strong>${exercise.name}</strong></div>
-              <div><em>Duration: ${exercise.duration}</em></div>
+              <div class="exercise-details">
+                <span class="exercise-duration">${exercise.duration}</span>
+                ${exercise.intensity ? `<span class="exercise-intensity intensity-${exercise.intensity.toLowerCase().replace('-', '')}">${exercise.intensity}</span>` : ''}
+              </div>
               ${exercise.instructions ? `
                 <div class="exercise-instructions">
                   <strong>Instructions:</strong>
@@ -2228,7 +2231,10 @@ class WeightLossManager {
                 <span>${exercise.calories} calories</span>
               </div>
               <div><strong>${exercise.name}</strong></div>
-              <div><em>Duration: ${exercise.duration}</em></div>
+              <div class="exercise-details">
+                <span class="exercise-duration">${exercise.duration}</span>
+                ${exercise.intensity ? `<span class="exercise-intensity intensity-${exercise.intensity.toLowerCase().replace('-', '')}">${exercise.intensity}</span>` : ''}
+              </div>
               ${exercise.instructions ? `
                 <div class="exercise-instructions">
                   <strong>Instructions:</strong>
@@ -2237,25 +2243,6 @@ class WeightLossManager {
               ` : ''}
             </div>
           `).join('')}
-          
-          ${this.exercisePlan.totalWeeks > 1 ? `
-            <div class="plan-note">
-              <p><strong>Complete Plan:</strong> This weekly template repeats for ${this.exercisePlan.totalWeeks} weeks (${this.exercisePlan.totalDays} days total).</p>
-              <p><strong>Progression:</strong> As you get stronger, increase intensity, duration, or add more challenging variations.</p>
-            </div>
-          ` : ''}
-        </div>
-        
-        <div class="section">
-          <h2>📝 Tips for Success</h2>
-          <ul>
-            <li>Track your weight weekly to monitor progress</li>
-            <li>Stay consistent with your meal and exercise plan</li>
-            <li>Drink plenty of water throughout the day</li>
-            <li>Get adequate sleep (7-9 hours per night)</li>
-            <li>Be patient - sustainable weight loss takes time</li>
-            <li>Adjust the plan if needed based on your progress</li>
-          </ul>
         </div>
       </body>
       </html>
@@ -2267,6 +2254,3 @@ class WeightLossManager {
     setTimeout(() => printWindow.print(), 500);
   }
 }
-
-// Initialize Weight Loss Manager
-window.weightLossManager = new WeightLossManager(); 
