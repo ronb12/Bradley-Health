@@ -26,6 +26,26 @@ class NutritionTracker {
     }
   }
 
+  init() {
+    // Wait for authentication
+    if (window.authManager) {
+      window.authManager.auth.onAuthStateChanged((user) => {
+        this.currentUser = user;
+        if (user) {
+          console.log('Nutrition Tracker: User authenticated, loading data');
+          this.loadNutritionData();
+          this.setupEventListeners();
+        } else {
+          console.log('Nutrition Tracker: User signed out, clearing data...');
+          this.meals = [];
+          this.cholesterolEntries = [];
+          this.renderMealHistory();
+          this.renderCholesterolHistory();
+        }
+      });
+    }
+  }
+
   initializeFoodDatabase() {
     // Sample food database with cholesterol content (mg per 100g)
     return {
@@ -434,6 +454,114 @@ class NutritionTracker {
       window.showToast(message, type);
     } else {
       console.log(`${type.toUpperCase()}: ${message}`);
+    }
+  }
+
+  setupEventListeners() {
+    // Meal form
+    const mealForm = document.getElementById('mealForm');
+    if (mealForm) {
+      mealForm.addEventListener('submit', (e) => this.addMeal(e));
+    }
+
+    // Cholesterol form
+    const cholesterolForm = document.getElementById('cholesterolForm');
+    if (cholesterolForm) {
+      cholesterolForm.addEventListener('submit', (e) => this.addCholesterolEntry(e));
+    }
+
+    // Set default date and time
+    this.setDefaultDateTime();
+  }
+
+  setDefaultDateTime() {
+    const now = new Date();
+    const date = now.toISOString().split('T')[0];
+    const time = now.toTimeString().split(' ')[0].substring(0, 5);
+
+    const mealDate = document.getElementById('mealDate');
+    const mealTime = document.getElementById('mealTime');
+    const cholesterolDate = document.getElementById('cholesterolDate');
+
+    if (mealDate) mealDate.value = date;
+    if (mealTime) mealTime.value = time;
+    if (cholesterolDate) cholesterolDate.value = date;
+  }
+
+  async loadNutritionData() {
+    if (!this.currentUser) return;
+
+    try {
+      console.log('Nutrition Tracker: Loading nutrition data');
+      
+      // Load meals
+      const mealsSnapshot = await this.db.collection('meals')
+        .where('userId', '==', this.currentUser.uid)
+        .orderBy('timestamp', 'desc')
+        .limit(50)
+        .get();
+
+      this.meals = mealsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      // Load cholesterol entries
+      const cholesterolSnapshot = await this.db.collection('cholesterolEntries')
+        .where('userId', '==', this.currentUser.uid)
+        .orderBy('timestamp', 'desc')
+        .limit(50)
+        .get();
+
+      this.cholesterolEntries = cholesterolSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      console.log('Nutrition Tracker: Loaded', this.meals.length, 'meals and', this.cholesterolEntries.length, 'cholesterol entries');
+
+      this.renderMealHistory();
+      this.renderCholesterolHistory();
+      this.updateNutritionOverview();
+
+    } catch (error) {
+      console.error('Error loading nutrition data:', error);
+      this.showToast('Error loading nutrition data', 'error');
+    }
+  }
+
+  async addCholesterolEntry(e) {
+    e.preventDefault();
+    
+    if (!this.currentUser || !this.currentUser.uid) {
+      this.showToast('Please sign in to log cholesterol', 'error');
+      return;
+    }
+
+    const formData = new FormData(e.target);
+    
+    const date = formData.get('date');
+    const value = parseFloat(formData.get('value'));
+    const notes = formData.get('notes');
+    const timestamp = new Date(`${date}T00:00:00`);
+
+    const cholesterolEntry = {
+      value: value,
+      date: date,
+      notes: notes,
+      timestamp: timestamp,
+      userId: this.currentUser.uid
+    };
+
+    try {
+      await this.db.collection('cholesterolEntries').add(cholesterolEntry);
+      this.showToast('Cholesterol reading logged successfully', 'success');
+      e.target.reset();
+      this.setDefaultDateTime();
+      this.loadNutritionData();
+    } catch (error) {
+      console.error('Error saving cholesterol entry:', error);
+      this.showToast('Error saving cholesterol entry', 'error');
     }
   }
 

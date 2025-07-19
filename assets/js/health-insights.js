@@ -660,6 +660,10 @@ class HealthInsights {
 
     } catch (error) {
       console.error('Error analyzing nutrition data:', error);
+      // Handle permission errors gracefully
+      if (error.code === 'permission-denied') {
+        console.log('Nutrition data permissions not set up yet - this is normal for new users');
+      }
     }
   }
 
@@ -741,6 +745,10 @@ class HealthInsights {
 
     } catch (error) {
       console.error('Error analyzing cholesterol data:', error);
+      // Handle permission errors gracefully
+      if (error.code === 'permission-denied') {
+        console.log('Cholesterol data permissions not set up yet - this is normal for new users');
+      }
     }
   }
 
@@ -795,6 +803,10 @@ class HealthInsights {
 
     } catch (error) {
       console.error('Error analyzing data completeness:', error);
+      // Handle permission errors gracefully
+      if (error.code === 'permission-denied') {
+        console.log('Data completeness analysis permissions not set up yet - this is normal for new users');
+      }
     }
   }
 
