@@ -1,16 +1,16 @@
 class DMEManager {
   constructor() {
     // Wait for Firebase to be ready
-    if (firebase && firebase.firestore) {
-      this.db = firebase.firestore();
+    if (window.firebaseServices && window.firebaseServices.db) {
+      this.db = window.firebaseServices.db;
       this.currentUser = null;
       this.dmeItems = [];
       this.init();
     } else {
       // Retry after a short delay
       setTimeout(() => {
-        if (firebase && firebase.firestore) {
-          this.db = firebase.firestore();
+        if (window.firebaseServices && window.firebaseServices.db) {
+          this.db = window.firebaseServices.db;
           this.currentUser = null;
           this.dmeItems = [];
           this.init();
@@ -250,7 +250,7 @@ class DMEManager {
     }
 
     // Check if Firebase is ready
-    if (!firebase || !firebase.firestore || !firebase.firestore.Timestamp) {
+    if (!firebase || !firebase.firestore || !window.firebaseServices || !window.firebaseServices.db) {
       alert('Firebase is not ready. Please wait a moment and try again.');
       return;
     }
@@ -262,13 +262,13 @@ class DMEManager {
       type: formData.get('type'),
       status: formData.get('status'),
       notes: formData.get('notes') || '',
-      dateAcquired: firebase.firestore.Timestamp.now(),
-      timestamp: firebase.firestore.Timestamp.now()
+      dateAcquired: window.firebaseServices.db.Timestamp.now(),
+      timestamp: window.firebaseServices.db.Timestamp.now()
     };
 
     // Add last maintenance date if provided
     if (formData.get('lastMaintenance')) {
-      dmeData.lastMaintenance = firebase.firestore.Timestamp.fromDate(new Date(formData.get('lastMaintenance')));
+      dmeData.lastMaintenance = window.firebaseServices.db.Timestamp.fromDate(new Date(formData.get('lastMaintenance')));
     }
 
     try {
