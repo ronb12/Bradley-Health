@@ -182,6 +182,11 @@
   font-size: 0.85em;
 }
 
+.food-item.online {
+  background: rgba(13, 110, 253, 0.1);
+  border-left: 3px solid #0d6efd;
+}
+
 .food-item.database {
   background: rgba(40, 167, 69, 0.1);
   border-left: 3px solid #28a745;

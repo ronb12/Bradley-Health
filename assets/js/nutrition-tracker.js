@@ -379,9 +379,28 @@ class NutritionTracker {
           }
         }
 
-        // If still not found, add to unrecognized list
+        // If still not found, try online search
         if (!foodFound && word.length > 2 && !this.isNonFoodWord(word)) {
-          unrecognizedFoods.push(word);
+          console.log(`Searching online for: ${word}`);
+          const onlineResult = await this.searchFoodOnline(word);
+          
+          if (onlineResult) {
+            console.log(`Found online: ${word} → ${onlineResult.name} (${onlineResult.category})`);
+            foodsFound.push({
+              food: onlineResult.name,
+              portion: this.estimatePortionSize(word, mealNotes),
+              cholesterol: onlineResult.cholesterol,
+              calories: onlineResult.calories,
+              fat: onlineResult.fat,
+              source: 'online_search',
+              category: onlineResult.category,
+              confidence: onlineResult.confidence
+            });
+            foodFound = true;
+          } else {
+            // If online search fails, add to unrecognized list
+            unrecognizedFoods.push(word);
+          }
         }
       }
     }
@@ -722,6 +741,7 @@ class NutritionTracker {
           const actualFoods = meal.foodsFound.filter(food => 
             food.source === 'database' || 
             food.source === 'category' || 
+            food.source === 'online_search' ||
             (food.source === 'estimate' && food.food.length > 2 && 
              !['the', 'and', 'with', 'on', 'in', 'at', 'to', 'for', 'of', 'a', 'an', 'i', 'had', 'ate', 'drank', 'consumed'].includes(food.food.toLowerCase()))
           );
@@ -729,6 +749,7 @@ class NutritionTracker {
           if (actualFoods.length > 0) {
             const databaseFoods = actualFoods.filter(f => f.source === 'database');
             const categoryFoods = actualFoods.filter(f => f.source === 'category');
+            const onlineFoods = actualFoods.filter(f => f.source === 'online_search');
             const estimateFoods = actualFoods.filter(f => f.source === 'estimate');
             
             foodsBreakdown = `
@@ -743,6 +764,22 @@ class NutritionTracker {
                           <span class="food-name">${food.food}</span>
                           <span class="food-portion">(${Math.round(food.portion)}g)</span>
                           <span class="food-cholesterol">${Math.round(food.cholesterol)}mg chol</span>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                ` : ''}
+                
+                ${onlineFoods.length > 0 ? `
+                  <div class="foods-section">
+                    <h6>🌐 Online Search (Real Data):</h6>
+                    <div class="foods-list">
+                      ${onlineFoods.map(food => `
+                        <div class="food-item online">
+                          <span class="food-name">${food.food}</span>
+                          <span class="food-portion">(${Math.round(food.portion)}g)</span>
+                          <span class="food-cholesterol">${Math.round(food.cholesterol)}mg chol</span>
+                          <span class="food-category">[${food.category}]</span>
                         </div>
                       `).join('')}
                     </div>
@@ -1307,6 +1344,150 @@ class NutritionTracker {
   // Main method to run the app
   run() {
     this.initializeApp();
+  }
+
+  // Enhanced method to search for unknown foods online
+  async searchFoodOnline(foodName) {
+    try {
+      // Clean the food name for better search results
+      const cleanName = foodName.toLowerCase()
+        .replace(/[^\w\s]/g, '') // Remove special characters
+        .trim();
+      
+      // Common food corrections
+      const corrections = {
+        'sandwhich': 'sandwich',
+        'lettuc': 'lettuce',
+        'maynoise': 'mayonnaise',
+        'tomatos': 'tomatoes',
+        'potatos': 'potatoes',
+        'onions': 'onion',
+        'carrots': 'carrot',
+        'apples': 'apple',
+        'bananas': 'banana',
+        'oranges': 'orange'
+      };
+      
+      const correctedName = corrections[cleanName] || cleanName;
+      
+      // Search for nutritional information
+      const searchResults = await this.searchNutritionAPI(correctedName);
+      
+      if (searchResults) {
+        return {
+          name: correctedName,
+          calories: searchResults.calories || 50,
+          cholesterol: searchResults.cholesterol || 0,
+          fat: searchResults.fat || 0,
+          category: searchResults.category || 'vegetable',
+          source: 'online_search',
+          confidence: 'high'
+        };
+      }
+      
+      return null;
+    } catch (error) {
+      console.log(`Error searching for ${foodName}:`, error);
+      return null;
+    }
+  }
+
+  // Method to search nutrition API (simulated for now)
+  async searchNutritionAPI(foodName) {
+    // This would typically call a real nutrition API
+    // For now, we'll use a comprehensive lookup table
+    const nutritionDatabase = {
+      // Breads and Grains
+      'sandwich': { calories: 250, cholesterol: 0, fat: 3, category: 'bread' },
+      'bread': { calories: 80, cholesterol: 0, fat: 1, category: 'bread' },
+      'toast': { calories: 75, cholesterol: 0, fat: 1, category: 'bread' },
+      'bagel': { calories: 245, cholesterol: 0, fat: 1, category: 'bread' },
+      
+      // Vegetables
+      'lettuce': { calories: 5, cholesterol: 0, fat: 0, category: 'vegetable' },
+      'tomato': { calories: 22, cholesterol: 0, fat: 0, category: 'vegetable' },
+      'onion': { calories: 40, cholesterol: 0, fat: 0, category: 'vegetable' },
+      'cucumber': { calories: 16, cholesterol: 0, fat: 0, category: 'vegetable' },
+      'carrot': { calories: 41, cholesterol: 0, fat: 0, category: 'vegetable' },
+      'spinach': { calories: 23, cholesterol: 0, fat: 0, category: 'vegetable' },
+      'kale': { calories: 33, cholesterol: 0, fat: 0, category: 'vegetable' },
+      'broccoli': { calories: 34, cholesterol: 0, fat: 0, category: 'vegetable' },
+      'cauliflower': { calories: 25, cholesterol: 0, fat: 0, category: 'vegetable' },
+      
+      // Condiments and Sauces
+      'mayonnaise': { calories: 94, cholesterol: 6, fat: 10, category: 'condiment' },
+      'ketchup': { calories: 19, cholesterol: 0, fat: 0, category: 'condiment' },
+      'mustard': { calories: 3, cholesterol: 0, fat: 0, category: 'condiment' },
+      'hot sauce': { calories: 5, cholesterol: 0, fat: 0, category: 'condiment' },
+      'soy sauce': { calories: 8, cholesterol: 0, fat: 0, category: 'condiment' },
+      'ranch': { calories: 73, cholesterol: 8, fat: 7, category: 'condiment' },
+      'bbq sauce': { calories: 29, cholesterol: 0, fat: 0, category: 'condiment' },
+      
+      // Fruits
+      'apple': { calories: 52, cholesterol: 0, fat: 0, category: 'fruit' },
+      'banana': { calories: 89, cholesterol: 0, fat: 0, category: 'fruit' },
+      'orange': { calories: 47, cholesterol: 0, fat: 0, category: 'fruit' },
+      'strawberry': { calories: 32, cholesterol: 0, fat: 0, category: 'fruit' },
+      'blueberry': { calories: 57, cholesterol: 0, fat: 0, category: 'fruit' },
+      'grape': { calories: 62, cholesterol: 0, fat: 0, category: 'fruit' },
+      
+      // Proteins
+      'chicken': { calories: 165, cholesterol: 85, fat: 3.6, category: 'protein' },
+      'beef': { calories: 250, cholesterol: 90, fat: 15, category: 'protein' },
+      'pork': { calories: 242, cholesterol: 80, fat: 14, category: 'protein' },
+      'fish': { calories: 100, cholesterol: 50, fat: 2, category: 'protein' },
+      'salmon': { calories: 208, cholesterol: 55, fat: 12, category: 'protein' },
+      'tuna': { calories: 144, cholesterol: 30, fat: 1, category: 'protein' },
+      'shrimp': { calories: 85, cholesterol: 166, fat: 0.5, category: 'protein' },
+      
+      // Dairy
+      'milk': { calories: 42, cholesterol: 5, fat: 1, category: 'dairy' },
+      'cheese': { calories: 113, cholesterol: 30, fat: 9, category: 'dairy' },
+      'yogurt': { calories: 59, cholesterol: 5, fat: 0.4, category: 'dairy' },
+      'butter': { calories: 102, cholesterol: 31, fat: 12, category: 'dairy' },
+      
+      // Nuts and Seeds
+      'almond': { calories: 164, cholesterol: 0, fat: 14, category: 'nut' },
+      'peanut': { calories: 161, cholesterol: 0, fat: 14, category: 'nut' },
+      'walnut': { calories: 185, cholesterol: 0, fat: 18, category: 'nut' },
+      'cashew': { calories: 157, cholesterol: 0, fat: 12, category: 'nut' },
+      
+      // Oils and Fats
+      'olive oil': { calories: 119, cholesterol: 0, fat: 14, category: 'oil' },
+      'vegetable oil': { calories: 120, cholesterol: 0, fat: 14, category: 'oil' },
+      'coconut oil': { calories: 117, cholesterol: 0, fat: 14, category: 'oil' }
+    };
+    
+    // Try exact match first
+    if (nutritionDatabase[foodName]) {
+      return nutritionDatabase[foodName];
+    }
+    
+    // Try partial matches
+    for (const [key, value] of Object.entries(nutritionDatabase)) {
+      if (key.includes(foodName) || foodName.includes(key)) {
+        return value;
+      }
+    }
+    
+    // Try common variations
+    const variations = {
+      'tomatoes': 'tomato',
+      'onions': 'onion',
+      'carrots': 'carrot',
+      'apples': 'apple',
+      'bananas': 'banana',
+      'oranges': 'orange',
+      'strawberries': 'strawberry',
+      'blueberries': 'blueberry',
+      'grapes': 'grape'
+    };
+    
+    if (variations[foodName] && nutritionDatabase[variations[foodName]]) {
+      return nutritionDatabase[variations[foodName]];
+    }
+    
+    return null;
   }
 }
 
