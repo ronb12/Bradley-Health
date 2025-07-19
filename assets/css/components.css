@@ -2559,6 +2559,72 @@ input[type="range"]::-moz-range-thumb {
           color: #495057;
         }
 
+/* Exercise Intensity Indicators */
+.exercise-details {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 8px;
+        }
+
+.exercise-intensity {
+          padding: 2px 8px;
+          border-radius: 12px;
+          font-size: 0.7rem;
+          font-weight: 600;
+          text-transform: uppercase;
+        }
+
+.intensity-low {
+          background: #d4edda;
+          color: #155724;
+        }
+
+.intensity-lowmedium {
+          background: #fff3cd;
+          color: #856404;
+        }
+
+.intensity-medium {
+          background: #f8d7da;
+          color: #721c24;
+        }
+
+.intensity-mediumhigh {
+          background: #f5c6cb;
+          color: #721c24;
+        }
+
+.intensity-high {
+          background: #cce5ff;
+          color: #004085;
+        }
+
+/* Meal Ingredients */
+.meal-ingredients {
+          margin: 10px 0;
+          padding: 8px;
+          background: #f8f9fa;
+          border-radius: 6px;
+          border-left: 3px solid var(--primary-color);
+        }
+
+.meal-ingredients strong {
+          color: var(--text-primary);
+          font-size: 0.85rem;
+        }
+
+.meal-ingredients ul {
+          margin: 5px 0 0 0;
+          padding-left: 20px;
+        }
+
+.meal-ingredients li {
+          font-size: 0.8rem;
+          color: var(--text-secondary);
+          margin: 2px 0;
+        }
+
 .back-to-summary {
   text-align: center;
   padding: 20px 0;

@@ -251,9 +251,10 @@ class WeightLossManager {
   }
 
   generateMealPlan(dailyCalories) {
-    const proteinRatio = 0.3; // 30% protein
-    const carbRatio = 0.45; // 45% carbs
-    const fatRatio = 0.25; // 25% fat
+    // Optimized macro ratios for weight loss
+    const proteinRatio = 0.35; // 35% protein (higher for satiety and muscle preservation)
+    const carbRatio = 0.40; // 40% carbs (moderate for energy)
+    const fatRatio = 0.25; // 25% fat (healthy fats for satiety)
 
     const proteinGrams = Math.round((dailyCalories * proteinRatio) / 4);
     const carbGrams = Math.round((dailyCalories * carbRatio) / 4);
@@ -276,15 +277,34 @@ class WeightLossManager {
     };
 
     for (let day = 1; day <= planDuration; day++) {
+      // Vary meal types to include smoothies and different combinations
+      const includeSmoothie = Math.random() < 0.3; // 30% chance of smoothie
+      const smoothieMeal = Math.random() < 0.5 ? 'breakfast' : 'snack'; // Smoothie for breakfast or snack
+      
       const dayPlan = {
         day: day,
-        meals: {
-          breakfast: this.generateMeal('breakfast', dailyCalories * 0.25, this.weightGoal.restrictions),
-          lunch: this.generateMeal('lunch', dailyCalories * 0.35, this.weightGoal.restrictions),
-          dinner: this.generateMeal('dinner', dailyCalories * 0.35, this.weightGoal.restrictions),
-          snack: this.generateMeal('snack', dailyCalories * 0.05, this.weightGoal.restrictions)
-        }
+        meals: {}
       };
+
+      // Generate meals with varied calorie distribution
+      if (includeSmoothie && smoothieMeal === 'breakfast') {
+        dayPlan.meals.breakfast = this.generateMeal('smoothie', dailyCalories * 0.20, this.weightGoal.restrictions);
+        dayPlan.meals.lunch = this.generateMeal('lunch', dailyCalories * 0.35, this.weightGoal.restrictions);
+        dayPlan.meals.dinner = this.generateMeal('dinner', dailyCalories * 0.35, this.weightGoal.restrictions);
+        dayPlan.meals.snack = this.generateMeal('snack', dailyCalories * 0.10, this.weightGoal.restrictions);
+      } else if (includeSmoothie && smoothieMeal === 'snack') {
+        dayPlan.meals.breakfast = this.generateMeal('breakfast', dailyCalories * 0.25, this.weightGoal.restrictions);
+        dayPlan.meals.lunch = this.generateMeal('lunch', dailyCalories * 0.35, this.weightGoal.restrictions);
+        dayPlan.meals.dinner = this.generateMeal('dinner', dailyCalories * 0.30, this.weightGoal.restrictions);
+        dayPlan.meals.snack = this.generateMeal('smoothie', dailyCalories * 0.10, this.weightGoal.restrictions);
+      } else {
+        // Standard meal distribution
+        dayPlan.meals.breakfast = this.generateMeal('breakfast', dailyCalories * 0.25, this.weightGoal.restrictions);
+        dayPlan.meals.lunch = this.generateMeal('lunch', dailyCalories * 0.35, this.weightGoal.restrictions);
+        dayPlan.meals.dinner = this.generateMeal('dinner', dailyCalories * 0.30, this.weightGoal.restrictions);
+        dayPlan.meals.snack = this.generateMeal('snack', dailyCalories * 0.10, this.weightGoal.restrictions);
+      }
+
       mealPlan.days.push(dayPlan);
     }
 
@@ -293,62 +313,103 @@ class WeightLossManager {
 
   generateMeal(mealType, targetCalories, restrictions) {
     const lowCholesterol = restrictions && restrictions.toLowerCase().includes('cholesterol');
+    const isVegan = restrictions && restrictions.toLowerCase().includes('vegan');
+    const isVegetarian = restrictions && restrictions.toLowerCase().includes('vegetarian');
     
     const mealTemplates = {
       breakfast: {
         lowCholesterol: [
-          { name: 'Oatmeal with Berries', calories: 250, protein: 8, carbs: 45, fat: 4, cholesterol: 0 },
-          { name: 'Greek Yogurt with Nuts', calories: 200, protein: 15, carbs: 12, fat: 8, cholesterol: 5 },
-          { name: 'Egg White Scramble', calories: 180, protein: 20, carbs: 5, fat: 6, cholesterol: 0 },
-          { name: 'Smoothie Bowl', calories: 220, protein: 12, carbs: 35, fat: 3, cholesterol: 0 }
+          { name: 'Oatmeal with Berries & Almonds', calories: 280, protein: 10, carbs: 48, fat: 8, cholesterol: 0 },
+          { name: 'Greek Yogurt Parfait with Granola', calories: 240, protein: 18, carbs: 28, fat: 6, cholesterol: 8 },
+          { name: 'Egg White Omelette with Spinach', calories: 200, protein: 22, carbs: 6, fat: 8, cholesterol: 0 },
+          { name: 'Protein Smoothie Bowl', calories: 260, protein: 20, carbs: 32, fat: 4, cholesterol: 0 },
+          { name: 'Whole Grain Toast with Avocado', calories: 220, protein: 8, carbs: 28, fat: 10, cholesterol: 0 },
+          { name: 'Chia Pudding with Berries', calories: 180, protein: 6, carbs: 24, fat: 8, cholesterol: 0 }
         ],
         regular: [
-          { name: 'Scrambled Eggs with Toast', calories: 300, protein: 15, carbs: 25, fat: 15, cholesterol: 373 },
-          { name: 'Pancakes with Syrup', calories: 350, protein: 8, carbs: 55, fat: 12, cholesterol: 50 },
-          { name: 'Bacon and Eggs', calories: 400, protein: 20, carbs: 5, fat: 30, cholesterol: 470 }
+          { name: 'Scrambled Eggs with Whole Grain Toast', calories: 320, protein: 18, carbs: 28, fat: 16, cholesterol: 380 },
+          { name: 'Protein Pancakes with Berries', calories: 340, protein: 16, carbs: 42, fat: 10, cholesterol: 45 },
+          { name: 'Breakfast Burrito with Turkey', calories: 380, protein: 22, carbs: 32, fat: 18, cholesterol: 120 },
+          { name: 'Cottage Cheese with Fruit', calories: 200, protein: 20, carbs: 18, fat: 4, cholesterol: 15 },
+          { name: 'Protein Smoothie', calories: 240, protein: 24, carbs: 22, fat: 4, cholesterol: 0 }
         ]
       },
       lunch: {
         lowCholesterol: [
-          { name: 'Grilled Chicken Salad', calories: 280, protein: 25, carbs: 15, fat: 12, cholesterol: 25 },
-          { name: 'Quinoa Bowl with Vegetables', calories: 320, protein: 12, carbs: 45, fat: 8, cholesterol: 0 },
-          { name: 'Tuna Salad (Light Mayo)', calories: 250, protein: 20, carbs: 8, fat: 12, cholesterol: 38 },
-          { name: 'Vegetarian Wrap', calories: 300, protein: 10, carbs: 40, fat: 10, cholesterol: 0 }
+          { name: 'Grilled Chicken Caesar Salad', calories: 320, protein: 28, carbs: 18, fat: 14, cholesterol: 35 },
+          { name: 'Quinoa Buddha Bowl', calories: 360, protein: 14, carbs: 52, fat: 10, cholesterol: 0 },
+          { name: 'Tuna Salad with Mixed Greens', calories: 280, protein: 24, carbs: 12, fat: 14, cholesterol: 42 },
+          { name: 'Mediterranean Wrap', calories: 340, protein: 12, carbs: 44, fat: 12, cholesterol: 0 },
+          { name: 'Lentil Soup with Whole Grain Bread', calories: 300, protein: 16, carbs: 48, fat: 6, cholesterol: 0 },
+          { name: 'Grilled Fish Tacos', calories: 320, protein: 26, carbs: 28, fat: 12, cholesterol: 48 }
         ],
         regular: [
-          { name: 'Turkey Sandwich', calories: 350, protein: 20, carbs: 35, fat: 15, cholesterol: 45 },
-          { name: 'Chicken Caesar Salad', calories: 400, protein: 25, carbs: 20, fat: 25, cholesterol: 80 },
-          { name: 'Beef Burger', calories: 450, protein: 25, carbs: 30, fat: 25, cholesterol: 66 }
+          { name: 'Turkey & Avocado Sandwich', calories: 380, protein: 24, carbs: 38, fat: 16, cholesterol: 50 },
+          { name: 'Chicken & Rice Bowl', calories: 420, protein: 28, carbs: 42, fat: 18, cholesterol: 85 },
+          { name: 'Lean Beef Burger with Sweet Potato Fries', calories: 460, protein: 30, carbs: 38, fat: 22, cholesterol: 70 },
+          { name: 'Salmon Salad with Mixed Greens', calories: 340, protein: 26, carbs: 16, fat: 18, cholesterol: 55 },
+          { name: 'Protein Bowl with Quinoa', calories: 400, protein: 22, carbs: 46, fat: 14, cholesterol: 0 }
         ]
       },
       dinner: {
         lowCholesterol: [
-          { name: 'Salmon with Brown Rice', calories: 380, protein: 30, carbs: 35, fat: 15, cholesterol: 55 },
-          { name: 'Tofu Stir Fry', calories: 320, protein: 18, carbs: 40, fat: 8, cholesterol: 0 },
-          { name: 'Grilled Fish with Vegetables', calories: 300, protein: 25, carbs: 20, fat: 12, cholesterol: 45 },
-          { name: 'Lentil Curry', calories: 350, protein: 15, carbs: 50, fat: 8, cholesterol: 0 }
+          { name: 'Grilled Salmon with Brown Rice & Vegetables', calories: 420, protein: 32, carbs: 38, fat: 18, cholesterol: 58 },
+          { name: 'Tofu Stir-Fry with Quinoa', calories: 380, protein: 20, carbs: 44, fat: 12, cholesterol: 0 },
+          { name: 'Baked Cod with Sweet Potato', calories: 360, protein: 28, carbs: 32, fat: 14, cholesterol: 48 },
+          { name: 'Lentil Curry with Brown Rice', calories: 400, protein: 18, carbs: 56, fat: 10, cholesterol: 0 },
+          { name: 'Grilled Chicken with Roasted Vegetables', calories: 380, protein: 30, carbs: 28, fat: 16, cholesterol: 75 },
+          { name: 'Vegetarian Chili with Cornbread', calories: 340, protein: 14, carbs: 48, fat: 8, cholesterol: 0 }
         ],
         regular: [
-          { name: 'Grilled Chicken with Pasta', calories: 450, protein: 30, carbs: 45, fat: 18, cholesterol: 73 },
-          { name: 'Steak with Potatoes', calories: 500, protein: 35, carbs: 30, fat: 25, cholesterol: 62 },
-          { name: 'Pork Chops with Rice', calories: 420, protein: 28, carbs: 35, fat: 20, cholesterol: 62 }
+          { name: 'Grilled Chicken with Pasta Primavera', calories: 480, protein: 32, carbs: 48, fat: 20, cholesterol: 78 },
+          { name: 'Lean Beef Steak with Mashed Potatoes', calories: 520, protein: 38, carbs: 34, fat: 28, cholesterol: 65 },
+          { name: 'Pork Tenderloin with Roasted Vegetables', calories: 440, protein: 30, carbs: 32, fat: 22, cholesterol: 68 },
+          { name: 'Shrimp Scampi with Whole Grain Pasta', calories: 460, protein: 26, carbs: 44, fat: 20, cholesterol: 85 },
+          { name: 'Turkey Meatballs with Spaghetti', calories: 420, protein: 28, carbs: 42, fat: 18, cholesterol: 72 }
         ]
       },
       snack: {
         lowCholesterol: [
-          { name: 'Apple with Almonds', calories: 150, protein: 4, carbs: 20, fat: 8, cholesterol: 0 },
-          { name: 'Carrot Sticks with Hummus', calories: 120, protein: 3, carbs: 15, fat: 6, cholesterol: 0 },
-          { name: 'Greek Yogurt', calories: 100, protein: 12, carbs: 8, fat: 2, cholesterol: 5 }
+          { name: 'Apple with Almond Butter', calories: 160, protein: 4, carbs: 22, fat: 8, cholesterol: 0 },
+          { name: 'Carrot Sticks with Hummus', calories: 140, protein: 4, carbs: 18, fat: 6, cholesterol: 0 },
+          { name: 'Greek Yogurt with Berries', calories: 120, protein: 14, carbs: 10, fat: 3, cholesterol: 6 },
+          { name: 'Mixed Nuts & Dried Fruit', calories: 180, protein: 6, carbs: 16, fat: 12, cholesterol: 0 },
+          { name: 'Protein Smoothie', calories: 160, protein: 16, carbs: 14, fat: 4, cholesterol: 0 },
+          { name: 'Rice Cakes with Peanut Butter', calories: 140, protein: 4, carbs: 18, fat: 6, cholesterol: 0 }
         ],
         regular: [
-          { name: 'Mixed Nuts', calories: 180, protein: 6, carbs: 8, fat: 16, cholesterol: 0 },
-          { name: 'Cheese and Crackers', calories: 200, protein: 8, carbs: 15, fat: 12, cholesterol: 25 },
-          { name: 'Trail Mix', calories: 160, protein: 4, carbs: 18, fat: 8, cholesterol: 0 }
+          { name: 'Mixed Nuts & Seeds', calories: 200, protein: 8, carbs: 10, fat: 18, cholesterol: 0 },
+          { name: 'Cheese & Whole Grain Crackers', calories: 220, protein: 10, carbs: 18, fat: 14, cholesterol: 28 },
+          { name: 'Trail Mix with Dark Chocolate', calories: 180, protein: 6, carbs: 20, fat: 10, cholesterol: 0 },
+          { name: 'Protein Bar', calories: 200, protein: 16, carbs: 18, fat: 8, cholesterol: 0 },
+          { name: 'Smoothie with Protein Powder', calories: 160, protein: 18, carbs: 12, fat: 4, cholesterol: 0 }
+        ]
+      },
+      smoothie: {
+        lowCholesterol: [
+          { name: 'Berry Protein Smoothie', calories: 180, protein: 16, carbs: 20, fat: 4, cholesterol: 0 },
+          { name: 'Green Detox Smoothie', calories: 140, protein: 8, carbs: 18, fat: 4, cholesterol: 0 },
+          { name: 'Banana Almond Smoothie', calories: 200, protein: 12, carbs: 24, fat: 8, cholesterol: 0 },
+          { name: 'Tropical Protein Smoothie', calories: 160, protein: 14, carbs: 18, fat: 4, cholesterol: 0 },
+          { name: 'Chocolate Protein Smoothie', calories: 180, protein: 18, carbs: 16, fat: 6, cholesterol: 0 },
+          { name: 'Strawberry Banana Smoothie', calories: 160, protein: 10, carbs: 22, fat: 4, cholesterol: 0 }
+        ],
+        regular: [
+          { name: 'Berry Blast Protein Smoothie', calories: 200, protein: 18, carbs: 22, fat: 6, cholesterol: 0 },
+          { name: 'Green Machine Smoothie', calories: 160, protein: 10, carbs: 20, fat: 4, cholesterol: 0 },
+          { name: 'Peanut Butter Banana Smoothie', calories: 220, protein: 14, carbs: 26, fat: 10, cholesterol: 0 },
+          { name: 'Tropical Paradise Smoothie', calories: 180, protein: 12, carbs: 20, fat: 6, cholesterol: 0 },
+          { name: 'Chocolate Peanut Butter Smoothie', calories: 200, protein: 16, carbs: 18, fat: 8, cholesterol: 0 },
+          { name: 'Strawberry Cheesecake Smoothie', calories: 180, protein: 12, carbs: 20, fat: 6, cholesterol: 0 }
         ]
       }
     };
 
-    const templates = mealTemplates[mealType][lowCholesterol ? 'lowCholesterol' : 'regular'];
+    // Select appropriate template based on restrictions
+    let templateKey = 'regular';
+    if (lowCholesterol) templateKey = 'lowCholesterol';
+    
+    const templates = mealTemplates[mealType][templateKey];
     const selectedMeal = templates[Math.floor(Math.random() * templates.length)];
     
     // Adjust portion size to match target calories
@@ -368,45 +429,49 @@ class WeightLossManager {
     
     const exerciseTemplates = {
       sedentary: {
-        weeklyWorkouts: 3,
-        focus: 'Cardio & Strength',
+        weeklyWorkouts: 4,
+        focus: 'Cardio & Strength Building',
         exercises: [
-          { day: 1, type: 'Cardio', name: 'Walking', duration: '30 minutes', calories: 150 },
-          { day: 2, type: 'Strength', name: 'Bodyweight Exercises', duration: '20 minutes', calories: 100 },
-          { day: 3, type: 'Cardio', name: 'Cycling', duration: '25 minutes', calories: 180 }
+          { day: 1, type: 'Cardio', name: 'Brisk Walking', duration: '30 minutes', calories: 180, intensity: 'Low' },
+          { day: 2, type: 'Strength', name: 'Bodyweight Circuit', duration: '25 minutes', calories: 120, intensity: 'Low' },
+          { day: 3, type: 'Cardio', name: 'Stationary Cycling', duration: '25 minutes', calories: 200, intensity: 'Low' },
+          { day: 4, type: 'Flexibility', name: 'Gentle Yoga', duration: '30 minutes', calories: 100, intensity: 'Low' }
         ]
       },
       light: {
-        weeklyWorkouts: 4,
+        weeklyWorkouts: 5,
         focus: 'Cardio & Toning',
         exercises: [
-          { day: 1, type: 'Cardio', name: 'Jogging', duration: '30 minutes', calories: 250 },
-          { day: 2, type: 'Strength', name: 'Light Weights', duration: '30 minutes', calories: 150 },
-          { day: 3, type: 'Cardio', name: 'Swimming', duration: '25 minutes', calories: 200 },
-          { day: 4, type: 'Flexibility', name: 'Yoga', duration: '45 minutes', calories: 120 }
+          { day: 1, type: 'Cardio', name: 'Jogging/Walking Intervals', duration: '35 minutes', calories: 280, intensity: 'Low-Medium' },
+          { day: 2, type: 'Strength', name: 'Dumbbell Training', duration: '35 minutes', calories: 180, intensity: 'Medium' },
+          { day: 3, type: 'Cardio', name: 'Swimming', duration: '30 minutes', calories: 240, intensity: 'Medium' },
+          { day: 4, type: 'Strength', name: 'Resistance Band Workout', duration: '30 minutes', calories: 160, intensity: 'Medium' },
+          { day: 5, type: 'Flexibility', name: 'Power Yoga', duration: '45 minutes', calories: 140, intensity: 'Medium' }
         ]
       },
       moderate: {
-        weeklyWorkouts: 5,
+        weeklyWorkouts: 6,
         focus: 'Strength & Cardio',
         exercises: [
-          { day: 1, type: 'Strength', name: 'Upper Body', duration: '45 minutes', calories: 200 },
-          { day: 2, type: 'Cardio', name: 'Running', duration: '35 minutes', calories: 350 },
-          { day: 3, type: 'Strength', name: 'Lower Body', duration: '45 minutes', calories: 200 },
-          { day: 4, type: 'Cardio', name: 'HIIT', duration: '25 minutes', calories: 300 },
-          { day: 5, type: 'Recovery', name: 'Stretching', duration: '30 minutes', calories: 80 }
+          { day: 1, type: 'Strength', name: 'Upper Body Focus', duration: '45 minutes', calories: 220, intensity: 'Medium' },
+          { day: 2, type: 'Cardio', name: 'Running', duration: '40 minutes', calories: 380, intensity: 'Medium' },
+          { day: 3, type: 'Strength', name: 'Lower Body Focus', duration: '45 minutes', calories: 220, intensity: 'Medium' },
+          { day: 4, type: 'Cardio', name: 'HIIT Training', duration: '30 minutes', calories: 320, intensity: 'High' },
+          { day: 5, type: 'Strength', name: 'Full Body Circuit', duration: '40 minutes', calories: 240, intensity: 'Medium' },
+          { day: 6, type: 'Recovery', name: 'Active Recovery & Stretching', duration: '35 minutes', calories: 100, intensity: 'Low' }
         ]
       },
       active: {
-        weeklyWorkouts: 6,
+        weeklyWorkouts: 7,
         focus: 'Performance & Endurance',
         exercises: [
-          { day: 1, type: 'Strength', name: 'Full Body', duration: '60 minutes', calories: 300 },
-          { day: 2, type: 'Cardio', name: 'Long Distance Run', duration: '45 minutes', calories: 450 },
-          { day: 3, type: 'Strength', name: 'Power Lifting', duration: '50 minutes', calories: 250 },
-          { day: 4, type: 'Cardio', name: 'Interval Training', duration: '30 minutes', calories: 400 },
-          { day: 5, type: 'Strength', name: 'Functional Training', duration: '45 minutes', calories: 280 },
-          { day: 6, type: 'Recovery', name: 'Active Recovery', duration: '40 minutes', calories: 150 }
+          { day: 1, type: 'Strength', name: 'Full Body Strength', duration: '60 minutes', calories: 320, intensity: 'High' },
+          { day: 2, type: 'Cardio', name: 'Long Distance Run', duration: '50 minutes', calories: 480, intensity: 'High' },
+          { day: 3, type: 'Strength', name: 'Power Lifting', duration: '55 minutes', calories: 280, intensity: 'High' },
+          { day: 4, type: 'Cardio', name: 'High-Intensity Intervals', duration: '35 minutes', calories: 420, intensity: 'High' },
+          { day: 5, type: 'Strength', name: 'Functional Training', duration: '50 minutes', calories: 300, intensity: 'High' },
+          { day: 6, type: 'Cardio', name: 'Cross Training', duration: '45 minutes', calories: 360, intensity: 'Medium-High' },
+          { day: 7, type: 'Recovery', name: 'Active Recovery & Mobility', duration: '40 minutes', calories: 120, intensity: 'Low' }
         ]
       }
     };
@@ -473,6 +538,14 @@ class WeightLossManager {
               <span class="meal-calories">${meal.calories} cal</span>
             </div>
             <div class="meal-name">${meal.name}</div>
+            ${meal.ingredients ? `
+              <div class="meal-ingredients">
+                <strong>Ingredients:</strong>
+                <ul>
+                  ${meal.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+                </ul>
+              </div>
+            ` : ''}
             <div class="meal-macros">
               <span class="macro">P: ${meal.protein}g</span>
               <span class="macro">C: ${meal.carbs}g</span>
@@ -528,7 +601,10 @@ class WeightLossManager {
               <span class="exercise-calories">${exercise.calories} cal</span>
             </div>
             <div class="exercise-name">${exercise.name}</div>
-            <div class="exercise-duration">${exercise.duration}</div>
+            <div class="exercise-details">
+              <span class="exercise-duration">${exercise.duration}</span>
+              ${exercise.intensity ? `<span class="exercise-intensity intensity-${exercise.intensity.toLowerCase().replace('-', '')}">${exercise.intensity}</span>` : ''}
+            </div>
           </div>
         `;
       }
@@ -670,6 +746,92 @@ class WeightLossManager {
     }
   }
 
+  generateSmoothie(targetCalories, restrictions) {
+    const lowCholesterol = restrictions && restrictions.toLowerCase().includes('cholesterol');
+    
+    const smoothieRecipes = {
+      lowCholesterol: [
+        {
+          name: 'Berry Protein Power Smoothie',
+          ingredients: ['1 cup mixed berries', '1 scoop vanilla protein powder', '1 cup almond milk', '1 tbsp chia seeds'],
+          calories: 180, protein: 16, carbs: 20, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Green Detox Smoothie',
+          ingredients: ['2 cups spinach', '1 banana', '1 cup coconut water', '1 tbsp flax seeds', '1/2 cup pineapple'],
+          calories: 140, protein: 8, carbs: 18, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Banana Almond Smoothie',
+          ingredients: ['1 banana', '1 cup almond milk', '2 tbsp almond butter', '1 scoop protein powder', '1 tbsp honey'],
+          calories: 200, protein: 12, carbs: 24, fat: 8, cholesterol: 0
+        },
+        {
+          name: 'Tropical Protein Smoothie',
+          ingredients: ['1 cup mango', '1/2 cup pineapple', '1 scoop vanilla protein', '1 cup coconut milk', '1 tbsp coconut flakes'],
+          calories: 160, protein: 14, carbs: 18, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Chocolate Protein Smoothie',
+          ingredients: ['1 scoop chocolate protein powder', '1 cup almond milk', '1 banana', '1 tbsp cocoa powder', '1 tbsp peanut butter'],
+          calories: 180, protein: 18, carbs: 16, fat: 6, cholesterol: 0
+        },
+        {
+          name: 'Strawberry Banana Smoothie',
+          ingredients: ['1 cup strawberries', '1 banana', '1 cup Greek yogurt', '1 tbsp honey', '1/2 cup ice'],
+          calories: 160, protein: 10, carbs: 22, fat: 4, cholesterol: 0
+        }
+      ],
+      regular: [
+        {
+          name: 'Berry Blast Protein Smoothie',
+          ingredients: ['1 cup mixed berries', '1 scoop vanilla protein powder', '1 cup whole milk', '1 tbsp honey', '1/2 cup ice'],
+          calories: 200, protein: 18, carbs: 22, fat: 6, cholesterol: 0
+        },
+        {
+          name: 'Green Machine Smoothie',
+          ingredients: ['2 cups kale', '1 apple', '1 cup apple juice', '1 tbsp ginger', '1/2 cup ice'],
+          calories: 160, protein: 10, carbs: 20, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Peanut Butter Banana Smoothie',
+          ingredients: ['1 banana', '2 tbsp peanut butter', '1 cup whole milk', '1 scoop protein powder', '1 tbsp honey'],
+          calories: 220, protein: 14, carbs: 26, fat: 10, cholesterol: 0
+        },
+        {
+          name: 'Tropical Paradise Smoothie',
+          ingredients: ['1 cup mango', '1/2 cup pineapple', '1 cup coconut milk', '1 tbsp coconut oil', '1/2 cup ice'],
+          calories: 180, protein: 12, carbs: 20, fat: 6, cholesterol: 0
+        },
+        {
+          name: 'Chocolate Peanut Butter Smoothie',
+          ingredients: ['1 scoop chocolate protein powder', '2 tbsp peanut butter', '1 cup whole milk', '1 banana', '1 tbsp cocoa powder'],
+          calories: 200, protein: 16, carbs: 18, fat: 8, cholesterol: 0
+        },
+        {
+          name: 'Strawberry Cheesecake Smoothie',
+          ingredients: ['1 cup strawberries', '1/2 cup cottage cheese', '1 cup whole milk', '1 tbsp honey', '1/2 cup ice'],
+          calories: 180, protein: 12, carbs: 20, fat: 6, cholesterol: 0
+        }
+      ]
+    };
+
+    const templates = smoothieRecipes[lowCholesterol ? 'lowCholesterol' : 'regular'];
+    const selectedSmoothie = templates[Math.floor(Math.random() * templates.length)];
+    
+    // Adjust portion size to match target calories
+    const calorieRatio = targetCalories / selectedSmoothie.calories;
+    return {
+      name: selectedSmoothie.name,
+      ingredients: selectedSmoothie.ingredients,
+      calories: Math.round(selectedSmoothie.calories * calorieRatio),
+      protein: Math.round(selectedSmoothie.protein * calorieRatio),
+      carbs: Math.round(selectedSmoothie.carbs * calorieRatio),
+      fat: Math.round(selectedSmoothie.fat * calorieRatio),
+      cholesterol: Math.round(selectedSmoothie.cholesterol * calorieRatio)
+    };
+  }
+
   printMealPlan(mealPlan) {
     const printWindow = window.open('', '_blank');
     const printContent = `
@@ -713,6 +875,14 @@ class WeightLossManager {
                   <span>${meal.calories} calories</span>
                 </div>
                 <div><strong>${meal.name}</strong></div>
+                ${meal.ingredients ? `
+                  <div class="meal-ingredients">
+                    <strong>Ingredients:</strong>
+                    <ul>
+                      ${meal.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+                    </ul>
+                  </div>
+                ` : ''}
                 <div class="meal-macros">
                   <span class="macro">Protein: ${meal.protein}g</span>
                   <span class="macro">Carbs: ${meal.carbs}g</span>
@@ -858,6 +1028,14 @@ class WeightLossManager {
                   <span>${meal.calories} calories</span>
                 </div>
                 <div><strong>${meal.name}</strong></div>
+                ${meal.ingredients ? `
+                  <div class="meal-ingredients">
+                    <strong>Ingredients:</strong>
+                    <ul>
+                      ${meal.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+                    </ul>
+                  </div>
+                ` : ''}
                 <div class="meal-macros">
                   <span class="macro">Protein: ${meal.protein}g</span>
                   <span class="macro">Carbs: ${meal.carbs}g</span>
