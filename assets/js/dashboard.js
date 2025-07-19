@@ -136,6 +136,9 @@ class DashboardManager {
       case 'limb-care':
         this.loadLimbCareData();
         break;
+      case 'health-insights':
+        this.loadHealthInsightsData();
+        break;
       case 'profile':
         this.loadProfileData();
         break;
@@ -169,11 +172,6 @@ class DashboardManager {
     try {
       await this.updateHealthOverview();
       await this.loadAlerts();
-      
-      // Load health insights
-      if (window.healthInsights) {
-        await window.healthInsights.refreshInsights();
-      }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     }
@@ -410,6 +408,13 @@ class DashboardManager {
 
     // This would load profile from Firestore
     console.log('Loading profile data...');
+  }
+
+  loadHealthInsightsData() {
+    // Load health insights data only when on health insights tab
+    if (window.healthInsights) {
+      window.healthInsights.refreshInsights();
+    }
   }
 
   // Global function for switching tabs
