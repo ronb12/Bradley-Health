@@ -31,16 +31,34 @@ class NutritionTracker {
     const checkAuthManager = () => {
       if (window.authManager) {
         console.log('Nutrition Tracker: authManager found, initializing...');
-        this.currentUser = window.authManager.getCurrentUser();
         
+        // Set up auth state listener
+        window.authManager.auth.onAuthStateChanged((user) => {
+          this.currentUser = user;
+          if (user) {
+            console.log('Nutrition Tracker: User authenticated, loading data');
+            this.loadNutritionData();
+            this.setupEventListeners();
+            this.setDefaultDateTime();
+            this.initialized = true;
+          } else {
+            console.log('Nutrition Tracker: User signed out, clearing data...');
+            this.meals = [];
+            this.cholesterolEntries = [];
+            this.renderMealHistory();
+            this.renderCholesterolHistory();
+            this.initialized = false;
+          }
+        });
+        
+        // Get initial user state
+        this.currentUser = window.authManager.getCurrentUser();
         if (this.currentUser) {
-          console.log('Nutrition Tracker: User authenticated, loading data');
+          console.log('Nutrition Tracker: User already authenticated, loading data');
           this.loadNutritionData();
           this.setupEventListeners();
           this.setDefaultDateTime();
           this.initialized = true;
-        } else {
-          console.log('Nutrition Tracker: No user authenticated');
         }
       } else {
         console.log('Nutrition Tracker: authManager not found, retrying...');
@@ -422,6 +440,18 @@ class NutritionTracker {
     }
     
     console.log('Add meal form submitted');
+
+    // Get current user from authManager
+    if (window.authManager) {
+      this.currentUser = window.authManager.getCurrentUser();
+    }
+    
+    if (!this.currentUser || !this.currentUser.uid) {
+      console.error('No authenticated user found');
+      this.showToast('Please sign in to add meals', 'error');
+      this.reenableSubmitButton(submitButton);
+      return;
+    }
 
     const addMealForm = document.getElementById('addMealForm');
     if (!addMealForm) {
