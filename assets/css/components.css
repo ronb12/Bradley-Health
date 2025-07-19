@@ -3083,4 +3083,140 @@ input[type="range"]::-moz-range-thumb {
   .food-examples {
     grid-template-columns: 1fr;
   }
+}
+
+/* Cholesterol Management Guide */
+.cholesterol-management {
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.cholesterol-management h2 {
+  margin: 0 0 20px 0;
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.cholesterol-tips {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tip-section h3 {
+  margin: 0 0 15px 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.limit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.limit-item {
+  text-align: center;
+  padding: 15px;
+  border-radius: 12px;
+  background: rgba(102, 126, 234, 0.05);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.limit-value {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 5px;
+}
+
+.limit-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.substitution-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.substitution-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(40, 167, 69, 0.05);
+  border: 1px solid rgba(40, 167, 69, 0.1);
+}
+
+.food-high {
+  color: #dc3545;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.arrow {
+  color: var(--text-secondary);
+  font-weight: bold;
+}
+
+.food-low {
+  color: #28a745;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.food-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.food-categories .food-category {
+  text-align: center;
+  padding: 15px;
+  border-radius: 12px;
+  background: rgba(40, 167, 69, 0.05);
+  border: 1px solid rgba(40, 167, 69, 0.1);
+}
+
+.food-categories h4 {
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.food-categories p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .limit-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .food-categories {
+    grid-template-columns: 1fr;
+  }
+  
+  .substitution-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 5px;
+  }
 } 

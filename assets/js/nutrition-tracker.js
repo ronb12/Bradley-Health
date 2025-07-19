@@ -30,46 +30,46 @@ class NutritionTracker {
     // Sample food database with cholesterol content (mg per 100g)
     return {
       // Dairy Products
-      'whole milk': { cholesterol: 14, calories: 61, fat: 3.3 },
-      'skim milk': { cholesterol: 5, calories: 42, fat: 0.1 },
-      'cheddar cheese': { cholesterol: 105, calories: 403, fat: 33.1 },
-      'eggs': { cholesterol: 373, calories: 155, fat: 11.3 },
-      'yogurt': { cholesterol: 13, calories: 59, fat: 0.4 },
-      'butter': { cholesterol: 215, calories: 717, fat: 81.1 },
+      'whole milk': { cholesterol: 14, calories: 61, fat: 3.3, alternatives: ['skim milk', 'almond milk', 'oat milk'] },
+      'skim milk': { cholesterol: 5, calories: 42, fat: 0.1, alternatives: ['almond milk', 'oat milk', 'soy milk'] },
+      'cheddar cheese': { cholesterol: 105, calories: 403, fat: 33.1, alternatives: ['low-fat cheese', 'cottage cheese', 'nutritional yeast'] },
+      'eggs': { cholesterol: 373, calories: 155, fat: 11.3, alternatives: ['egg whites', 'tofu scramble', 'chickpea scramble'] },
+      'yogurt': { cholesterol: 13, calories: 59, fat: 0.4, alternatives: ['greek yogurt', 'plant-based yogurt'] },
+      'butter': { cholesterol: 215, calories: 717, fat: 81.1, alternatives: ['olive oil', 'avocado', 'nut butter'] },
       
       // Meats
-      'beef': { cholesterol: 62, calories: 250, fat: 15.4 },
-      'pork': { cholesterol: 62, calories: 242, fat: 14.0 },
-      'chicken breast': { cholesterol: 73, calories: 165, fat: 3.6 },
-      'chicken thigh': { cholesterol: 82, calories: 177, fat: 9.3 },
-      'salmon': { cholesterol: 55, calories: 208, fat: 12.4 },
-      'tuna': { cholesterol: 38, calories: 144, fat: 0.5 },
-      'shrimp': { cholesterol: 195, calories: 99, fat: 0.3 },
+      'beef': { cholesterol: 62, calories: 250, fat: 15.4, alternatives: ['lean beef', 'turkey', 'fish', 'tofu'] },
+      'pork': { cholesterol: 62, calories: 242, fat: 14.0, alternatives: ['lean pork', 'chicken', 'fish'] },
+      'chicken breast': { cholesterol: 73, calories: 165, fat: 3.6, alternatives: ['skinless chicken', 'turkey', 'fish'] },
+      'chicken thigh': { cholesterol: 82, calories: 177, fat: 9.3, alternatives: ['chicken breast', 'turkey', 'fish'] },
+      'salmon': { cholesterol: 55, calories: 208, fat: 12.4, alternatives: ['cod', 'tilapia', 'tofu'] },
+      'tuna': { cholesterol: 38, calories: 144, fat: 0.5, alternatives: ['salmon', 'cod', 'tofu'] },
+      'shrimp': { cholesterol: 195, calories: 99, fat: 0.3, alternatives: ['cod', 'tilapia', 'tofu'] },
       
       // Processed Foods
-      'bacon': { cholesterol: 97, calories: 541, fat: 42.0 },
-      'sausage': { cholesterol: 80, calories: 296, fat: 26.0 },
-      'hot dog': { cholesterol: 77, calories: 290, fat: 26.0 },
-      'hamburger': { cholesterol: 66, calories: 295, fat: 12.0 },
+      'bacon': { cholesterol: 97, calories: 541, fat: 42.0, alternatives: ['turkey bacon', 'tempeh bacon', 'mushroom bacon'] },
+      'sausage': { cholesterol: 80, calories: 296, fat: 26.0, alternatives: ['turkey sausage', 'vegetarian sausage', 'tempeh'] },
+      'hot dog': { cholesterol: 77, calories: 290, fat: 26.0, alternatives: ['turkey hot dog', 'vegetarian hot dog', 'tofu dog'] },
+      'hamburger': { cholesterol: 66, calories: 295, fat: 12.0, alternatives: ['turkey burger', 'veggie burger', 'portobello burger'] },
       
       // Plant-based (low cholesterol)
-      'tofu': { cholesterol: 0, calories: 76, fat: 4.8 },
-      'beans': { cholesterol: 0, calories: 88, fat: 0.5 },
-      'lentils': { cholesterol: 0, calories: 116, fat: 0.4 },
-      'quinoa': { cholesterol: 0, calories: 120, fat: 1.9 },
+      'tofu': { cholesterol: 0, calories: 76, fat: 4.8, alternatives: ['tempeh', 'seitan', 'legumes'] },
+      'beans': { cholesterol: 0, calories: 88, fat: 0.5, alternatives: ['lentils', 'chickpeas', 'black beans'] },
+      'lentils': { cholesterol: 0, calories: 116, fat: 0.4, alternatives: ['beans', 'chickpeas', 'quinoa'] },
+      'quinoa': { cholesterol: 0, calories: 120, fat: 1.9, alternatives: ['brown rice', 'farro', 'barley'] },
       
       // Fruits and Vegetables (no cholesterol)
-      'apple': { cholesterol: 0, calories: 52, fat: 0.2 },
-      'banana': { cholesterol: 0, calories: 89, fat: 0.3 },
-      'broccoli': { cholesterol: 0, calories: 34, fat: 0.4 },
-      'spinach': { cholesterol: 0, calories: 23, fat: 0.4 },
-      'carrots': { cholesterol: 0, calories: 41, fat: 0.2 },
+      'apple': { cholesterol: 0, calories: 52, fat: 0.2, alternatives: ['pear', 'orange', 'berries'] },
+      'banana': { cholesterol: 0, calories: 89, fat: 0.3, alternatives: ['apple', 'orange', 'berries'] },
+      'broccoli': { cholesterol: 0, calories: 34, fat: 0.4, alternatives: ['cauliflower', 'brussels sprouts', 'kale'] },
+      'spinach': { cholesterol: 0, calories: 23, fat: 0.4, alternatives: ['kale', 'swiss chard', 'arugula'] },
+      'carrots': { cholesterol: 0, calories: 41, fat: 0.2, alternatives: ['sweet potato', 'butternut squash', 'beets'] },
       
       // Grains
-      'bread': { cholesterol: 0, calories: 265, fat: 3.2 },
-      'rice': { cholesterol: 0, calories: 130, fat: 0.3 },
-      'pasta': { cholesterol: 0, calories: 131, fat: 1.1 },
-      'oatmeal': { cholesterol: 0, calories: 68, fat: 1.4 }
+      'bread': { cholesterol: 0, calories: 265, fat: 3.2, alternatives: ['whole grain bread', 'sprouted bread', 'rye bread'] },
+      'rice': { cholesterol: 0, calories: 130, fat: 0.3, alternatives: ['brown rice', 'quinoa', 'farro'] },
+      'pasta': { cholesterol: 0, calories: 131, fat: 1.1, alternatives: ['whole grain pasta', 'zucchini noodles', 'spaghetti squash'] },
+      'oatmeal': { cholesterol: 0, calories: 68, fat: 1.4, alternatives: ['quinoa', 'buckwheat', 'amaranth'] }
     };
   }
 
@@ -177,7 +177,17 @@ class NutritionTracker {
       
       // Show nutrition summary if data was found
       if (nutrition.hasData) {
-        this.showToast(`Meal logged! Estimated: ${nutrition.estimatedCalories} cal, ${nutrition.estimatedCholesterol}mg cholesterol`, 'success');
+        let message = `Meal logged! Estimated: ${nutrition.estimatedCalories} cal, ${nutrition.estimatedCholesterol}mg cholesterol`;
+        
+        // Check for high cholesterol foods and provide alternatives
+        if (nutrition.estimatedCholesterol > 100) {
+          const recommendations = this.generateCholesterolRecommendations([meal]);
+          if (recommendations.length > 0) {
+            message += `\n💡 Tip: ${recommendations[0].message}`;
+          }
+        }
+        
+        this.showToast(message, nutrition.estimatedCholesterol > 200 ? 'warning' : 'success');
       } else {
         this.showToast('Meal logged successfully', 'success');
       }
@@ -250,16 +260,42 @@ class NutritionTracker {
       totalMeals.textContent = this.meals.length;
     }
 
-    // Update cholesterol level (show estimated intake if available)
+    // Update cholesterol level with alerts
     const cholesterolLevel = document.getElementById('cholesterolLevel');
     if (cholesterolLevel) {
       if (this.cholesterolEntries.length > 0) {
         const latestCholesterol = this.cholesterolEntries[0];
         cholesterolLevel.textContent = `${latestCholesterol.value} mg/dL`;
+        
+        // Add visual indicator for high cholesterol
+        if (latestCholesterol.value >= 240) {
+          cholesterolLevel.style.color = '#dc3545';
+          cholesterolLevel.style.fontWeight = 'bold';
+        } else if (latestCholesterol.value >= 200) {
+          cholesterolLevel.style.color = '#ffc107';
+          cholesterolLevel.style.fontWeight = 'bold';
+        } else {
+          cholesterolLevel.style.color = '#28a745';
+        }
       } else if (dailyStats.totalCholesterol > 0) {
+        // Check daily intake limits
+        const limitCheck = this.checkCholesterolLimits(dailyStats.totalCholesterol);
         cholesterolLevel.textContent = `${dailyStats.totalCholesterol} mg (est.)`;
+        
+        if (limitCheck.status === 'exceeded') {
+          cholesterolLevel.style.color = '#dc3545';
+          cholesterolLevel.style.fontWeight = 'bold';
+          this.showToast(limitCheck.message, 'warning');
+        } else if (limitCheck.status === 'warning') {
+          cholesterolLevel.style.color = '#ffc107';
+          cholesterolLevel.style.fontWeight = 'bold';
+        } else {
+          cholesterolLevel.style.color = '#28a745';
+        }
       } else {
         cholesterolLevel.textContent = '--';
+        cholesterolLevel.style.color = '';
+        cholesterolLevel.style.fontWeight = '';
       }
     }
   }
@@ -399,6 +435,89 @@ class NutritionTracker {
     } else {
       console.log(`${type.toUpperCase()}: ${message}`);
     }
+  }
+
+  // Get cholesterol-lowering alternatives for a food
+  getCholesterolAlternatives(foodName) {
+    const food = this.foodDatabase[foodName.toLowerCase()];
+    if (food && food.alternatives) {
+      return food.alternatives.map(alt => ({
+        name: alt,
+        cholesterol: this.foodDatabase[alt]?.cholesterol || 0,
+        reduction: food.cholesterol - (this.foodDatabase[alt]?.cholesterol || 0)
+      })).filter(alt => alt.reduction > 0);
+    }
+    return [];
+  }
+
+  // Check if daily cholesterol intake exceeds recommended limits
+  checkCholesterolLimits(dailyIntake) {
+    const recommendedDaily = 300; // mg per day for general population
+    const highRiskLimit = 200; // mg per day for people with heart disease
+    
+    if (dailyIntake > recommendedDaily) {
+      return {
+        status: 'exceeded',
+        limit: recommendedDaily,
+        overage: dailyIntake - recommendedDaily,
+        message: `You've exceeded the daily recommended limit of ${recommendedDaily}mg by ${dailyIntake - recommendedDaily}mg`
+      };
+    } else if (dailyIntake > highRiskLimit) {
+      return {
+        status: 'warning',
+        limit: highRiskLimit,
+        overage: dailyIntake - highRiskLimit,
+        message: `You're approaching the limit for high-risk individuals (${highRiskLimit}mg)`
+      };
+    } else {
+      return {
+        status: 'good',
+        limit: recommendedDaily,
+        remaining: recommendedDaily - dailyIntake,
+        message: `Great job! You have ${recommendedDaily - dailyIntake}mg remaining today`
+      };
+    }
+  }
+
+  // Generate cholesterol-lowering recommendations
+  generateCholesterolRecommendations(meals) {
+    const recommendations = [];
+    const highCholesterolFoods = [];
+    
+    // Analyze meals for high-cholesterol foods
+    meals.forEach(meal => {
+      if (meal.foodsFound) {
+        meal.foodsFound.forEach(food => {
+          if (food.cholesterol > 50) { // High cholesterol threshold
+            highCholesterolFoods.push({
+              food: food.food,
+              cholesterol: food.cholesterol,
+              meal: meal.name,
+              alternatives: this.getCholesterolAlternatives(food.food)
+            });
+          }
+        });
+      }
+    });
+
+    // Generate specific recommendations
+    if (highCholesterolFoods.length > 0) {
+      highCholesterolFoods.forEach(item => {
+        if (item.alternatives.length > 0) {
+          const bestAlternative = item.alternatives[0];
+          recommendations.push({
+            type: 'substitution',
+            food: item.food,
+            cholesterol: item.cholesterol,
+            alternative: bestAlternative.name,
+            reduction: bestAlternative.reduction,
+            message: `Replace ${item.food} with ${bestAlternative.name} to reduce cholesterol by ${bestAlternative.reduction}mg`
+          });
+        }
+      });
+    }
+
+    return recommendations;
   }
 }
 
