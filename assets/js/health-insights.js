@@ -1388,21 +1388,35 @@ class HealthInsights {
 
     insightsContainer.innerHTML = '';
 
+    // Add header for expanded view
+    const expandedHeader = document.createElement('div');
+    expandedHeader.className = 'expanded-insights-header';
+    expandedHeader.innerHTML = `
+      <div class="expanded-header-content">
+        <span class="expanded-icon">🧠</span>
+        <div class="expanded-header-text">
+          <h4>All Health Insights</h4>
+          <p>Complete analysis of your health data patterns</p>
+        </div>
+      </div>
+    `;
+    insightsContainer.appendChild(expandedHeader);
+
     this.insights.forEach(insight => {
       const insightElement = document.createElement('div');
-      insightElement.className = `insight-item ${insight.severity}`;
+      insightElement.className = `expanded-insight-item ${insight.severity}`;
       insightElement.innerHTML = `
-        <div class="insight-header">
-          <span class="insight-icon">${insight.icon}</span>
-          <div class="insight-title">
+        <div class="expanded-insight-header">
+          <span class="expanded-insight-icon">${insight.icon}</span>
+          <div class="expanded-insight-title">
             <h3>${insight.title}</h3>
-            <span class="insight-time">${this.formatTime(insight.timestamp)}</span>
+            <span class="expanded-insight-time">${this.formatTime(insight.timestamp)}</span>
           </div>
-          <span class="insight-severity ${insight.severity}">${insight.severity.toUpperCase()}</span>
+          <span class="expanded-insight-severity ${insight.severity}">${insight.severity.toUpperCase()}</span>
         </div>
-        <div class="insight-content">
-          <p class="insight-message">${insight.message}</p>
-          <div class="insight-recommendation">
+        <div class="expanded-insight-content">
+          <p class="expanded-insight-message">${insight.message}</p>
+          <div class="expanded-insight-recommendation">
             <strong>Recommendation:</strong> ${insight.recommendation}
           </div>
         </div>
