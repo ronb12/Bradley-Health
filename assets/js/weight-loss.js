@@ -312,6 +312,11 @@ class WeightLossManager {
   }
 
   generateMeal(mealType, targetCalories, restrictions) {
+    // Handle smoothie meals separately
+    if (mealType === 'smoothie') {
+      return this.generateSmoothie(targetCalories, restrictions);
+    }
+
     const lowCholesterol = restrictions && restrictions.toLowerCase().includes('cholesterol');
     const isVegan = restrictions && restrictions.toLowerCase().includes('vegan');
     const isVegetarian = restrictions && restrictions.toLowerCase().includes('vegetarian');
