@@ -990,7 +990,7 @@ class WeightLossManager {
             </div>
             <div class="meal-name">
               ${meal.name}
-              ${meal.ingredients ? `<span class="info-icon" onclick="window.weightLossManager.showMealDetails('${meal.name}', ${JSON.stringify(meal.ingredients)}, '${meal.instructions || ''}')" title="Click for recipe details">ℹ️</span>` : ''}
+              ${meal.ingredients ? `<span class="info-icon" onclick="window.weightLossManager.showMealDetails('${meal.name.replace(/'/g, "\\'")}', '${meal.ingredients.join('|').replace(/'/g, "\\'")}', '${(meal.instructions || '').replace(/'/g, "\\'")}')" title="Click for recipe details">i</span>` : ''}
             </div>
             ${meal.ingredients ? `
               <div class="meal-ingredients">
@@ -1213,6 +1213,9 @@ class WeightLossManager {
   }
 
   showMealDetails(mealName, ingredients, instructions) {
+    // Parse ingredients from string format
+    const ingredientsList = ingredients.split('|');
+    
     // Create modal for meal details
     const modal = document.createElement('div');
     modal.className = 'meal-details-modal';
@@ -1226,7 +1229,7 @@ class WeightLossManager {
           <div class="ingredients-section">
             <h4>Ingredients:</h4>
             <ul>
-              ${ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+              ${ingredientsList.map(ingredient => `<li>${ingredient}</li>`).join('')}
             </ul>
           </div>
           ${instructions ? `
@@ -1297,12 +1300,24 @@ class WeightLossManager {
       .info-icon {
         cursor: pointer;
         margin-left: 8px;
-        font-size: 16px;
-        opacity: 0.7;
-        transition: opacity 0.2s;
+        font-size: 18px;
+        opacity: 0.8;
+        transition: all 0.2s;
+        background: #007bff;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
       }
       .info-icon:hover {
         opacity: 1;
+        background: #0056b3;
+        transform: scale(1.1);
       }
     `;
     
