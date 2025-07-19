@@ -1,21 +1,48 @@
 // Mood Tracking System
 class MoodTracker {
   constructor() {
-    this.db = firebase.firestore();
-    this.currentUser = null;
-    this.moodEntries = [];
-    this.moodFactors = [];
-    this.isSubmitting = false; // Flag to prevent duplicate submissions
-    this.eventListenersSetup = false; // Flag to prevent duplicate event listener setup
-    this.init();
+    // Wait for Firebase to be ready
+    if (window.firebaseServices && window.firebaseServices.db) {
+      this.db = window.firebaseServices.db;
+      this.currentUser = null;
+      this.moodEntries = [];
+      this.moodFactors = [];
+      this.init();
+    } else {
+      // Retry after a short delay
+      setTimeout(() => {
+        if (window.firebaseServices && window.firebaseServices.db) {
+          this.db = window.firebaseServices.db;
+          this.currentUser = null;
+          this.moodEntries = [];
+          this.moodFactors = [];
+          this.init();
+        } else {
+          console.error('Firebase not available for mood tracker');
+        }
+      }, 1000);
+    }
   }
 
   init() {
-    console.log('Initializing MoodTracker...');
-    this.setupAuthListener();
-    this.setupEventListeners();
-    this.setupMoodChart();
-    this.loadMoodFactors();
+    // Wait for authentication
+    if (window.authManager) {
+      window.authManager.auth.onAuthStateChanged((user) => {
+        this.currentUser = user;
+        if (user) {
+          console.log('Mood Tracker: User authenticated, loading data');
+          this.loadMoodEntries();
+          this.loadMoodFactors();
+          this.setupEventListeners();
+        } else {
+          console.log('Mood Tracker: User signed out, clearing data...');
+          this.moodEntries = [];
+          this.moodFactors = [];
+          this.renderMoodEntries();
+          this.renderMoodFactors();
+        }
+      });
+    }
   }
 
   // Reset event listeners setup flag - call this when switching to mood tab

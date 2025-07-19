@@ -1,10 +1,25 @@
 // Goals Management System
 class GoalsManager {
   constructor() {
-    this.db = firebase.firestore();
-    this.currentUser = null;
-    this.goals = [];
-    this.init();
+    // Wait for Firebase to be ready
+    if (window.firebaseServices && window.firebaseServices.db) {
+      this.db = window.firebaseServices.db;
+      this.currentUser = null;
+      this.goals = [];
+      this.init();
+    } else {
+      // Retry after a short delay
+      setTimeout(() => {
+        if (window.firebaseServices && window.firebaseServices.db) {
+          this.db = window.firebaseServices.db;
+          this.currentUser = null;
+          this.goals = [];
+          this.init();
+        } else {
+          console.error('Firebase not available for goals manager');
+        }
+      }, 1000);
+    }
   }
 
   init() {

@@ -1,8 +1,23 @@
 // Dashboard and Tab Management for Bradley Health
 class DashboardManager {
   constructor() {
-    this.currentTab = 'dashboard';
-    this.init();
+    // Wait for Firebase to be ready
+    if (window.firebaseServices && window.firebaseServices.db) {
+      this.db = window.firebaseServices.db;
+      this.currentTab = 'dashboard';
+      this.init();
+    } else {
+      // Retry after a short delay
+      setTimeout(() => {
+        if (window.firebaseServices && window.firebaseServices.db) {
+          this.db = window.firebaseServices.db;
+          this.currentTab = 'dashboard';
+          this.init();
+        } else {
+          console.error('Firebase not available for dashboard manager');
+        }
+      }, 1000);
+    }
   }
 
   init() {
@@ -170,7 +185,7 @@ class DashboardManager {
 
     try {
       // Get latest blood pressure reading
-      const bpSnapshot = await firebase.firestore()
+      const bpSnapshot = await this.db
         .collection('bloodPressure')
         .where('userId', '==', userId)
         .orderBy('timestamp', 'desc')
@@ -186,7 +201,7 @@ class DashboardManager {
       }
 
       // Get medication count
-      const medSnapshot = await firebase.firestore()
+      const medSnapshot = await this.db
         .collection('medications')
         .where('userId', '==', userId)
         .get();
@@ -197,7 +212,7 @@ class DashboardManager {
       }
 
       // Get latest mood
-      const moodSnapshot = await firebase.firestore()
+      const moodSnapshot = await this.db
         .collection('moodEntries')
         .where('userId', '==', userId)
         .orderBy('timestamp', 'desc')
@@ -213,7 +228,7 @@ class DashboardManager {
       }
 
       // Get latest limb assessment
-      const limbSnapshot = await firebase.firestore()
+      const limbSnapshot = await this.db
         .collection('limbAssessments')
         .where('userId', '==', userId)
         .orderBy('timestamp', 'desc')
@@ -272,41 +287,41 @@ class DashboardManager {
 
     const alerts = [];
 
-    // Check for high blood pressure
-    const userId = window.authManager?.getUserId();
-    if (userId) {
-      try {
-        const bpSnapshot = await firebase.firestore()
-          .collection('bloodPressure')
-          .where('userId', '==', userId)
-          .orderBy('timestamp', 'desc')
-          .limit(1)
-          .get();
+            // Check for high blood pressure
+        const userId = window.authManager?.getUserId();
+        if (userId) {
+          try {
+            const bpSnapshot = await this.db
+              .collection('bloodPressure')
+              .where('userId', '==', userId)
+              .orderBy('timestamp', 'desc')
+              .limit(1)
+              .get();
 
-        if (!bpSnapshot.empty) {
-          const latestBP = bpSnapshot.docs[0].data();
-          if (latestBP.systolic > 130 || latestBP.diastolic > 80) {
-            alerts.push({
-              type: 'warning',
-              icon: '⚠️',
-              text: 'Your latest blood pressure reading is elevated'
-            });
-          }
-        }
+            if (!bpSnapshot.empty) {
+              const latestBP = bpSnapshot.docs[0].data();
+              if (latestBP.systolic > 130 || latestBP.diastolic > 80) {
+                alerts.push({
+                  type: 'warning',
+                  icon: '⚠️',
+                  text: 'Your latest blood pressure reading is elevated'
+                });
+              }
+            }
 
-        // Check for missed medications
-        const medSnapshot = await firebase.firestore()
-          .collection('medications')
-          .where('userId', '==', userId)
-          .get();
+            // Check for missed medications
+            const medSnapshot = await this.db
+              .collection('medications')
+              .where('userId', '==', userId)
+              .get();
 
-        if (medSnapshot.size > 0) {
-          alerts.push({
-            type: 'info',
-            icon: '💊',
-            text: `You have ${medSnapshot.size} active medications`
-          });
-        }
+            if (medSnapshot.size > 0) {
+              alerts.push({
+                type: 'info',
+                icon: '💊',
+                text: `You have ${medSnapshot.size} active medications`
+              });
+            }
       } catch (error) {
         // Handle Firestore permissions error gracefully
         if (error.code === 'permission-denied') {

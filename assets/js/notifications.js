@@ -1,11 +1,27 @@
-// Notification System for Bradley Health
+// Notification Management System
 class NotificationManager {
   constructor() {
-    this.db = firebase.firestore();
-    this.messaging = null;
-    this.currentUser = null;
-    this.permission = 'default';
-    this.init();
+    // Wait for Firebase to be ready
+    if (window.firebaseServices && window.firebaseServices.db) {
+      this.db = window.firebaseServices.db;
+      this.currentUser = null;
+      this.notifications = [];
+      this.reminders = [];
+      this.init();
+    } else {
+      // Retry after a short delay
+      setTimeout(() => {
+        if (window.firebaseServices && window.firebaseServices.db) {
+          this.db = window.firebaseServices.db;
+          this.currentUser = null;
+          this.notifications = [];
+          this.reminders = [];
+          this.init();
+        } else {
+          console.error('Firebase not available for notification manager');
+        }
+      }, 1000);
+    }
   }
 
   init() {

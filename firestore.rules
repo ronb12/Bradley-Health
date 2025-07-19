@@ -156,6 +156,94 @@ service cloud.firestore {
         isRequestOwner(request.resource.data.userId);
     }
     
+    // Meals - users can only access their own meal data
+    match /meals/{mealId} {
+      allow read, write, update, delete: if isAuthenticated() && 
+        (resource == null || isResourceOwner(resource.data.userId));
+      allow create: if isAuthenticated() && 
+        isRequestOwner(request.resource.data.userId);
+    }
+    
+    // Cholesterol entries - users can only access their own cholesterol data
+    match /cholesterolEntries/{entryId} {
+      allow read, write, update, delete: if isAuthenticated() && 
+        (resource == null || isResourceOwner(resource.data.userId));
+      allow create: if isAuthenticated() && 
+        isRequestOwner(request.resource.data.userId);
+    }
+    
+    // Weight entries - users can only access their own weight data
+    match /weightEntries/{entryId} {
+      allow read, write, update, delete: if isAuthenticated() && 
+        (resource == null || isResourceOwner(resource.data.userId));
+      allow create: if isAuthenticated() && 
+        isRequestOwner(request.resource.data.userId);
+    }
+    
+    // Weight goals - users can only access their own weight goals
+    match /weightGoals/{goalId} {
+      allow read, write, update, delete: if isAuthenticated() && 
+        (resource == null || isResourceOwner(resource.data.userId));
+      allow create: if isAuthenticated() && 
+        isRequestOwner(request.resource.data.userId);
+    }
+    
+    // Weight loss plans - users can only access their own plans
+    match /weightLossPlans/{planId} {
+      allow read, write, update, delete: if isAuthenticated() && 
+        (resource == null || isResourceOwner(resource.data.userId));
+      allow create: if isAuthenticated() && 
+        isRequestOwner(request.resource.data.userId);
+    }
+    
+    // Physical activity - users can only access their own activity data
+    match /physicalActivity/{activityId} {
+      allow read, write, update, delete: if isAuthenticated() && 
+        (resource == null || isResourceOwner(resource.data.userId));
+      allow create: if isAuthenticated() && 
+        isRequestOwner(request.resource.data.userId);
+    }
+    
+    // Sleep entries - users can only access their own sleep data
+    match /sleepEntries/{entryId} {
+      allow read, write, update, delete: if isAuthenticated() && 
+        (resource == null || isResourceOwner(resource.data.userId));
+      allow create: if isAuthenticated() && 
+        isRequestOwner(request.resource.data.userId);
+    }
+    
+    // Medical history - users can only access their own medical history
+    match /medicalHistory/{historyId} {
+      allow read, write, update, delete: if isAuthenticated() && 
+        (resource == null || isResourceOwner(resource.data.userId));
+      allow create: if isAuthenticated() && 
+        isRequestOwner(request.resource.data.userId);
+    }
+    
+    // Immunizations - users can only access their own immunization records
+    match /immunizations/{immunizationId} {
+      allow read, write, update, delete: if isAuthenticated() && 
+        (resource == null || isResourceOwner(resource.data.userId));
+      allow create: if isAuthenticated() && 
+        isRequestOwner(request.resource.data.userId);
+    }
+    
+    // User profiles - users can only access their own profile
+    match /profiles/{profileId} {
+      allow read, write, update, delete: if isAuthenticated() && 
+        (resource == null || isResourceOwner(resource.data.userId));
+      allow create: if isAuthenticated() && 
+        isRequestOwner(request.resource.data.userId);
+    }
+    
+    // Nutrition entries - users can only access their own nutrition data
+    match /nutritionEntries/{entryId} {
+      allow read, write, update, delete: if isAuthenticated() && 
+        (resource == null || isResourceOwner(resource.data.userId));
+      allow create: if isAuthenticated() && 
+        isRequestOwner(request.resource.data.userId);
+    }
+    
     // Deny access to all other collections and documents
     match /{document=**} {
       allow read, write: if false;

@@ -1,10 +1,25 @@
 // Blood Pressure Management System
 class BloodPressureManager {
   constructor() {
-    this.db = firebase.firestore();
-    this.currentUser = null;
-    this.readings = [];
-    this.init();
+    // Wait for Firebase to be ready
+    if (window.firebaseServices && window.firebaseServices.db) {
+      this.db = window.firebaseServices.db;
+      this.currentUser = null;
+      this.readings = [];
+      this.init();
+    } else {
+      // Retry after a short delay
+      setTimeout(() => {
+        if (window.firebaseServices && window.firebaseServices.db) {
+          this.db = window.firebaseServices.db;
+          this.currentUser = null;
+          this.readings = [];
+          this.init();
+        } else {
+          console.error('Firebase not available for blood pressure manager');
+        }
+      }, 1000);
+    }
   }
 
   init() {
