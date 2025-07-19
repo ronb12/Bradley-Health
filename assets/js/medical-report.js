@@ -12,15 +12,51 @@ class MedicalReportGenerator {
     if (window.authManager) {
       window.authManager.auth.onAuthStateChanged((user) => {
         this.currentUser = user;
+        console.log('MedicalReportGenerator: User authentication state changed', user ? 'authenticated' : 'not authenticated');
       });
+    } else {
+      // If authManager isn't available yet, wait for it
+      const checkAuthManager = () => {
+        if (window.authManager) {
+          window.authManager.auth.onAuthStateChanged((user) => {
+            this.currentUser = user;
+            console.log('MedicalReportGenerator: User authentication state changed', user ? 'authenticated' : 'not authenticated');
+          });
+        } else {
+          setTimeout(checkAuthManager, 100);
+        }
+      };
+      checkAuthManager();
     }
   }
 
   async generateComprehensiveReport(dateRange = '30days') {
+    // Wait for user to be authenticated
     if (!this.currentUser) {
-      throw new Error('User not authenticated');
+      // Wait for authentication with timeout
+      return new Promise((resolve, reject) => {
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        const checkAuth = () => {
+          attempts++;
+          if (this.currentUser) {
+            this.generateReportInternal(dateRange).then(resolve).catch(reject);
+          } else if (attempts < maxAttempts) {
+            setTimeout(checkAuth, 500);
+          } else {
+            reject(new Error('User authentication timeout. Please refresh the page and try again.'));
+          }
+        };
+        
+        checkAuth();
+      });
     }
 
+    return this.generateReportInternal(dateRange);
+  }
+
+  async generateReportInternal(dateRange = '30days') {
     const userId = this.currentUser.uid;
     const reportDate = new Date();
     

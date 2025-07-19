@@ -909,7 +909,15 @@
         const summary = document.getElementById('reportSummary');
         
         preview.style.display = 'block';
-        summary.innerHTML = '<p>Generating report...</p>';
+        summary.innerHTML = '<p>Checking authentication...</p>';
+        
+        // Check if user is authenticated
+        if (!window.authManager || !window.authManager.getUserId()) {
+          summary.innerHTML = '<p class="report-alert">Please sign in to generate medical reports.</p>';
+          return;
+        }
+        
+        summary.innerHTML = '<p>Generating comprehensive medical report...</p>';
         
         // Generate the report
         const report = await window.medicalReportGenerator.generateComprehensiveReport(period);
@@ -922,8 +930,11 @@
         
       } catch (error) {
         console.error('Error generating medical report:', error);
+        const errorMessage = error.message.includes('timeout') 
+          ? 'Authentication timeout. Please refresh the page and try again.'
+          : 'Error generating report. Please try again.';
         document.getElementById('reportSummary').innerHTML = 
-          '<p class="report-alert">Error generating report. Please try again.</p>';
+          `<p class="report-alert">${errorMessage}</p>`;
       }
     }
 
