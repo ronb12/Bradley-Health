@@ -1,36 +1,34 @@
 // AI-Powered Weight Loss System
 class WeightLossManager {
   constructor() {
+    this.db = null;
+    this.currentUser = null;
+    this.weightEntries = [];
+    this.weightGoal = null;
+    this.mealPlan = null;
+    this.exercisePlan = null;
+    this.initialized = false;
+    
     // Wait for Firebase to be ready
+    this.waitForFirebase();
+  }
+
+  waitForFirebase() {
     if (window.firebaseServices && window.firebaseServices.db) {
       this.db = window.firebaseServices.db;
-      this.currentUser = null;
-      this.weightEntries = [];
-      this.weightGoal = null;
-      this.mealPlan = null;
-      this.exercisePlan = null;
       this.init();
     } else {
       // Retry after a short delay
-      setTimeout(() => {
-        if (window.firebaseServices && window.firebaseServices.db) {
-          this.db = window.firebaseServices.db;
-          this.currentUser = null;
-          this.weightEntries = [];
-          this.weightGoal = null;
-          this.mealPlan = null;
-          this.exercisePlan = null;
-          this.init();
-        } else {
-          console.error('Firebase not available for weight loss manager');
-        }
-      }, 1000);
+      setTimeout(() => this.waitForFirebase(), 500);
     }
   }
 
   init() {
+    console.log('Weight Loss Manager: Initializing...');
+    
     // Wait for authentication
     if (window.authManager) {
+      console.log('Weight Loss Manager: Auth manager found, setting up auth listener');
       window.authManager.auth.onAuthStateChanged((user) => {
         this.currentUser = user;
         if (user) {
@@ -46,20 +44,30 @@ class WeightLossManager {
           this.renderWeightHistory();
         }
       });
+    } else {
+      console.log('Weight Loss Manager: Auth manager not found, will retry');
+      // Retry after a short delay
+      setTimeout(() => this.init(), 1000);
     }
   }
 
   setupEventListeners() {
+    console.log('Weight Loss Manager: Setting up event listeners');
+    
     // Weight goal form
     const weightGoalForm = document.getElementById('weightGoalForm');
+    console.log('Weight Loss Manager: weightGoalForm found:', !!weightGoalForm);
     if (weightGoalForm) {
       weightGoalForm.addEventListener('submit', (e) => this.setWeightGoal(e));
+      console.log('Weight Loss Manager: Event listener added to weightGoalForm');
     }
 
     // Weight tracking form
     const weightTrackingForm = document.getElementById('weightTrackingForm');
+    console.log('Weight Loss Manager: weightTrackingForm found:', !!weightTrackingForm);
     if (weightTrackingForm) {
       weightTrackingForm.addEventListener('submit', (e) => this.logWeight(e));
+      console.log('Weight Loss Manager: Event listener added to weightTrackingForm');
     }
 
     // Set default date
@@ -115,6 +123,14 @@ class WeightLossManager {
 
   async setWeightGoal(e) {
     e.preventDefault();
+    
+    console.log('Weight Loss Manager: setWeightGoal called');
+    
+    if (!this.db) {
+      console.error('Weight Loss Manager: Database not available');
+      this.showToast('System not ready. Please try again.', 'error');
+      return;
+    }
     
     if (!this.currentUser || !this.currentUser.uid) {
       this.showToast('Please sign in to set weight goals', 'error');
