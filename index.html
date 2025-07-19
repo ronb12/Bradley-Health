@@ -169,6 +169,10 @@
           <span class="tab-icon">🦽</span>
           <span class="tab-text">DME</span>
         </button>
+        <button class="tab-button" data-tab="health-insights">
+          <span class="tab-icon">🧠</span>
+          <span class="tab-text">Health Insights</span>
+        </button>
         <button class="tab-button" data-tab="profile">
           <span class="tab-icon">👤</span>
           <span class="tab-text">Profile</span>
@@ -232,6 +236,10 @@
               <button class="action-btn" onclick="switchToTab('dme')">
                 <span class="action-icon">🦽</span>
                 <span>Manage Equipment</span>
+              </button>
+              <button class="action-btn" onclick="switchToTab('health-insights')">
+                <span class="action-icon">🧠</span>
+                <span>Health Insights</span>
               </button>
             </div>
           </div>
@@ -820,6 +828,54 @@
                 <span class="contact-icon">🚨</span>
                 <span>Emergency Issue</span>
               </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Health Insights Tab -->
+      <section class="tab-content" id="health-insights">
+        <div class="health-insights-container">
+          <!-- Insights Overview -->
+          <div class="card insights-overview">
+            <div class="section-header">
+              <h2><i class="fas fa-brain"></i> Health Insights</h2>
+              <button class="btn btn-secondary" onclick="window.healthInsights.refreshInsights()">
+                <i class="fas fa-refresh"></i> Refresh
+              </button>
+            </div>
+            <p class="insights-description">
+              AI-powered analysis of your health data to provide personalized insights and recommendations.
+            </p>
+          </div>
+
+          <!-- Insights List -->
+          <div class="card insights-list-card">
+            <h3>Your Health Insights</h3>
+            <div id="insightsList" class="insights-list">
+              <!-- Health insights will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Recommendations -->
+          <div class="card recommendations-card">
+            <h3>Personalized Recommendations</h3>
+            <div id="recommendationsList" class="recommendations-list">
+              <!-- Recommendations will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Health Score -->
+          <div class="card health-score-card">
+            <h3>Overall Health Score</h3>
+            <div class="health-score-display">
+              <div class="score-circle">
+                <span id="healthScoreValue">--</span>
+                <span class="score-label">/ 100</span>
+              </div>
+              <div class="score-description">
+                <p>Based on your recent health data and trends</p>
+              </div>
             </div>
           </div>
         </div>

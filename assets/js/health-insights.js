@@ -1,11 +1,27 @@
 // Health Insights & AI Recommendations System
 class HealthInsights {
   constructor() {
-    this.db = firebase.firestore();
-    this.currentUser = null;
-    this.insights = [];
-    this.recommendations = [];
-    this.init();
+    // Wait for Firebase to be ready
+    if (window.firebaseServices && window.firebaseServices.db) {
+      this.db = window.firebaseServices.db;
+      this.currentUser = null;
+      this.insights = [];
+      this.recommendations = [];
+      this.init();
+    } else {
+      // Retry after a short delay
+      setTimeout(() => {
+        if (window.firebaseServices && window.firebaseServices.db) {
+          this.db = window.firebaseServices.db;
+          this.currentUser = null;
+          this.insights = [];
+          this.recommendations = [];
+          this.init();
+        } else {
+          console.error('Firebase not available for health insights');
+        }
+      }, 1000);
+    }
   }
 
   init() {
@@ -21,10 +37,16 @@ class HealthInsights {
   }
 
   async loadInsights() {
-    if (!this.currentUser) return;
+    if (!this.currentUser) {
+      console.log('Health Insights: No current user, skipping load');
+      return;
+    }
 
+    console.log('Health Insights: Loading insights for user:', this.currentUser.uid);
+    
     try {
       await this.analyzeHealthData();
+      console.log('Health Insights: Analysis complete, insights count:', this.insights.length);
       this.displayInsights();
     } catch (error) {
       console.error('Error loading health insights:', error);
@@ -297,7 +319,12 @@ class HealthInsights {
 
   displayInsights() {
     const insightsContainer = document.getElementById('insightsList');
-    if (!insightsContainer) return;
+    if (!insightsContainer) {
+      console.log('Health Insights: insightsList container not found');
+      return;
+    }
+    
+    console.log('Health Insights: Displaying insights, count:', this.insights.length);
 
     // Sort insights by severity (alert > warning > info)
     const severityOrder = { 'alert': 3, 'warning': 2, 'info': 1 };
