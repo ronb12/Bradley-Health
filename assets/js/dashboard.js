@@ -154,6 +154,11 @@ class DashboardManager {
     try {
       await this.updateHealthOverview();
       await this.loadAlerts();
+      
+      // Load health insights
+      if (window.healthInsights) {
+        await window.healthInsights.refreshInsights();
+      }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     }
