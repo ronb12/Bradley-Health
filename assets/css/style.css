@@ -1,0 +1,200 @@
+/* Meal History Styling */
+.meal-entry {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.meal-entry:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.history-type {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meal-type-icon {
+  font-size: 1.2em;
+}
+
+.meal-type {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.history-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.history-date {
+  font-size: 0.9em;
+  color: var(--text-muted);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit, .btn-delete {
+  background: none;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9em;
+}
+
+.btn-edit {
+  color: var(--primary-color);
+}
+
+.btn-edit:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-delete {
+  color: var(--danger-color);
+}
+
+.btn-delete:hover {
+  background: var(--danger-color);
+  color: white;
+}
+
+.history-content h4 {
+  margin: 0 0 8px 0;
+  color: var(--text-color);
+  font-size: 1.1em;
+}
+
+.history-content p {
+  margin: 0 0 12px 0;
+  color: var(--text-muted);
+  font-size: 0.95em;
+}
+
+.meal-nutrition {
+  display: flex;
+  gap: 16px;
+  margin: 12px 0;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.nutrition-item {
+  font-size: 0.9em;
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.foods-breakdown {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.foods-breakdown h5 {
+  margin: 0 0 12px 0;
+  color: var(--text-color);
+  font-size: 1em;
+}
+
+.foods-section {
+  margin-bottom: 16px;
+}
+
+.foods-section h6 {
+  margin: 0 0 8px 0;
+  color: var(--text-muted);
+  font-size: 0.9em;
+  font-weight: 600;
+}
+
+.foods-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.food-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.85em;
+}
+
+.food-item.database {
+  background: rgba(40, 167, 69, 0.1);
+  border-left: 3px solid #28a745;
+}
+
+.food-item.category {
+  background: rgba(255, 193, 7, 0.1);
+  border-left: 3px solid #ffc107;
+}
+
+.food-item.estimate {
+  background: rgba(108, 117, 125, 0.1);
+  border-left: 3px solid #6c757d;
+}
+
+.food-name {
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.food-portion {
+  color: var(--text-muted);
+}
+
+.food-cholesterol {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.food-category, .food-note {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Cancel Edit Button */
+.cancel-edit-btn {
+  margin-left: 8px;
+}
+
+/* Form Edit Mode */
+.btn-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #212529;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+  border-color: #d39e00;
+  color: #212529;
+} 

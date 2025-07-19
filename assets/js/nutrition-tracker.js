@@ -416,71 +416,91 @@ class NutritionTracker {
   async addMeal(e) {
     e.preventDefault();
     console.log('Add meal form submitted');
-    
-    if (!this.currentUser || !this.currentUser.uid) {
-      console.log('No current user found');
-      this.showToast('Please sign in to save meals', 'error');
+
+    const addMealForm = document.getElementById('addMealForm');
+    if (!addMealForm) {
+      console.error('Add meal form not found');
       return;
     }
 
-    const formData = new FormData(e.target);
-    console.log('Form data collected');
-    
-    // Create timestamp from date and time
+    // Check if we're in edit mode
+    const isEditMode = addMealForm.dataset.editIndex !== undefined;
+    const editIndex = parseInt(addMealForm.dataset.editIndex);
+    const editId = addMealForm.dataset.editId;
+
+    // Collect form data
+    const formData = new FormData(addMealForm);
+    const mealName = formData.get('mealName');
+    const mealType = formData.get('mealType');
     const date = formData.get('date');
     const time = formData.get('time');
-    const timestamp = new Date(`${date}T${time}`);
+    const mealNotes = formData.get('mealNotes');
 
-    const mealName = formData.get('name');
-    const mealNotes = formData.get('notes');
-    
-    console.log('Meal data:', { mealName, mealType: formData.get('type'), date, time, mealNotes });
-    
-    // Calculate estimated nutrition
-    const nutrition = this.calculateCholesterolFromMeal(mealName, mealNotes);
-    console.log('Nutrition calculated:', nutrition);
+    console.log('Form data collected');
 
-    const meal = {
+    if (!mealName || !mealType || !date || !time) {
+      this.showToast('Please fill in all required fields', 'error');
+      return;
+    }
+
+    console.log('Meal data:', { mealName, mealType, date, time, mealNotes });
+
+    // Calculate nutrition
+    const nutritionData = this.calculateCholesterolFromMeal(mealName, mealNotes);
+    console.log('Nutrition calculated:', nutritionData);
+
+    // Create meal object
+    const mealData = {
       name: mealName,
-      type: formData.get('type'),
+      type: mealType,
       date: date,
       time: time,
       notes: mealNotes,
-      timestamp: timestamp,
+      timestamp: new Date(`${date}T${time}`),
       userId: this.currentUser.uid,
-      // Add calculated nutrition data
-      estimatedCholesterol: nutrition.estimatedCholesterol,
-      estimatedCalories: nutrition.estimatedCalories,
-      estimatedFat: nutrition.estimatedFat,
-      foodsFound: nutrition.foodsFound,
-      hasNutritionData: nutrition.hasData
+      hasNutritionData: nutritionData.hasData,
+      estimatedCholesterol: nutritionData.estimatedCholesterol,
+      estimatedCalories: nutritionData.estimatedCalories,
+      estimatedFat: nutritionData.estimatedFat,
+      foodsFound: nutritionData.foodsFound
     };
 
     try {
       console.log('Saving meal to database...');
-      await this.db.collection('meals').add(meal);
-      console.log('Meal saved successfully');
       
-      // Show nutrition summary if data was found
-      if (nutrition.hasData) {
-        let message = `Meal logged! Estimated: ${nutrition.estimatedCalories} cal, ${nutrition.estimatedCholesterol}mg cholesterol`;
-        
-        // Check for high cholesterol foods and provide alternatives
-        if (nutrition.estimatedCholesterol > 100) {
-          const recommendations = this.generateCholesterolRecommendations([meal]);
-          if (recommendations.length > 0) {
-            message += `\n💡 Tip: ${recommendations[0].message}`;
-          }
+      if (isEditMode) {
+        // Update existing meal
+        if (editId) {
+          await this.db.collection('meals').doc(editId).update(mealData);
         }
         
-        this.showToast(message, nutrition.estimatedCholesterol > 200 ? 'warning' : 'success');
+        // Update local array
+        if (this.meals[editIndex]) {
+          this.meals[editIndex] = { ...this.meals[editIndex], ...mealData };
+        }
+        
+        // Exit edit mode
+        this.cancelEdit();
+        
+        this.showToast('Meal updated successfully', 'success');
       } else {
-        this.showToast('Meal logged successfully', 'success');
+        // Add new meal
+        const docRef = await this.db.collection('meals').add(mealData);
+        mealData.id = docRef.id;
+        this.meals.unshift(mealData);
+        this.showToast('Meal added successfully', 'success');
       }
-      
-      e.target.reset();
+
+      console.log('Meal saved successfully');
+
+      // Reset form
+      addMealForm.reset();
       this.setDefaultDateTime();
-      this.loadNutritionData();
+
+      // Update UI
+      this.renderMealHistory();
+      this.updateNutritionOverview();
+
     } catch (error) {
       console.error('Error saving meal:', error);
       this.showToast('Error saving meal', 'error');
@@ -600,7 +620,7 @@ class NutritionTracker {
       return;
     }
 
-    mealHistoryList.innerHTML = this.meals.map(meal => {
+    mealHistoryList.innerHTML = this.meals.map((meal, index) => {
       const timestamp = this.formatTimestamp(meal.timestamp);
       const mealTypeIcon = this.getMealTypeIcon(meal.type);
       
@@ -668,14 +688,14 @@ class NutritionTracker {
                 
                 ${estimateFoods.length > 0 ? `
                   <div class="foods-section">
-                    <h6>🧠 Estimated Foods:</h6>
+                    <h6>❓ Unknown Foods (Conservative Estimate):</h6>
                     <div class="foods-list">
                       ${estimateFoods.map(food => `
                         <div class="food-item estimate">
                           <span class="food-name">${food.food}</span>
                           <span class="food-portion">(${Math.round(food.portion)}g)</span>
                           <span class="food-cholesterol">${Math.round(food.cholesterol)}mg chol</span>
-                          <span class="food-source">[${food.source}]</span>
+                          <span class="food-note">[estimated]</span>
                         </div>
                       `).join('')}
                     </div>
@@ -688,15 +708,30 @@ class NutritionTracker {
       }
       
       return `
-        <div class="meal-entry">
-          <div class="meal-header">
-            <h3>${meal.name}</h3>
-            <span class="meal-type-icon">${mealTypeIcon}</span>
-            <span class="meal-timestamp">${timestamp}</span>
+        <div class="history-item meal-entry" data-meal-index="${index}">
+          <div class="history-header">
+            <div class="history-type">
+              <span class="meal-type-icon">${mealTypeIcon}</span>
+              <span class="meal-type">${meal.type}</span>
+            </div>
+            <div class="history-actions">
+              <span class="history-date">${timestamp}</span>
+              <div class="action-buttons">
+                <button class="btn-edit" onclick="nutritionTracker.editMeal(${index})" title="Edit meal">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-delete" onclick="nutritionTracker.deleteMeal(${index})" title="Delete meal">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
           </div>
-          ${nutritionInfo}
-          ${foodsBreakdown}
-          <p class="meal-notes">${meal.notes || 'No notes'}</p>
+          <div class="history-content">
+            <h4>${meal.name}</h4>
+            ${meal.notes ? `<p>${meal.notes}</p>` : ''}
+            ${nutritionInfo}
+            ${foodsBreakdown}
+          </div>
         </div>
       `;
     }).join('');
@@ -730,9 +765,43 @@ class NutritionTracker {
 
   // Helper method to format timestamp for display
   formatTimestamp(timestamp) {
-    const date = new Date(timestamp);
-    const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-    return date.toLocaleDateString(undefined, options);
+    try {
+      let date;
+      
+      // Handle different timestamp formats
+      if (timestamp instanceof Date) {
+        date = timestamp;
+      } else if (timestamp && timestamp.toDate) {
+        // Firebase Timestamp
+        date = timestamp.toDate();
+      } else if (timestamp && timestamp.seconds) {
+        // Firebase Timestamp object
+        date = new Date(timestamp.seconds * 1000);
+      } else if (typeof timestamp === 'string' || typeof timestamp === 'number') {
+        // String or number timestamp
+        date = new Date(timestamp);
+      } else {
+        // Fallback to current date
+        date = new Date();
+      }
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return 'Date unavailable';
+      }
+      
+      const options = { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      };
+      return date.toLocaleDateString(undefined, options);
+    } catch (error) {
+      console.error('Error formatting timestamp:', error, timestamp);
+      return 'Date unavailable';
+    }
   }
 
   // Helper method to get meal type icon
@@ -968,11 +1037,140 @@ class NutritionTracker {
     }
   }
 
+  // Helper method to edit a meal
+  async editMeal(index) {
+    const meal = this.meals[index];
+    if (!meal) {
+      this.showToast('Meal not found', 'error');
+      return;
+    }
+
+    // Populate the form with existing data
+    const mealNameInput = document.getElementById('mealName');
+    const mealTypeSelect = document.getElementById('mealType');
+    const dateInput = document.getElementById('date');
+    const timeInput = document.getElementById('time');
+    const mealNotesInput = document.getElementById('mealNotes');
+
+    if (mealNameInput) mealNameInput.value = meal.name;
+    if (mealTypeSelect) mealTypeSelect.value = meal.type;
+    if (dateInput) {
+      const mealDate = new Date(meal.timestamp);
+      dateInput.value = mealDate.toISOString().split('T')[0];
+    }
+    if (timeInput) {
+      const mealDate = new Date(meal.timestamp);
+      timeInput.value = mealDate.toTimeString().substring(0, 5);
+    }
+    if (mealNotesInput) mealNotesInput.value = meal.notes || '';
+
+    // Change form to edit mode
+    const addMealForm = document.getElementById('addMealForm');
+    if (addMealForm) {
+      addMealForm.dataset.editIndex = index;
+      addMealForm.dataset.editId = meal.id;
+      
+      // Change submit button text
+      const submitButton = addMealForm.querySelector('button[type="submit"]');
+      if (submitButton) {
+        submitButton.textContent = 'Update Meal';
+        submitButton.classList.remove('btn-primary');
+        submitButton.classList.add('btn-warning');
+      }
+
+      // Show cancel button
+      const cancelButton = addMealForm.querySelector('.cancel-edit-btn');
+      if (cancelButton) {
+        cancelButton.style.display = 'inline-block';
+      }
+    }
+
+    // Scroll to form
+    addMealForm?.scrollIntoView({ behavior: 'smooth' });
+    this.showToast('Edit mode activated - update the meal details and click "Update Meal"', 'info');
+  }
+
+  // Helper method to delete a meal
+  async deleteMeal(index) {
+    const meal = this.meals[index];
+    if (!meal) {
+      this.showToast('Meal not found', 'error');
+      return;
+    }
+
+    // Confirm deletion
+    if (!confirm(`Are you sure you want to delete "${meal.name}"?`)) {
+      return;
+    }
+
+    try {
+      // Delete from database if it has an ID
+      if (meal.id) {
+        await this.db.collection('meals').doc(meal.id).delete();
+      }
+      
+      // Remove from local array
+      this.meals.splice(index, 1);
+      
+      // Re-render the history
+      this.renderMealHistory();
+      this.updateNutritionOverview();
+      
+      this.showToast('Meal deleted successfully', 'success');
+    } catch (error) {
+      console.error('Error deleting meal:', error);
+      this.showToast('Error deleting meal', 'error');
+    }
+  }
+
+  // Helper method to cancel edit mode
+  cancelEdit() {
+    const addMealForm = document.getElementById('addMealForm');
+    if (addMealForm) {
+      // Clear edit mode
+      delete addMealForm.dataset.editIndex;
+      delete addMealForm.dataset.editId;
+      
+      // Reset form
+      addMealForm.reset();
+      
+      // Reset submit button
+      const submitButton = addMealForm.querySelector('button[type="submit"]');
+      if (submitButton) {
+        submitButton.textContent = 'Add Meal';
+        submitButton.classList.remove('btn-warning');
+        submitButton.classList.add('btn-primary');
+      }
+
+      // Hide cancel button
+      const cancelButton = addMealForm.querySelector('.cancel-edit-btn');
+      if (cancelButton) {
+        cancelButton.style.display = 'none';
+      }
+    }
+    
+    this.showToast('Edit mode cancelled', 'info');
+  }
+
   // Helper method to setup event listeners for forms
   setupEventListeners() {
     const addMealForm = document.getElementById('addMealForm');
     if (addMealForm) {
       addMealForm.addEventListener('submit', this.addMeal.bind(this));
+      
+      // Add cancel button for edit mode
+      const cancelButton = document.createElement('button');
+      cancelButton.type = 'button';
+      cancelButton.className = 'btn btn-secondary cancel-edit-btn';
+      cancelButton.textContent = 'Cancel Edit';
+      cancelButton.style.display = 'none';
+      cancelButton.onclick = () => this.cancelEdit();
+      
+      // Insert cancel button after submit button
+      const submitButton = addMealForm.querySelector('button[type="submit"]');
+      if (submitButton) {
+        submitButton.parentNode.insertBefore(cancelButton, submitButton.nextSibling);
+      }
     }
 
     const addCholesterolForm = document.getElementById('addCholesterolForm');
