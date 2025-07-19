@@ -71,6 +71,10 @@ class NutritionTracker {
       'sausage': { cholesterol: 80, calories: 296, fat: 26.0, alternatives: ['turkey sausage', 'vegetarian sausage', 'tempeh'] },
       'hot dog': { cholesterol: 77, calories: 290, fat: 26.0, alternatives: ['turkey hot dog', 'vegetarian hot dog', 'tofu dog'] },
       'hamburger': { cholesterol: 66, calories: 295, fat: 12.0, alternatives: ['turkey burger', 'veggie burger', 'portobello burger'] },
+      'ham': { cholesterol: 53, calories: 145, fat: 5.5, alternatives: ['turkey', 'chicken', 'tofu', 'tempeh'] },
+      'mayonnaise': { cholesterol: 42, calories: 680, fat: 75.0, alternatives: ['mustard', 'hummus', 'avocado', 'greek yogurt'] },
+      'lettuce': { cholesterol: 0, calories: 15, fat: 0.1, alternatives: ['spinach', 'kale', 'arugula', 'mixed greens'] },
+      'tomato': { cholesterol: 0, calories: 18, fat: 0.2, alternatives: ['bell pepper', 'cucumber', 'onion', 'avocado'] },
       
       // Plant-based (low cholesterol)
       'tofu': { cholesterol: 0, calories: 76, fat: 4.8, alternatives: ['tempeh', 'seitan', 'legumes'] },
@@ -87,6 +91,9 @@ class NutritionTracker {
       
       // Grains
       'bread': { cholesterol: 0, calories: 265, fat: 3.2, alternatives: ['whole grain bread', 'sprouted bread', 'rye bread'] },
+      'sandwich bread': { cholesterol: 0, calories: 265, fat: 3.2, alternatives: ['whole grain bread', 'sprouted bread', 'rye bread'] },
+      'white bread': { cholesterol: 0, calories: 265, fat: 3.2, alternatives: ['whole grain bread', 'sprouted bread', 'rye bread'] },
+      'wheat bread': { cholesterol: 0, calories: 247, fat: 3.4, alternatives: ['whole grain bread', 'sprouted bread', 'rye bread'] },
       'rice': { cholesterol: 0, calories: 130, fat: 0.3, alternatives: ['brown rice', 'quinoa', 'farro'] },
       'pasta': { cholesterol: 0, calories: 131, fat: 1.1, alternatives: ['whole grain pasta', 'zucchini noodles', 'spaghetti squash'] },
       'oatmeal': { cholesterol: 0, calories: 68, fat: 1.4, alternatives: ['quinoa', 'buckwheat', 'amaranth'] }
@@ -101,14 +108,38 @@ class NutritionTracker {
     let totalFat = 0;
     let foodsFound = [];
     
+    // Enhanced portion size estimation for common foods
+    const portionEstimates = {
+      'bread': 60, // 2 slices
+      'ham': 50, // 2-3 slices
+      'cheese': 30, // 1 slice
+      'mayonnaise': 15, // 1 tbsp
+      'lettuce': 20, // 1/4 cup
+      'tomato': 30, // 2-3 slices
+      'egg': 50, // 1 large egg
+      'milk': 240, // 1 cup
+      'chicken': 100, // 3.5 oz
+      'beef': 100, // 3.5 oz
+      'salmon': 100, // 3.5 oz
+      'rice': 150, // 1 cup cooked
+      'pasta': 100, // 1 cup cooked
+      'oatmeal': 150, // 1 cup cooked
+      'yogurt': 170, // 3/4 cup
+      'butter': 14, // 1 tbsp
+      'bacon': 15, // 1 slice
+      'sausage': 50, // 1 link
+      'hot dog': 50, // 1 hot dog
+      'hamburger': 100, // 1 patty
+    };
+    
     // Search for foods in the database
     for (const [food, nutrition] of Object.entries(this.foodDatabase)) {
       if (text.includes(food)) {
-        // Estimate portion size (default 100g)
-        let portionSize = 100;
+        // Estimate portion size (default from portionEstimates or 100g)
+        let portionSize = portionEstimates[food] || 100;
         
         // Try to extract portion size from text
-        const portionMatch = text.match(new RegExp(`(\\d+)\\s*(g|gram|grams|oz|ounce|ounces|cup|cups|tbsp|tablespoon|tablespoons|tsp|teaspoon|teaspoons)\\s*${food}`));
+        const portionMatch = text.match(new RegExp(`(\\d+)\\s*(g|gram|grams|oz|ounce|ounces|cup|cups|tbsp|tablespoon|tablespoons|tsp|teaspoon|teaspoons|slice|slices|piece|pieces)\\s*${food}`));
         if (portionMatch) {
           const amount = parseFloat(portionMatch[1]);
           const unit = portionMatch[2];
@@ -122,6 +153,14 @@ class NutritionTracker {
             portionSize = amount * 15; // tablespoon to grams
           } else if (unit.includes('tsp') || unit.includes('teaspoon')) {
             portionSize = amount * 5; // teaspoon to grams
+          } else if (unit.includes('slice')) {
+            // Estimate slice sizes
+            if (food === 'bread') portionSize = amount * 30; // 30g per slice
+            else if (food === 'cheese') portionSize = amount * 25; // 25g per slice
+            else if (food === 'ham') portionSize = amount * 25; // 25g per slice
+            else portionSize = amount * 30; // default slice size
+          } else if (unit.includes('piece')) {
+            portionSize = amount * 50; // 50g per piece
           } else {
             portionSize = amount; // already in grams
           }
@@ -340,6 +379,8 @@ class NutritionTracker {
       
       // Add nutrition information if available
       let nutritionInfo = '';
+      let foodsBreakdown = '';
+      
       if (meal.hasNutritionData) {
         nutritionInfo = `
           <div class="meal-nutrition">
@@ -348,6 +389,24 @@ class NutritionTracker {
             <span class="nutrition-item">${meal.estimatedFat}g fat</span>
           </div>
         `;
+        
+        // Show detailed foods breakdown
+        if (meal.foodsFound && meal.foodsFound.length > 0) {
+          foodsBreakdown = `
+            <div class="foods-breakdown">
+              <h5>🍽️ Foods Detected:</h5>
+              <div class="foods-list">
+                ${meal.foodsFound.map(food => `
+                  <div class="food-item">
+                    <span class="food-name">${food.food}</span>
+                    <span class="food-portion">(${Math.round(food.portion)}g)</span>
+                    <span class="food-cholesterol">${Math.round(food.cholesterol)}mg chol</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
       }
       
       return `
@@ -363,6 +422,7 @@ class NutritionTracker {
             <h4>${meal.name}</h4>
             ${meal.notes ? `<p>${meal.notes}</p>` : ''}
             ${nutritionInfo}
+            ${foodsBreakdown}
           </div>
         </div>
       `;
