@@ -638,13 +638,35 @@ class NutritionTracker {
     let totalCholesterol = 0;
     
     this.meals.forEach(meal => {
-      const mealDate = new Date(meal.timestamp);
-      const mealDateString = mealDate.toISOString().split('T')[0];
-      console.log(`Meal date: ${mealDateString}, target date: ${date}, match: ${mealDateString === date}`);
-      
-      if (mealDateString === date && meal.hasNutritionData) {
-        totalCholesterol += meal.estimatedCholesterol || 0;
-        console.log(`Added ${meal.estimatedCholesterol}mg cholesterol from meal: ${meal.name}`);
+      try {
+        // Handle different timestamp formats
+        let mealDate;
+        if (meal.timestamp && meal.timestamp.toDate) {
+          // Firestore timestamp
+          mealDate = meal.timestamp.toDate();
+        } else if (meal.timestamp) {
+          // Regular date object or string
+          mealDate = new Date(meal.timestamp);
+        } else {
+          console.log('No timestamp found for meal:', meal.name);
+          return;
+        }
+
+        // Check if date is valid
+        if (isNaN(mealDate.getTime())) {
+          console.log('Invalid timestamp for meal:', meal.name, meal.timestamp);
+          return;
+        }
+
+        const mealDateString = mealDate.toISOString().split('T')[0];
+        console.log(`Meal date: ${mealDateString}, target date: ${date}, match: ${mealDateString === date}`);
+        
+        if (mealDateString === date && meal.hasNutritionData) {
+          totalCholesterol += meal.estimatedCholesterol || 0;
+          console.log(`Added ${meal.estimatedCholesterol}mg cholesterol from meal: ${meal.name}`);
+        }
+      } catch (error) {
+        console.error('Error processing meal timestamp:', error, meal);
       }
     });
 
@@ -667,13 +689,35 @@ class NutritionTracker {
       // Calculate today's total calories using same date logic
       let todayCalories = 0;
       this.meals.forEach(meal => {
-        const mealDate = new Date(meal.timestamp);
-        const mealDateString = mealDate.toISOString().split('T')[0];
-        console.log(`Meal: ${meal.name}, date: ${mealDateString}, today: ${today}, match: ${mealDateString === today}`);
-        
-        if (mealDateString === today && meal.hasNutritionData) {
-          todayCalories += meal.estimatedCalories || 0;
-          console.log(`Added ${meal.estimatedCalories} calories from meal: ${meal.name}`);
+        try {
+          // Handle different timestamp formats
+          let mealDate;
+          if (meal.timestamp && meal.timestamp.toDate) {
+            // Firestore timestamp
+            mealDate = meal.timestamp.toDate();
+          } else if (meal.timestamp) {
+            // Regular date object or string
+            mealDate = new Date(meal.timestamp);
+          } else {
+            console.log('No timestamp found for meal:', meal.name);
+            return;
+          }
+
+          // Check if date is valid
+          if (isNaN(mealDate.getTime())) {
+            console.log('Invalid timestamp for meal:', meal.name, meal.timestamp);
+            return;
+          }
+
+          const mealDateString = mealDate.toISOString().split('T')[0];
+          console.log(`Meal: ${meal.name}, date: ${mealDateString}, today: ${today}, match: ${mealDateString === today}`);
+          
+          if (mealDateString === today && meal.hasNutritionData) {
+            todayCalories += meal.estimatedCalories || 0;
+            console.log(`Added ${meal.estimatedCalories} calories from meal: ${meal.name}`);
+          }
+        } catch (error) {
+          console.error('Error processing meal timestamp for calories:', error, meal);
         }
       });
       console.log('Today\'s calories calculated:', todayCalories);
