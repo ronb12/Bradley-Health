@@ -1,61 +1,54 @@
 // Nutrition Tracking System with Cholesterol Monitoring
 class NutritionTracker {
   constructor() {
-    // Wait for Firebase to be ready
-    if (window.firebaseServices && window.firebaseServices.db) {
-      this.db = window.firebaseServices.db;
-      this.currentUser = null;
-      this.meals = [];
-      this.cholesterolEntries = [];
-      this.foodDatabase = this.initializeFoodDatabase();
-      this.init();
+    this.db = firebase.firestore();
+    this.meals = [];
+    this.cholesterolEntries = [];
+    this.currentUser = null;
+    this.initialized = false;
+    this.foodDatabase = {};
+    
+    // Initialize food database
+    this.initializeFoodDatabase();
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this.init());
     } else {
-      // Retry after a short delay
-      setTimeout(() => {
-        if (window.firebaseServices && window.firebaseServices.db) {
-          this.db = window.firebaseServices.db;
-          this.currentUser = null;
-          this.meals = [];
-          this.cholesterolEntries = [];
-          this.foodDatabase = this.initializeFoodDatabase();
-          this.init();
-        } else {
-          console.error('Firebase not available for nutrition tracker');
-        }
-      }, 1000);
+      this.init();
     }
   }
 
   init() {
-    // Wait for authentication
-    if (window.authManager) {
-      window.authManager.auth.onAuthStateChanged((user) => {
-        this.currentUser = user;
-        if (user) {
+    console.log('Nutrition Tracker: Waiting for authManager...');
+    
+    // Prevent multiple initializations
+    if (this.initialized) {
+      console.log('Nutrition Tracker: Already initialized, skipping...');
+      return;
+    }
+
+    const checkAuthManager = () => {
+      if (window.authManager) {
+        console.log('Nutrition Tracker: authManager found, initializing...');
+        this.currentUser = window.authManager.getCurrentUser();
+        
+        if (this.currentUser) {
           console.log('Nutrition Tracker: User authenticated, loading data');
           this.loadNutritionData();
           this.setupEventListeners();
+          this.setDefaultDateTime();
+          this.initialized = true;
         } else {
-          console.log('Nutrition Tracker: User signed out, clearing data...');
-          this.meals = [];
-          this.cholesterolEntries = [];
-          this.renderMealHistory();
-          this.renderCholesterolHistory();
+          console.log('Nutrition Tracker: No user authenticated');
         }
-      });
-    } else {
-      // Wait for authManager to be available
-      console.log('Nutrition Tracker: Waiting for authManager...');
-      const checkAuthManager = () => {
-        if (window.authManager) {
-          console.log('Nutrition Tracker: authManager found, initializing...');
-          this.init();
-        } else {
-          setTimeout(checkAuthManager, 100);
-        }
-      };
-      checkAuthManager();
-    }
+      } else {
+        console.log('Nutrition Tracker: authManager not found, retrying...');
+        setTimeout(checkAuthManager, 100);
+      }
+    };
+    
+    checkAuthManager();
   }
 
   initializeFoodDatabase() {
@@ -415,11 +408,25 @@ class NutritionTracker {
   // Enhanced meal logging with automatic nutrition calculation
   async addMeal(e) {
     e.preventDefault();
+    
+    // Prevent multiple submissions
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    if (submitButton && submitButton.disabled) {
+      return; // Already processing
+    }
+    
+    // Disable submit button to prevent multiple submissions
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Processing...';
+    }
+    
     console.log('Add meal form submitted');
 
     const addMealForm = document.getElementById('addMealForm');
     if (!addMealForm) {
       console.error('Add meal form not found');
+      this.re-enableSubmitButton(submitButton);
       return;
     }
 
@@ -440,6 +447,7 @@ class NutritionTracker {
 
     if (!mealName || !mealType || !date || !time) {
       this.showToast('Please fill in all required fields', 'error');
+      this.re-enableSubmitButton(submitButton);
       return;
     }
 
@@ -504,6 +512,17 @@ class NutritionTracker {
     } catch (error) {
       console.error('Error saving meal:', error);
       this.showToast('Error saving meal', 'error');
+    } finally {
+      // Re-enable submit button
+      this.re-enableSubmitButton(submitButton);
+    }
+  }
+
+  // Helper method to re-enable submit button
+  re-enableSubmitButton(submitButton) {
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Add Meal';
     }
   }
 
@@ -1188,7 +1207,12 @@ class NutritionTracker {
   setupEventListeners() {
     const addMealForm = document.getElementById('addMealForm');
     if (addMealForm) {
-      addMealForm.addEventListener('submit', this.addMeal.bind(this));
+      // Remove any existing event listeners to prevent duplicates
+      const newForm = addMealForm.cloneNode(true);
+      addMealForm.parentNode.replaceChild(newForm, addMealForm);
+      
+      // Add event listener to the new form
+      newForm.addEventListener('submit', this.addMeal.bind(this));
       
       // Add cancel button for edit mode
       const cancelButton = document.createElement('button');
@@ -1199,7 +1223,7 @@ class NutritionTracker {
       cancelButton.onclick = () => this.cancelEdit();
       
       // Insert cancel button after submit button
-      const submitButton = addMealForm.querySelector('button[type="submit"]');
+      const submitButton = newForm.querySelector('button[type="submit"]');
       if (submitButton) {
         submitButton.parentNode.insertBefore(cancelButton, submitButton.nextSibling);
       }
