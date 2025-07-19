@@ -67,17 +67,13 @@ class HealthInsights {
       this.calculateHealthScore();
       this.generateRecommendations();
       
-      // Check if we're on the health insights tab or dashboard
+      // Only display on health insights tab
       const isHealthInsightsTab = document.querySelector('.health-insights-container');
       
       if (isHealthInsightsTab) {
         // On health insights tab - show full detailed view
         this.displayFullInsights();
         this.displayFullRecommendations();
-      } else {
-        // On dashboard - show compact summary
-        this.displayInsights();
-        this.displayRecommendations();
       }
       
       this.displayHealthScore();
@@ -1324,116 +1320,69 @@ class HealthInsights {
       return;
     }
 
-    // Check if we're on the dashboard or health insights tab
-    const isDashboard = !document.querySelector('.health-insights-container');
+    // Health Insights Tab: Show full summary with health score
+    const alertCount = this.insights.filter(i => i.severity === 'alert').length;
+    const warningCount = this.insights.filter(i => i.severity === 'warning').length;
+    const infoCount = this.insights.filter(i => i.severity === 'info').length;
+    const successCount = this.insights.filter(i => i.severity === 'success').length;
+
+    // Get top 3 most important insights
+    const topInsights = this.insights.slice(0, 3);
+
+    const summaryElement = document.createElement('div');
+    summaryElement.className = 'insights-summary';
     
-    if (isDashboard) {
-      // Dashboard: Show only insight names and status
-      const summaryElement = document.createElement('div');
-      summaryElement.className = 'insights-summary';
-      
-      // Get top 5 most important insights for dashboard
-      const topInsights = this.insights.slice(0, 5);
-      
-      let summaryHTML = `
-        <div class="summary-header">
-          <span class="summary-icon">🧠</span>
-          <h3>Health Insights</h3>
+    let summaryHTML = `
+      <div class="summary-header">
+        <span class="summary-icon">🧠</span>
+        <h3>Health Insights</h3>
+        <div class="insights-stats">
+          ${alertCount > 0 ? `<span class="stat alert">${alertCount}</span>` : ''}
+          ${warningCount > 0 ? `<span class="stat warning">${warningCount}</span>` : ''}
+          ${infoCount > 0 ? `<span class="stat info">${infoCount}</span>` : ''}
+          ${successCount > 0 ? `<span class="stat success">${successCount}</span>` : ''}
         </div>
-        <div class="summary-content">
-      `;
-
-      if (topInsights.length > 0) {
-        summaryHTML += '<div class="dashboard-insights-list">';
-        topInsights.forEach(insight => {
-          summaryHTML += `
-            <div class="dashboard-insight-item ${insight.severity}">
-              <span class="insight-icon-small">${insight.icon}</span>
-              <div class="insight-name">${insight.title}</div>
-              <span class="insight-status ${insight.severity}">${insight.severity.toUpperCase()}</span>
-            </div>
-          `;
-        });
-        summaryHTML += '</div>';
-      }
-
-      if (this.insights.length > 5) {
-        summaryHTML += `
-          <div class="more-insights">
-            <span class="more-count">+${this.insights.length - 5} more</span>
-            <button class="btn-view-insights" onclick="switchToTab('health-insights')">View All</button>
+      </div>
+      <div class="summary-content">
+        <div class="health-score-compact">
+          <div class="score-circle-compact ${this.getHealthScoreClass()}">
+            <span class="score-value">${this.healthScore}</span>
           </div>
-        `;
-      }
-
-      summaryHTML += '</div>';
-      summaryElement.innerHTML = summaryHTML;
-      insightsContainer.appendChild(summaryElement);
-    } else {
-      // Health Insights Tab: Show full summary with health score
-      const alertCount = this.insights.filter(i => i.severity === 'alert').length;
-      const warningCount = this.insights.filter(i => i.severity === 'warning').length;
-      const infoCount = this.insights.filter(i => i.severity === 'info').length;
-      const successCount = this.insights.filter(i => i.severity === 'success').length;
-
-      // Get top 3 most important insights
-      const topInsights = this.insights.slice(0, 3);
-
-      const summaryElement = document.createElement('div');
-      summaryElement.className = 'insights-summary';
-      
-      let summaryHTML = `
-        <div class="summary-header">
-          <span class="summary-icon">🧠</span>
-          <h3>Health Insights</h3>
-          <div class="insights-stats">
-            ${alertCount > 0 ? `<span class="stat alert">${alertCount}</span>` : ''}
-            ${warningCount > 0 ? `<span class="stat warning">${warningCount}</span>` : ''}
-            ${infoCount > 0 ? `<span class="stat info">${infoCount}</span>` : ''}
-            ${successCount > 0 ? `<span class="stat success">${successCount}</span>` : ''}
+          <div class="score-info">
+            <span class="score-label">Health Score</span>
+            <span class="score-description">${this.getHealthScoreDescription()}</span>
           </div>
         </div>
-        <div class="summary-content">
-          <div class="health-score-compact">
-            <div class="score-circle-compact ${this.getHealthScoreClass()}">
-              <span class="score-value">${this.healthScore}</span>
-            </div>
-            <div class="score-info">
-              <span class="score-label">Health Score</span>
-              <span class="score-description">${this.getHealthScoreDescription()}</span>
-            </div>
-          </div>
-      `;
+    `;
 
-      if (topInsights.length > 0) {
-        summaryHTML += '<div class="top-insights">';
-        topInsights.forEach(insight => {
-          summaryHTML += `
-            <div class="insight-summary ${insight.severity}">
-              <span class="insight-icon-small">${insight.icon}</span>
-              <div class="insight-text">
-                <strong>${insight.title}</strong>
-                <span class="insight-brief">${insight.message.substring(0, 60)}${insight.message.length > 60 ? '...' : ''}</span>
-              </div>
-            </div>
-          `;
-        });
-        summaryHTML += '</div>';
-      }
-
-      if (this.insights.length > 3) {
+    if (topInsights.length > 0) {
+      summaryHTML += '<div class="top-insights">';
+      topInsights.forEach(insight => {
         summaryHTML += `
-          <div class="more-insights">
-            <span class="more-count">+${this.insights.length - 3} more insights</span>
-            <button class="btn-view-all" onclick="window.healthInsights.showAllInsights()">View All</button>
+          <div class="insight-summary ${insight.severity}">
+            <span class="insight-icon-small">${insight.icon}</span>
+            <div class="insight-text">
+              <strong>${insight.title}</strong>
+              <span class="insight-brief">${insight.message.substring(0, 60)}${insight.message.length > 60 ? '...' : ''}</span>
+            </div>
           </div>
         `;
-      }
-
+      });
       summaryHTML += '</div>';
-      summaryElement.innerHTML = summaryHTML;
-      insightsContainer.appendChild(summaryElement);
     }
+
+    if (this.insights.length > 3) {
+      summaryHTML += `
+        <div class="more-insights">
+          <span class="more-count">+${this.insights.length - 3} more insights</span>
+          <button class="btn-view-all" onclick="window.healthInsights.showAllInsights()">View All</button>
+        </div>
+      `;
+    }
+
+    summaryHTML += '</div>';
+    summaryElement.innerHTML = summaryHTML;
+    insightsContainer.appendChild(summaryElement);
   }
 
   showAllInsights() {
@@ -1714,14 +1663,6 @@ class HealthInsights {
       console.log('Health Insights: insightsList container not found');
       return;
     }
-    
-    // Check if we're on the health insights tab
-    const isHealthInsightsTab = document.querySelector('.health-insights-container');
-    if (!isHealthInsightsTab) {
-      // If not on health insights tab, use regular display
-      this.displayInsights();
-      return;
-    }
 
     console.log('Health Insights: Displaying full insights, count:', this.insights.length);
 
@@ -1780,14 +1721,6 @@ class HealthInsights {
     const recommendationsContainer = document.getElementById('recommendationsList');
     if (!recommendationsContainer) {
       console.log('Health Insights: recommendationsList container not found');
-      return;
-    }
-    
-    // Check if we're on the health insights tab
-    const isHealthInsightsTab = document.querySelector('.health-insights-container');
-    if (!isHealthInsightsTab) {
-      // If not on health insights tab, use regular display
-      this.displayRecommendations();
       return;
     }
 
