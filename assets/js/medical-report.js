@@ -78,6 +78,7 @@ class MedicalReportGenerator {
         physicalActivity: { entries: [], summary: { message: 'No data available' } },
         nutrition: { entries: [], summary: { message: 'No data available' } },
         medicalHistory: { history: [], summary: { message: 'No data available' } },
+        dme: { items: [], summary: { message: 'No data available' }, maintenanceAlerts: [] },
         emergency: { contacts: [], protocols: [] },
         insights: [],
         dataQuality: {} // Added for data quality metrics
@@ -132,6 +133,10 @@ class MedicalReportGenerator {
         console.error('Error collecting medical history data:', error);
       });
       
+      await this.collectDMEData(userId).catch(error => {
+        console.error('Error collecting DME data:', error);
+      });
+
       await this.collectHealthInsights(userId).catch(error => {
         console.error('Error collecting health insights:', error);
       });
@@ -524,6 +529,36 @@ class MedicalReportGenerator {
     }
   }
 
+  async collectDMEData(userId) {
+    try {
+      const dmeSnapshot = await this.db.collection('durableMedicalEquipment')
+        .where('userId', '==', userId)
+        .orderBy('dateAcquired', 'desc')
+        .get();
+
+      const dmeItems = dmeSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        dateAcquired: doc.data().dateAcquired.toDate(),
+        lastMaintenance: doc.data().lastMaintenance ? doc.data().lastMaintenance.toDate() : null,
+        nextMaintenance: doc.data().nextMaintenance ? doc.data().nextMaintenance.toDate() : null
+      }));
+
+      this.reportData.dme = {
+        items: dmeItems,
+        summary: this.analyzeDMEData(dmeItems),
+        maintenanceAlerts: this.checkMaintenanceAlerts(dmeItems)
+      };
+    } catch (error) {
+      console.error('Error collecting DME data:', error);
+      this.reportData.dme = {
+        items: [],
+        summary: { message: 'Error loading DME data' },
+        maintenanceAlerts: []
+      };
+    }
+  }
+
   analyzeBloodPressure(readings) {
     if (!readings || readings.length === 0) {
       return { message: 'No blood pressure readings available' };
@@ -789,6 +824,143 @@ class MedicalReportGenerator {
     };
   }
 
+  analyzeDMEData(items) {
+    if (!items || items.length === 0) {
+      return { message: 'No DME items recorded' };
+    }
+
+    const activeItems = items.filter(item => item.status === 'active');
+    const inactiveItems = items.filter(item => item.status === 'inactive');
+    const maintenanceDue = items.filter(item => {
+      if (!item.nextMaintenance) return false;
+      return new Date(item.nextMaintenance) <= new Date();
+    });
+
+    // Group by equipment type
+    const equipmentTypes = {};
+    items.forEach(item => {
+      if (!equipmentTypes[item.type]) {
+        equipmentTypes[item.type] = [];
+      }
+      equipmentTypes[item.type].push(item);
+    });
+
+    // Calculate total value
+    const totalValue = items.reduce((sum, item) => sum + (item.value || 0), 0);
+
+    return {
+      totalItems: items.length,
+      activeItems: activeItems.length,
+      inactiveItems: inactiveItems.length,
+      maintenanceDue: maintenanceDue.length,
+      equipmentTypes: equipmentTypes,
+      totalValue: totalValue,
+      averageAge: this.calculateAverageAge(items),
+      coverageStatus: this.assessCoverageStatus(items)
+    };
+  }
+
+  checkMaintenanceAlerts(items) {
+    const alerts = [];
+    const today = new Date();
+
+    items.forEach(item => {
+      // Check if maintenance is overdue
+      if (item.nextMaintenance && new Date(item.nextMaintenance) < today) {
+        alerts.push({
+          type: 'maintenance_overdue',
+          severity: 'high',
+          item: item.name,
+          message: `Maintenance overdue for ${item.name} since ${new Date(item.nextMaintenance).toLocaleDateString()}`,
+          dueDate: item.nextMaintenance
+        });
+      }
+
+      // Check if maintenance is due soon (within 30 days)
+      if (item.nextMaintenance) {
+        const daysUntilDue = Math.ceil((new Date(item.nextMaintenance) - today) / (1000 * 60 * 60 * 24));
+        if (daysUntilDue <= 30 && daysUntilDue > 0) {
+          alerts.push({
+            type: 'maintenance_due_soon',
+            severity: 'medium',
+            item: item.name,
+            message: `Maintenance due for ${item.name} in ${daysUntilDue} days`,
+            dueDate: item.nextMaintenance
+          });
+        }
+      }
+
+      // Check warranty expiration
+      if (item.warrantyExpiry && new Date(item.warrantyExpiry) < today) {
+        alerts.push({
+          type: 'warranty_expired',
+          severity: 'medium',
+          item: item.name,
+          message: `Warranty expired for ${item.name} on ${new Date(item.warrantyExpiry).toLocaleDateString()}`,
+          dueDate: item.warrantyExpiry
+        });
+      }
+
+      // Check if equipment is aging (over 5 years old)
+      if (item.dateAcquired) {
+        const ageInYears = (today - new Date(item.dateAcquired)) / (1000 * 60 * 60 * 24 * 365);
+        if (ageInYears > 5) {
+          alerts.push({
+            type: 'equipment_aging',
+            severity: 'low',
+            item: item.name,
+            message: `${item.name} is ${Math.round(ageInYears)} years old and may need replacement consideration`,
+            age: Math.round(ageInYears)
+          });
+        }
+      }
+    });
+
+    return alerts;
+  }
+
+  calculateAverageAge(items) {
+    if (!items || items.length === 0) return 0;
+    
+    const today = new Date();
+    const totalAge = items.reduce((sum, item) => {
+      if (item.dateAcquired) {
+        return sum + ((today - new Date(item.dateAcquired)) / (1000 * 60 * 60 * 24 * 365));
+      }
+      return sum;
+    }, 0);
+    
+    return Math.round(totalAge / items.length);
+  }
+
+  assessCoverageStatus(items) {
+    const coverage = {
+      mobility: false,
+      respiratory: false,
+      monitoring: false,
+      dailyLiving: false
+    };
+
+    items.forEach(item => {
+      switch (item.category) {
+        case 'mobility':
+          coverage.mobility = true;
+          break;
+        case 'respiratory':
+          coverage.respiratory = true;
+          break;
+        case 'monitoring':
+          coverage.monitoring = true;
+          break;
+        case 'dailyLiving':
+          coverage.dailyLiving = true;
+          break;
+      }
+    });
+
+    return coverage;
+  }
+
   categorizeBP(systolic, diastolic) {
     if (systolic < 120 && diastolic < 80) return 'Normal';
     if (systolic < 130 && diastolic < 80) return 'Elevated';
@@ -846,6 +1018,7 @@ class MedicalReportGenerator {
     const sleep = this.reportData.sleep || {};
     const emergency = this.reportData.emergency || {};
     const medicalHistory = this.reportData.medicalHistory || {};
+    const dme = this.reportData.dme || {};
     const dataQuality = this.reportData.dataQuality || {}; // Added data quality metrics
 
     const report = {
@@ -859,7 +1032,7 @@ class MedicalReportGenerator {
         patientAge: profile.age || 'Not provided'
       },
       
-      executiveSummary: this.generateExecutiveSummary(bp, meds, mood, goals, weight, sleep, this.reportData.physicalActivity, this.reportData.nutrition, insights),
+      executiveSummary: this.generateExecutiveSummary(bp, meds, mood, goals, weight, sleep, this.reportData.physicalActivity, this.reportData.nutrition, dme, insights),
       
       patientDemographics: {
         name: profile.name,
@@ -912,6 +1085,34 @@ class MedicalReportGenerator {
         trends: sleep.trends
       },
       
+      physicalActivity: {
+        summary: this.reportData.physicalActivity.summary,
+        recentEntries: this.reportData.physicalActivity.entries ? this.reportData.physicalActivity.entries.slice(0, 10) : [],
+        trends: this.reportData.physicalActivity.trends
+      },
+      
+      nutrition: {
+        summary: this.reportData.nutrition.summary,
+        recentEntries: this.reportData.nutrition.entries ? this.reportData.nutrition.entries.slice(0, 10) : [],
+        trends: this.reportData.nutrition.trends,
+        dietaryRestrictions: this.reportData.nutrition.dietaryRestrictions || [],
+        foodAllergies: this.reportData.nutrition.foodAllergies || [],
+        supplements: this.reportData.nutrition.supplements || []
+      },
+      
+      medicalHistory: {
+        summary: medicalHistory.summary,
+        recentConditions: medicalHistory.history ? medicalHistory.history.slice(0, 5) : [],
+        recentImmunizations: medicalHistory.immunizations ? medicalHistory.immunizations.slice(0, 5) : [],
+        familyHistory: medicalHistory.familyHistory || []
+      },
+      
+      dme: {
+        summary: dme.summary,
+        items: dme.items || [],
+        maintenanceAlerts: dme.maintenanceAlerts || []
+      },
+      
       emergency: {
         contacts: emergency.contacts || [],
         protocols: emergency.protocols || [],
@@ -919,24 +1120,16 @@ class MedicalReportGenerator {
         medicalAlert: emergency.medicalAlert
       },
       
-      medicalHistory: {
-        summary: medicalHistory.summary,
-        recentConditions: medicalHistory.recentConditions,
-        recentImmunizations: medicalHistory.recentImmunizations,
-        latestCondition: medicalHistory.latestCondition,
-        latestImmunization: medicalHistory.latestImmunization
-      },
-      
       healthInsights: insights,
       
-      recommendations: this.generateRecommendations(bp, meds, mood, goals, weight, sleep, this.reportData.physicalActivity, this.reportData.nutrition, insights),
+      recommendations: this.generateRecommendations(bp, meds, mood, goals, weight, sleep, this.reportData.physicalActivity, this.reportData.nutrition, dme, insights),
       dataQuality: dataQuality // Added data quality metrics to report
     };
 
     return report;
   }
 
-  generateExecutiveSummary(bp, meds, mood, goals, weight, sleep, physicalActivity, nutrition, insights) {
+  generateExecutiveSummary(bp, meds, mood, goals, weight, sleep, physicalActivity, nutrition, dme, insights) {
     const summary = {
       overallHealthStatus: 'Good',
       keyFindings: [],
@@ -999,6 +1192,12 @@ class MedicalReportGenerator {
       summary.recommendations.push('Consult with a nutritionist for dietary guidance');
     }
 
+    // DME Analysis
+    if (dme.summary && dme.summary.maintenanceDue > 0) {
+      summary.keyFindings.push(`${dme.summary.maintenanceDue} DME items have overdue maintenance`);
+      summary.recommendations.push('Schedule maintenance for your DME items to prevent breakdowns');
+    }
+
     // Insights Analysis
     insights.forEach(insight => {
       if (insight.severity === 'alert') {
@@ -1010,7 +1209,7 @@ class MedicalReportGenerator {
     return summary;
   }
 
-  generateRecommendations(bp, meds, mood, goals, weight, sleep, physicalActivity, nutrition, insights) {
+  generateRecommendations(bp, meds, mood, goals, weight, sleep, physicalActivity, nutrition, dme, insights) {
     const recommendations = [];
 
     // Blood Pressure Recommendations
@@ -1073,6 +1272,15 @@ class MedicalReportGenerator {
         category: 'Nutrition',
         priority: 'Medium',
         recommendation: 'Consult with a nutritionist for dietary guidance'
+      });
+    }
+
+    // DME Recommendations
+    if (dme.summary && dme.summary.maintenanceDue > 0) {
+      recommendations.push({
+        category: 'Durable Medical Equipment',
+        priority: 'High',
+        recommendation: 'Schedule maintenance for your DME items to prevent breakdowns'
       });
     }
 
@@ -1311,6 +1519,39 @@ class MedicalReportGenerator {
         </div>
 
         <div class="section">
+          <h2>Durable Medical Equipment (DME)</h2>
+          ${report.dme.summary.message ? 
+            `<p>${report.dme.summary.message}</p>` :
+            `<div class="summary-box">
+              <p><strong>Total DME Items:</strong> ${report.dme.summary.totalItems}</p>
+              <p><strong>Active Items:</strong> ${report.dme.summary.activeItems}</p>
+              <p><strong>Inactive Items:</strong> ${report.dme.summary.inactiveItems}</p>
+              <p><strong>Maintenance Due:</strong> ${report.dme.summary.maintenanceDue}</p>
+              <p><strong>Average Age:</strong> ${report.dme.summary.averageAge} years</p>
+              <p><strong>Coverage Status:</strong> ${report.dme.summary.coverageStatus.mobility ? 'Mobility' : ''} ${report.dme.summary.coverageStatus.respiratory ? 'Respiratory' : ''} ${report.dme.summary.coverageStatus.monitoring ? 'Monitoring' : ''} ${report.dme.summary.coverageStatus.dailyLiving ? 'Daily Living' : ''}</p>
+            </div>
+            ${report.dme.maintenanceAlerts.length > 0 ? `
+              <h4>Maintenance Alerts:</h4>
+              <ul>${report.dme.maintenanceAlerts.map(alert => 
+                `<li class="${alert.severity === 'high' ? 'alert' : alert.severity === 'medium' ? 'warning' : ''}">
+                  <strong>${alert.severity.charAt(0).toUpperCase() + alert.severity.slice(1)} Alert:</strong> ${alert.message} (Due: ${new Date(alert.dueDate).toLocaleDateString()})
+                </li>`
+              ).join('')}
+            </ul>` : ''}
+            <div class="summary-box">
+              <p><strong>Equipment Types:</strong></p>
+              <ul>${Object.entries(report.dme.summary.equipmentTypes).map(([type, items]) => 
+                `<li>${type}: ${items.length} items</li>`
+              ).join('')}
+            </ul>
+            </div>
+            <div class="summary-box">
+              <p><strong>Total DME Value:</strong> $${report.dme.summary.totalValue.toLocaleString()}</p>
+            </div>`
+          }
+        </div>
+
+        <div class="section">
           <h2>Data Quality Metrics</h2>
           <div class="summary-box">
             <p><strong>Overall Score:</strong> ${report.dataQuality.overallScore}%</p>
@@ -1378,7 +1619,8 @@ class MedicalReportGenerator {
       sleep: this.reportData.sleep,
       physicalActivity: this.reportData.physicalActivity,
       nutrition: this.reportData.nutrition,
-      medicalHistory: this.reportData.medicalHistory
+      medicalHistory: this.reportData.medicalHistory,
+      dme: this.reportData.dme
     };
 
     let totalCompleteness = 0;
