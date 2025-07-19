@@ -73,6 +73,9 @@ class MedicalReportGenerator {
         mood: { entries: [], summary: { message: 'No data available' } },
         goals: { all: [], summary: { message: 'No data available' } },
         limbCare: { assessments: [], summary: { message: 'No data available' } },
+        weight: { entries: [], summary: { message: 'No data available' } },
+        sleep: { entries: [], summary: { message: 'No data available' } },
+        emergency: { contacts: [], protocols: [] },
         insights: []
       };
 
@@ -99,6 +102,18 @@ class MedicalReportGenerator {
       
       await this.collectLimbCareData(userId, startDate, endDate).catch(error => {
         console.error('Error collecting limb care data:', error);
+      });
+      
+      await this.collectWeightData(userId, startDate, endDate).catch(error => {
+        console.error('Error collecting weight data:', error);
+      });
+      
+      await this.collectSleepData(userId, startDate, endDate).catch(error => {
+        console.error('Error collecting sleep data:', error);
+      });
+      
+      await this.collectEmergencyData(userId).catch(error => {
+        console.error('Error collecting emergency data:', error);
       });
       
       await this.collectHealthInsights(userId).catch(error => {
@@ -282,6 +297,98 @@ class MedicalReportGenerator {
     }
   }
 
+  async collectWeightData(userId, startDate, endDate) {
+    try {
+      const weightSnapshot = await this.db.collection('weightEntries')
+        .where('userId', '==', userId)
+        .where('timestamp', '>=', startDate)
+        .where('timestamp', '<=', endDate)
+        .orderBy('timestamp', 'desc')
+        .get();
+
+      const weightEntries = weightSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp.toDate()
+      }));
+
+      this.reportData.weight = {
+        entries: weightEntries,
+        summary: this.analyzeWeightData(weightEntries),
+        trends: weightEntries.length > 0 ? this.calculateTrend(weightEntries.map(w => w.weight)) : 'no data'
+      };
+    } catch (error) {
+      console.error('Error collecting weight data:', error);
+      this.reportData.weight = {
+        entries: [],
+        summary: { message: 'Error loading weight data' },
+        trends: 'error'
+      };
+    }
+  }
+
+  async collectSleepData(userId, startDate, endDate) {
+    try {
+      const sleepSnapshot = await this.db.collection('sleepEntries')
+        .where('userId', '==', userId)
+        .where('timestamp', '>=', startDate)
+        .where('timestamp', '<=', endDate)
+        .orderBy('timestamp', 'desc')
+        .get();
+
+      const sleepEntries = sleepSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp.toDate()
+      }));
+
+      this.reportData.sleep = {
+        entries: sleepEntries,
+        summary: this.analyzeSleepData(sleepEntries),
+        trends: sleepEntries.length > 0 ? this.calculateTrend(sleepEntries.map(s => s.duration)) : 'no data'
+      };
+    } catch (error) {
+      console.error('Error collecting sleep data:', error);
+      this.reportData.sleep = {
+        entries: [],
+        summary: { message: 'Error loading sleep data' },
+        trends: 'error'
+      };
+    }
+  }
+
+  async collectEmergencyData(userId) {
+    try {
+      const emergencySnapshot = await this.db.collection('emergencyContacts')
+        .where('userId', '==', userId)
+        .get();
+
+      const emergencyContacts = emergencySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      // Get emergency protocols from profile
+      const profileDoc = await this.db.collection('profiles').doc(userId).get();
+      const profileData = profileDoc.exists ? profileDoc.data() : {};
+
+      this.reportData.emergency = {
+        contacts: emergencyContacts,
+        protocols: profileData.emergencyProtocols || [],
+        primaryContact: profileData.emergencyContact || 'Not provided',
+        medicalAlert: profileData.medicalAlert || 'None'
+      };
+    } catch (error) {
+      console.error('Error collecting emergency data:', error);
+      this.reportData.emergency = {
+        contacts: [],
+        protocols: [],
+        primaryContact: 'Error loading emergency data',
+        medicalAlert: 'Error loading medical alerts'
+      };
+    }
+  }
+
   analyzeBloodPressure(readings) {
     if (!readings || readings.length === 0) {
       return { message: 'No blood pressure readings available' };
@@ -397,10 +504,72 @@ class MedicalReportGenerator {
     };
   }
 
+  analyzeWeightData(entries) {
+    if (!entries || entries.length === 0) {
+      return { message: 'No weight entries available' };
+    }
+
+    const weights = entries.map(e => e.weight);
+    const dates = entries.map(e => e.timestamp);
+
+    const avgWeight = weights.reduce((a, b) => a + b, 0) / weights.length;
+    const latestWeight = entries[0].weight;
+    const weightTrend = this.calculateTrend(weights);
+
+    // Calculate BMI if height is available
+    let bmi = null;
+    let bmiCategory = null;
+    if (this.reportData.profile && this.reportData.profile.height) {
+      const heightInMeters = this.reportData.profile.height / 39.37; // Convert inches to meters
+      const weightInKg = latestWeight * 0.453592; // Convert lbs to kg
+      bmi = Math.round((weightInKg / (heightInMeters * heightInMeters)) * 10) / 10;
+      bmiCategory = this.categorizeBMI(bmi);
+    }
+
+    return {
+      totalEntries: entries.length,
+      averageWeight: Math.round(avgWeight * 10) / 10,
+      latestWeight: latestWeight,
+      weightTrend: weightTrend,
+      bmi: bmi,
+      bmiCategory: bmiCategory
+    };
+  }
+
+  analyzeSleepData(entries) {
+    if (!entries || entries.length === 0) {
+      return { message: 'No sleep entries available' };
+    }
+
+    const durations = entries.map(e => e.duration);
+    const sleepQuality = entries.map(e => e.quality);
+    const wakeUps = entries.map(e => e.wakeUps);
+
+    const avgDuration = durations.reduce((a, b) => a + b, 0) / durations.length;
+    const avgSleepQuality = sleepQuality.reduce((a, b) => a + b, 0) / sleepQuality.length;
+    const avgWakeUps = wakeUps.reduce((a, b) => a + b, 0) / wakeUps.length;
+
+    return {
+      totalEntries: entries.length,
+      averageDuration: Math.round(avgDuration),
+      averageSleepQuality: Math.round(avgSleepQuality * 10) / 10,
+      averageWakeUps: Math.round(avgWakeUps),
+      sleepTrend: this.calculateTrend(durations)
+    };
+  }
+
   categorizeBP(systolic, diastolic) {
     if (systolic < 120 && diastolic < 80) return 'Normal';
     if (systolic < 130 && diastolic < 80) return 'Elevated';
     if (systolic >= 130 || diastolic >= 80) return 'High';
+    return 'Unknown';
+  }
+
+  categorizeBMI(bmi) {
+    if (bmi < 18.5) return 'Underweight';
+    if (bmi >= 18.5 && bmi < 25) return 'Normal';
+    if (bmi >= 25 && bmi < 30) return 'Overweight';
+    if (bmi >= 30) return 'Obese';
     return 'Unknown';
   }
 
@@ -442,6 +611,9 @@ class MedicalReportGenerator {
     const goals = this.reportData.goals || {};
     const limbCare = this.reportData.limbCare || {};
     const insights = this.reportData.insights || [];
+    const weight = this.reportData.weight || {};
+    const sleep = this.reportData.sleep || {};
+    const emergency = this.reportData.emergency || {};
 
     const report = {
       reportInfo: {
@@ -454,7 +626,7 @@ class MedicalReportGenerator {
         patientAge: profile.age || 'Not provided'
       },
       
-      executiveSummary: this.generateExecutiveSummary(bp, meds, mood, goals, insights),
+      executiveSummary: this.generateExecutiveSummary(bp, meds, mood, goals, weight, sleep, insights),
       
       patientDemographics: {
         name: profile.name,
@@ -493,15 +665,36 @@ class MedicalReportGenerator {
         recentAssessments: limbCare.assessments ? limbCare.assessments.slice(0, 5) : []
       },
       
+      weight: {
+        summary: weight.summary,
+        recentEntries: weight.entries ? weight.entries.slice(0, 10) : [],
+        trends: weight.trends,
+        bmi: weight.bmi,
+        bmiCategory: weight.bmiCategory
+      },
+      
+      sleep: {
+        summary: sleep.summary,
+        recentEntries: sleep.entries ? sleep.entries.slice(0, 10) : [],
+        trends: sleep.trends
+      },
+      
+      emergency: {
+        contacts: emergency.contacts || [],
+        protocols: emergency.protocols || [],
+        primaryContact: emergency.primaryContact,
+        medicalAlert: emergency.medicalAlert
+      },
+      
       healthInsights: insights,
       
-      recommendations: this.generateRecommendations(bp, meds, mood, goals, insights)
+      recommendations: this.generateRecommendations(bp, meds, mood, goals, weight, sleep, insights)
     };
 
     return report;
   }
 
-  generateExecutiveSummary(bp, meds, mood, goals, insights) {
+  generateExecutiveSummary(bp, meds, mood, goals, weight, sleep, insights) {
     const summary = {
       overallHealthStatus: 'Good',
       keyFindings: [],
@@ -538,6 +731,20 @@ class MedicalReportGenerator {
       summary.keyFindings.push(`${goals.summary.overdueGoals} health goals are overdue`);
     }
 
+    // Weight Analysis
+    if (weight.summary && weight.summary.averageWeight < 150) {
+      summary.keyFindings.push('Weight is within a healthy range');
+    } else if (weight.summary && weight.summary.averageWeight > 200) {
+      summary.keyFindings.push('Weight is above a healthy range');
+      summary.recommendations.push('Consider a weight loss plan with a healthcare provider');
+    }
+
+    // Sleep Analysis
+    if (sleep.summary && sleep.summary.averageDuration < 7) {
+      summary.keyFindings.push('Sleep duration is below recommended levels');
+      summary.recommendations.push('Ensure adequate sleep for optimal health');
+    }
+
     // Insights Analysis
     insights.forEach(insight => {
       if (insight.severity === 'alert') {
@@ -549,7 +756,7 @@ class MedicalReportGenerator {
     return summary;
   }
 
-  generateRecommendations(bp, meds, mood, goals, insights) {
+  generateRecommendations(bp, meds, mood, goals, weight, sleep, insights) {
     const recommendations = [];
 
     // Blood Pressure Recommendations
@@ -576,6 +783,24 @@ class MedicalReportGenerator {
         category: 'Mental Health',
         priority: 'High',
         recommendation: 'Implement stress management techniques: meditation, exercise, counseling'
+      });
+    }
+
+    // Weight Recommendations
+    if (weight.summary && weight.summary.averageWeight > 200) {
+      recommendations.push({
+        category: 'Weight',
+        priority: 'High',
+        recommendation: 'Consider a weight loss plan with a healthcare provider'
+      });
+    }
+
+    // Sleep Recommendations
+    if (sleep.summary && sleep.summary.averageDuration < 7) {
+      recommendations.push({
+        category: 'Sleep',
+        priority: 'High',
+        recommendation: 'Ensure adequate sleep for optimal health'
       });
     }
 
@@ -723,6 +948,51 @@ class MedicalReportGenerator {
               `<tr><td>${rec.category}</td><td>${rec.priority}</td><td>${rec.recommendation}</td></tr>`
             ).join('')}
           </table>
+        </div>
+
+        <div class="section">
+          <h2>Weight Summary</h2>
+          ${report.weight.summary.message ? 
+            `<p>${report.weight.summary.message}</p>` :
+            `<div class="summary-box">
+              <p><strong>Average Weight:</strong> ${report.weight.summary.averageWeight} lbs</p>
+              <p><strong>Latest Weight:</strong> ${report.weight.summary.latestWeight} lbs</p>
+              <p><strong>Weight Trend:</strong> ${report.weight.summary.weightTrend}</p>
+              ${report.weight.summary.bmi ? `<p><strong>BMI:</strong> ${report.weight.summary.bmi} (${report.weight.summary.bmiCategory})</p>` : ''}
+            </div>`
+          }
+        </div>
+
+        <div class="section">
+          <h2>Sleep Summary</h2>
+          ${report.sleep.summary.message ? 
+            `<p>${report.sleep.summary.message}</p>` :
+            `<div class="summary-box">
+              <p><strong>Average Sleep Duration:</strong> ${report.sleep.summary.averageDuration} hours</p>
+              <p><strong>Average Sleep Quality:</strong> ${report.sleep.summary.averageSleepQuality}/10</p>
+              <p><strong>Average Wake Ups:</strong> ${report.sleep.summary.averageWakeUps}</p>
+            </div>`
+          }
+        </div>
+
+        <div class="section">
+          <h2>Emergency Information</h2>
+          <div class="summary-box">
+            <p><strong>Primary Emergency Contact:</strong> ${report.emergency.primaryContact}</p>
+            <p><strong>Medical Alerts:</strong> ${report.emergency.medicalAlert}</p>
+            ${report.emergency.contacts.length > 0 ? `
+              <h4>Emergency Contacts:</h4>
+              <ul>${report.emergency.contacts.map(contact => 
+                `<li>${contact.name} - ${contact.phone} (${contact.relationship})</li>`
+              ).join('')}</ul>
+            ` : ''}
+            ${report.emergency.protocols.length > 0 ? `
+              <h4>Emergency Protocols:</h4>
+              <ul>${report.emergency.protocols.map(protocol => 
+                `<li>${protocol}</li>`
+              ).join('')}</ul>
+            ` : ''}
+          </div>
         </div>
       </body>
       </html>
