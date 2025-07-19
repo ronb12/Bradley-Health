@@ -1019,13 +1019,20 @@ class WeightLossManager {
 
     mealPlanCard.style.display = 'block';
     
-    // Add print button if not already present
+    // Add print buttons if not already present
     if (!mealPlanCard.querySelector('.print-plan-btn')) {
       const printButton = document.createElement('button');
       printButton.className = 'btn btn-secondary print-plan-btn';
       printButton.innerHTML = '🖨️ Print Full Meal Plan';
       printButton.onclick = () => this.printMealPlan(mealPlan);
       mealPlanCard.appendChild(printButton);
+      
+      // Add print smoothies only button
+      const printSmoothiesButton = document.createElement('button');
+      printSmoothiesButton.className = 'btn btn-primary print-smoothies-btn';
+      printSmoothiesButton.innerHTML = '🥤 Print Smoothies Only';
+      printSmoothiesButton.onclick = () => this.printSmoothiesOnly(mealPlan);
+      mealPlanCard.appendChild(printSmoothiesButton);
     }
   }
 
@@ -1882,6 +1889,234 @@ class WeightLossManager {
             <p><strong>Progression:</strong> As you get stronger, you can increase intensity, duration, or add more challenging variations.</p>
           </div>
         ` : ''}
+      </body>
+      </html>
+    `;
+    
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 500);
+  }
+
+  printSmoothiesOnly(mealPlan) {
+    if (!mealPlan || !mealPlan.days) {
+      this.showToast('No meal plan available to print', 'error');
+      return;
+    }
+
+    // Collect all smoothies from the meal plan
+    const smoothies = [];
+    mealPlan.days.forEach((day, dayIndex) => {
+      Object.entries(day.meals).forEach(([mealType, meal]) => {
+        if (mealType === 'smoothie' && meal.ingredients) {
+          smoothies.push({
+            day: dayIndex + 1,
+            name: meal.name,
+            calories: meal.calories,
+            ingredients: meal.ingredients,
+            instructions: meal.instructions,
+            protein: meal.protein,
+            carbs: meal.carbs,
+            fat: meal.fat
+          });
+        }
+      });
+    });
+
+    if (smoothies.length === 0) {
+      this.showToast('No smoothies found in the meal plan', 'error');
+      return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Smoothie Recipes - Bradley Health App</title>
+        <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            line-height: 1.6;
+          }
+          .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 20px;
+          }
+          .smoothie-item { 
+            border: 2px solid #e9ecef; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 10px;
+            page-break-inside: avoid;
+            background: #f8f9fa;
+          }
+          .smoothie-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+          }
+          .smoothie-name { 
+            font-size: 1.3em; 
+            font-weight: bold; 
+            color: #007bff;
+          }
+          .smoothie-calories { 
+            background: #28a745; 
+            color: white; 
+            padding: 5px 10px; 
+            border-radius: 15px;
+            font-weight: bold;
+          }
+          .smoothie-day { 
+            background: #6c757d; 
+            color: white; 
+            padding: 3px 8px; 
+            border-radius: 10px;
+            font-size: 0.9em;
+            margin-right: 10px;
+          }
+          .ingredients-section { 
+            margin: 15px 0; 
+          }
+          .ingredients-list { 
+            list-style: none; 
+            padding: 0; 
+          }
+          .ingredients-list li { 
+            padding: 5px 0; 
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 20px;
+          }
+          .ingredients-list li:before { 
+            content: "🥤"; 
+            position: absolute; 
+            left: 0; 
+          }
+          .instructions-section { 
+            margin: 15px 0; 
+            padding: 15px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 5px;
+          }
+          .macros { 
+            display: flex; 
+            gap: 15px; 
+            margin-top: 15px;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+          }
+          .macro { 
+            font-weight: bold; 
+            color: #495057;
+          }
+          .summary { 
+            background: #d1ecf1; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 10px;
+            border-left: 4px solid #17a2b8;
+          }
+          .tips { 
+            background: #d4edda; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+          }
+          @media print { 
+            body { margin: 0; }
+            .smoothie-item { 
+              border: 1px solid #000; 
+              margin: 10px 0;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>🥤 Smoothie Recipe Collection</h1>
+          <p>Complete smoothie recipes from your personalized meal plan</p>
+          <p><strong>Generated by Bradley Health App</strong></p>
+          <p><em>Total Smoothies: ${smoothies.length}</em></p>
+        </div>
+        
+        <div class="summary">
+          <h2>📊 Smoothie Summary</h2>
+          <p><strong>Total Smoothies:</strong> ${smoothies.length}</p>
+          <p><strong>Average Calories:</strong> ${Math.round(smoothies.reduce((sum, s) => sum + s.calories, 0) / smoothies.length)} calories</p>
+          <p><strong>Plan Duration:</strong> ${mealPlan.totalDays} days</p>
+        </div>
+        
+        ${smoothies.map((smoothie, index) => `
+          <div class="smoothie-item">
+            <div class="smoothie-header">
+              <div>
+                <span class="smoothie-day">Day ${smoothie.day}</span>
+                <span class="smoothie-name">${smoothie.name}</span>
+              </div>
+              <span class="smoothie-calories">${smoothie.calories} cal</span>
+            </div>
+            
+            <div class="ingredients-section">
+              <h3>📝 Ingredients:</h3>
+              <ul class="ingredients-list">
+                ${smoothie.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+              </ul>
+            </div>
+            
+            ${smoothie.instructions ? `
+              <div class="instructions-section">
+                <h3>👨‍🍳 Instructions:</h3>
+                <p>${smoothie.instructions}</p>
+              </div>
+            ` : ''}
+            
+            <div class="macros">
+              <span class="macro">Protein: ${smoothie.protein}g</span>
+              <span class="macro">Carbs: ${smoothie.carbs}g</span>
+              <span class="macro">Fat: ${smoothie.fat}g</span>
+            </div>
+          </div>
+        `).join('')}
+        
+        <div class="tips">
+          <h2>💡 Smoothie Making Tips</h2>
+          <ul>
+            <li><strong>Blending Order:</strong> Start with liquids, add soft fruits, then frozen ingredients</li>
+            <li><strong>Texture:</strong> Add ice cubes for a thicker, colder smoothie</li>
+            <li><strong>Sweetness:</strong> Use ripe bananas or dates for natural sweetness</li>
+            <li><strong>Protein:</strong> Add protein powder, Greek yogurt, or nut butter for extra protein</li>
+            <li><strong>Storage:</strong> Drink immediately for best taste and nutrition</li>
+            <li><strong>Variations:</strong> Feel free to substitute ingredients based on availability</li>
+          </ul>
+        </div>
+        
+        <div class="summary">
+          <h2>📋 Shopping List</h2>
+          <p><strong>Common Ingredients:</strong></p>
+          <ul>
+            <li>Fresh or frozen berries (strawberries, blueberries, raspberries)</li>
+            <li>Bananas (fresh or frozen)</li>
+            <li>Greek yogurt or plant-based yogurt</li>
+            <li>Almond milk, coconut milk, or regular milk</li>
+            <li>Spinach or kale for green smoothies</li>
+            <li>Protein powder (whey, plant-based, or collagen)</li>
+            <li>Chia seeds, flax seeds, or hemp seeds</li>
+            <li>Nut butters (peanut, almond, or cashew)</li>
+            <li>Honey, maple syrup, or dates for sweetness</li>
+          </ul>
+        </div>
       </body>
       </html>
     `;
