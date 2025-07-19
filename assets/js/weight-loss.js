@@ -57,9 +57,15 @@ class WeightLossManager {
     // Weight goal form
     const weightGoalForm = document.getElementById('weightGoalForm');
     console.log('Weight Loss Manager: weightGoalForm found:', !!weightGoalForm);
+    console.log('Weight Loss Manager: weightGoalForm element:', weightGoalForm);
     if (weightGoalForm) {
-      weightGoalForm.addEventListener('submit', (e) => this.setWeightGoal(e));
+      weightGoalForm.addEventListener('submit', (e) => {
+        console.log('Weight Loss Manager: Form submitted!');
+        this.setWeightGoal(e);
+      });
       console.log('Weight Loss Manager: Event listener added to weightGoalForm');
+    } else {
+      console.error('Weight Loss Manager: weightGoalForm not found!');
     }
 
     // Weight tracking form
@@ -125,6 +131,7 @@ class WeightLossManager {
     e.preventDefault();
     
     console.log('Weight Loss Manager: setWeightGoal called');
+    console.log('Weight Loss Manager: Form data:', e.target);
     
     if (!this.db) {
       console.error('Weight Loss Manager: Database not available');
@@ -133,17 +140,27 @@ class WeightLossManager {
     }
     
     if (!this.currentUser || !this.currentUser.uid) {
+      console.error('Weight Loss Manager: No current user');
       this.showToast('Please sign in to set weight goals', 'error');
       return;
     }
 
     const formData = new FormData(e.target);
+    console.log('Weight Loss Manager: Form data collected');
     
     const currentWeight = parseFloat(formData.get('currentWeight'));
     const goalWeight = parseFloat(formData.get('goalWeight'));
     const weeklyRate = parseFloat(formData.get('rate'));
     const activityLevel = formData.get('activity');
     const restrictions = formData.get('restrictions');
+
+    console.log('Weight Loss Manager: Form values:', {
+      currentWeight,
+      goalWeight,
+      weeklyRate,
+      activityLevel,
+      restrictions
+    });
 
     if (goalWeight >= currentWeight) {
       this.showToast('Goal weight should be less than current weight', 'error');
