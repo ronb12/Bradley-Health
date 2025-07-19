@@ -426,7 +426,7 @@ class NutritionTracker {
     const addMealForm = document.getElementById('addMealForm');
     if (!addMealForm) {
       console.error('Add meal form not found');
-      this.re-enableSubmitButton(submitButton);
+      this.reenableSubmitButton(submitButton);
       return;
     }
 
@@ -447,7 +447,7 @@ class NutritionTracker {
 
     if (!mealName || !mealType || !date || !time) {
       this.showToast('Please fill in all required fields', 'error');
-      this.re-enableSubmitButton(submitButton);
+      this.reenableSubmitButton(submitButton);
       return;
     }
 
@@ -514,12 +514,12 @@ class NutritionTracker {
       this.showToast('Error saving meal', 'error');
     } finally {
       // Re-enable submit button
-      this.re-enableSubmitButton(submitButton);
+      this.reenableSubmitButton(submitButton);
     }
   }
 
   // Helper method to re-enable submit button
-  re-enableSubmitButton(submitButton) {
+  reenableSubmitButton(submitButton) {
     if (submitButton) {
       submitButton.disabled = false;
       submitButton.textContent = 'Add Meal';
