@@ -1235,25 +1235,120 @@ input[type="range"]::-moz-range-thumb {
   transform: translateX(26px);
 }
 
+/* ===== LEGAL STYLES ===== */
+.legal-links {
+  margin-bottom: 20px;
+}
+
 .legal-options {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-3);
+  gap: 12px;
 }
 
 .legal-link {
-  display: block;
-  padding: var(--spacing-3);
   color: var(--primary-color);
   text-decoration: none;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  transition: all var(--transition-fast);
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .legal-link:hover {
-  background-color: var(--bg-secondary);
+  background: var(--bg-secondary);
   border-color: var(--primary-color);
+  transform: translateX(5px);
+}
+
+.legal-link:active {
+  transform: translateX(5px) scale(0.98);
+}
+
+/* HIPAA Compliance Link Styling */
+.legal-link[onclick*="HIPAA"] {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  font-weight: 600;
+  border: 2px solid #4CAF50;
+  position: relative;
+  overflow: hidden;
+}
+
+.legal-link[onclick*="HIPAA"]::before {
+  content: "🛡️";
+  font-size: 1.2rem;
+}
+
+.legal-link[onclick*="HIPAA"]:hover {
+  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+  border-color: #45a049;
+  transform: translateX(5px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.legal-link[onclick*="HIPAA"]:active {
+  transform: translateX(5px) scale(0.98);
+}
+
+/* Legal Modal Content Styling */
+.legal-content h3 {
+  color: var(--primary-color);
+  margin-top: 25px;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+.legal-content h3:first-child {
+  margin-top: 0;
+}
+
+.legal-content p {
+  line-height: 1.6;
+  margin-bottom: 15px;
+  color: var(--text-primary);
+}
+
+.legal-content ul {
+  margin: 15px 0;
+  padding-left: 20px;
+}
+
+.legal-content li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.legal-content strong {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* HIPAA-specific styling in modal */
+.legal-content h2:contains("HIPAA") {
+  color: #4CAF50;
+}
+
+/* Responsive legal links */
+@media (max-width: 768px) {
+  .legal-options {
+    gap: 8px;
+  }
+  
+  .legal-link {
+    padding: 12px 15px;
+    font-size: 0.95rem;
+  }
+  
+  .legal-link[onclick*="HIPAA"]::before {
+    font-size: 1rem;
+  }
 }
 
 /* ===== PWA INSTALLATION PROMPT ===== */

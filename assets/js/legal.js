@@ -14,6 +14,7 @@ class LegalManager {
     window.showPrivacyPolicy = () => this.showPrivacyPolicy();
     window.showTermsOfService = () => this.showTermsOfService();
     window.showDataUsage = () => this.showDataUsage();
+    window.showHIPAACompliance = () => this.showHIPAACompliance();
   }
 
   showPrivacyPolicy() {
@@ -152,6 +153,54 @@ class LegalManager {
     `;
     
     this.showLegalModal('Data Usage Information', content);
+  }
+
+  showHIPAACompliance() {
+    const content = `
+      <div class="legal-modal">
+        <h2>HIPAA Compliance</h2>
+        <div class="legal-content">
+          <h3>HIPAA Overview</h3>
+          <p>Bradley Health is committed to protecting your health information in accordance with the Health Insurance Portability and Accountability Act (HIPAA) and its implementing regulations (HITECH).</p>
+          
+          <h3>Privacy of Health Information</h3>
+          <p>We maintain strict confidentiality and security measures to ensure that your health information is only accessible to authorized personnel and is protected from unauthorized access, use, or disclosure.</p>
+          
+          <h3>Access and Use of Health Information</h3>
+          <p>Your health information will only be used for the purposes of providing and improving our health monitoring services, including:</p>
+          <ul>
+            <li>Providing health insights and trends</li>
+            <li>Generating reports and charts</li>
+            <li>Setting and tracking health goals</li>
+            <li>Medication reminders</li>
+          </ul>
+          
+          <h3>Disclosure of Health Information</h3>
+          <p>We will not disclose your health information to third parties, except as required by law or to authorized persons for the purposes of providing services to you.</p>
+          
+          <h3>Your Rights</h3>
+          <p>You have the right to:</p>
+          <ul>
+            <li>Access your health information</li>
+            <li>Request corrections to your health information</li>
+            <li>Request restrictions on the use or disclosure of your health information</li>
+            <li>Request an accounting of disclosures of your health information</li>
+            <li>Receive confidential communications about your health information</li>
+          </ul>
+          
+          <h3>Security Measures</h3>
+          <p>We implement robust security measures to protect your health information, including:</p>
+          <ul>
+            <li>Encryption in transit and at rest</li>
+            <li>Access controls and authentication</li>
+            <li>Regular security audits</li>
+            <li>Secure data centers</li>
+          </ul>
+        </div>
+      </div>
+    `;
+    
+    this.showLegalModal('HIPAA Compliance', content);
   }
 
   showLegalModal(title, content) {
