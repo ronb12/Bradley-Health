@@ -3219,4 +3219,362 @@ input[type="range"]::-moz-range-thumb {
     text-align: center;
     gap: 5px;
   }
+}
+
+/* Weight Loss Styles */
+.weight-loss-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+.weight-loss-overview {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+}
+
+.weight-loss-overview h2 {
+  color: white;
+  margin-bottom: 15px;
+}
+
+.weight-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.weight-metrics .metric {
+  text-align: center;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.weight-metrics .metric-icon {
+  font-size: 24px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.weight-metrics .metric-label {
+  font-size: 12px;
+  opacity: 0.9;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.weight-metrics .metric-value {
+  font-size: 18px;
+  font-weight: 600;
+  display: block;
+}
+
+.weight-goal-setup,
+.weight-tracking,
+.weight-history {
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.weight-goal-setup h2,
+.weight-tracking h2,
+.weight-history h2 {
+  margin: 0 0 20px 0;
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.weight-goal-form,
+.weight-tracking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.weight-goal-form .form-row,
+.weight-tracking-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.weight-goal-form .form-group,
+.weight-tracking-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.weight-goal-form label,
+.weight-tracking-form label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.weight-goal-form input,
+.weight-goal-form select,
+.weight-goal-form textarea,
+.weight-tracking-form input,
+.weight-tracking-form textarea {
+  padding: 12px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  transition: border-color 0.3s ease;
+}
+
+.weight-goal-form input:focus,
+.weight-goal-form select:focus,
+.weight-goal-form textarea:focus,
+.weight-tracking-form input:focus,
+.weight-tracking-form textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* AI Meal Plan Styles */
+.ai-meal-plan,
+.ai-exercise-plan {
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ai-meal-plan h2,
+.ai-exercise-plan h2 {
+  margin: 0 0 20px 0;
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.meal-plan-summary,
+.exercise-plan-summary {
+  margin-bottom: 20px;
+}
+
+.plan-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+}
+
+.plan-metric {
+  text-align: center;
+  padding: 15px;
+  background: rgba(102, 126, 234, 0.05);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  border-radius: 12px;
+}
+
+.plan-metric .metric-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.plan-metric .metric-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-color);
+  display: block;
+}
+
+.meal-plan-days,
+.exercise-schedule {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.day-plan,
+.exercise-day {
+  background: rgba(102, 126, 234, 0.05);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  border-radius: 12px;
+  padding: 15px;
+}
+
+.day-plan h3,
+.exercise-day h3 {
+  margin: 0 0 15px 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.meals-container,
+.exercises-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.meal-item,
+.exercise-item {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.meal-header,
+.exercise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.meal-type,
+.exercise-type {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+  text-transform: capitalize;
+}
+
+.meal-calories,
+.exercise-calories {
+  font-size: 12px;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.meal-name,
+.exercise-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+}
+
+.meal-macros {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.macro {
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: rgba(102, 126, 234, 0.1);
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.macro.cholesterol {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+.exercise-duration {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.weight-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.history-item.weight-entry {
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 15px;
+  transition: all 0.3s ease;
+}
+
+.history-item.weight-entry:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.weight-icon {
+  font-size: 16px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 50%;
+}
+
+.weight-value {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+/* Responsive Design for Weight Loss */
+@media (max-width: 768px) {
+  .weight-loss-container {
+    padding: 15px;
+    gap: 15px;
+  }
+  
+  .weight-metrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .weight-goal-form .form-row,
+  .weight-tracking-form .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .plan-metrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .meal-plan-days,
+  .exercise-schedule {
+    grid-template-columns: 1fr;
+  }
+  
+  .meal-macros {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .weight-loss-container {
+    padding: 10px;
+  }
+  
+  .weight-goal-setup,
+  .weight-tracking,
+  .weight-history,
+  .ai-meal-plan,
+  .ai-exercise-plan {
+    padding: 15px;
+  }
+  
+  .day-plan,
+  .exercise-day {
+    padding: 12px;
+  }
+  
+  .meal-item,
+  .exercise-item {
+    padding: 10px;
+  }
 } 
