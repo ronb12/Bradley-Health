@@ -23,14 +23,13 @@ try {
   // Initialize Firestore with settings before any other operations
   db = firebase.firestore();
   
-  // Set Firestore settings using the newer API with cache configuration
+  // Set Firestore settings with better error handling and connection management
   db.settings({
     cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
-    merge: true, // Use merge to avoid overriding existing settings
-    // Use the newer cache configuration instead of enablePersistence
-    cache: {
-      tabManager: firebase.firestore.TabManager
-    }
+    merge: true,
+    // Disable persistence to avoid connection issues
+    experimentalForceLongPolling: true,
+    useFetchStreams: false
   });
 
   storage = firebase.storage();
@@ -97,9 +96,34 @@ if (auth) {
   });
 }
 
+// Add Firestore connection error handling
+if (db) {
+  // Handle Firestore connection errors
+  db.enableNetwork().catch(error => {
+    console.log('Firestore network enable error (non-critical):', error.message);
+  });
+  
+  // Add connection state listener
+  db.onSnapshot(() => {}, (error) => {
+    if (error.code === 'unavailable') {
+      console.log('Firestore temporarily unavailable - will retry automatically');
+    } else {
+      console.log('Firestore error (non-critical):', error.message);
+    }
+  });
+}
+
 // Add network status monitoring
 window.addEventListener('online', () => {
   console.log('Network connection restored');
+  // Re-enable Firestore network
+  if (db) {
+    db.enableNetwork().then(() => {
+      console.log('Firestore network re-enabled');
+    }).catch(error => {
+      console.log('Firestore network re-enable error:', error.message);
+    });
+  }
   // Trigger any pending operations
   if (window.authManager && window.authManager.currentUser) {
     console.log('Reloading user profile after connection restored');
@@ -109,4 +133,31 @@ window.addEventListener('online', () => {
 
 window.addEventListener('offline', () => {
   console.log('Network connection lost - app will work offline');
+  // Disable Firestore network to prevent connection errors
+  if (db) {
+    db.disableNetwork().then(() => {
+      console.log('Firestore network disabled for offline mode');
+    }).catch(error => {
+      console.log('Firestore network disable error:', error.message);
+    });
+  }
+});
+
+// Add page visibility change handler to manage Firebase connections
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    // Page is hidden, can disable network to save resources
+    if (db) {
+      db.disableNetwork().catch(error => {
+        console.log('Firestore network disable error:', error.message);
+      });
+    }
+  } else {
+    // Page is visible, re-enable network
+    if (db && navigator.onLine) {
+      db.enableNetwork().catch(error => {
+        console.log('Firestore network enable error:', error.message);
+      });
+    }
+  }
 }); 
