@@ -301,10 +301,10 @@ class DMEManager {
       await this.db.collection('durableMedicalEquipment').add(dmeData);
       e.target.reset();
       this.loadDMEData();
-      showNotification('Equipment added successfully!', 'success');
+      this.showToast('Equipment added successfully!', 'success');
     } catch (error) {
       console.error('Error adding DME:', error);
-      showNotification('Error adding equipment. Please try again.', 'error');
+      this.showToast('Error adding equipment. Please try again.', 'error');
     }
   }
 
@@ -356,10 +356,10 @@ class DMEManager {
       await this.db.collection('durableMedicalEquipment').add(dmeData);
       e.target.reset();
       this.loadDMEData();
-      showNotification('Equipment added successfully!', 'success');
+      this.showToast('Equipment added successfully!', 'success');
     } catch (error) {
       console.error('Error adding DME:', error);
-      showNotification('Error adding equipment. Please try again.', 'error');
+      this.showToast('Error adding equipment. Please try again.', 'error');
     }
   }
 
@@ -408,10 +408,10 @@ class DMEManager {
         })()
       });
       this.loadDMEData();
-      showNotification('Status updated!', 'success');
+      this.showToast('Status updated!', 'success');
     } catch (error) {
       console.error('Error updating status:', error);
-      showNotification('Error updating status. Please try again.', 'error');
+      this.showToast('Error updating status. Please try again.', 'error');
     }
   }
 
@@ -439,10 +439,19 @@ class DMEManager {
     try {
       await this.db.collection('durableMedicalEquipment').doc(itemId).delete();
       this.loadDMEData();
-      showNotification('Equipment deleted successfully!', 'success');
+      this.showToast('Equipment deleted successfully!', 'success');
     } catch (error) {
       console.error('Error deleting DME:', error);
-      showNotification('Error deleting equipment. Please try again.', 'error');
+      this.showToast('Error deleting equipment. Please try again.', 'error');
+    }
+  }
+
+  showToast(message, type = 'info') {
+    if (window.showToast) {
+      window.showToast(message, type);
+    } else {
+      // Fallback to alert if toast system is not available
+      alert(message);
     }
   }
 }
