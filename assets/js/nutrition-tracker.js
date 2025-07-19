@@ -236,7 +236,7 @@ class NutritionTracker {
   }
 
   // Calculate estimated cholesterol from meal description
-  calculateCholesterolFromMeal(mealName, mealNotes) {
+  async calculateCholesterolFromMeal(mealName, mealNotes) {
     const text = `${mealName} ${mealNotes || ''}`.toLowerCase();
     let totalCholesterol = 0;
     let totalCalories = 0;
@@ -514,7 +514,7 @@ class NutritionTracker {
     console.log('Meal data:', { mealName, mealType, date, time, mealNotes });
 
     // Calculate nutrition
-    const nutritionData = this.calculateCholesterolFromMeal(mealName, mealNotes);
+    const nutritionData = await this.calculateCholesterolFromMeal(mealName, mealNotes);
     console.log('Nutrition calculated:', nutritionData);
 
     // Create meal object
