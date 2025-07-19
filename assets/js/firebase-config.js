@@ -67,7 +67,10 @@ if (firebaseInitialized) {
 window.firebase = {
   auth: () => window.firebaseServices.auth,
   firestore: () => window.firebaseServices.db,
-  messaging: () => null // Always return null to prevent messaging errors
+  messaging: () => null, // Always return null to prevent messaging errors
+  firestore: {
+    Timestamp: window.firebaseServices.db.Timestamp
+  }
 };
 
 // Add authentication error handler with better offline handling

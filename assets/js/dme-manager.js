@@ -1,6 +1,6 @@
 class DMEManager {
   constructor() {
-    this.db = window.firebaseServices.db;
+    this.db = firebase.firestore();
     this.currentUser = null;
     this.dmeItems = [];
     this.init();
@@ -241,13 +241,13 @@ class DMEManager {
       type: formData.get('type'),
       status: formData.get('status'),
       notes: formData.get('notes') || '',
-      dateAcquired: this.db.Timestamp.now(),
-      timestamp: this.db.Timestamp.now()
+      dateAcquired: firebase.firestore.Timestamp.now(),
+      timestamp: firebase.firestore.Timestamp.now()
     };
 
     // Add last maintenance date if provided
     if (formData.get('lastMaintenance')) {
-      dmeData.lastMaintenance = this.db.Timestamp.fromDate(new Date(formData.get('lastMaintenance')));
+      dmeData.lastMaintenance = firebase.firestore.Timestamp.fromDate(new Date(formData.get('lastMaintenance')));
     }
 
     try {
@@ -276,11 +276,11 @@ class DMEManager {
       type: formData.get('type'),
       category: formData.get('category'),
       status: formData.get('status'),
-      dateAcquired: this.db.Timestamp.fromDate(new Date(formData.get('dateAcquired'))),
+      dateAcquired: firebase.firestore.Timestamp.fromDate(new Date(formData.get('dateAcquired'))),
       value: parseFloat(formData.get('value')) || 0,
       serialNumber: formData.get('serialNumber') || '',
       notes: formData.get('notes') || '',
-      timestamp: this.db.Timestamp.now()
+      timestamp: firebase.firestore.Timestamp.now()
     };
 
     // Add optional dates if provided
@@ -336,7 +336,7 @@ class DMEManager {
     try {
       await this.db.collection('durableMedicalEquipment').doc(itemId).update({
         status: status,
-        lastUpdated: this.db.Timestamp.now()
+        lastUpdated: firebase.firestore.Timestamp.now()
       });
       this.loadDMEData();
       showNotification('Status updated!', 'success');
