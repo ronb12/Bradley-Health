@@ -21,10 +21,10 @@ class DMEManager {
   }
 
   setupEventListeners() {
-    // Add DME form submission
-    const addDMEForm = document.getElementById('addDMEForm');
-    if (addDMEForm) {
-      addDMEForm.addEventListener('submit', (e) => this.handleAddDME(e));
+    // Quick add DME form submission
+    const quickAddDMEForm = document.getElementById('quickAddDMEForm');
+    if (quickAddDMEForm) {
+      quickAddDMEForm.addEventListener('submit', (e) => this.handleQuickAddDME(e));
     }
 
     // Setup tab switching
@@ -63,24 +63,23 @@ class DMEManager {
   }
 
   updateDMEStats() {
-    const totalCount = this.dmeItems.length;
-    const activeCount = this.dmeItems.filter(item => item.status === 'active').length;
+    const workingCount = this.dmeItems.filter(item => item.status === 'working').length;
+    const issuesCount = this.dmeItems.filter(item => 
+      item.status === 'minor-issues' || item.status === 'needs-repair' || item.status === 'broken'
+    ).length;
     const maintenanceCount = this.dmeItems.filter(item => {
       if (!item.nextMaintenance) return false;
       return new Date(item.nextMaintenance) <= new Date();
     }).length;
-    const totalValue = this.dmeItems.reduce((sum, item) => sum + (item.value || 0), 0);
 
-    // Update stats display
-    const totalCountEl = document.getElementById('dme-total-count');
-    const activeCountEl = document.getElementById('dme-active-count');
+    // Update patient-friendly stats display
+    const workingCountEl = document.getElementById('dme-working-count');
+    const issuesCountEl = document.getElementById('dme-issues-count');
     const maintenanceCountEl = document.getElementById('dme-maintenance-count');
-    const totalValueEl = document.getElementById('dme-total-value');
 
-    if (totalCountEl) totalCountEl.textContent = totalCount;
-    if (activeCountEl) activeCountEl.textContent = activeCount;
-    if (maintenanceCountEl) maintenanceCountEl.textContent = maintenanceCount;
-    if (totalValueEl) totalValueEl.textContent = `$${totalValue.toLocaleString()}`;
+    if (workingCountEl) workingCountEl.textContent = `${workingCount} items`;
+    if (issuesCountEl) issuesCountEl.textContent = `${issuesCount} items`;
+    if (maintenanceCountEl) maintenanceCountEl.textContent = `${maintenanceCount} items`;
   }
 
   updateDMEAlerts() {
@@ -119,60 +118,73 @@ class DMEManager {
     }
 
     const equipmentHTML = this.dmeItems.map(item => `
-      <div class="equipment-item ${item.status}">
+      <div class="equipment-card ${item.status}">
         <div class="equipment-header">
+          <div class="equipment-icon">${this.getEquipmentIcon(item.type)}</div>
+          <div class="equipment-status-badge ${item.status}">
+            ${this.getStatusText(item.status)}
+          </div>
+        </div>
+        <div class="equipment-content">
           <h3>${item.name}</h3>
-          <div class="equipment-status ${item.status}">${item.status}</div>
-        </div>
-        <div class="equipment-details">
-          <div class="detail-row">
-            <span class="detail-label">Type:</span>
-            <span class="detail-value">${item.type}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Category:</span>
-            <span class="detail-value">${item.category}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Acquired:</span>
-            <span class="detail-value">${item.dateAcquired.toLocaleDateString()}</span>
-          </div>
-          ${item.value ? `
-            <div class="detail-row">
-              <span class="detail-label">Value:</span>
-              <span class="detail-value">$${item.value.toLocaleString()}</span>
-            </div>
-          ` : ''}
-          ${item.nextMaintenance ? `
-            <div class="detail-row">
-              <span class="detail-label">Next Maintenance:</span>
-              <span class="detail-value ${new Date(item.nextMaintenance) <= new Date() ? 'overdue' : ''}">
-                ${item.nextMaintenance.toLocaleDateString()}
-              </span>
-            </div>
-          ` : ''}
-          ${item.warrantyExpiry ? `
-            <div class="detail-row">
-              <span class="detail-label">Warranty:</span>
-              <span class="detail-value ${new Date(item.warrantyExpiry) <= new Date() ? 'expired' : ''}">
-                ${item.warrantyExpiry.toLocaleDateString()}
-              </span>
-            </div>
+          <p class="equipment-type">${this.getTypeText(item.type)}</p>
+          ${item.notes ? `<p class="equipment-notes">${item.notes}</p>` : ''}
+          ${item.lastMaintenance ? `
+            <p class="last-service">Last serviced: ${item.lastMaintenance.toLocaleDateString()}</p>
           ` : ''}
         </div>
-        ${item.notes ? `
-          <div class="equipment-notes">
-            <strong>Notes:</strong> ${item.notes}
-          </div>
-        ` : ''}
         <div class="equipment-actions">
-          <button class="btn btn-secondary" onclick="dmeManager.editDME('${item.id}')">Edit</button>
-          <button class="btn btn-danger" onclick="dmeManager.deleteDME('${item.id}')">Delete</button>
+          <button class="btn btn-secondary" onclick="dmeManager.updateStatus('${item.id}')">
+            Update Status
+          </button>
+          <button class="btn btn-primary" onclick="dmeManager.contactAbout('${item.id}')">
+            Get Help
+          </button>
         </div>
       </div>
     `).join('');
 
     equipmentList.innerHTML = equipmentHTML;
+  }
+
+  getEquipmentIcon(type) {
+    const icons = {
+      wheelchair: '🦽',
+      walker: '🚶',
+      crutches: '🩼',
+      cane: '🦯',
+      prosthetic: '🦿',
+      orthotic: '🦴',
+      other: '🩺'
+    };
+    return icons[type] || '🩺';
+  }
+
+  getStatusText(status) {
+    const statusTexts = {
+      'working': 'Working Well',
+      'minor-issues': 'Minor Issues',
+      'needs-repair': 'Needs Repair',
+      'broken': 'Broken',
+      'active': 'Active',
+      'inactive': 'Inactive',
+      'maintenance': 'In Maintenance',
+      'repair': 'In Repair'
+    };
+    return statusTexts[status] || status;
+  }
+
+  getTypeText(type) {
+    const typeTexts = {
+      wheelchair: 'Wheelchair',
+      walker: 'Walker',
+      crutches: 'Crutches',
+      cane: 'Cane',
+      prosthetic: 'Prosthetic',
+      orthotic: 'Brace/Orthotic',
+      other: 'Other Equipment'
+    };
+    return typeTexts[type] || type;
   }
 
   checkMaintenanceAlerts() {
@@ -258,6 +270,57 @@ class DMEManager {
     }
   }
 
+  async updateStatus(itemId) {
+    const item = this.dmeItems.find(i => i.id === itemId);
+    if (!item) return;
+
+    const newStatus = prompt(
+      `How is ${item.name} working now?\n\n` +
+      `1. Working well\n` +
+      `2. Minor issues\n` +
+      `3. Needs repair\n` +
+      `4. Broken\n\n` +
+      `Enter 1, 2, 3, or 4:`
+    );
+
+    if (!newStatus) return;
+
+    const statusMap = {
+      '1': 'working',
+      '2': 'minor-issues', 
+      '3': 'needs-repair',
+      '4': 'broken'
+    };
+
+    const status = statusMap[newStatus];
+    if (!status) {
+      alert('Please enter 1, 2, 3, or 4');
+      return;
+    }
+
+    try {
+      await this.db.collection('durableMedicalEquipment').doc(itemId).update({
+        status: status,
+        lastUpdated: firebase.firestore.Timestamp.now()
+      });
+      this.loadDMEData();
+      showNotification('Status updated!', 'success');
+    } catch (error) {
+      console.error('Error updating status:', error);
+      showNotification('Error updating status. Please try again.', 'error');
+    }
+  }
+
+  contactAbout(itemId) {
+    const item = this.dmeItems.find(i => i.id === itemId);
+    if (!item) return;
+
+    const message = `I need help with my ${item.name} (${this.getTypeText(item.type)}). Current status: ${this.getStatusText(item.status)}.`;
+    
+    // In a real app, this would open a contact form or messaging system
+    alert(`Contact your provider about: ${item.name}\n\nMessage: ${message}\n\nThis would open your provider's contact form in a real app.`);
+  }
+
   async editDME(itemId) {
     // Implementation for editing DME items
     console.log('Edit DME:', itemId);
@@ -286,11 +349,25 @@ document.addEventListener('DOMContentLoaded', () => {
   dmeManager = new DMEManager();
 });
 
-// Global function for modal
-function showDMEModal() {
-  // Scroll to the add DME form
-  const addDMEForm = document.querySelector('.add-dme');
-  if (addDMEForm) {
-    addDMEForm.scrollIntoView({ behavior: 'smooth' });
+// Global functions for patient-friendly interface
+function showQuickAddModal() {
+  // Scroll to the quick add DME form
+  const quickAddForm = document.querySelector('.quick-add-dme');
+  if (quickAddForm) {
+    quickAddForm.scrollIntoView({ behavior: 'smooth' });
   }
+}
+
+function contactProvider(type) {
+  const messages = {
+    maintenance: 'I need to schedule maintenance for my equipment.',
+    repair: 'I have equipment that needs repair.',
+    adjustment: 'I need an adjustment to my equipment.',
+    emergency: 'I have an emergency issue with my equipment.'
+  };
+
+  const message = messages[type] || 'I need help with my equipment.';
+  
+  // In a real app, this would open a contact form or messaging system
+  alert(`Contact your provider\n\nType: ${type.charAt(0).toUpperCase() + type.slice(1)}\nMessage: ${message}\n\nThis would open your provider's contact form in a real app.`);
 } 

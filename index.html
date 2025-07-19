@@ -703,116 +703,84 @@
           <!-- DME Overview -->
           <div class="card dme-overview">
             <div class="section-header">
-              <h2><i class="fas fa-wheelchair"></i> Durable Medical Equipment</h2>
-              <button class="btn btn-primary" onclick="showDMEModal()">
+              <h2><i class="fas fa-wheelchair"></i> My Equipment</h2>
+              <button class="btn btn-primary" onclick="showQuickAddModal()">
                 <i class="fas fa-plus"></i> Add Equipment
               </button>
             </div>
             
-            <div class="dme-stats">
-              <div class="stat-card">
-                <h3>Total Equipment</h3>
-                <p id="dme-total-count">0</p>
+            <!-- Quick Status Overview -->
+            <div class="dme-quick-status">
+              <div class="status-card working">
+                <div class="status-icon">✅</div>
+                <div class="status-info">
+                  <h3>Working Well</h3>
+                  <p id="dme-working-count">0 items</p>
+                </div>
               </div>
-              <div class="stat-card">
-                <h3>Active Items</h3>
-                <p id="dme-active-count">0</p>
+              <div class="status-card needs-attention">
+                <div class="status-icon">⚠️</div>
+                <div class="status-info">
+                  <h3>Needs Attention</h3>
+                  <p id="dme-issues-count">0 items</p>
+                </div>
               </div>
-              <div class="stat-card">
-                <h3>Maintenance Due</h3>
-                <p id="dme-maintenance-count">0</p>
-              </div>
-              <div class="stat-card">
-                <h3>Total Value</h3>
-                <p id="dme-total-value">$0</p>
+              <div class="status-card maintenance">
+                <div class="status-icon">🔧</div>
+                <div class="status-info">
+                  <h3>Maintenance Due</h3>
+                  <p id="dme-maintenance-count">0 items</p>
+                </div>
               </div>
             </div>
             
+            <!-- Quick Alerts -->
             <div class="dme-alerts" id="dme-alerts">
               <!-- Maintenance alerts will be populated here -->
             </div>
           </div>
 
-          <!-- Add DME Equipment -->
-          <div class="card add-dme">
-            <h2>Add New Equipment</h2>
-            <form id="addDMEForm" class="dme-form">
+          <!-- Quick Add Equipment -->
+          <div class="card quick-add-dme">
+            <h2>Quick Add Equipment</h2>
+            <form id="quickAddDMEForm" class="quick-dme-form">
               <div class="form-row">
                 <div class="form-group">
-                  <label for="dmeName">Equipment Name</label>
-                  <input type="text" id="dmeName" name="name" required>
+                  <label for="quickDmeName">What's it called?</label>
+                  <input type="text" id="quickDmeName" name="name" placeholder="e.g., My wheelchair, Left prosthetic" required>
                 </div>
                 <div class="form-group">
-                  <label for="dmeType">Equipment Type</label>
-                  <select id="dmeType" name="type" required>
-                    <option value="">Select type</option>
+                  <label for="quickDmeType">What type is it?</label>
+                  <select id="quickDmeType" name="type" required>
+                    <option value="">Choose type</option>
                     <option value="wheelchair">Wheelchair</option>
                     <option value="walker">Walker</option>
                     <option value="crutches">Crutches</option>
                     <option value="cane">Cane</option>
                     <option value="prosthetic">Prosthetic</option>
-                    <option value="orthotic">Orthotic</option>
-                    <option value="oxygen">Oxygen Equipment</option>
-                    <option value="cpap">CPAP Machine</option>
-                    <option value="monitor">Health Monitor</option>
+                    <option value="orthotic">Brace/Orthotic</option>
                     <option value="other">Other</option>
                   </select>
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="dmeCategory">Category</label>
-                  <select id="dmeCategory" name="category" required>
-                    <option value="">Select category</option>
-                    <option value="mobility">Mobility</option>
-                    <option value="respiratory">Respiratory</option>
-                    <option value="monitoring">Monitoring</option>
-                    <option value="dailyLiving">Daily Living</option>
+                  <label for="quickDmeStatus">How is it working?</label>
+                  <select id="quickDmeStatus" name="status" required>
+                    <option value="working">Working well</option>
+                    <option value="minor-issues">Minor issues</option>
+                    <option value="needs-repair">Needs repair</option>
+                    <option value="broken">Broken</option>
                   </select>
                 </div>
                 <div class="form-group">
-                  <label for="dmeStatus">Status</label>
-                  <select id="dmeStatus" name="status" required>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="maintenance">In Maintenance</option>
-                    <option value="repair">In Repair</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="dmeDateAcquired">Date Acquired</label>
-                  <input type="date" id="dmeDateAcquired" name="dateAcquired" required>
-                </div>
-                <div class="form-group">
-                  <label for="dmeValue">Value ($)</label>
-                  <input type="number" id="dmeValue" name="value" min="0" step="0.01">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="dmeLastMaintenance">Last Maintenance</label>
-                  <input type="date" id="dmeLastMaintenance" name="lastMaintenance">
-                </div>
-                <div class="form-group">
-                  <label for="dmeNextMaintenance">Next Maintenance Due</label>
-                  <input type="date" id="dmeNextMaintenance" name="nextMaintenance">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="dmeWarrantyExpiry">Warranty Expiry</label>
-                  <input type="date" id="dmeWarrantyExpiry" name="warrantyExpiry">
-                </div>
-                <div class="form-group">
-                  <label for="dmeSerialNumber">Serial Number</label>
-                  <input type="text" id="dmeSerialNumber" name="serialNumber">
+                  <label for="quickDmeLastService">When was it last serviced?</label>
+                  <input type="date" id="quickDmeLastService" name="lastMaintenance">
                 </div>
               </div>
               <div class="form-group">
-                <label for="dmeNotes">Notes</label>
-                <textarea id="dmeNotes" name="notes" rows="3" placeholder="Additional details about the equipment"></textarea>
+                <label for="quickDmeNotes">Any notes or issues?</label>
+                <textarea id="quickDmeNotes" name="notes" rows="2" placeholder="Describe any problems, discomfort, or things to remember"></textarea>
               </div>
               <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Add Equipment</button>
@@ -820,11 +788,34 @@
             </form>
           </div>
 
-          <!-- DME Equipment List -->
-          <div class="card dme-list">
-            <h2>Your Equipment</h2>
-            <div id="dmeEquipmentList" class="equipment-list">
-              <!-- Equipment list will be populated dynamically -->
+          <!-- My Equipment List -->
+          <div class="card my-equipment">
+            <h2>My Equipment</h2>
+            <div id="dmeEquipmentList" class="equipment-grid">
+              <!-- Equipment cards will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Provider Contact -->
+          <div class="card provider-contact">
+            <h2>Need Help?</h2>
+            <div class="contact-options">
+              <button class="contact-btn" onclick="contactProvider('maintenance')">
+                <span class="contact-icon">🔧</span>
+                <span>Schedule Maintenance</span>
+              </button>
+              <button class="contact-btn" onclick="contactProvider('repair')">
+                <span class="contact-icon">🛠️</span>
+                <span>Report Problem</span>
+              </button>
+              <button class="contact-btn" onclick="contactProvider('adjustment')">
+                <span class="contact-icon">⚙️</span>
+                <span>Request Adjustment</span>
+              </button>
+              <button class="contact-btn" onclick="contactProvider('emergency')">
+                <span class="contact-icon">🚨</span>
+                <span>Emergency Issue</span>
+              </button>
             </div>
           </div>
         </div>
