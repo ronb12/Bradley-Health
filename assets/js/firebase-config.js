@@ -26,10 +26,7 @@ try {
   // Set Firestore settings with better error handling and connection management
   db.settings({
     cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
-    merge: true,
-    // Disable persistence to avoid connection issues
-    experimentalForceLongPolling: true,
-    useFetchStreams: false
+    merge: true
   });
 
   storage = firebase.storage();
@@ -46,20 +43,9 @@ try {
 
 // Export Firebase services
 if (firebaseInitialized) {
-  window.firebaseServices = {
-    auth,
-    db,
-    storage,
-    messaging: null // Always null to prevent messaging errors
-  };
+  console.log('Firebase services available');
 } else {
   console.error('Firebase services not available');
-  window.firebaseServices = {
-    auth: null,
-    db: null,
-    storage: null,
-    messaging: null
-  };
 }
 
 // Global Firebase reference for compatibility
@@ -68,6 +54,24 @@ window.firebase = {
   messaging: () => null, // Always return null to prevent messaging errors
   firestore: () => window.firebaseServices.db
 };
+
+// Ensure Firebase services are available globally
+if (firebaseInitialized) {
+  window.firebaseServices = {
+    auth,
+    db,
+    storage,
+    messaging: null
+  };
+} else {
+  // Create fallback services
+  window.firebaseServices = {
+    auth: null,
+    db: null,
+    storage: null,
+    messaging: null
+  };
+}
 
 // Add Timestamp class to firebase.firestore for compatibility
 if (window.firebaseServices && window.firebaseServices.db) {
@@ -103,14 +107,18 @@ if (db) {
     console.log('Firestore network enable error (non-critical):', error.message);
   });
   
-  // Add connection state listener
-  db.onSnapshot(() => {}, (error) => {
-    if (error.code === 'unavailable') {
-      console.log('Firestore temporarily unavailable - will retry automatically');
-    } else {
-      console.log('Firestore error (non-critical):', error.message);
-    }
-  });
+  // Add connection state listener with proper error handling
+  try {
+    const unsubscribe = db.collection('test').onSnapshot(() => {}, (error) => {
+      if (error.code === 'unavailable') {
+        console.log('Firestore temporarily unavailable - will retry automatically');
+      } else {
+        console.log('Firestore error (non-critical):', error.message);
+      }
+    });
+  } catch (error) {
+    console.log('Firestore snapshot setup error (non-critical):', error.message);
+  }
 }
 
 // Add network status monitoring
