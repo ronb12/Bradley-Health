@@ -61,10 +61,10 @@ class MoodTracker {
       console.log('Mood entry form event listener added');
     }
 
-    // Quick mood buttons
+    // Quick mood buttons - now just set the mood level in the detailed form
     const quickMoodBtns = document.querySelectorAll('.mood-btn');
     quickMoodBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => this.quickMoodEntry(e));
+      btn.addEventListener('click', (e) => this.setMoodLevel(e));
     });
     console.log(`Quick mood button event listeners added for ${quickMoodBtns.length} buttons`);
 
@@ -80,6 +80,33 @@ class MoodTracker {
     
     this.eventListenersSetup = true;
     console.log('Mood tracker event listeners setup completed');
+  }
+
+  setMoodLevel(e) {
+    // Remove previous selection
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+      btn.classList.remove('selected');
+    });
+    
+    // Add selection to clicked button
+    e.target.classList.add('selected');
+    
+    const mood = parseInt(e.target.dataset.mood);
+    
+    // Set the mood level in the detailed form
+    const moodLevel = document.getElementById('moodLevel');
+    const moodValue = document.getElementById('moodValue');
+    
+    if (moodLevel && moodValue) {
+      moodLevel.value = mood;
+      moodValue.textContent = mood;
+      console.log(`Mood level set to ${mood} in detailed form`);
+    }
+    
+    // Remove selection after a short delay
+    setTimeout(() => {
+      e.target.classList.remove('selected');
+    }, 1000);
   }
 
   setupRangeInputs() {
@@ -148,7 +175,7 @@ class MoodTracker {
       activities: formData.getAll('activities'),
       notes: formData.get('notes'),
       factors: formData.getAll('factors'),
-      timestamp: new Date(),
+      timestamp: firebase.firestore.Timestamp.now(), // Use Firestore timestamp
       userId: this.currentUser.uid
     };
 
@@ -177,75 +204,6 @@ class MoodTracker {
       this.hideLoading();
       this.isSubmitting = false;
       console.log('Mood entry submission completed');
-    }
-  }
-
-  async quickMoodEntry(e) {
-    // Prevent duplicate submissions
-    if (this.isSubmitting) {
-      console.log('Quick mood entry submission already in progress, ignoring duplicate');
-      return;
-    }
-    
-    // Check if user is authenticated
-    if (!this.currentUser || !this.currentUser.uid) {
-      this.showToast('Please sign in to save mood entries', 'error');
-      return;
-    }
-    
-    console.log('Starting quick mood entry submission...');
-    this.isSubmitting = true;
-    
-    // Remove previous selection
-    document.querySelectorAll('.mood-btn').forEach(btn => {
-      btn.classList.remove('selected');
-    });
-    
-    // Add selection to clicked button
-    e.target.classList.add('selected');
-    
-    const mood = parseInt(e.target.dataset.mood);
-    const moodEntry = {
-      mood,
-      energy: 5,
-      stress: 5,
-      sleep: 5,
-      activities: [],
-      notes: 'Quick mood entry',
-      factors: [],
-      timestamp: new Date(),
-      userId: this.currentUser.uid
-    };
-
-    console.log('Quick mood entry data:', {
-      mood: moodEntry.mood,
-      energy: moodEntry.energy,
-      stress: moodEntry.stress,
-      sleep: moodEntry.sleep,
-      notes: moodEntry.notes,
-      timestamp: moodEntry.timestamp
-    });
-
-    try {
-      this.showLoading('Saving mood...');
-      console.log('Saving quick mood entry to Firestore...');
-      await this.db.collection('moodEntries').add(moodEntry);
-      console.log('Quick mood entry saved successfully to Firestore');
-      this.showToast('Mood saved!', 'success');
-      this.loadMoodEntries();
-      
-      // Remove selection after a short delay
-      setTimeout(() => {
-        e.target.classList.remove('selected');
-      }, 2000);
-    } catch (error) {
-      console.error('Error saving quick mood entry:', error);
-      this.showToast('Error saving mood entry', 'error');
-      e.target.classList.remove('selected');
-    } finally {
-      this.hideLoading();
-      this.isSubmitting = false;
-      console.log('Quick mood entry submission completed');
     }
   }
 
@@ -289,21 +247,32 @@ class MoodTracker {
     moodList.innerHTML = this.moodEntries.map(entry => {
       // Handle different timestamp formats (Firestore Timestamp vs JavaScript Date)
       let timestamp;
-      if (entry.timestamp && entry.timestamp.toDate) {
-        // Firestore Timestamp
-        timestamp = entry.timestamp.toDate();
-      } else if (entry.timestamp) {
-        // JavaScript Date or timestamp number
-        timestamp = new Date(entry.timestamp);
-      } else {
-        // Fallback to current time
-        timestamp = new Date();
+      let dateString = 'Unknown Date';
+      
+      try {
+        if (entry.timestamp && entry.timestamp.toDate) {
+          // Firestore Timestamp
+          timestamp = entry.timestamp.toDate();
+          dateString = timestamp.toLocaleDateString();
+        } else if (entry.timestamp && entry.timestamp.seconds) {
+          // Firestore Timestamp with seconds
+          timestamp = new Date(entry.timestamp.seconds * 1000);
+          dateString = timestamp.toLocaleDateString();
+        } else if (entry.timestamp) {
+          // JavaScript Date or timestamp number
+          timestamp = new Date(entry.timestamp);
+          if (!isNaN(timestamp.getTime())) {
+            dateString = timestamp.toLocaleDateString();
+          }
+        }
+      } catch (error) {
+        console.warn('Error parsing timestamp for mood entry:', entry.id, entry.timestamp, error);
+        dateString = 'Unknown Date';
       }
 
-      // Validate the timestamp
-      if (isNaN(timestamp.getTime())) {
-        console.warn('Invalid timestamp for mood entry:', entry.id, entry.timestamp);
-        timestamp = new Date(); // Fallback to current time
+      // Debug logging for timestamp issues
+      if (dateString === 'Unknown Date') {
+        console.warn('Could not parse timestamp for mood entry:', entry.id, entry.timestamp);
       }
 
       return `
@@ -314,7 +283,7 @@ class MoodTracker {
               <span class="mood-value">${entry.mood}/10</span>
             </div>
             <div class="mood-date">
-              ${timestamp.toLocaleDateString()}
+              ${dateString}
             </div>
           </div>
           <div class="mood-metrics">
@@ -331,7 +300,7 @@ class MoodTracker {
               <span class="metric-value">${entry.sleep}/10</span>
             </div>
           </div>
-          ${entry.activities.length > 0 ? `
+          ${entry.activities && entry.activities.length > 0 ? `
             <div class="mood-activities">
               <strong>Activities:</strong> ${entry.activities.join(', ')}
             </div>
