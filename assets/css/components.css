@@ -2608,4 +2608,331 @@ input[type="range"]::-moz-range-thumb {
     height: 80px;
     font-size: 18px;
   }
+}
+
+/* Nutrition Tracking Styles */
+.nutrition-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+.nutrition-overview {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+}
+
+.nutrition-overview h2 {
+  color: white;
+  margin-bottom: 15px;
+}
+
+.nutrition-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.nutrition-metrics .metric {
+  text-align: center;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.nutrition-metrics .metric-icon {
+  font-size: 24px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.nutrition-metrics .metric-label {
+  font-size: 12px;
+  opacity: 0.9;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.nutrition-metrics .metric-value {
+  font-size: 18px;
+  font-weight: 600;
+  display: block;
+}
+
+.add-meal,
+.cholesterol-monitoring {
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.add-meal h2,
+.cholesterol-monitoring h2 {
+  margin: 0 0 20px 0;
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.meal-form,
+.cholesterol-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.meal-form .form-row,
+.cholesterol-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.meal-form .form-group,
+.cholesterol-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.meal-form label,
+.cholesterol-form label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.meal-form input,
+.meal-form select,
+.meal-form textarea,
+.cholesterol-form input,
+.cholesterol-form textarea {
+  padding: 12px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  transition: border-color 0.3s ease;
+}
+
+.meal-form input:focus,
+.meal-form select:focus,
+.meal-form textarea:focus,
+.cholesterol-form input:focus,
+.cholesterol-form textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.meal-history,
+.cholesterol-history {
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.meal-history h2,
+.cholesterol-history h2 {
+  margin: 0 0 20px 0;
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.history-item.meal-entry {
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 15px;
+  transition: all 0.3s ease;
+}
+
+.history-item.meal-entry:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.history-item.cholesterol-entry {
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 15px;
+  transition: all 0.3s ease;
+}
+
+.history-item.cholesterol-entry:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.history-item.cholesterol-entry.optimal {
+  border-left: 4px solid #28a745;
+  background: linear-gradient(135deg, #f8fff9 0%, #d4edda 100%);
+}
+
+.history-item.cholesterol-entry.borderline {
+  border-left: 4px solid #ffc107;
+  background: linear-gradient(135deg, #fffbf0 0%, #fff3cd 100%);
+}
+
+.history-item.cholesterol-entry.high {
+  border-left: 4px solid #dc3545;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe6e6 100%);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.history-type {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meal-type-icon {
+  font-size: 16px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 50%;
+}
+
+.meal-type {
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.cholesterol-icon {
+  font-size: 16px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(220, 53, 69, 0.1);
+  border-radius: 50%;
+}
+
+.cholesterol-value {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+.history-date {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.history-content h4 {
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.history-content p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.cholesterol-status {
+  margin-bottom: 8px;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.optimal {
+  background: #28a745;
+  color: white;
+}
+
+.status-badge.borderline {
+  background: #ffc107;
+  color: #212529;
+}
+
+.status-badge.high {
+  background: #dc3545;
+  color: white;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Responsive Design for Nutrition */
+@media (max-width: 768px) {
+  .nutrition-container {
+    padding: 15px;
+    gap: 15px;
+  }
+  
+  .nutrition-metrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .meal-form .form-row,
+  .cholesterol-form .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nutrition-container {
+    padding: 10px;
+  }
+  
+  .add-meal,
+  .cholesterol-monitoring,
+  .meal-history,
+  .cholesterol-history {
+    padding: 15px;
+  }
+  
+  .history-item.meal-entry,
+  .history-item.cholesterol-entry {
+    padding: 12px;
+  }
 } 

@@ -121,6 +121,8 @@ class HealthInsights {
       this.analyzeSleepPatterns(userId),
       this.analyzeLimbCareData(userId),
       this.analyzeDMEData(userId),
+      this.analyzeNutritionData(userId),
+      this.analyzeCholesterolData(userId),
       this.generateCrossCorrelations(userId),
       this.analyzeDataCompleteness(userId)
     ]);
@@ -597,12 +599,157 @@ class HealthInsights {
     }
   }
 
+  async analyzeNutritionData(userId) {
+    try {
+      console.log('Health Insights: Analyzing nutrition data');
+      
+      const mealsSnapshot = await this.db.collection('meals')
+        .where('userId', '==', userId)
+        .orderBy('timestamp', 'desc')
+        .limit(30)
+        .get();
+
+      if (mealsSnapshot.empty) {
+        this.insights.push({
+          type: 'nutrition',
+          severity: 'info',
+          title: 'No Nutrition Data',
+          message: 'You haven\'t logged any meals yet.',
+          recommendation: 'Start tracking your meals to monitor your nutrition and identify dietary patterns.',
+          icon: '🥗',
+          timestamp: new Date()
+        });
+        return;
+      }
+
+      const meals = mealsSnapshot.docs.map(doc => doc.data());
+      const mealTypes = meals.map(meal => meal.type);
+      
+      // Analyze meal patterns
+      const mealCounts = {};
+      mealTypes.forEach(type => {
+        mealCounts[type] = (mealCounts[type] || 0) + 1;
+      });
+
+      // Check for meal variety
+      const uniqueMealTypes = Object.keys(mealCounts).length;
+      if (uniqueMealTypes < 3) {
+        this.insights.push({
+          type: 'nutrition',
+          severity: 'info',
+          title: 'Limited Meal Variety',
+          message: `You've logged ${uniqueMealTypes} different meal types recently.`,
+          recommendation: 'Consider adding more variety to your meals for better nutrition and dietary balance.',
+          icon: '🍽️',
+          timestamp: new Date()
+        });
+      }
+
+      // Check for regular meal logging
+      if (meals.length < 7) {
+        this.insights.push({
+          type: 'nutrition',
+          severity: 'info',
+          title: 'Intermittent Meal Tracking',
+          message: `You've logged ${meals.length} meals recently.`,
+          recommendation: 'Try to log your meals consistently to better understand your eating patterns and nutrition.',
+          icon: '📝',
+          timestamp: new Date()
+        });
+      }
+
+    } catch (error) {
+      console.error('Error analyzing nutrition data:', error);
+    }
+  }
+
+  async analyzeCholesterolData(userId) {
+    try {
+      console.log('Health Insights: Analyzing cholesterol data');
+      
+      const cholesterolSnapshot = await this.db.collection('cholesterolEntries')
+        .where('userId', '==', userId)
+        .orderBy('timestamp', 'desc')
+        .limit(20)
+        .get();
+
+      if (cholesterolSnapshot.empty) {
+        this.insights.push({
+          type: 'cholesterol',
+          severity: 'info',
+          title: 'No Cholesterol Data',
+          message: 'You haven\'t logged any cholesterol readings yet.',
+          recommendation: 'Start monitoring your cholesterol levels regularly, especially if you have cardiovascular concerns.',
+          icon: '🧀',
+          timestamp: new Date()
+        });
+        return;
+      }
+
+      const cholesterolEntries = cholesterolSnapshot.docs.map(doc => doc.data());
+      const values = cholesterolEntries.map(entry => entry.value);
+      
+      // Calculate average and trends
+      const avgCholesterol = values.reduce((a, b) => a + b, 0) / values.length;
+      const cholesterolTrend = this.calculateTrend(values);
+
+      // Analyze cholesterol levels
+      if (avgCholesterol >= 240) {
+        this.insights.push({
+          type: 'cholesterol',
+          severity: 'alert',
+          title: 'High Cholesterol Levels',
+          message: `Your average cholesterol level is ${avgCholesterol.toFixed(1)} mg/dL, which is above the recommended range.`,
+          recommendation: 'Consult your healthcare provider immediately. Consider dietary changes, exercise, and possibly medication.',
+          icon: '⚠️',
+          timestamp: new Date()
+        });
+      } else if (avgCholesterol >= 200) {
+        this.insights.push({
+          type: 'cholesterol',
+          severity: 'warning',
+          title: 'Borderline High Cholesterol',
+          message: `Your average cholesterol level is ${avgCholesterol.toFixed(1)} mg/dL, which is borderline high.`,
+          recommendation: 'Monitor your cholesterol regularly and consider lifestyle changes to lower it.',
+          icon: '📊',
+          timestamp: new Date()
+        });
+      } else {
+        this.insights.push({
+          type: 'cholesterol',
+          severity: 'success',
+          title: 'Healthy Cholesterol Levels',
+          message: `Your average cholesterol level is ${avgCholesterol.toFixed(1)} mg/dL, which is in the optimal range.`,
+          recommendation: 'Keep up the great work! Continue your healthy lifestyle habits.',
+          icon: '✅',
+          timestamp: new Date()
+        });
+      }
+
+      // Check for trends
+      if (cholesterolTrend > 5) {
+        this.insights.push({
+          type: 'cholesterol',
+          severity: 'warning',
+          title: 'Rising Cholesterol Trend',
+          message: 'Your cholesterol levels have been trending upward recently.',
+          recommendation: 'Consider dietary changes, increased exercise, and consult your healthcare provider.',
+          icon: '📈',
+          timestamp: new Date()
+        });
+      }
+
+    } catch (error) {
+      console.error('Error analyzing cholesterol data:', error);
+    }
+  }
+
   async analyzeDataCompleteness(userId) {
     try {
       console.log('Health Insights: Analyzing data completeness');
       
       // Check how much data the user has logged
-      const collections = ['bloodPressure', 'moodEntries', 'medications', 'limbAssessments', 'durableMedicalEquipment'];
+      const collections = ['bloodPressure', 'moodEntries', 'medications', 'limbAssessments', 'durableMedicalEquipment', 'meals', 'cholesterolEntries'];
       const dataCounts = {};
 
       for (const collection of collections) {
@@ -620,7 +767,7 @@ class HealthInsights {
           severity: 'info',
           title: 'Welcome to Health Tracking!',
           message: 'You\'re just getting started with health tracking.',
-          recommendation: 'Begin by logging your blood pressure, mood, or medications. The more data you provide, the better insights we can offer.',
+          recommendation: 'Begin by logging your blood pressure, mood, medications, or nutrition. The more data you provide, the better insights we can offer.',
           icon: '🎯',
           timestamp: new Date()
         });
@@ -860,6 +1007,79 @@ class HealthInsights {
           priority: 'medium',
           dataDriven: true,
           metric: 'dme',
+          severity: 'warning'
+        });
+      }
+    }
+
+    // Analyze nutrition patterns
+    const nutritionInsights = this.insights.filter(i => i.type === 'nutrition');
+    if (nutritionInsights.length > 0) {
+      const hasLimitedVariety = nutritionInsights.some(i => i.title.includes('Limited Meal Variety'));
+      const hasIntermittentTracking = nutritionInsights.some(i => i.title.includes('Intermittent Meal Tracking'));
+      
+      if (hasLimitedVariety) {
+        this.recommendations.push({
+          category: 'Nutrition',
+          title: 'Improve Meal Variety',
+          description: 'Your meal variety is limited. Consider: adding more fruits and vegetables, trying new recipes, incorporating different protein sources, and consulting a nutritionist for personalized advice.',
+          priority: 'medium',
+          dataDriven: true,
+          metric: 'nutrition',
+          severity: 'info'
+        });
+      }
+
+      if (hasIntermittentTracking) {
+        this.recommendations.push({
+          category: 'Nutrition',
+          title: 'Consistent Meal Tracking',
+          description: 'Start tracking your meals regularly to better understand your eating patterns and identify areas for improvement.',
+          priority: 'medium',
+          dataDriven: true,
+          metric: 'nutrition',
+          severity: 'info'
+        });
+      }
+    }
+
+    // Analyze cholesterol patterns
+    const cholesterolInsights = this.insights.filter(i => i.type === 'cholesterol');
+    if (cholesterolInsights.length > 0) {
+      const hasHighCholesterol = cholesterolInsights.some(i => i.severity === 'alert');
+      const hasBorderlineCholesterol = cholesterolInsights.some(i => i.severity === 'warning');
+      const hasRisingTrend = cholesterolInsights.some(i => i.title.includes('Rising Cholesterol'));
+      
+      if (hasHighCholesterol) {
+        this.recommendations.push({
+          category: 'Cardiovascular Health',
+          title: 'Manage High Cholesterol',
+          description: 'Your cholesterol levels are high. Immediate actions: reduce saturated and trans fats, increase fiber intake, exercise regularly, and consult your healthcare provider for medication options.',
+          priority: 'high',
+          dataDriven: true,
+          metric: 'cholesterol',
+          severity: 'alert'
+        });
+      } else if (hasBorderlineCholesterol) {
+        this.recommendations.push({
+          category: 'Cardiovascular Health',
+          title: 'Monitor Cholesterol Levels',
+          description: 'Your cholesterol is borderline high. Focus on: heart-healthy diet, regular exercise, weight management, and regular cholesterol monitoring.',
+          priority: 'medium',
+          dataDriven: true,
+          metric: 'cholesterol',
+          severity: 'warning'
+        });
+      }
+
+      if (hasRisingTrend) {
+        this.recommendations.push({
+          category: 'Cardiovascular Health',
+          title: 'Address Rising Cholesterol',
+          description: 'Your cholesterol levels are trending upward. Consider: dietary changes, increased physical activity, stress management, and regular monitoring.',
+          priority: 'high',
+          dataDriven: true,
+          metric: 'cholesterol',
           severity: 'warning'
         });
       }
@@ -1175,6 +1395,8 @@ class HealthInsights {
       'medication': '💊',
       'limb-care': '🦵',
       'dme': '🦽',
+      'nutrition': '🥗',
+      'cholesterol': '🧀',
       'health-score': '📊',
       'data-completeness': '📈',
       'stress-correlation': '🧠',
