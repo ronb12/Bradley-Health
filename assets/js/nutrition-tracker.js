@@ -445,10 +445,12 @@ class NutritionTracker {
   // Enhanced meal logging with automatic nutrition calculation
   async addMeal(e) {
     e.preventDefault();
+    console.log('=== ADD MEAL METHOD CALLED ===');
     
     // Prevent multiple submissions
     const submitButton = e.target.querySelector('button[type="submit"]');
     if (submitButton && submitButton.disabled) {
+      console.log('Button already disabled, returning');
       return; // Already processing
     }
     
@@ -456,6 +458,9 @@ class NutritionTracker {
     if (submitButton) {
       submitButton.disabled = true;
       submitButton.textContent = 'Processing...';
+      console.log('Button disabled and text changed to Processing...');
+    } else {
+      console.log('Submit button not found in event target');
     }
     
     console.log('Add meal form submitted');
@@ -463,6 +468,9 @@ class NutritionTracker {
     // Get current user from authManager
     if (window.authManager) {
       this.currentUser = window.authManager.getCurrentUser();
+      console.log('Current user from authManager:', this.currentUser ? this.currentUser.uid : 'null');
+    } else {
+      console.log('authManager not found');
     }
     
     if (!this.currentUser || !this.currentUser.uid) {
@@ -478,11 +486,13 @@ class NutritionTracker {
       this.reenableSubmitButton(submitButton);
       return;
     }
+    console.log('Add meal form found:', addMealForm);
 
     // Check if we're in edit mode
     const isEditMode = addMealForm.dataset.editIndex !== undefined;
     const editIndex = parseInt(addMealForm.dataset.editIndex);
     const editId = addMealForm.dataset.editId;
+    console.log('Edit mode:', isEditMode, 'Edit index:', editIndex, 'Edit ID:', editId);
 
     // Collect form data
     const formData = new FormData(addMealForm);
@@ -492,9 +502,10 @@ class NutritionTracker {
     const time = formData.get('time');
     const mealNotes = formData.get('mealNotes');
 
-    console.log('Form data collected');
+    console.log('Form data collected:', { mealName, mealType, date, time, mealNotes });
 
     if (!mealName || !mealType || !date || !time) {
+      console.log('Missing required fields');
       this.showToast('Please fill in all required fields', 'error');
       this.reenableSubmitButton(submitButton);
       return;
@@ -1274,8 +1285,9 @@ class NutritionTracker {
   setupEventListeners() {
     const addMealForm = document.getElementById('addMealForm');
     if (addMealForm) {
-      // Remove any existing event listeners to prevent duplicates
+      // Remove any existing event listeners by cloning the form
       const newForm = addMealForm.cloneNode(true);
+      newForm.id = 'addMealForm'; // Ensure the ID is preserved
       addMealForm.parentNode.replaceChild(newForm, addMealForm);
       
       // Add event listener to the new form
@@ -1294,6 +1306,9 @@ class NutritionTracker {
       if (submitButton) {
         submitButton.parentNode.insertBefore(cancelButton, submitButton.nextSibling);
       }
+      
+      // Set default date and time
+      this.setDefaultDateTime();
     }
 
     const addCholesterolForm = document.getElementById('addCholesterolForm');
