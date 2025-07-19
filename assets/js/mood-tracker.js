@@ -22,7 +22,15 @@ class MoodTracker {
   resetEventListeners() {
     console.log('Resetting mood tracker event listeners...');
     this.eventListenersSetup = false;
+    this.isSubmitting = false; // Reset submission flag as well
     this.setupEventListeners();
+  }
+
+  // Manual reset function for submission flag
+  resetSubmissionFlag() {
+    console.log('Manually resetting submission flag');
+    this.isSubmitting = false;
+    this.hideLoading();
   }
 
   setupAuthListener() {
@@ -182,7 +190,29 @@ class MoodTracker {
     console.log('Starting mood entry submission...');
     this.isSubmitting = true;
     
+    // Add a timeout to reset the flag in case it gets stuck
+    const submissionTimeout = setTimeout(() => {
+      if (this.isSubmitting) {
+        console.warn('Mood entry submission timeout - resetting flag');
+        this.isSubmitting = false;
+        this.hideLoading();
+      }
+    }, 10000); // 10 second timeout
+    
     const formData = new FormData(e.target);
+    
+    // Create timestamp - use Firestore timestamp if available, otherwise use JavaScript Date
+    let timestamp;
+    try {
+      if (firebase && firebase.firestore && firebase.firestore.Timestamp) {
+        timestamp = firebase.firestore.Timestamp.now();
+      } else {
+        timestamp = new Date();
+      }
+    } catch (error) {
+      console.warn('Firebase timestamp not available, using JavaScript Date:', error);
+      timestamp = new Date();
+    }
     
     const moodEntry = {
       mood: parseInt(formData.get('mood')),
@@ -192,7 +222,7 @@ class MoodTracker {
       activities: formData.getAll('activities'),
       notes: formData.get('notes'),
       factors: formData.getAll('factors'),
-      timestamp: firebase.firestore.Timestamp.now(), // Use Firestore timestamp
+      timestamp: timestamp,
       userId: this.currentUser.uid
     };
 
@@ -218,6 +248,7 @@ class MoodTracker {
       console.error('Error saving mood entry:', error);
       this.showToast('Error saving mood entry', 'error');
     } finally {
+      clearTimeout(submissionTimeout);
       this.hideLoading();
       this.isSubmitting = false;
       console.log('Mood entry submission completed');
