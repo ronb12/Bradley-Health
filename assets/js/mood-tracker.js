@@ -182,47 +182,68 @@ class MoodTracker {
       return;
     }
 
-    moodList.innerHTML = this.moodEntries.map(entry => `
-      <div class="mood-entry-item" data-id="${entry.id}">
-        <div class="mood-header">
-          <div class="mood-score">
-            <span class="mood-emoji">${this.getMoodEmoji(entry.mood)}</span>
-            <span class="mood-value">${entry.mood}/10</span>
+    moodList.innerHTML = this.moodEntries.map(entry => {
+      // Handle different timestamp formats (Firestore Timestamp vs JavaScript Date)
+      let timestamp;
+      if (entry.timestamp && entry.timestamp.toDate) {
+        // Firestore Timestamp
+        timestamp = entry.timestamp.toDate();
+      } else if (entry.timestamp) {
+        // JavaScript Date or timestamp number
+        timestamp = new Date(entry.timestamp);
+      } else {
+        // Fallback to current time
+        timestamp = new Date();
+      }
+
+      // Validate the timestamp
+      if (isNaN(timestamp.getTime())) {
+        console.warn('Invalid timestamp for mood entry:', entry.id, entry.timestamp);
+        timestamp = new Date(); // Fallback to current time
+      }
+
+      return `
+        <div class="mood-entry-item" data-id="${entry.id}">
+          <div class="mood-header">
+            <div class="mood-score">
+              <span class="mood-emoji">${this.getMoodEmoji(entry.mood)}</span>
+              <span class="mood-value">${entry.mood}/10</span>
+            </div>
+            <div class="mood-date">
+              ${timestamp.toLocaleDateString()}
+            </div>
           </div>
-          <div class="mood-date">
-            ${new Date(entry.timestamp).toLocaleDateString()}
+          <div class="mood-metrics">
+            <div class="metric">
+              <span class="metric-label">Energy:</span>
+              <span class="metric-value">${entry.energy}/10</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Stress:</span>
+              <span class="metric-value">${entry.stress}/10</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Sleep:</span>
+              <span class="metric-value">${entry.sleep}/10</span>
+            </div>
+          </div>
+          ${entry.activities.length > 0 ? `
+            <div class="mood-activities">
+              <strong>Activities:</strong> ${entry.activities.join(', ')}
+            </div>
+          ` : ''}
+          ${entry.notes ? `
+            <div class="mood-notes">
+              <strong>Notes:</strong> ${entry.notes}
+            </div>
+          ` : ''}
+          <div class="mood-actions">
+            <button class="btn btn-small" onclick="moodTracker.editMoodEntry('${entry.id}')">Edit</button>
+            <button class="btn btn-small btn-danger" onclick="moodTracker.deleteMoodEntry('${entry.id}')">Delete</button>
           </div>
         </div>
-        <div class="mood-metrics">
-          <div class="metric">
-            <span class="metric-label">Energy:</span>
-            <span class="metric-value">${entry.energy}/10</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Stress:</span>
-            <span class="metric-value">${entry.stress}/10</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">Sleep:</span>
-            <span class="metric-value">${entry.sleep}/10</span>
-          </div>
-        </div>
-        ${entry.activities.length > 0 ? `
-          <div class="mood-activities">
-            <strong>Activities:</strong> ${entry.activities.join(', ')}
-          </div>
-        ` : ''}
-        ${entry.notes ? `
-          <div class="mood-notes">
-            <strong>Notes:</strong> ${entry.notes}
-          </div>
-        ` : ''}
-        <div class="mood-actions">
-          <button class="btn btn-small" onclick="moodTracker.editMoodEntry('${entry.id}')">Edit</button>
-          <button class="btn btn-small btn-danger" onclick="moodTracker.deleteMoodEntry('${entry.id}')">Delete</button>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   getMoodEmoji(mood) {
@@ -283,9 +304,28 @@ class MoodTracker {
 
     const recentEntries = this.moodEntries.slice(0, 7).reverse();
     
-    this.moodChart.data.labels = recentEntries.map(entry => 
-      new Date(entry.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-    );
+    this.moodChart.data.labels = recentEntries.map(entry => {
+      // Handle different timestamp formats (Firestore Timestamp vs JavaScript Date)
+      let timestamp;
+      if (entry.timestamp && entry.timestamp.toDate) {
+        // Firestore Timestamp
+        timestamp = entry.timestamp.toDate();
+      } else if (entry.timestamp) {
+        // JavaScript Date or timestamp number
+        timestamp = new Date(entry.timestamp);
+      } else {
+        // Fallback to current time
+        timestamp = new Date();
+      }
+
+      // Validate the timestamp
+      if (isNaN(timestamp.getTime())) {
+        console.warn('Invalid timestamp for mood chart entry:', entry.id, entry.timestamp);
+        timestamp = new Date(); // Fallback to current time
+      }
+
+      return timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
     
     this.moodChart.data.datasets[0].data = recentEntries.map(entry => entry.mood);
     this.moodChart.data.datasets[1].data = recentEntries.map(entry => entry.energy);
