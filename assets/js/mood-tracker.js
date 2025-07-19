@@ -5,6 +5,8 @@ class MoodTracker {
     this.currentUser = null;
     this.moodEntries = [];
     this.moodFactors = [];
+    this.isSubmitting = false; // Flag to prevent duplicate submissions
+    this.eventListenersSetup = false; // Flag to prevent duplicate event listener setup
     this.init();
   }
 
@@ -44,10 +46,19 @@ class MoodTracker {
   }
 
   setupEventListeners() {
+    // Prevent duplicate event listener setup
+    if (this.eventListenersSetup) {
+      console.log('Event listeners already setup, skipping...');
+      return;
+    }
+    
+    console.log('Setting up mood tracker event listeners...');
+    
     // Add mood entry form
     const moodForm = document.getElementById('moodEntryForm');
     if (moodForm) {
       moodForm.addEventListener('submit', (e) => this.addMoodEntry(e));
+      console.log('Mood entry form event listener added');
     }
 
     // Quick mood buttons
@@ -55,15 +66,20 @@ class MoodTracker {
     quickMoodBtns.forEach(btn => {
       btn.addEventListener('click', (e) => this.quickMoodEntry(e));
     });
+    console.log(`Quick mood button event listeners added for ${quickMoodBtns.length} buttons`);
 
     // Mood factors form
     const factorsForm = document.getElementById('moodFactorsForm');
     if (factorsForm) {
       factorsForm.addEventListener('submit', (e) => this.addMoodFactor(e));
+      console.log('Mood factors form event listener added');
     }
 
     // Range input event listeners for real-time value updates
     this.setupRangeInputs();
+    
+    this.eventListenersSetup = true;
+    console.log('Mood tracker event listeners setup completed');
   }
 
   setupRangeInputs() {
@@ -107,11 +123,20 @@ class MoodTracker {
   async addMoodEntry(e) {
     e.preventDefault();
     
+    // Prevent duplicate submissions
+    if (this.isSubmitting) {
+      console.log('Mood entry submission already in progress, ignoring duplicate');
+      return;
+    }
+    
     // Check if user is authenticated
     if (!this.currentUser || !this.currentUser.uid) {
       this.showToast('Please sign in to save mood entries', 'error');
       return;
     }
+    
+    console.log('Starting mood entry submission...');
+    this.isSubmitting = true;
     
     const formData = new FormData(e.target);
     
@@ -139,7 +164,9 @@ class MoodTracker {
 
     try {
       this.showLoading('Saving mood entry...');
+      console.log('Saving mood entry to Firestore...');
       await this.db.collection('moodEntries').add(moodEntry);
+      console.log('Mood entry saved successfully to Firestore');
       this.showToast('Mood entry saved successfully!', 'success');
       this.loadMoodEntries();
       e.target.reset();
@@ -148,15 +175,26 @@ class MoodTracker {
       this.showToast('Error saving mood entry', 'error');
     } finally {
       this.hideLoading();
+      this.isSubmitting = false;
+      console.log('Mood entry submission completed');
     }
   }
 
   async quickMoodEntry(e) {
+    // Prevent duplicate submissions
+    if (this.isSubmitting) {
+      console.log('Quick mood entry submission already in progress, ignoring duplicate');
+      return;
+    }
+    
     // Check if user is authenticated
     if (!this.currentUser || !this.currentUser.uid) {
       this.showToast('Please sign in to save mood entries', 'error');
       return;
     }
+    
+    console.log('Starting quick mood entry submission...');
+    this.isSubmitting = true;
     
     // Remove previous selection
     document.querySelectorAll('.mood-btn').forEach(btn => {
@@ -179,9 +217,20 @@ class MoodTracker {
       userId: this.currentUser.uid
     };
 
+    console.log('Quick mood entry data:', {
+      mood: moodEntry.mood,
+      energy: moodEntry.energy,
+      stress: moodEntry.stress,
+      sleep: moodEntry.sleep,
+      notes: moodEntry.notes,
+      timestamp: moodEntry.timestamp
+    });
+
     try {
       this.showLoading('Saving mood...');
+      console.log('Saving quick mood entry to Firestore...');
       await this.db.collection('moodEntries').add(moodEntry);
+      console.log('Quick mood entry saved successfully to Firestore');
       this.showToast('Mood saved!', 'success');
       this.loadMoodEntries();
       
@@ -190,10 +239,13 @@ class MoodTracker {
         e.target.classList.remove('selected');
       }, 2000);
     } catch (error) {
+      console.error('Error saving quick mood entry:', error);
       this.showToast('Error saving mood entry', 'error');
       e.target.classList.remove('selected');
     } finally {
       this.hideLoading();
+      this.isSubmitting = false;
+      console.log('Quick mood entry submission completed');
     }
   }
 
