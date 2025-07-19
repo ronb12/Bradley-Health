@@ -294,13 +294,37 @@ class NutritionTracker {
       'dessert': ['dessert', 'cake', 'cookie', 'pie', 'pastry', 'donut', 'muffin', 'brownie', 'fudge', 'candy', 'chocolate', 'ice cream', 'sorbet', 'gelato', 'pudding', 'custard', 'flan', 'creme brulee', 'tiramisu', 'cheesecake', 'trifle', 'parfait', 'sundae', 'milkshake', 'smoothie', 'shake', 'float', 'soda', 'pop', 'cola', 'lemonade', 'juice', 'nectar', 'syrup', 'honey', 'jam', 'jelly', 'marmalade', 'preserve', 'compote', 'chutney', 'relish', 'pickle']
     };
 
-    // Split text into words and analyze each
-    const words = text.split(/\s+/);
+    // Clean and split text into words, filtering out non-food content
+    const cleanText = text
+      .replace(/[()]/g, ' ') // Remove parentheses
+      .replace(/\d+g\b/g, ' ') // Remove "100g" patterns
+      .replace(/\d+mg\b/g, ' ') // Remove "mg" patterns
+      .replace(/\d+cal\b/g, ' ') // Remove "cal" patterns
+      .replace(/[\[\]]/g, ' ') // Remove brackets
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .trim();
+    
+    const words = cleanText.split(/\s+/);
     const processedWords = new Set();
 
+    console.log('Cleaned text:', cleanText);
+    console.log('Words to process:', words);
+
     for (const word of words) {
-      if (processedWords.has(word)) continue;
+      // Skip if already processed or if it's a non-food word
+      if (processedWords.has(word) || this.isNonFoodWord(word)) {
+        console.log(`Skipping word: ${word} (already processed or non-food)`);
+        continue;
+      }
+      
+      // Skip words that are just numbers or formatting artifacts
+      if (/^\d+$/.test(word) || /^[^\w]+$/.test(word) || word.length < 2) {
+        console.log(`Skipping word: ${word} (number or formatting artifact)`);
+        continue;
+      }
+      
       processedWords.add(word);
+      console.log(`Processing food word: ${word}`);
 
       let foodFound = false;
       let portionSize = 100; // default portion size
@@ -326,6 +350,7 @@ class NutritionTracker {
           source: 'database'
         });
         foodFound = true;
+        console.log(`Found in database: ${word} - ${cholesterol}mg cholesterol, ${calories} calories`);
       }
 
       // If not found, try fuzzy matching and category detection
@@ -352,6 +377,7 @@ class NutritionTracker {
           } else {
             portionSize = amount;
           }
+          console.log(`Skipping portion indicator: ${word}`);
           continue; // Skip to next word as this is just a portion indicator
         }
 
@@ -376,12 +402,13 @@ class NutritionTracker {
               category: category
             });
             foodFound = true;
+            console.log(`Categorized as ${category}: ${word} - ${cholesterol}mg cholesterol, ${calories} calories`);
             break;
           }
         }
 
         // If still not found, try online search
-        if (!foodFound && word.length > 2 && !this.isNonFoodWord(word)) {
+        if (!foodFound && word.length > 2) {
           console.log(`Searching online for: ${word}`);
           const onlineResult = await this.searchFoodOnline(word);
           
@@ -401,6 +428,7 @@ class NutritionTracker {
           } else {
             // If online search fails, add to unrecognized list
             unrecognizedFoods.push(word);
+            console.log(`Unrecognized food: ${word}`);
           }
         }
       }
@@ -408,6 +436,7 @@ class NutritionTracker {
 
     // Handle unrecognized foods with conservative estimates
     if (unrecognizedFoods.length > 0) {
+      console.log(`Unrecognized foods: ${unrecognizedFoods.join(', ')}`);
       const conservativeEstimate = {
         cholesterol: 10, // conservative estimate
         calories: 50,
@@ -430,8 +459,16 @@ class NutritionTracker {
           fat: fat,
           source: 'estimate'
         });
+        console.log(`Conservative estimate for ${food}: ${cholesterol}mg cholesterol, ${calories} calories`);
       });
     }
+    
+    console.log('Final nutrition calculation:', {
+      totalCholesterol: Math.round(totalCholesterol),
+      totalCalories: Math.round(totalCalories),
+      totalFat: Math.round(totalFat * 10) / 10,
+      foodsFound: foodsFound.length
+    });
     
     return {
       estimatedCholesterol: Math.round(totalCholesterol),
@@ -917,24 +954,54 @@ class NutritionTracker {
       // Articles
       'the', 'a', 'an',
       // Prepositions
-      'with', 'on', 'in', 'at', 'to', 'for', 'of', 'from', 'by', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below',
+      'with', 'on', 'in', 'at', 'to', 'for', 'of', 'from', 'by', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'under', 'over', 'across', 'along', 'around', 'behind', 'beneath', 'beside', 'beyond', 'inside', 'outside', 'within', 'without',
       // Conjunctions
-      'and', 'or', 'but', 'nor', 'yet', 'so',
+      'and', 'or', 'but', 'nor', 'yet', 'so', 'because', 'although', 'unless', 'while', 'whereas', 'since', 'as', 'if', 'whether', 'though', 'even', 'though',
       // Pronouns
-      'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'her', 'its', 'our', 'their',
+      'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'her', 'its', 'our', 'their', 'mine', 'yours', 'his', 'hers', 'ours', 'theirs', 'myself', 'yourself', 'himself', 'herself', 'itself', 'ourselves', 'yourselves', 'themselves',
       // Common verbs
-      'had', 'ate', 'drank', 'consumed', 'was', 'were', 'is', 'are', 'am', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'must', 'shall',
+      'had', 'ate', 'drank', 'consumed', 'was', 'were', 'is', 'are', 'am', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'must', 'shall', 'eat', 'drink', 'cook', 'prepare', 'make', 'made', 'making', 'add', 'added', 'adding', 'mix', 'mixed', 'mixing', 'stir', 'stirred', 'stirring', 'heat', 'heated', 'heating', 'serve', 'served', 'serving',
       // Other common words
-      'this', 'that', 'these', 'those', 'here', 'there', 'where', 'when', 'why', 'how', 'what', 'which', 'who', 'whom', 'whose',
+      'this', 'that', 'these', 'those', 'here', 'there', 'where', 'when', 'why', 'how', 'what', 'which', 'who', 'whom', 'whose', 'each', 'every', 'all', 'both', 'either', 'neither', 'any', 'some', 'no', 'none', 'other', 'another', 'others', 'such', 'same', 'different', 'similar', 'various', 'several', 'many', 'much', 'few', 'little', 'more', 'most', 'least', 'less', 'enough', 'too', 'very', 'quite', 'rather', 'just', 'only', 'even', 'still', 'again', 'back', 'away', 'out', 'up', 'down', 'over', 'under',
       // Time words
-      'today', 'yesterday', 'tomorrow', 'morning', 'afternoon', 'evening', 'night', 'breakfast', 'lunch', 'dinner', 'snack',
+      'today', 'yesterday', 'tomorrow', 'morning', 'afternoon', 'evening', 'night', 'breakfast', 'lunch', 'dinner', 'snack', 'meal', 'meals', 'time', 'times', 'hour', 'hours', 'minute', 'minutes', 'second', 'seconds', 'day', 'days', 'week', 'weeks', 'month', 'months', 'year', 'years', 'now', 'then', 'ago', 'before', 'after', 'during', 'while', 'when', 'since', 'until', 'till', 'by', 'from', 'to',
       // Quantity words (unless followed by food)
-      'some', 'any', 'many', 'much', 'few', 'several', 'lots', 'plenty', 'enough', 'more', 'less', 'most', 'least',
-      // Common connectors
-      'also', 'too', 'as', 'like', 'such', 'very', 'really', 'quite', 'rather', 'just', 'only', 'even', 'still', 'again', 'back', 'away', 'out', 'up', 'down', 'over', 'under'
+      'some', 'any', 'many', 'much', 'few', 'several', 'lots', 'plenty', 'enough', 'more', 'less', 'most', 'least', 'all', 'both', 'each', 'every', 'none', 'no', 'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'hundred', 'thousand', 'million', 'billion', 'dozen', 'dozens', 'pair', 'pairs', 'set', 'sets', 'group', 'groups', 'bunch', 'bunches', 'pack', 'packs', 'box', 'boxes', 'can', 'cans', 'jar', 'jars', 'bottle', 'bottles', 'bag', 'bags', 'container', 'containers',
+      // Common connectors and modifiers
+      'also', 'too', 'as', 'like', 'such', 'very', 'really', 'quite', 'rather', 'just', 'only', 'even', 'still', 'again', 'back', 'away', 'out', 'up', 'down', 'over', 'under', 'well', 'badly', 'good', 'bad', 'better', 'worse', 'best', 'worst', 'big', 'small', 'large', 'tiny', 'huge', 'enormous', 'giant', 'mini', 'miniature', 'fresh', 'frozen', 'cooked', 'raw', 'hot', 'cold', 'warm', 'cool', 'spicy', 'mild', 'sweet', 'sour', 'bitter', 'salty', 'tasty', 'delicious', 'yummy', 'gross', 'disgusting', 'healthy', 'unhealthy', 'organic', 'natural', 'artificial', 'homemade', 'store', 'bought', 'prepared', 'ready', 'made',
+      // Formatting and punctuation artifacts
+      'mg', 'g', 'gram', 'grams', 'oz', 'ounce', 'ounces', 'cup', 'cups', 'tbsp', 'tablespoon', 'tablespoons', 'tsp', 'teaspoon', 'teaspoons', 'slice', 'slices', 'piece', 'pieces', 'serving', 'servings', 'portion', 'portions', 'cal', 'calorie', 'calories', 'kcal', 'kilocalorie', 'kilocalories', 'fat', 'protein', 'carb', 'carbohydrate', 'carbohydrates', 'fiber', 'sugar', 'sodium', 'salt', 'vitamin', 'vitamins', 'mineral', 'minerals', 'cholesterol', 'saturated', 'unsaturated', 'trans', 'omega', 'fiber', 'dietary', 'nutritional', 'nutrition', 'nutrient', 'nutrients',
+      // Common food preparation words (not actual foods)
+      'cooked', 'raw', 'fried', 'baked', 'grilled', 'roasted', 'boiled', 'steamed', 'sauteed', 'stir', 'fried', 'deep', 'pan', 'oven', 'microwave', 'toasted', 'toast', 'toasting', 'heated', 'warmed', 'chilled', 'frozen', 'thawed', 'defrosted', 'marinated', 'seasoned', 'spiced', 'salted', 'peppered', 'sauced', 'dressed', 'topped', 'filled', 'stuffed', 'wrapped', 'rolled', 'sliced', 'chopped', 'diced', 'minced', 'grated', 'shredded', 'crumbled', 'mashed', 'pureed', 'blended', 'mixed', 'combined', 'added', 'included', 'served', 'plated', 'presented'
     ];
     
-    return nonFoodWords.includes(word.toLowerCase());
+    // Also check for common patterns that indicate non-food words
+    const nonFoodPatterns = [
+      /^\d+$/, // Just numbers
+      /^[^\w]+$/, // Just punctuation/symbols
+      /^[a-z]$/, // Single letters
+      /^(mg|g|oz|cup|tbsp|tsp|cal|kcal)$/i, // Units only
+      /^(slice|piece|serving|portion)s?$/i, // Portion words
+      /^(cooked|raw|fried|baked|grilled|roasted|boiled|steamed)$/i, // Preparation methods
+      /^(fresh|frozen|organic|natural|homemade|store|bought)$/i, // Descriptors
+      /^(delicious|tasty|yummy|gross|disgusting|healthy|unhealthy)$/i // Taste/health descriptors
+    ];
+    
+    const lowerWord = word.toLowerCase();
+    
+    // Check exact matches
+    if (nonFoodWords.includes(lowerWord)) {
+      return true;
+    }
+    
+    // Check patterns
+    for (const pattern of nonFoodPatterns) {
+      if (pattern.test(lowerWord)) {
+        return true;
+      }
+    }
+    
+    return false;
   }
 
   // Helper method to format timestamp for display
