@@ -628,24 +628,27 @@ class NutritionTracker {
   // Fallback method to calculate daily cholesterol from local data
   calculateDailyCholesterolFromLocalData(date) {
     if (!this.meals || this.meals.length === 0) {
+      console.log('No meals available for daily cholesterol calculation');
       return 0;
     }
 
-    const targetDate = new Date(date);
-    targetDate.setHours(0, 0, 0, 0);
-    
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+    console.log('Calculating daily cholesterol for date:', date);
+    console.log('Available meals:', this.meals.length);
 
     let totalCholesterol = 0;
     
     this.meals.forEach(meal => {
       const mealDate = new Date(meal.timestamp);
-      if (mealDate >= targetDate && mealDate <= endOfDay && meal.hasNutritionData) {
+      const mealDateString = mealDate.toISOString().split('T')[0];
+      console.log(`Meal date: ${mealDateString}, target date: ${date}, match: ${mealDateString === date}`);
+      
+      if (mealDateString === date && meal.hasNutritionData) {
         totalCholesterol += meal.estimatedCholesterol || 0;
+        console.log(`Added ${meal.estimatedCholesterol}mg cholesterol from meal: ${meal.name}`);
       }
     });
 
+    console.log('Total daily cholesterol calculated:', totalCholesterol);
     return totalCholesterol;
   }
 
@@ -653,6 +656,7 @@ class NutritionTracker {
   async updateNutritionOverview() {
     console.log('=== UPDATING NUTRITION OVERVIEW ===');
     const today = new Date().toISOString().split('T')[0];
+    console.log('Today\'s date:', today);
     const dailyStats = await this.calculateDailyCholesterolIntake(today);
     console.log('Daily cholesterol intake:', dailyStats);
     
@@ -660,13 +664,16 @@ class NutritionTracker {
     const dailyCalories = document.getElementById('dailyCalories');
     console.log('Daily calories element found:', !!dailyCalories);
     if (dailyCalories) {
-      // Calculate today's total calories
+      // Calculate today's total calories using same date logic
       let todayCalories = 0;
       this.meals.forEach(meal => {
         const mealDate = new Date(meal.timestamp);
-        const todayDate = new Date(today);
-        if (mealDate.toDateString() === todayDate.toDateString() && meal.hasNutritionData) {
+        const mealDateString = mealDate.toISOString().split('T')[0];
+        console.log(`Meal: ${meal.name}, date: ${mealDateString}, today: ${today}, match: ${mealDateString === today}`);
+        
+        if (mealDateString === today && meal.hasNutritionData) {
           todayCalories += meal.estimatedCalories || 0;
+          console.log(`Added ${meal.estimatedCalories} calories from meal: ${meal.name}`);
         }
       });
       console.log('Today\'s calories calculated:', todayCalories);
