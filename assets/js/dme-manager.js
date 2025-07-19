@@ -226,6 +226,41 @@ class DMEManager {
     return alerts;
   }
 
+  async handleQuickAddDME(e) {
+    e.preventDefault();
+    
+    if (!this.currentUser) {
+      alert('Please log in to add equipment');
+      return;
+    }
+
+    const formData = new FormData(e.target);
+    const dmeData = {
+      userId: this.currentUser.uid,
+      name: formData.get('name'),
+      type: formData.get('type'),
+      status: formData.get('status'),
+      notes: formData.get('notes') || '',
+      dateAcquired: firebase.firestore.Timestamp.now(),
+      timestamp: firebase.firestore.Timestamp.now()
+    };
+
+    // Add last maintenance date if provided
+    if (formData.get('lastMaintenance')) {
+      dmeData.lastMaintenance = firebase.firestore.Timestamp.fromDate(new Date(formData.get('lastMaintenance')));
+    }
+
+    try {
+      await this.db.collection('durableMedicalEquipment').add(dmeData);
+      e.target.reset();
+      this.loadDMEData();
+      showNotification('Equipment added successfully!', 'success');
+    } catch (error) {
+      console.error('Error adding DME:', error);
+      showNotification('Error adding equipment. Please try again.', 'error');
+    }
+  }
+
   async handleAddDME(e) {
     e.preventDefault();
     
