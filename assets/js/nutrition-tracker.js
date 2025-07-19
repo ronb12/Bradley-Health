@@ -507,17 +507,21 @@ class NutritionTracker {
     }
   }
 
-  // Calculate daily cholesterol intake from meals
+  // Helper method to calculate daily cholesterol intake
   async calculateDailyCholesterolIntake(date) {
-    if (!this.currentUser) return 0;
-    
+    if (!this.currentUser || !this.currentUser.uid) {
+      console.log('No current user, cannot calculate daily cholesterol intake.');
+      return 0;
+    }
+
     try {
+      // Try to use the optimized query with index
       const startOfDay = new Date(date);
       startOfDay.setHours(0, 0, 0, 0);
       
       const endOfDay = new Date(date);
       endOfDay.setHours(23, 59, 59, 999);
-      
+
       const mealsSnapshot = await this.db.collection('meals')
         .where('userId', '==', this.currentUser.uid)
         .where('timestamp', '>=', startOfDay)
@@ -525,84 +529,110 @@ class NutritionTracker {
         .get();
 
       let totalCholesterol = 0;
-      let totalCalories = 0;
-      let mealsWithData = 0;
-
       mealsSnapshot.docs.forEach(doc => {
         const meal = doc.data();
         if (meal.hasNutritionData) {
           totalCholesterol += meal.estimatedCholesterol || 0;
-          totalCalories += meal.estimatedCalories || 0;
-          mealsWithData++;
         }
       });
 
-      return {
-        totalCholesterol: totalCholesterol,
-        totalCalories: totalCalories,
-        mealsWithData: mealsWithData,
-        averageCholesterolPerMeal: mealsWithData > 0 ? Math.round(totalCholesterol / mealsWithData) : 0
-      };
+      return totalCholesterol;
     } catch (error) {
-      console.error('Error calculating daily cholesterol intake:', error);
-      return { totalCholesterol: 0, totalCalories: 0, mealsWithData: 0, averageCholesterolPerMeal: 0 };
+      console.log('Firebase index error, using fallback calculation method:', error.message);
+      
+      // Fallback: Calculate from local meals array
+      return this.calculateDailyCholesterolFromLocalData(date);
     }
   }
 
-  // Enhanced nutrition overview with calculated data
+  // Fallback method to calculate daily cholesterol from local data
+  calculateDailyCholesterolFromLocalData(date) {
+    if (!this.meals || this.meals.length === 0) {
+      return 0;
+    }
+
+    const targetDate = new Date(date);
+    targetDate.setHours(0, 0, 0, 0);
+    
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    let totalCholesterol = 0;
+    
+    this.meals.forEach(meal => {
+      const mealDate = new Date(meal.timestamp);
+      if (mealDate >= targetDate && mealDate <= endOfDay && meal.hasNutritionData) {
+        totalCholesterol += meal.estimatedCholesterol || 0;
+      }
+    });
+
+    return totalCholesterol;
+  }
+
+  // Helper method to update nutrition overview
   async updateNutritionOverview() {
     const today = new Date().toISOString().split('T')[0];
     const dailyStats = await this.calculateDailyCholesterolIntake(today);
     
-    // Update daily calories
-    const dailyCalories = document.getElementById('dailyCalories');
-    if (dailyCalories) {
-      dailyCalories.textContent = dailyStats.totalCalories > 0 ? dailyStats.totalCalories : '--';
+    const dailyCholesterol = document.getElementById('dailyCholesterol');
+    if (dailyCholesterol) {
+      dailyCholesterol.textContent = dailyStats > 0 ? dailyStats : '--';
     }
 
-    // Update total meals
-    const totalMeals = document.getElementById('totalMeals');
-    if (totalMeals) {
-      totalMeals.textContent = this.meals.length;
-    }
-
-    // Update cholesterol level with alerts
     const cholesterolLevel = document.getElementById('cholesterolLevel');
     if (cholesterolLevel) {
-      if (this.cholesterolEntries.length > 0) {
-        const latestCholesterol = this.cholesterolEntries[0];
-        cholesterolLevel.textContent = `${latestCholesterol.value} mg/dL`;
-        
-        // Add visual indicator for high cholesterol
-        if (latestCholesterol.value >= 240) {
-          cholesterolLevel.style.color = '#dc3545';
-          cholesterolLevel.style.fontWeight = 'bold';
-        } else if (latestCholesterol.value >= 200) {
-          cholesterolLevel.style.color = '#ffc107';
-          cholesterolLevel.style.fontWeight = 'bold';
-        } else {
-          cholesterolLevel.style.color = '#28a745';
-        }
-      } else if (dailyStats.totalCholesterol > 0) {
+      if (dailyStats === 0) {
+        cholesterolLevel.textContent = 'No data';
+        cholesterolLevel.style.color = '#6c757d';
+      } else if (dailyStats > 0) {
         // Check daily intake limits
-        const limitCheck = this.checkCholesterolLimits(dailyStats.totalCholesterol);
-        cholesterolLevel.textContent = `${dailyStats.totalCholesterol} mg (est.)`;
+        const limitCheck = this.checkCholesterolLimits(dailyStats);
+        cholesterolLevel.textContent = `${dailyStats} mg (est.)`;
         
         if (limitCheck.status === 'exceeded') {
           cholesterolLevel.style.color = '#dc3545';
-          cholesterolLevel.style.fontWeight = 'bold';
-          this.showToast(limitCheck.message, 'warning');
         } else if (limitCheck.status === 'warning') {
           cholesterolLevel.style.color = '#ffc107';
-          cholesterolLevel.style.fontWeight = 'bold';
         } else {
           cholesterolLevel.style.color = '#28a745';
         }
-      } else {
-        cholesterolLevel.textContent = '--';
-        cholesterolLevel.style.color = '';
-        cholesterolLevel.style.fontWeight = '';
       }
+    }
+
+    // Calculate total nutrition from all meals
+    let totalCholesterol = 0;
+    let totalCalories = 0;
+    let totalFat = 0;
+    let mealsWithData = 0;
+
+    this.meals.forEach(meal => {
+      if (meal.hasNutritionData) {
+        totalCholesterol += meal.estimatedCholesterol || 0;
+        totalCalories += meal.estimatedCalories || 0;
+        totalFat += meal.estimatedFat || 0;
+        mealsWithData++;
+      }
+    });
+
+    const totalCholesterolElement = document.getElementById('totalCholesterol');
+    if (totalCholesterolElement) {
+      totalCholesterolElement.textContent = totalCholesterol > 0 ? totalCholesterol : '--';
+    }
+
+    const totalCaloriesElement = document.getElementById('totalCalories');
+    if (totalCaloriesElement) {
+      totalCaloriesElement.textContent = totalCalories > 0 ? totalCalories : '--';
+    }
+
+    const totalFatElement = document.getElementById('totalFat');
+    if (totalFatElement) {
+      totalFatElement.textContent = totalFat > 0 ? totalFat : '--';
+    }
+
+    const averageCholesterolElement = document.getElementById('averageCholesterol');
+    if (averageCholesterolElement) {
+      const average = mealsWithData > 0 ? Math.round(totalCholesterol / mealsWithData) : 0;
+      averageCholesterolElement.textContent = average > 0 ? average : '--';
     }
   }
 
