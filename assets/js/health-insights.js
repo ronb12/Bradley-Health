@@ -67,8 +67,19 @@ class HealthInsights {
       this.calculateHealthScore();
       this.generateRecommendations();
       
-      this.displayInsights();
-      this.displayRecommendations();
+      // Check if we're on the health insights tab or dashboard
+      const isHealthInsightsTab = document.querySelector('.health-insights-container');
+      
+      if (isHealthInsightsTab) {
+        // On health insights tab - show full detailed view
+        this.displayFullInsights();
+        this.displayFullRecommendations();
+      } else {
+        // On dashboard - show compact summary
+        this.displayInsights();
+        this.displayRecommendations();
+      }
+      
       this.displayHealthScore();
       
       this.hideLoadingState();
@@ -1364,11 +1375,21 @@ class HealthInsights {
       summaryHTML += '</div>';
     }
 
-    if (this.insights.length > 3) {
+    // Check if we're on the dashboard (no "View All" button) or health insights tab
+    const isDashboard = !document.querySelector('.health-insights-container');
+    
+    if (this.insights.length > 3 && !isDashboard) {
       summaryHTML += `
         <div class="more-insights">
           <span class="more-count">+${this.insights.length - 3} more insights</span>
           <button class="btn-view-all" onclick="window.healthInsights.showAllInsights()">View All</button>
+        </div>
+      `;
+    } else if (this.insights.length > 3 && isDashboard) {
+      summaryHTML += `
+        <div class="more-insights">
+          <span class="more-count">+${this.insights.length - 3} more insights</span>
+          <button class="btn-view-insights" onclick="switchToTab('health-insights')">View Full Analysis</button>
         </div>
       `;
     }
@@ -1494,11 +1515,21 @@ class HealthInsights {
       summaryHTML += '</div>';
     }
 
-    if (this.recommendations.length > 3) {
+    // Check if we're on the dashboard or health insights tab
+    const isDashboard = !document.querySelector('.health-insights-container');
+    
+    if (this.recommendations.length > 3 && !isDashboard) {
       summaryHTML += `
         <div class="more-recommendations">
           <span class="more-count">+${this.recommendations.length - 3} more recommendations</span>
           <button class="btn-view-all" onclick="window.healthInsights.showAllRecommendations()">View All</button>
+        </div>
+      `;
+    } else if (this.recommendations.length > 3 && isDashboard) {
+      summaryHTML += `
+        <div class="more-recommendations">
+          <span class="more-count">+${this.recommendations.length - 3} more recommendations</span>
+          <button class="btn-view-insights" onclick="switchToTab('health-insights')">View Full Analysis</button>
         </div>
       `;
     }
@@ -1637,6 +1668,142 @@ class HealthInsights {
   async refreshInsights() {
     console.log('Health Insights: Refreshing insights');
     await this.loadInsights();
+  }
+
+  // Method to display insights for the dedicated health insights tab
+  displayFullInsights() {
+    const insightsContainer = document.getElementById('insightsList');
+    if (!insightsContainer) {
+      console.log('Health Insights: insightsList container not found');
+      return;
+    }
+    
+    // Check if we're on the health insights tab
+    const isHealthInsightsTab = document.querySelector('.health-insights-container');
+    if (!isHealthInsightsTab) {
+      // If not on health insights tab, use regular display
+      this.displayInsights();
+      return;
+    }
+
+    console.log('Health Insights: Displaying full insights, count:', this.insights.length);
+
+    // Sort insights by severity
+    const severityOrder = { 'alert': 4, 'warning': 3, 'info': 2, 'success': 1 };
+    this.insights.sort((a, b) => severityOrder[b.severity] - severityOrder[a.severity]);
+
+    insightsContainer.innerHTML = '';
+
+    if (this.insights.length === 0) {
+      insightsContainer.innerHTML = `
+        <div class="no-insights">
+          <div class="no-insights-icon">📊</div>
+          <h3>No Health Insights Yet</h3>
+          <p>Keep logging your health data to receive personalized insights and recommendations!</p>
+          <div class="insights-tips">
+            <p><strong>Start by logging:</strong></p>
+            <ul>
+              <li>Blood pressure readings</li>
+              <li>Daily mood and energy levels</li>
+              <li>Medication intake</li>
+              <li>Limb care assessments</li>
+            </ul>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    // Show all insights in full detail
+    this.insights.forEach(insight => {
+      const insightElement = document.createElement('div');
+      insightElement.className = `expanded-insight-item ${insight.severity}`;
+      insightElement.innerHTML = `
+        <div class="expanded-insight-header">
+          <span class="expanded-insight-icon">${insight.icon}</span>
+          <div class="expanded-insight-title">
+            <h3>${insight.title}</h3>
+            <span class="expanded-insight-time">${this.formatTime(insight.timestamp)}</span>
+          </div>
+          <span class="expanded-insight-severity ${insight.severity}">${insight.severity.toUpperCase()}</span>
+        </div>
+        <div class="expanded-insight-content">
+          <p class="expanded-insight-message">${insight.message}</p>
+          <div class="expanded-insight-recommendation">
+            <strong>Recommendation:</strong> ${insight.recommendation}
+          </div>
+        </div>
+      `;
+      insightsContainer.appendChild(insightElement);
+    });
+  }
+
+  // Method to display full recommendations for the dedicated health insights tab
+  displayFullRecommendations() {
+    const recommendationsContainer = document.getElementById('recommendationsList');
+    if (!recommendationsContainer) {
+      console.log('Health Insights: recommendationsList container not found');
+      return;
+    }
+    
+    // Check if we're on the health insights tab
+    const isHealthInsightsTab = document.querySelector('.health-insights-container');
+    if (!isHealthInsightsTab) {
+      // If not on health insights tab, use regular display
+      this.displayRecommendations();
+      return;
+    }
+
+    recommendationsContainer.innerHTML = '';
+
+    if (this.recommendations.length === 0) {
+      recommendationsContainer.innerHTML = `
+        <div class="no-recommendations">
+          <p>No specific recommendations at this time.</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Add AI-driven header
+    const aiHeader = document.createElement('div');
+    aiHeader.className = 'ai-recommendations-header';
+    aiHeader.innerHTML = `
+      <div class="ai-header-content">
+        <span class="ai-icon">🤖</span>
+        <div class="ai-header-text">
+          <h4>AI-Powered Recommendations</h4>
+          <p>Personalized suggestions based on your health data patterns</p>
+        </div>
+      </div>
+    `;
+    recommendationsContainer.appendChild(aiHeader);
+
+    this.recommendations.forEach((rec, index) => {
+      const recElement = document.createElement('div');
+      recElement.className = `recommendation-item ${rec.priority} ${rec.dataDriven ? 'data-driven' : 'general'}`;
+      
+      const aiBadge = rec.dataDriven ? '<span class="ai-badge">AI</span>' : '';
+      const metricIcon = this.getMetricIcon(rec.metric);
+      const specificCount = rec.specificCount ? ` (${rec.specificCount})` : '';
+      
+      recElement.innerHTML = `
+        <div class="recommendation-header">
+          <div class="recommendation-meta">
+            <span class="recommendation-category">${rec.category}</span>
+            ${aiBadge}
+          </div>
+          <div class="recommendation-indicators">
+            <span class="metric-icon">${metricIcon}</span>
+            <span class="recommendation-priority ${rec.priority}">${rec.priority}</span>
+          </div>
+        </div>
+        <h4>${rec.title}${specificCount}</h4>
+        <p>${rec.description}</p>
+        ${rec.dataDriven ? '<div class="data-source">Based on your health data analysis</div>' : ''}
+      `;
+      recommendationsContainer.appendChild(recElement);
+    });
   }
 }
 
