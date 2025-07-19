@@ -66,12 +66,14 @@ if (firebaseInitialized) {
 // Global Firebase reference for compatibility
 window.firebase = {
   auth: () => window.firebaseServices.auth,
-  firestore: () => window.firebaseServices.db,
   messaging: () => null, // Always return null to prevent messaging errors
-  firestore: {
-    Timestamp: window.firebaseServices.db.Timestamp
-  }
+  firestore: () => window.firebaseServices.db
 };
+
+// Add Timestamp class to firebase.firestore for compatibility
+if (window.firebaseServices && window.firebaseServices.db) {
+  window.firebase.firestore.Timestamp = window.firebaseServices.db.Timestamp;
+}
 
 // Add authentication error handler with better offline handling
 if (auth) {
