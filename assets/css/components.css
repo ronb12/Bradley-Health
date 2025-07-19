@@ -2495,6 +2495,70 @@ input[type="range"]::-moz-range-thumb {
   }
 }
 
+/* Plan Duration Info */
+.plan-duration-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+  padding: 10px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.duration-badge {
+  background: var(--primary-color);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.duration-text {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Mobile responsive for plan duration info */
+@media (max-width: 768px) {
+  .plan-duration-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .duration-badge {
+    font-size: 0.7rem;
+  }
+  
+            .duration-text {
+            font-size: 0.8rem;
+          }
+        }
+
+/* Plan Notes for Print */
+.plan-note {
+          background: #f8f9fa;
+          border: 1px solid #dee2e6;
+          border-radius: 8px;
+          padding: 15px;
+          margin: 20px 0;
+          border-left: 4px solid #007bff;
+        }
+
+.plan-note h2 {
+          margin-top: 0;
+          color: #007bff;
+          font-size: 1.2rem;
+        }
+
+.plan-note p {
+          margin: 8px 0;
+          color: #495057;
+        }
+
 .back-to-summary {
   text-align: center;
   padding: 20px 0;

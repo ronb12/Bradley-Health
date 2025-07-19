@@ -259,7 +259,10 @@ class WeightLossManager {
     const carbGrams = Math.round((dailyCalories * carbRatio) / 4);
     const fatGrams = Math.round((dailyCalories * fatRatio) / 9);
 
-    // Generate 3 days of meals
+    // Determine plan duration based on weight goal timeline
+    const planDuration = Math.min(this.weightGoal.weeksToGoal * 7, 30); // Max 30 days for display
+    const displayDays = Math.min(planDuration, 7); // Show first 7 days in UI, rest in print
+
     const mealPlan = {
       dailyCalories: dailyCalories,
       macros: {
@@ -267,10 +270,12 @@ class WeightLossManager {
         carbs: carbGrams,
         fat: fatGrams
       },
-      days: []
+      days: [],
+      totalDays: planDuration,
+      displayDays: displayDays
     };
 
-    for (let day = 1; day <= 3; day++) {
+    for (let day = 1; day <= planDuration; day++) {
       const dayPlan = {
         day: day,
         meals: {
@@ -409,11 +414,28 @@ class WeightLossManager {
     const template = exerciseTemplates[activityLevel] || exerciseTemplates.moderate;
     const weeklyCaloriesBurned = template.exercises.reduce((total, exercise) => total + exercise.calories, 0);
 
+    // Calculate total weeks and generate repeating weekly plan
+    const totalWeeks = this.weightGoal.weeksToGoal;
+    const allExercises = [];
+    
+    for (let week = 1; week <= totalWeeks; week++) {
+      template.exercises.forEach(exercise => {
+        allExercises.push({
+          ...exercise,
+          week: week,
+          day: exercise.day + ((week - 1) * 7)
+        });
+      });
+    }
+
     return {
       weeklyWorkouts: template.weeklyWorkouts,
       focus: template.focus,
       weeklyCaloriesBurned: weeklyCaloriesBurned,
-      exercises: template.exercises
+      totalWeeks: totalWeeks,
+      totalDays: totalWeeks * 7,
+      exercises: allExercises,
+      weeklyTemplate: template.exercises
     };
   }
 
@@ -427,12 +449,24 @@ class WeightLossManager {
     document.getElementById('carbsTarget').textContent = mealPlan.macros.carbs;
     document.getElementById('fatTarget').textContent = mealPlan.macros.fat;
 
-    // Display daily meal plans
-    mealPlan.days.forEach((day, index) => {
-      const dayPlanElement = document.getElementById(`day${index + 1}Plan`);
-      if (dayPlanElement) {
+    // Add plan duration info
+    const planInfoElement = document.getElementById('mealPlanInfo');
+    if (planInfoElement) {
+      planInfoElement.innerHTML = `
+        <div class="plan-duration-info">
+          <span class="duration-badge">${mealPlan.totalDays} Days</span>
+          <span class="duration-text">Showing first ${mealPlan.displayDays} days</span>
+        </div>
+      `;
+    }
+
+    // Display daily meal plans (show first 7 days in UI)
+    const daysToShow = Math.min(mealPlan.displayDays, 7);
+    for (let i = 0; i < daysToShow; i++) {
+      const dayPlanElement = document.getElementById(`day${i + 1}Plan`);
+      if (dayPlanElement && mealPlan.days[i]) {
         const mealsContainer = dayPlanElement.querySelector('.meals-container');
-        mealsContainer.innerHTML = Object.entries(day.meals).map(([mealType, meal]) => `
+        mealsContainer.innerHTML = Object.entries(mealPlan.days[i].meals).map(([mealType, meal]) => `
           <div class="meal-item">
             <div class="meal-header">
               <span class="meal-type">${mealType.charAt(0).toUpperCase() + mealType.slice(1)}</span>
@@ -448,7 +482,7 @@ class WeightLossManager {
           </div>
         `).join('');
       }
-    });
+    }
 
     mealPlanCard.style.display = 'block';
     
@@ -456,7 +490,7 @@ class WeightLossManager {
     if (!mealPlanCard.querySelector('.print-plan-btn')) {
       const printButton = document.createElement('button');
       printButton.className = 'btn btn-secondary print-plan-btn';
-      printButton.innerHTML = '🖨️ Print Meal Plan';
+      printButton.innerHTML = '🖨️ Print Full Meal Plan';
       printButton.onclick = () => this.printMealPlan(mealPlan);
       mealPlanCard.appendChild(printButton);
     }
@@ -471,8 +505,19 @@ class WeightLossManager {
     document.getElementById('weeklyCaloriesBurned').textContent = exercisePlan.weeklyCaloriesBurned;
     document.getElementById('exerciseFocus').textContent = exercisePlan.focus;
 
-    // Display exercise schedule
-    exercisePlan.exercises.forEach((exercise, index) => {
+    // Add plan duration info
+    const exercisePlanInfoElement = document.getElementById('exercisePlanInfo');
+    if (exercisePlanInfoElement) {
+      exercisePlanInfoElement.innerHTML = `
+        <div class="plan-duration-info">
+          <span class="duration-badge">${exercisePlan.totalWeeks} Weeks</span>
+          <span class="duration-text">${exercisePlan.totalDays} total days</span>
+        </div>
+      `;
+    }
+
+    // Display weekly exercise template (first week)
+    exercisePlan.weeklyTemplate.forEach((exercise, index) => {
       const exerciseDayElement = document.getElementById(`exerciseDay${index + 1}`);
       if (exerciseDayElement) {
         const exercisesContainer = exerciseDayElement.querySelector('.exercises-container');
@@ -678,6 +723,13 @@ class WeightLossManager {
             `).join('')}
           </div>
         `).join('')}
+        
+        ${mealPlan.totalDays > 7 ? `
+          <div class="plan-note">
+            <p><strong>Note:</strong> This plan continues for ${mealPlan.totalDays} days total. 
+            The meal structure and calorie targets remain consistent throughout your weight loss journey.</p>
+          </div>
+        ` : ''}
       </body>
       </html>
     `;
@@ -718,9 +770,10 @@ class WeightLossManager {
           <p><strong>Focus Areas:</strong> ${exercisePlan.focus}</p>
         </div>
         
-        ${exercisePlan.exercises.map((exercise, index) => `
+        <h2>Weekly Exercise Template</h2>
+        ${exercisePlan.weeklyTemplate.map((exercise, index) => `
           <div class="exercise-day">
-            <h2>Day ${index + 1}</h2>
+            <h3>Day ${index + 1}</h3>
             <div class="exercise-item">
               <div class="exercise-header">
                 <span>${exercise.type}</span>
@@ -731,6 +784,15 @@ class WeightLossManager {
             </div>
           </div>
         `).join('')}
+        
+        ${exercisePlan.totalWeeks > 1 ? `
+          <div class="plan-note">
+            <h2>Complete Exercise Plan</h2>
+            <p><strong>Duration:</strong> ${exercisePlan.totalWeeks} weeks (${exercisePlan.totalDays} days total)</p>
+            <p><strong>Structure:</strong> This weekly template repeats for ${exercisePlan.totalWeeks} weeks.</p>
+            <p><strong>Progression:</strong> As you get stronger, you can increase intensity, duration, or add more challenging variations.</p>
+          </div>
+        ` : ''}
       </body>
       </html>
     `;
@@ -787,7 +849,7 @@ class WeightLossManager {
           <p><strong>Daily Calories:</strong> ${this.mealPlan.dailyCalories} calories</p>
           <p><strong>Protein:</strong> ${this.mealPlan.macros.protein}g | <strong>Carbs:</strong> ${this.mealPlan.macros.carbs}g | <strong>Fat:</strong> ${this.mealPlan.macros.fat}g</p>
           
-          ${this.mealPlan.days.map((day, index) => `
+          ${this.mealPlan.days.slice(0, 7).map((day, index) => `
             <h3>Day ${index + 1}</h3>
             ${Object.entries(day.meals).map(([mealType, meal]) => `
               <div class="meal-item">
@@ -805,6 +867,13 @@ class WeightLossManager {
               </div>
             `).join('')}
           `).join('')}
+          
+          ${this.mealPlan.totalDays > 7 ? `
+            <div class="plan-note">
+              <p><strong>Note:</strong> This meal plan continues for ${this.mealPlan.totalDays} days total. 
+              The meal structure and calorie targets remain consistent throughout your weight loss journey.</p>
+            </div>
+          ` : ''}
         </div>
         
         <div class="section">
@@ -813,17 +882,24 @@ class WeightLossManager {
           <p><strong>Weekly Calories Burned:</strong> ${this.exercisePlan.weeklyCaloriesBurned}</p>
           <p><strong>Focus Areas:</strong> ${this.exercisePlan.focus}</p>
           
-          ${this.exercisePlan.exercises.map((exercise, index) => `
-            <h3>Day ${index + 1}</h3>
+          <h3>Weekly Exercise Template</h3>
+          ${this.exercisePlan.weeklyTemplate.map((exercise, index) => `
             <div class="exercise-item">
               <div class="exercise-header">
-                <span>${exercise.type}</span>
+                <span>Day ${index + 1} - ${exercise.type}</span>
                 <span>${exercise.calories} calories</span>
               </div>
               <div><strong>${exercise.name}</strong></div>
               <div><em>Duration: ${exercise.duration}</em></div>
             </div>
           `).join('')}
+          
+          ${this.exercisePlan.totalWeeks > 1 ? `
+            <div class="plan-note">
+              <p><strong>Complete Plan:</strong> This weekly template repeats for ${this.exercisePlan.totalWeeks} weeks (${this.exercisePlan.totalDays} days total).</p>
+              <p><strong>Progression:</strong> As you get stronger, increase intensity, duration, or add more challenging variations.</p>
+            </div>
+          ` : ''}
         </div>
         
         <div class="section">
