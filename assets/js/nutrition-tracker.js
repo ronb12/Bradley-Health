@@ -369,7 +369,7 @@ class NutritionTracker {
         }
 
         // If still not found, add to unrecognized list
-        if (!foodFound && word.length > 2 && !['the', 'and', 'with', 'on', 'in', 'at', 'to', 'for', 'of', 'a', 'an'].includes(word)) {
+        if (!foodFound && word.length > 2 && !this.isNonFoodWord(word)) {
           unrecognizedFoods.push(word);
         }
       }
@@ -617,376 +617,415 @@ class NutritionTracker {
           </div>
         `;
         
-        // Show detailed foods breakdown
+        // Show detailed foods breakdown - ONLY show actual detected foods
         if (meal.foodsFound && meal.foodsFound.length > 0) {
-          const databaseFoods = meal.foodsFound.filter(f => f.source === 'database');
-          const categoryFoods = meal.foodsFound.filter(f => f.source === 'category');
-          const estimateFoods = meal.foodsFound.filter(f => f.source === 'estimate');
+          // Filter out non-food words and only show foods that were actually analyzed
+          const actualFoods = meal.foodsFound.filter(food => 
+            food.source === 'database' || 
+            food.source === 'category' || 
+            (food.source === 'estimate' && food.food.length > 2 && 
+             !['the', 'and', 'with', 'on', 'in', 'at', 'to', 'for', 'of', 'a', 'an', 'i', 'had', 'ate', 'drank', 'consumed'].includes(food.food.toLowerCase()))
+          );
           
-          foodsBreakdown = `
-            <div class="foods-breakdown">
-              <h5>🍽️ Foods Detected:</h5>
-              ${databaseFoods.length > 0 ? `
-                <div class="foods-section">
-                  <h6>✅ Database Foods (Accurate):</h6>
-                  <div class="foods-list">
-                    ${databaseFoods.map(food => `
-                      <div class="food-item database">
-                        <span class="food-name">${food.food}</span>
-                        <span class="food-portion">(${Math.round(food.portion)}g)</span>
-                        <span class="food-cholesterol">${Math.round(food.cholesterol)}mg chol</span>
-                      </div>
-                    `).join('')}
+          if (actualFoods.length > 0) {
+            const databaseFoods = actualFoods.filter(f => f.source === 'database');
+            const categoryFoods = actualFoods.filter(f => f.source === 'category');
+            const estimateFoods = actualFoods.filter(f => f.source === 'estimate');
+            
+            foodsBreakdown = `
+              <div class="foods-breakdown">
+                <h5>🍽️ Foods Detected:</h5>
+                ${databaseFoods.length > 0 ? `
+                  <div class="foods-section">
+                    <h6>✅ Database Foods (Accurate):</h6>
+                    <div class="foods-list">
+                      ${databaseFoods.map(food => `
+                        <div class="food-item database">
+                          <span class="food-name">${food.food}</span>
+                          <span class="food-portion">(${Math.round(food.portion)}g)</span>
+                          <span class="food-cholesterol">${Math.round(food.cholesterol)}mg chol</span>
+                        </div>
+                      `).join('')}
+                    </div>
                   </div>
-                </div>
-              ` : ''}
-              
-              ${categoryFoods.length > 0 ? `
-                <div class="foods-section">
-                  <h6>🔍 Category Foods (Estimated):</h6>
-                  <div class="foods-list">
-                    ${categoryFoods.map(food => `
-                      <div class="food-item category">
-                        <span class="food-name">${food.food}</span>
-                        <span class="food-portion">(${Math.round(food.portion)}g)</span>
-                        <span class="food-cholesterol">${Math.round(food.cholesterol)}mg chol</span>
-                        <span class="food-category">[${food.category}]</span>
-                      </div>
-                    `).join('')}
+                ` : ''}
+                
+                ${categoryFoods.length > 0 ? `
+                  <div class="foods-section">
+                    <h6>🔍 Category Foods (Estimated):</h6>
+                    <div class="foods-list">
+                      ${categoryFoods.map(food => `
+                        <div class="food-item category">
+                          <span class="food-name">${food.food}</span>
+                          <span class="food-portion">(${Math.round(food.portion)}g)</span>
+                          <span class="food-cholesterol">${Math.round(food.cholesterol)}mg chol</span>
+                          <span class="food-category">[${food.category}]</span>
+                        </div>
+                      `).join('')}
+                    </div>
                   </div>
-                </div>
-              ` : ''}
-              
-              ${estimateFoods.length > 0 ? `
-                <div class="foods-section">
-                  <h6>❓ Unknown Foods (Conservative Estimate):</h6>
-                  <div class="foods-list">
-                    ${estimateFoods.map(food => `
-                      <div class="food-item estimate">
-                        <span class="food-name">${food.food}</span>
-                        <span class="food-portion">(${Math.round(food.portion)}g)</span>
-                        <span class="food-cholesterol">${Math.round(food.cholesterol)}mg chol</span>
-                        <span class="food-note">[estimated]</span>
-                      </div>
-                    `).join('')}
+                ` : ''}
+                
+                ${estimateFoods.length > 0 ? `
+                  <div class="foods-section">
+                    <h6>🧠 Estimated Foods:</h6>
+                    <div class="foods-list">
+                      ${estimateFoods.map(food => `
+                        <div class="food-item estimate">
+                          <span class="food-name">${food.food}</span>
+                          <span class="food-portion">(${Math.round(food.portion)}g)</span>
+                          <span class="food-cholesterol">${Math.round(food.cholesterol)}mg chol</span>
+                          <span class="food-source">[${food.source}]</span>
+                        </div>
+                      `).join('')}
+                    </div>
                   </div>
-                </div>
-              ` : ''}
-            </div>
-          `;
+                ` : ''}
+              </div>
+            `;
+          }
         }
       }
       
       return `
-        <div class="history-item meal-entry">
-          <div class="history-header">
-            <div class="history-type">
-              <span class="meal-type-icon">${mealTypeIcon}</span>
-              <span class="meal-type">${meal.type}</span>
-            </div>
-            <span class="history-date">${timestamp}</span>
+        <div class="meal-entry">
+          <div class="meal-header">
+            <h3>${meal.name}</h3>
+            <span class="meal-type-icon">${mealTypeIcon}</span>
+            <span class="meal-timestamp">${timestamp}</span>
           </div>
-          <div class="history-content">
-            <h4>${meal.name}</h4>
-            ${meal.notes ? `<p>${meal.notes}</p>` : ''}
-            ${nutritionInfo}
-            ${foodsBreakdown}
-          </div>
+          ${nutritionInfo}
+          ${foodsBreakdown}
+          <p class="meal-notes">${meal.notes || 'No notes'}</p>
         </div>
       `;
     }).join('');
   }
 
-  renderCholesterolHistory() {
-    const cholesterolEntriesList = document.getElementById('cholesterolEntriesList');
-    if (!cholesterolEntriesList) return;
+  // Helper method to check if a word is a non-food word
+  isNonFoodWord(word) {
+    const nonFoodWords = [
+      // Articles
+      'the', 'a', 'an',
+      // Prepositions
+      'with', 'on', 'in', 'at', 'to', 'for', 'of', 'from', 'by', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below',
+      // Conjunctions
+      'and', 'or', 'but', 'nor', 'yet', 'so',
+      // Pronouns
+      'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'her', 'its', 'our', 'their',
+      // Common verbs
+      'had', 'ate', 'drank', 'consumed', 'was', 'were', 'is', 'are', 'am', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'must', 'shall',
+      // Other common words
+      'this', 'that', 'these', 'those', 'here', 'there', 'where', 'when', 'why', 'how', 'what', 'which', 'who', 'whom', 'whose',
+      // Time words
+      'today', 'yesterday', 'tomorrow', 'morning', 'afternoon', 'evening', 'night', 'breakfast', 'lunch', 'dinner', 'snack',
+      // Quantity words (unless followed by food)
+      'some', 'any', 'many', 'much', 'few', 'several', 'lots', 'plenty', 'enough', 'more', 'less', 'most', 'least',
+      // Common connectors
+      'also', 'too', 'as', 'like', 'such', 'very', 'really', 'quite', 'rather', 'just', 'only', 'even', 'still', 'again', 'back', 'away', 'out', 'up', 'down', 'over', 'under'
+    ];
+    
+    return nonFoodWords.includes(word.toLowerCase());
+  }
 
-    if (this.cholesterolEntries.length === 0) {
-      cholesterolEntriesList.innerHTML = `
-        <div class="no-data">
-          <p>No cholesterol readings logged yet. Start monitoring your cholesterol levels!</p>
-        </div>
-      `;
+  // Helper method to format timestamp for display
+  formatTimestamp(timestamp) {
+    const date = new Date(timestamp);
+    const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+    return date.toLocaleDateString(undefined, options);
+  }
+
+  // Helper method to get meal type icon
+  getMealTypeIcon(type) {
+    switch (type) {
+      case 'Breakfast':
+        return '🥣';
+      case 'Lunch':
+        return '🍽️';
+      case 'Dinner':
+        return '🍽️';
+      case 'Snack':
+        return '🍫';
+      default:
+        return '🍽️';
+    }
+  }
+
+  // Helper method to show toast messages
+  showToast(message, type = 'info') {
+    const toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) {
+      console.error('Toast container not found');
       return;
     }
 
-    cholesterolEntriesList.innerHTML = this.cholesterolEntries.map(entry => {
-      const timestamp = this.formatTimestamp(entry.timestamp);
-      const statusClass = entry.status;
-      const statusText = entry.status.charAt(0).toUpperCase() + entry.status.slice(1);
-      
-      return `
-        <div class="history-item cholesterol-entry ${statusClass}">
-          <div class="history-header">
-            <div class="history-type">
-              <span class="cholesterol-icon">🧀</span>
-              <span class="cholesterol-value">${entry.value} mg/dL</span>
-            </div>
-            <span class="history-date">${timestamp}</span>
-          </div>
-          <div class="history-content">
-            <div class="cholesterol-status ${statusClass}">
-              <span class="status-badge ${statusClass}">${statusText}</span>
-            </div>
-            ${entry.notes ? `<p>${entry.notes}</p>` : ''}
-          </div>
-        </div>
-      `;
-    }).join('');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
   }
 
-  getCholesterolStatus(value) {
-    if (value < 200) {
-      return 'optimal';
-    } else if (value < 240) {
-      return 'borderline';
-    } else {
-      return 'high';
-    }
-  }
-
-  getMealTypeIcon(type) {
-    const icons = {
-      'breakfast': '🌅',
-      'lunch': '🌞',
-      'dinner': '🌙',
-      'snack': '🍎',
-      'drink': '🥤'
-    };
-    return icons[type] || '🍽️';
-  }
-
-  formatTimestamp(timestamp) {
-    let date;
-    if (timestamp.toDate) {
-      // Firestore Timestamp
-      date = timestamp.toDate();
-    } else if (timestamp instanceof Date) {
-      // JavaScript Date
-      date = timestamp;
-    } else {
-      // Fallback
-      date = new Date(timestamp);
-    }
-
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
-
-  showToast(message, type = 'info') {
-    if (window.showToast) {
-      window.showToast(message, type);
-    } else {
-      console.log(`${type.toUpperCase()}: ${message}`);
-    }
-  }
-
-  setupEventListeners() {
-    console.log('Setting up nutrition tracker event listeners');
-    
-    // Meal form
-    const mealForm = document.getElementById('addMealForm');
-    console.log('Meal form found:', mealForm);
-    if (mealForm) {
-      mealForm.addEventListener('submit', (e) => this.addMeal(e));
-      console.log('Meal form event listener attached');
-    } else {
-      console.error('Meal form not found!');
-    }
-
-    // Cholesterol form
-    const cholesterolForm = document.getElementById('cholesterolForm');
-    console.log('Cholesterol form found:', cholesterolForm);
-    if (cholesterolForm) {
-      cholesterolForm.addEventListener('submit', (e) => this.addCholesterolEntry(e));
-      console.log('Cholesterol form event listener attached');
-    } else {
-      console.error('Cholesterol form not found!');
-    }
-
-    // Set default date and time
-    this.setDefaultDateTime();
-  }
-
+  // Helper method to set default date and time for new meals
   setDefaultDateTime() {
-    const now = new Date();
-    const date = now.toISOString().split('T')[0];
-    const time = now.toTimeString().split(' ')[0].substring(0, 5);
-
-    const mealDate = document.getElementById('mealDate');
-    const mealTime = document.getElementById('mealTime');
-    const cholesterolDate = document.getElementById('cholesterolDate');
-
-    if (mealDate) mealDate.value = date;
-    if (mealTime) mealTime.value = time;
-    if (cholesterolDate) cholesterolDate.value = date;
+    const dateInput = document.getElementById('date');
+    const timeInput = document.getElementById('time');
+    if (dateInput && timeInput) {
+      const today = new Date();
+      dateInput.value = today.toISOString().split('T')[0];
+      timeInput.value = today.toTimeString().substring(0, 5);
+    }
   }
 
+  // Helper method to load nutrition data from database
   async loadNutritionData() {
-    if (!this.currentUser) return;
+    if (!this.currentUser || !this.currentUser.uid) {
+      console.log('No current user, cannot load nutrition data.');
+      return;
+    }
 
     try {
-      console.log('Nutrition Tracker: Loading nutrition data');
-      
-      // Load meals
       const mealsSnapshot = await this.db.collection('meals')
         .where('userId', '==', this.currentUser.uid)
         .orderBy('timestamp', 'desc')
-        .limit(50)
         .get();
 
-      this.meals = mealsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      this.meals = [];
+      let totalCholesterol = 0;
+      let totalCalories = 0;
+      let totalFat = 0;
+      let mealsWithData = 0;
 
-      // Load cholesterol entries
-      const cholesterolSnapshot = await this.db.collection('cholesterolEntries')
-        .where('userId', '==', this.currentUser.uid)
-        .orderBy('timestamp', 'desc')
-        .limit(50)
-        .get();
+      mealsSnapshot.docs.forEach(doc => {
+        const meal = doc.data();
+        this.meals.push(meal);
+        if (meal.hasNutritionData) {
+          totalCholesterol += meal.estimatedCholesterol || 0;
+          totalCalories += meal.estimatedCalories || 0;
+          totalFat += meal.estimatedFat || 0;
+          mealsWithData++;
+        }
+      });
 
-      this.cholesterolEntries = cholesterolSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-
-      console.log('Nutrition Tracker: Loaded', this.meals.length, 'meals and', this.cholesterolEntries.length, 'cholesterol entries');
-
+      this.updateNutritionOverview();
       this.renderMealHistory();
       this.renderCholesterolHistory();
-      this.updateNutritionOverview();
-
     } catch (error) {
       console.error('Error loading nutrition data:', error);
       this.showToast('Error loading nutrition data', 'error');
     }
   }
 
-  async addCholesterolEntry(e) {
-    e.preventDefault();
-    
-    if (!this.currentUser || !this.currentUser.uid) {
-      this.showToast('Please sign in to log cholesterol', 'error');
+  // Helper method to generate cholesterol recommendations
+  generateCholesterolRecommendations(meals) {
+    const cholesterolRecommendations = [];
+    const cholesterolThreshold = 240; // mg/dL
+    const highCholesterolFoods = new Set();
+
+    meals.forEach(meal => {
+      if (meal.hasNutritionData && meal.estimatedCholesterol > cholesterolThreshold) {
+        highCholesterolFoods.add(meal.name);
+      }
+    });
+
+    if (highCholesterolFoods.size > 0) {
+      cholesterolRecommendations.push({
+        message: `You've consumed high cholesterol foods today. Consider replacing them with lower cholesterol options.`,
+        foods: Array.from(highCholesterolFoods)
+      });
+    }
+
+    return cholesterolRecommendations;
+  }
+
+  // Helper method to check cholesterol intake limits
+  checkCholesterolLimits(dailyCholesterol) {
+    const cholesterolThreshold = 240; // mg/dL
+    const warningThreshold = 200; // mg/dL
+
+    if (dailyCholesterol > cholesterolThreshold) {
+      return {
+        status: 'exceeded',
+        message: `Your daily cholesterol intake of ${dailyCholesterol} mg is above the recommended limit of ${cholesterolThreshold} mg.`,
+        action: 'Reduce cholesterol-rich foods.'
+      };
+    } else if (dailyCholesterol > warningThreshold) {
+      return {
+        status: 'warning',
+        message: `Your daily cholesterol intake of ${dailyCholesterol} mg is approaching the recommended limit.`,
+        action: 'Monitor your cholesterol intake.'
+      };
+    } else {
+      return {
+        status: 'ok',
+        message: `Your daily cholesterol intake of ${dailyCholesterol} mg is within the recommended limit.`,
+        action: 'Keep up the good work!'
+      };
+    }
+  }
+
+  // Helper method to render cholesterol history
+  async renderCholesterolHistory() {
+    const cholesterolHistoryList = document.getElementById('cholesterolHistoryList');
+    if (!cholesterolHistoryList) return;
+
+    cholesterolHistoryList.innerHTML = ''; // Clear previous history
+
+    if (this.cholesterolEntries.length === 0) {
+      cholesterolHistoryList.innerHTML = `
+        <div class="no-data">
+          <p>No cholesterol history logged yet. Start by adding your first entry!</p>
+        </div>
+      `;
       return;
     }
 
-    const formData = new FormData(e.target);
-    
-    const date = formData.get('date');
-    const value = parseFloat(formData.get('value'));
-    const notes = formData.get('notes');
-    const timestamp = new Date(`${date}T00:00:00`);
+    this.cholesterolEntries.forEach(entry => {
+      const date = new Date(entry.timestamp).toLocaleDateString();
+      cholesterolHistoryList.innerHTML += `
+        <div class="cholesterol-entry">
+          <span class="entry-date">${date}</span>
+          <span class="entry-value">${entry.value} mg/dL</span>
+          <span class="entry-notes">${entry.notes || 'No notes'}</span>
+        </div>
+      `;
+    });
+  }
 
-    const cholesterolEntry = {
-      value: value,
-      date: date,
+  // Helper method to add a new cholesterol entry
+  async addCholesterolEntry(value, notes) {
+    if (!this.currentUser || !this.currentUser.uid) {
+      console.log('No current user, cannot add cholesterol entry.');
+      this.showToast('Please sign in to track cholesterol', 'error');
+      return;
+    }
+
+    const newEntry = {
+      value: parseFloat(value),
       notes: notes,
-      timestamp: timestamp,
+      timestamp: new Date(),
       userId: this.currentUser.uid
     };
 
     try {
-      await this.db.collection('cholesterolEntries').add(cholesterolEntry);
-      this.showToast('Cholesterol reading logged successfully', 'success');
-      e.target.reset();
-      this.setDefaultDateTime();
-      this.loadNutritionData();
+      await this.db.collection('cholesterolHistory').add(newEntry);
+      this.cholesterolEntries.unshift(newEntry); // Add to the beginning for latest first
+      this.renderCholesterolHistory();
+      this.updateNutritionOverview(); // Update overview to reflect new cholesterol
     } catch (error) {
-      console.error('Error saving cholesterol entry:', error);
-      this.showToast('Error saving cholesterol entry', 'error');
+      console.error('Error adding cholesterol entry:', error);
+      this.showToast('Error adding cholesterol entry', 'error');
     }
   }
 
-  // Get cholesterol-lowering alternatives for a food
-  getCholesterolAlternatives(foodName) {
-    const food = this.foodDatabase[foodName.toLowerCase()];
-    if (food && food.alternatives) {
-      return food.alternatives.map(alt => ({
-        name: alt,
-        cholesterol: this.foodDatabase[alt]?.cholesterol || 0,
-        reduction: food.cholesterol - (this.foodDatabase[alt]?.cholesterol || 0)
-      })).filter(alt => alt.reduction > 0);
+  // Helper method to delete a cholesterol entry
+  async deleteCholesterolEntry(entryId) {
+    if (!this.currentUser || !this.currentUser.uid) {
+      console.log('No current user, cannot delete cholesterol entry.');
+      this.showToast('Please sign in to delete cholesterol entry', 'error');
+      return;
     }
-    return [];
-  }
 
-  // Check if daily cholesterol intake exceeds recommended limits
-  checkCholesterolLimits(dailyIntake) {
-    const recommendedDaily = 300; // mg per day for general population
-    const highRiskLimit = 200; // mg per day for people with heart disease
-    
-    if (dailyIntake > recommendedDaily) {
-      return {
-        status: 'exceeded',
-        limit: recommendedDaily,
-        overage: dailyIntake - recommendedDaily,
-        message: `You've exceeded the daily recommended limit of ${recommendedDaily}mg by ${dailyIntake - recommendedDaily}mg`
-      };
-    } else if (dailyIntake > highRiskLimit) {
-      return {
-        status: 'warning',
-        limit: highRiskLimit,
-        overage: dailyIntake - highRiskLimit,
-        message: `You're approaching the limit for high-risk individuals (${highRiskLimit}mg)`
-      };
-    } else {
-      return {
-        status: 'good',
-        limit: recommendedDaily,
-        remaining: recommendedDaily - dailyIntake,
-        message: `Great job! You have ${recommendedDaily - dailyIntake}mg remaining today`
-      };
+    try {
+      await this.db.collection('cholesterolHistory').doc(entryId).delete();
+      this.cholesterolEntries = this.cholesterolEntries.filter(entry => entry.id !== entryId);
+      this.renderCholesterolHistory();
+      this.updateNutritionOverview(); // Update overview to reflect deleted cholesterol
+    } catch (error) {
+      console.error('Error deleting cholesterol entry:', error);
+      this.showToast('Error deleting cholesterol entry', 'error');
     }
   }
 
-  // Generate cholesterol-lowering recommendations
-  generateCholesterolRecommendations(meals) {
-    const recommendations = [];
-    const highCholesterolFoods = [];
-    
-    // Analyze meals for high-cholesterol foods
-    meals.forEach(meal => {
-      if (meal.foodsFound) {
-        meal.foodsFound.forEach(food => {
-          if (food.cholesterol > 50) { // High cholesterol threshold
-            highCholesterolFoods.push({
-              food: food.food,
-              cholesterol: food.cholesterol,
-              meal: meal.name,
-              alternatives: this.getCholesterolAlternatives(food.food)
-            });
-          }
-        });
+  // Helper method to update a cholesterol entry
+  async updateCholesterolEntry(entryId, value, notes) {
+    if (!this.currentUser || !this.currentUser.uid) {
+      console.log('No current user, cannot update cholesterol entry.');
+      this.showToast('Please sign in to update cholesterol entry', 'error');
+      return;
+    }
+
+    try {
+      await this.db.collection('cholesterolHistory').doc(entryId).update({
+        value: parseFloat(value),
+        notes: notes,
+        timestamp: new Date()
+      });
+      const index = this.cholesterolEntries.findIndex(entry => entry.id === entryId);
+      if (index !== -1) {
+        this.cholesterolEntries[index].value = parseFloat(value);
+        this.cholesterolEntries[index].notes = notes;
+        this.cholesterolEntries[index].timestamp = new Date();
       }
-    });
+      this.renderCholesterolHistory();
+      this.updateNutritionOverview(); // Update overview to reflect updated cholesterol
+    } catch (error) {
+      console.error('Error updating cholesterol entry:', error);
+      this.showToast('Error updating cholesterol entry', 'error');
+    }
+  }
 
-    // Generate specific recommendations
-    if (highCholesterolFoods.length > 0) {
-      highCholesterolFoods.forEach(item => {
-        if (item.alternatives.length > 0) {
-          const bestAlternative = item.alternatives[0];
-          recommendations.push({
-            type: 'substitution',
-            food: item.food,
-            cholesterol: item.cholesterol,
-            alternative: bestAlternative.name,
-            reduction: bestAlternative.reduction,
-            message: `Replace ${item.food} with ${bestAlternative.name} to reduce cholesterol by ${bestAlternative.reduction}mg`
-          });
-        }
+  // Helper method to setup event listeners for forms
+  setupEventListeners() {
+    const addMealForm = document.getElementById('addMealForm');
+    if (addMealForm) {
+      addMealForm.addEventListener('submit', this.addMeal.bind(this));
+    }
+
+    const addCholesterolForm = document.getElementById('addCholesterolForm');
+    if (addCholesterolForm) {
+      addCholesterolForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const value = document.getElementById('cholesterolValue').value;
+        const notes = document.getElementById('cholesterolNotes').value;
+        await this.addCholesterolEntry(value, notes);
+        addCholesterolForm.reset();
       });
     }
 
-    return recommendations;
+    const updateCholesterolForm = document.getElementById('updateCholesterolForm');
+    if (updateCholesterolForm) {
+      updateCholesterolForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const entryId = updateCholesterolForm.dataset.entryId;
+        const value = document.getElementById('cholesterolValue').value;
+        const notes = document.getElementById('cholesterolNotes').value;
+        await this.updateCholesterolEntry(entryId, value, notes);
+        updateCholesterolForm.reset();
+        updateCholesterolForm.dataset.entryId = ''; // Clear entryId after update
+      });
+    }
+
+    const deleteCholesterolForm = document.getElementById('deleteCholesterolForm');
+    if (deleteCholesterolForm) {
+      deleteCholesterolForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const entryId = deleteCholesterolForm.dataset.entryId;
+        await this.deleteCholesterolEntry(entryId);
+        deleteCholesterolForm.reset();
+        deleteCholesterolForm.dataset.entryId = ''; // Clear entryId after delete
+      });
+    }
+  }
+
+  // Helper method to initialize the app (e.g., load data on page load)
+  async initializeApp() {
+    await this.loadNutritionData();
+    this.updateNutritionOverview();
+    this.renderMealHistory();
+    this.renderCholesterolHistory();
+    this.setupEventListeners();
+  }
+
+  // Main method to run the app
+  run() {
+    this.initializeApp();
   }
 }
 
-// Initialize Nutrition Tracker
-window.nutritionTracker = new NutritionTracker();
-window.nutritionTracker.init(); 
+// Instantiate the NutritionTracker class
+const nutritionTracker = new NutritionTracker();
+nutritionTracker.run();
