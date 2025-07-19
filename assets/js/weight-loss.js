@@ -707,46 +707,222 @@ class WeightLossManager {
         weeklyWorkouts: 4,
         focus: 'Cardio & Strength Building',
         exercises: [
-          { day: 1, type: 'Cardio', name: 'Brisk Walking', duration: '30 minutes', calories: 180, intensity: 'Low' },
-          { day: 2, type: 'Strength', name: 'Bodyweight Circuit', duration: '25 minutes', calories: 120, intensity: 'Low' },
-          { day: 3, type: 'Cardio', name: 'Stationary Cycling', duration: '25 minutes', calories: 200, intensity: 'Low' },
-          { day: 4, type: 'Flexibility', name: 'Gentle Yoga', duration: '30 minutes', calories: 100, intensity: 'Low' }
+          { 
+            day: 1, 
+            type: 'Cardio', 
+            name: 'Brisk Walking', 
+            duration: '30 minutes', 
+            calories: 180, 
+            intensity: 'Low',
+            instructions: 'Walk at a pace where you can talk but not sing. Maintain good posture, swing your arms naturally, and take deep breaths. Start with 5 minutes warm-up, 20 minutes brisk walking, 5 minutes cool-down.'
+          },
+          { 
+            day: 2, 
+            type: 'Strength', 
+            name: 'Bodyweight Circuit', 
+            duration: '25 minutes', 
+            calories: 120, 
+            intensity: 'Low',
+            instructions: 'Complete 3 rounds: 10 squats, 10 push-ups (modified if needed), 10 lunges each leg, 30-second plank, 10 glute bridges. Rest 1 minute between rounds.'
+          },
+          { 
+            day: 3, 
+            type: 'Cardio', 
+            name: 'Stationary Cycling', 
+            duration: '25 minutes', 
+            calories: 200, 
+            intensity: 'Low',
+            instructions: '5 minutes warm-up at easy pace, 15 minutes moderate cycling (can talk comfortably), 5 minutes cool-down. Adjust resistance to maintain steady pace.'
+          },
+          { 
+            day: 4, 
+            type: 'Flexibility', 
+            name: 'Gentle Yoga', 
+            duration: '30 minutes', 
+            calories: 100, 
+            intensity: 'Low',
+            instructions: 'Focus on breathing and gentle stretches. Include: cat-cow poses, child\'s pose, gentle twists, forward folds, and relaxation poses. Hold each pose for 30-60 seconds.'
+          }
         ]
       },
       light: {
         weeklyWorkouts: 5,
         focus: 'Cardio & Toning',
         exercises: [
-          { day: 1, type: 'Cardio', name: 'Jogging/Walking Intervals', duration: '35 minutes', calories: 280, intensity: 'Low-Medium' },
-          { day: 2, type: 'Strength', name: 'Dumbbell Training', duration: '35 minutes', calories: 180, intensity: 'Medium' },
-          { day: 3, type: 'Cardio', name: 'Swimming', duration: '30 minutes', calories: 240, intensity: 'Medium' },
-          { day: 4, type: 'Strength', name: 'Resistance Band Workout', duration: '30 minutes', calories: 160, intensity: 'Medium' },
-          { day: 5, type: 'Flexibility', name: 'Power Yoga', duration: '45 minutes', calories: 140, intensity: 'Medium' }
+          { 
+            day: 1, 
+            type: 'Cardio', 
+            name: 'Jogging/Walking Intervals', 
+            duration: '35 minutes', 
+            calories: 280, 
+            intensity: 'Low-Medium',
+            instructions: '5 minutes warm-up walk, then alternate: 2 minutes jogging, 3 minutes walking. Repeat 6 times. 5 minutes cool-down walk. Adjust pace to maintain conversation during walking intervals.'
+          },
+          { 
+            day: 2, 
+            type: 'Strength', 
+            name: 'Dumbbell Training', 
+            duration: '35 minutes', 
+            calories: 180, 
+            intensity: 'Medium',
+            instructions: '3 sets each: 12 bicep curls, 12 shoulder presses, 12 squats with dumbbells, 12 rows, 12 tricep extensions. Rest 60 seconds between sets. Use weights that challenge you but allow proper form.'
+          },
+          { 
+            day: 3, 
+            type: 'Cardio', 
+            name: 'Swimming', 
+            duration: '30 minutes', 
+            calories: 240, 
+            intensity: 'Medium',
+            instructions: '5 minutes warm-up with easy strokes, 20 minutes continuous swimming (freestyle or breaststroke), 5 minutes cool-down with gentle strokes. Focus on breathing rhythm and proper form.'
+          },
+          { 
+            day: 4, 
+            type: 'Strength', 
+            name: 'Resistance Band Workout', 
+            duration: '30 minutes', 
+            calories: 160, 
+            intensity: 'Medium',
+            instructions: '3 rounds: 15 band rows, 15 band squats, 15 band chest presses, 15 band lateral raises, 30-second band plank. Rest 45 seconds between rounds. Maintain tension on band throughout movement.'
+          },
+          { 
+            day: 5, 
+            type: 'Flexibility', 
+            name: 'Power Yoga', 
+            duration: '45 minutes', 
+            calories: 140, 
+            intensity: 'Medium',
+            instructions: 'Flow through sun salutations, warrior poses, balance poses, and strength-building sequences. Focus on breath-synchronized movement. Include 5 minutes meditation at the end.'
+          }
         ]
       },
       moderate: {
         weeklyWorkouts: 6,
         focus: 'Strength & Cardio',
         exercises: [
-          { day: 1, type: 'Strength', name: 'Upper Body Focus', duration: '45 minutes', calories: 220, intensity: 'Medium' },
-          { day: 2, type: 'Cardio', name: 'Running', duration: '40 minutes', calories: 380, intensity: 'Medium' },
-          { day: 3, type: 'Strength', name: 'Lower Body Focus', duration: '45 minutes', calories: 220, intensity: 'Medium' },
-          { day: 4, type: 'Cardio', name: 'HIIT Training', duration: '30 minutes', calories: 320, intensity: 'High' },
-          { day: 5, type: 'Strength', name: 'Full Body Circuit', duration: '40 minutes', calories: 240, intensity: 'Medium' },
-          { day: 6, type: 'Recovery', name: 'Active Recovery & Stretching', duration: '35 minutes', calories: 100, intensity: 'Low' }
+          { 
+            day: 1, 
+            type: 'Strength', 
+            name: 'Upper Body Focus', 
+            duration: '45 minutes', 
+            calories: 220, 
+            intensity: 'Medium',
+            instructions: '4 sets each: 10-12 bench press, 10-12 rows, 10-12 shoulder press, 10-12 lat pulldowns, 10-12 bicep curls, 10-12 tricep dips. Rest 90 seconds between sets. Progressive overload focus.'
+          },
+          { 
+            day: 2, 
+            type: 'Cardio', 
+            name: 'Running', 
+            duration: '40 minutes', 
+            calories: 380, 
+            intensity: 'Medium',
+            instructions: '10 minutes easy warm-up, 25 minutes steady-state running at conversational pace, 5 minutes cool-down. Focus on proper running form: mid-foot strike, relaxed shoulders, steady breathing.'
+          },
+          { 
+            day: 3, 
+            type: 'Strength', 
+            name: 'Lower Body Focus', 
+            duration: '45 minutes', 
+            calories: 220, 
+            intensity: 'Medium',
+            instructions: '4 sets each: 10-12 squats, 10-12 deadlifts, 10-12 lunges each leg, 10-12 leg press, 15 calf raises, 30-second wall sit. Rest 90 seconds between sets. Focus on proper form and depth.'
+          },
+          { 
+            day: 4, 
+            type: 'Cardio', 
+            name: 'HIIT Training', 
+            duration: '30 minutes', 
+            calories: 320, 
+            intensity: 'High',
+            instructions: '5 minutes warm-up, then 8 rounds: 30 seconds high-intensity exercise (burpees, mountain climbers, or jumping jacks), 90 seconds rest. 5 minutes cool-down. Push hard during work intervals.'
+          },
+          { 
+            day: 5, 
+            type: 'Strength', 
+            name: 'Full Body Circuit', 
+            duration: '40 minutes', 
+            calories: 240, 
+            intensity: 'Medium',
+            instructions: '3 rounds: 15 push-ups, 15 squats, 15 rows, 15 lunges, 15 shoulder presses, 30-second plank, 15 deadlifts. Rest 2 minutes between rounds. Minimal rest between exercises within rounds.'
+          },
+          { 
+            day: 6, 
+            type: 'Recovery', 
+            name: 'Active Recovery & Stretching', 
+            duration: '35 minutes', 
+            calories: 100, 
+            intensity: 'Low',
+            instructions: '15 minutes light walking or cycling, then 20 minutes stretching: hamstrings, quads, calves, chest, back, shoulders. Hold each stretch 30-60 seconds. Focus on breathing and relaxation.'
+          }
         ]
       },
       active: {
         weeklyWorkouts: 7,
         focus: 'Performance & Endurance',
         exercises: [
-          { day: 1, type: 'Strength', name: 'Full Body Strength', duration: '60 minutes', calories: 320, intensity: 'High' },
-          { day: 2, type: 'Cardio', name: 'Long Distance Run', duration: '50 minutes', calories: 480, intensity: 'High' },
-          { day: 3, type: 'Strength', name: 'Power Lifting', duration: '55 minutes', calories: 280, intensity: 'High' },
-          { day: 4, type: 'Cardio', name: 'High-Intensity Intervals', duration: '35 minutes', calories: 420, intensity: 'High' },
-          { day: 5, type: 'Strength', name: 'Functional Training', duration: '50 minutes', calories: 300, intensity: 'High' },
-          { day: 6, type: 'Cardio', name: 'Cross Training', duration: '45 minutes', calories: 360, intensity: 'Medium-High' },
-          { day: 7, type: 'Recovery', name: 'Active Recovery & Mobility', duration: '40 minutes', calories: 120, intensity: 'Low' }
+          { 
+            day: 1, 
+            type: 'Strength', 
+            name: 'Full Body Strength', 
+            duration: '60 minutes', 
+            calories: 320, 
+            intensity: 'High',
+            instructions: '5 sets each: 8-10 deadlifts, 8-10 bench press, 8-10 squats, 8-10 pull-ups, 8-10 overhead press. Rest 3 minutes between sets. Focus on compound movements and progressive overload.'
+          },
+          { 
+            day: 2, 
+            type: 'Cardio', 
+            name: 'Long Distance Run', 
+            duration: '50 minutes', 
+            calories: 480, 
+            intensity: 'High',
+            instructions: '10 minutes easy warm-up, 35 minutes steady-state running at moderate-high intensity, 5 minutes cool-down. Maintain consistent pace throughout. Focus on endurance and mental toughness.'
+          },
+          { 
+            day: 3, 
+            type: 'Strength', 
+            name: 'Power Lifting', 
+            duration: '55 minutes', 
+            calories: 280, 
+            intensity: 'High',
+            instructions: '5 sets each: 5 deadlifts (heavy), 5 squats (heavy), 5 bench press (heavy). Rest 4-5 minutes between sets. Focus on explosive power and proper form. Use 85-90% of 1RM.'
+          },
+          { 
+            day: 4, 
+            type: 'Cardio', 
+            name: 'High-Intensity Intervals', 
+            duration: '35 minutes', 
+            calories: 420, 
+            intensity: 'High',
+            instructions: '10 minutes warm-up, then 10 rounds: 1 minute all-out effort (sprinting, burpees, or rowing), 2 minutes active recovery. 5 minutes cool-down. Push to maximum effort during work intervals.'
+          },
+          { 
+            day: 5, 
+            type: 'Strength', 
+            name: 'Functional Training', 
+            duration: '50 minutes', 
+            calories: 300, 
+            intensity: 'High',
+            instructions: '4 rounds: 20 kettlebell swings, 15 box jumps, 12 pull-ups, 10 thrusters, 8 Turkish get-ups each side. Rest 3 minutes between rounds. Focus on functional movement patterns.'
+          },
+          { 
+            day: 6, 
+            type: 'Cardio', 
+            name: 'Cross Training', 
+            duration: '45 minutes', 
+            calories: 360, 
+            intensity: 'Medium-High',
+            instructions: 'Mix of activities: 15 minutes cycling, 15 minutes rowing, 15 minutes elliptical or stair climbing. Vary intensity throughout. Focus on different movement patterns and muscle groups.'
+          },
+          { 
+            day: 7, 
+            type: 'Recovery', 
+            name: 'Active Recovery & Mobility', 
+            duration: '40 minutes', 
+            calories: 120, 
+            intensity: 'Low',
+            instructions: '20 minutes light swimming or cycling, then 20 minutes mobility work: hip openers, shoulder mobility, thoracic spine work, and foam rolling. Focus on recovery and injury prevention.'
+          }
         ]
       }
     };
@@ -813,12 +989,24 @@ class WeightLossManager {
               <span class="meal-calories">${meal.calories} cal</span>
             </div>
             <div class="meal-name">${meal.name}</div>
-            ${meal.ingredients ? `
-              <div class="meal-ingredients">
-                <strong>Ingredients:</strong>
-                <ul>
-                  ${meal.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
-                </ul>
+                            ${meal.ingredients ? `
+                  <div class="meal-ingredients">
+                    <strong>Ingredients:</strong>
+                    <ul>
+                      ${meal.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+                    </ul>
+                  </div>
+                ` : ''}
+                ${meal.instructions ? `
+                  <div class="meal-instructions">
+                    <strong>Instructions:</strong>
+                    <p>${meal.instructions}</p>
+                  </div>
+                ` : ''}
+            ${meal.instructions ? `
+              <div class="meal-instructions">
+                <strong>Instructions:</strong>
+                <p>${meal.instructions}</p>
               </div>
             ` : ''}
             <div class="meal-macros">
@@ -880,6 +1068,12 @@ class WeightLossManager {
               <span class="exercise-duration">${exercise.duration}</span>
               ${exercise.intensity ? `<span class="exercise-intensity intensity-${exercise.intensity.toLowerCase().replace('-', '')}">${exercise.intensity}</span>` : ''}
             </div>
+            ${exercise.instructions ? `
+              <div class="exercise-instructions">
+                <strong>Instructions:</strong>
+                <p>${exercise.instructions}</p>
+              </div>
+            ` : ''}
           </div>
         `;
       }
@@ -1029,64 +1223,388 @@ class WeightLossManager {
         {
           name: 'Berry Protein Power Smoothie',
           ingredients: ['1 cup mixed berries', '1 scoop vanilla protein powder', '1 cup almond milk', '1 tbsp chia seeds'],
+          instructions: 'Blend all ingredients until smooth. Add ice if desired.',
           calories: 180, protein: 16, carbs: 20, fat: 4, cholesterol: 0
         },
         {
           name: 'Green Detox Smoothie',
           ingredients: ['2 cups spinach', '1 banana', '1 cup coconut water', '1 tbsp flax seeds', '1/2 cup pineapple'],
+          instructions: 'Blend spinach and coconut water first, then add remaining ingredients.',
           calories: 140, protein: 8, carbs: 18, fat: 4, cholesterol: 0
         },
         {
           name: 'Banana Almond Smoothie',
           ingredients: ['1 banana', '1 cup almond milk', '2 tbsp almond butter', '1 scoop protein powder', '1 tbsp honey'],
+          instructions: 'Blend until creamy and smooth. Serve immediately.',
           calories: 200, protein: 12, carbs: 24, fat: 8, cholesterol: 0
         },
         {
           name: 'Tropical Protein Smoothie',
           ingredients: ['1 cup mango', '1/2 cup pineapple', '1 scoop vanilla protein', '1 cup coconut milk', '1 tbsp coconut flakes'],
+          instructions: 'Blend fruits first, then add protein powder and coconut milk.',
           calories: 160, protein: 14, carbs: 18, fat: 4, cholesterol: 0
         },
         {
           name: 'Chocolate Protein Smoothie',
           ingredients: ['1 scoop chocolate protein powder', '1 cup almond milk', '1 banana', '1 tbsp cocoa powder', '1 tbsp peanut butter'],
+          instructions: 'Blend all ingredients until smooth and creamy.',
           calories: 180, protein: 18, carbs: 16, fat: 6, cholesterol: 0
         },
         {
           name: 'Strawberry Banana Smoothie',
           ingredients: ['1 cup strawberries', '1 banana', '1 cup Greek yogurt', '1 tbsp honey', '1/2 cup ice'],
+          instructions: 'Blend until smooth. Add more ice if needed for desired consistency.',
           calories: 160, protein: 10, carbs: 22, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Blueberry Almond Smoothie',
+          ingredients: ['1 cup blueberries', '1 cup almond milk', '2 tbsp almond butter', '1 scoop protein powder', '1 tbsp maple syrup'],
+          instructions: 'Blend blueberries and almond milk first, then add remaining ingredients.',
+          calories: 190, protein: 16, carbs: 22, fat: 8, cholesterol: 0
+        },
+        {
+          name: 'Spinach Apple Smoothie',
+          ingredients: ['2 cups spinach', '1 apple (cored)', '1 cup coconut water', '1 tbsp chia seeds', '1/2 lemon (juiced)'],
+          instructions: 'Blend spinach and coconut water first, then add apple and remaining ingredients.',
+          calories: 150, protein: 6, carbs: 20, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Coconut Berry Smoothie',
+          ingredients: ['1 cup mixed berries', '1 cup coconut milk', '1 tbsp coconut oil', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend berries and coconut milk first, then add protein powder and honey.',
+          calories: 170, protein: 14, carbs: 18, fat: 6, cholesterol: 0
+        },
+        {
+          name: 'Avocado Green Smoothie',
+          ingredients: ['1/2 avocado', '2 cups spinach', '1 cup almond milk', '1 tbsp flax seeds', '1 tbsp honey'],
+          instructions: 'Blend avocado and almond milk first, then add spinach and remaining ingredients.',
+          calories: 180, protein: 8, carbs: 16, fat: 10, cholesterol: 0
+        },
+        {
+          name: 'Mango Coconut Smoothie',
+          ingredients: ['1 cup mango', '1 cup coconut milk', '1 tbsp coconut flakes', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend mango and coconut milk until smooth, then add protein powder.',
+          calories: 160, protein: 14, carbs: 18, fat: 6, cholesterol: 0
+        },
+        {
+          name: 'Pineapple Ginger Smoothie',
+          ingredients: ['1 cup pineapple', '1 cup coconut water', '1 tbsp fresh ginger', '1 tbsp chia seeds', '1 tbsp honey'],
+          instructions: 'Blend pineapple and coconut water first, then add ginger and remaining ingredients.',
+          calories: 140, protein: 4, carbs: 20, fat: 2, cholesterol: 0
+        },
+        {
+          name: 'Raspberry Vanilla Smoothie',
+          ingredients: ['1 cup raspberries', '1 cup almond milk', '1 scoop vanilla protein', '1 tbsp vanilla extract', '1 tbsp honey'],
+          instructions: 'Blend raspberries and almond milk first, then add protein powder and vanilla.',
+          calories: 170, protein: 16, carbs: 18, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Kale Apple Smoothie',
+          ingredients: ['2 cups kale', '1 apple (cored)', '1 cup coconut water', '1 tbsp flax seeds', '1 tbsp lemon juice'],
+          instructions: 'Blend kale and coconut water first, then add apple and remaining ingredients.',
+          calories: 130, protein: 6, carbs: 18, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Strawberry Coconut Smoothie',
+          ingredients: ['1 cup strawberries', '1 cup coconut milk', '1 tbsp coconut oil', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend strawberries and coconut milk until smooth, then add protein powder.',
+          calories: 180, protein: 14, carbs: 20, fat: 6, cholesterol: 0
+        },
+        {
+          name: 'Blackberry Almond Smoothie',
+          ingredients: ['1 cup blackberries', '1 cup almond milk', '2 tbsp almond butter', '1 scoop protein powder', '1 tbsp honey'],
+          instructions: 'Blend blackberries and almond milk first, then add almond butter and protein.',
+          calories: 190, protein: 16, carbs: 20, fat: 8, cholesterol: 0
+        },
+        {
+          name: 'Spinach Pineapple Smoothie',
+          ingredients: ['2 cups spinach', '1 cup pineapple', '1 cup coconut water', '1 tbsp chia seeds', '1 tbsp honey'],
+          instructions: 'Blend spinach and coconut water first, then add pineapple and remaining ingredients.',
+          calories: 140, protein: 6, carbs: 18, fat: 2, cholesterol: 0
+        },
+        {
+          name: 'Blueberry Coconut Smoothie',
+          ingredients: ['1 cup blueberries', '1 cup coconut milk', '1 tbsp coconut flakes', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend blueberries and coconut milk until smooth, then add protein powder.',
+          calories: 170, protein: 14, carbs: 18, fat: 6, cholesterol: 0
+        },
+        {
+          name: 'Mango Almond Smoothie',
+          ingredients: ['1 cup mango', '1 cup almond milk', '2 tbsp almond butter', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend mango and almond milk first, then add almond butter and protein powder.',
+          calories: 200, protein: 16, carbs: 22, fat: 8, cholesterol: 0
+        },
+        {
+          name: 'Strawberry Spinach Smoothie',
+          ingredients: ['1 cup strawberries', '2 cups spinach', '1 cup almond milk', '1 tbsp chia seeds', '1 tbsp honey'],
+          instructions: 'Blend spinach and almond milk first, then add strawberries and remaining ingredients.',
+          calories: 150, protein: 8, carbs: 18, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Pineapple Coconut Smoothie',
+          ingredients: ['1 cup pineapple', '1 cup coconut milk', '1 tbsp coconut oil', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend pineapple and coconut milk until smooth, then add protein powder.',
+          calories: 160, protein: 14, carbs: 18, fat: 6, cholesterol: 0
+        },
+        {
+          name: 'Raspberry Coconut Smoothie',
+          ingredients: ['1 cup raspberries', '1 cup coconut milk', '1 tbsp coconut flakes', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend raspberries and coconut milk first, then add protein powder and coconut flakes.',
+          calories: 170, protein: 14, carbs: 18, fat: 6, cholesterol: 0
+        },
+        {
+          name: 'Blueberry Spinach Smoothie',
+          ingredients: ['1 cup blueberries', '2 cups spinach', '1 cup coconut water', '1 tbsp flax seeds', '1 tbsp honey'],
+          instructions: 'Blend spinach and coconut water first, then add blueberries and remaining ingredients.',
+          calories: 140, protein: 6, carbs: 18, fat: 2, cholesterol: 0
+        },
+        {
+          name: 'Mango Pineapple Smoothie',
+          ingredients: ['1 cup mango', '1 cup pineapple', '1 cup coconut water', '1 tbsp chia seeds', '1 tbsp honey'],
+          instructions: 'Blend mango and pineapple first, then add coconut water and remaining ingredients.',
+          calories: 150, protein: 4, carbs: 22, fat: 2, cholesterol: 0
+        },
+        {
+          name: 'Strawberry Mango Smoothie',
+          ingredients: ['1 cup strawberries', '1 cup mango', '1 cup almond milk', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend strawberries and mango first, then add almond milk and protein powder.',
+          calories: 180, protein: 14, carbs: 20, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Pineapple Almond Smoothie',
+          ingredients: ['1 cup pineapple', '1 cup almond milk', '2 tbsp almond butter', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend pineapple and almond milk first, then add almond butter and protein powder.',
+          calories: 200, protein: 16, carbs: 22, fat: 8, cholesterol: 0
+        },
+        {
+          name: 'Raspberry Almond Smoothie',
+          ingredients: ['1 cup raspberries', '1 cup almond milk', '2 tbsp almond butter', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend raspberries and almond milk first, then add almond butter and protein powder.',
+          calories: 190, protein: 16, carbs: 20, fat: 8, cholesterol: 0
+        },
+        {
+          name: 'Blueberry Mango Smoothie',
+          ingredients: ['1 cup blueberries', '1 cup mango', '1 cup coconut water', '1 tbsp chia seeds', '1 tbsp honey'],
+          instructions: 'Blend blueberries and mango first, then add coconut water and remaining ingredients.',
+          calories: 160, protein: 4, carbs: 22, fat: 2, cholesterol: 0
+        },
+        {
+          name: 'Strawberry Pineapple Smoothie',
+          ingredients: ['1 cup strawberries', '1 cup pineapple', '1 cup coconut water', '1 tbsp chia seeds', '1 tbsp honey'],
+          instructions: 'Blend strawberries and pineapple first, then add coconut water and remaining ingredients.',
+          calories: 150, protein: 4, carbs: 20, fat: 2, cholesterol: 0
+        },
+        {
+          name: 'Mango Spinach Smoothie',
+          ingredients: ['1 cup mango', '2 cups spinach', '1 cup coconut water', '1 tbsp flax seeds', '1 tbsp honey'],
+          instructions: 'Blend spinach and coconut water first, then add mango and remaining ingredients.',
+          calories: 140, protein: 6, carbs: 18, fat: 2, cholesterol: 0
+        },
+        {
+          name: 'Pineapple Spinach Smoothie',
+          ingredients: ['1 cup pineapple', '2 cups spinach', '1 cup coconut water', '1 tbsp chia seeds', '1 tbsp honey'],
+          instructions: 'Blend spinach and coconut water first, then add pineapple and remaining ingredients.',
+          calories: 130, protein: 6, carbs: 16, fat: 2, cholesterol: 0
+        },
+        {
+          name: 'Raspberry Spinach Smoothie',
+          ingredients: ['1 cup raspberries', '2 cups spinach', '1 cup coconut water', '1 tbsp flax seeds', '1 tbsp honey'],
+          instructions: 'Blend spinach and coconut water first, then add raspberries and remaining ingredients.',
+          calories: 140, protein: 6, carbs: 18, fat: 2, cholesterol: 0
         }
       ],
       regular: [
         {
           name: 'Berry Blast Protein Smoothie',
           ingredients: ['1 cup mixed berries', '1 scoop vanilla protein powder', '1 cup whole milk', '1 tbsp honey', '1/2 cup ice'],
+          instructions: 'Blend all ingredients until smooth. Add more ice if desired.',
           calories: 200, protein: 18, carbs: 22, fat: 6, cholesterol: 0
         },
         {
           name: 'Green Machine Smoothie',
           ingredients: ['2 cups kale', '1 apple', '1 cup apple juice', '1 tbsp ginger', '1/2 cup ice'],
+          instructions: 'Blend kale and apple juice first, then add apple and remaining ingredients.',
           calories: 160, protein: 10, carbs: 20, fat: 4, cholesterol: 0
         },
         {
           name: 'Peanut Butter Banana Smoothie',
           ingredients: ['1 banana', '2 tbsp peanut butter', '1 cup whole milk', '1 scoop protein powder', '1 tbsp honey'],
+          instructions: 'Blend until creamy and smooth. Serve immediately.',
           calories: 220, protein: 14, carbs: 26, fat: 10, cholesterol: 0
         },
         {
           name: 'Tropical Paradise Smoothie',
           ingredients: ['1 cup mango', '1/2 cup pineapple', '1 cup coconut milk', '1 tbsp coconut oil', '1/2 cup ice'],
+          instructions: 'Blend fruits first, then add coconut milk and remaining ingredients.',
           calories: 180, protein: 12, carbs: 20, fat: 6, cholesterol: 0
         },
         {
           name: 'Chocolate Peanut Butter Smoothie',
           ingredients: ['1 scoop chocolate protein powder', '2 tbsp peanut butter', '1 cup whole milk', '1 banana', '1 tbsp cocoa powder'],
+          instructions: 'Blend all ingredients until smooth and creamy.',
           calories: 200, protein: 16, carbs: 18, fat: 8, cholesterol: 0
         },
         {
           name: 'Strawberry Cheesecake Smoothie',
           ingredients: ['1 cup strawberries', '1/2 cup cottage cheese', '1 cup whole milk', '1 tbsp honey', '1/2 cup ice'],
+          instructions: 'Blend until smooth. Add more ice if needed for desired consistency.',
           calories: 180, protein: 12, carbs: 20, fat: 6, cholesterol: 0
+        },
+        {
+          name: 'Blueberry Protein Smoothie',
+          ingredients: ['1 cup blueberries', '1 scoop vanilla protein powder', '1 cup whole milk', '1 tbsp honey', '1/2 cup ice'],
+          instructions: 'Blend blueberries and milk first, then add protein powder and honey.',
+          calories: 210, protein: 18, carbs: 24, fat: 6, cholesterol: 0
+        },
+        {
+          name: 'Spinach Apple Smoothie',
+          ingredients: ['2 cups spinach', '1 apple (cored)', '1 cup apple juice', '1 tbsp ginger', '1/2 cup ice'],
+          instructions: 'Blend spinach and apple juice first, then add apple and remaining ingredients.',
+          calories: 170, protein: 8, carbs: 22, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Coconut Berry Smoothie',
+          ingredients: ['1 cup mixed berries', '1 cup coconut milk', '1 tbsp coconut oil', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend berries and coconut milk first, then add protein powder and honey.',
+          calories: 190, protein: 16, carbs: 20, fat: 8, cholesterol: 0
+        },
+        {
+          name: 'Avocado Green Smoothie',
+          ingredients: ['1/2 avocado', '2 cups spinach', '1 cup whole milk', '1 tbsp flax seeds', '1 tbsp honey'],
+          instructions: 'Blend avocado and milk first, then add spinach and remaining ingredients.',
+          calories: 200, protein: 10, carbs: 18, fat: 12, cholesterol: 0
+        },
+        {
+          name: 'Mango Coconut Smoothie',
+          ingredients: ['1 cup mango', '1 cup coconut milk', '1 tbsp coconut flakes', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend mango and coconut milk until smooth, then add protein powder.',
+          calories: 180, protein: 16, carbs: 20, fat: 8, cholesterol: 0
+        },
+        {
+          name: 'Pineapple Ginger Smoothie',
+          ingredients: ['1 cup pineapple', '1 cup apple juice', '1 tbsp fresh ginger', '1 tbsp chia seeds', '1 tbsp honey'],
+          instructions: 'Blend pineapple and apple juice first, then add ginger and remaining ingredients.',
+          calories: 160, protein: 6, carbs: 22, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Raspberry Vanilla Smoothie',
+          ingredients: ['1 cup raspberries', '1 cup whole milk', '1 scoop vanilla protein', '1 tbsp vanilla extract', '1 tbsp honey'],
+          instructions: 'Blend raspberries and milk first, then add protein powder and vanilla.',
+          calories: 190, protein: 18, carbs: 20, fat: 6, cholesterol: 0
+        },
+        {
+          name: 'Kale Apple Smoothie',
+          ingredients: ['2 cups kale', '1 apple (cored)', '1 cup apple juice', '1 tbsp flax seeds', '1 tbsp lemon juice'],
+          instructions: 'Blend kale and apple juice first, then add apple and remaining ingredients.',
+          calories: 150, protein: 8, carbs: 20, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Strawberry Coconut Smoothie',
+          ingredients: ['1 cup strawberries', '1 cup coconut milk', '1 tbsp coconut oil', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend strawberries and coconut milk until smooth, then add protein powder.',
+          calories: 200, protein: 16, carbs: 22, fat: 8, cholesterol: 0
+        },
+        {
+          name: 'Blackberry Protein Smoothie',
+          ingredients: ['1 cup blackberries', '1 cup whole milk', '2 tbsp peanut butter', '1 scoop protein powder', '1 tbsp honey'],
+          instructions: 'Blend blackberries and milk first, then add peanut butter and protein.',
+          calories: 220, protein: 18, carbs: 22, fat: 10, cholesterol: 0
+        },
+        {
+          name: 'Spinach Pineapple Smoothie',
+          ingredients: ['2 cups spinach', '1 cup pineapple', '1 cup apple juice', '1 tbsp chia seeds', '1 tbsp honey'],
+          instructions: 'Blend spinach and apple juice first, then add pineapple and remaining ingredients.',
+          calories: 160, protein: 8, carbs: 20, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Blueberry Coconut Smoothie',
+          ingredients: ['1 cup blueberries', '1 cup coconut milk', '1 tbsp coconut flakes', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend blueberries and coconut milk until smooth, then add protein powder.',
+          calories: 190, protein: 16, carbs: 20, fat: 8, cholesterol: 0
+        },
+        {
+          name: 'Mango Almond Smoothie',
+          ingredients: ['1 cup mango', '1 cup whole milk', '2 tbsp peanut butter', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend mango and milk first, then add peanut butter and protein powder.',
+          calories: 220, protein: 18, carbs: 24, fat: 10, cholesterol: 0
+        },
+        {
+          name: 'Strawberry Spinach Smoothie',
+          ingredients: ['1 cup strawberries', '2 cups spinach', '1 cup whole milk', '1 tbsp chia seeds', '1 tbsp honey'],
+          instructions: 'Blend spinach and milk first, then add strawberries and remaining ingredients.',
+          calories: 170, protein: 10, carbs: 20, fat: 6, cholesterol: 0
+        },
+        {
+          name: 'Pineapple Coconut Smoothie',
+          ingredients: ['1 cup pineapple', '1 cup coconut milk', '1 tbsp coconut oil', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend pineapple and coconut milk until smooth, then add protein powder.',
+          calories: 180, protein: 16, carbs: 20, fat: 8, cholesterol: 0
+        },
+        {
+          name: 'Raspberry Coconut Smoothie',
+          ingredients: ['1 cup raspberries', '1 cup coconut milk', '1 tbsp coconut flakes', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend raspberries and coconut milk first, then add protein powder and coconut flakes.',
+          calories: 190, protein: 16, carbs: 20, fat: 8, cholesterol: 0
+        },
+        {
+          name: 'Blueberry Spinach Smoothie',
+          ingredients: ['1 cup blueberries', '2 cups spinach', '1 cup apple juice', '1 tbsp flax seeds', '1 tbsp honey'],
+          instructions: 'Blend spinach and apple juice first, then add blueberries and remaining ingredients.',
+          calories: 160, protein: 8, carbs: 20, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Mango Pineapple Smoothie',
+          ingredients: ['1 cup mango', '1 cup pineapple', '1 cup apple juice', '1 tbsp chia seeds', '1 tbsp honey'],
+          instructions: 'Blend mango and pineapple first, then add apple juice and remaining ingredients.',
+          calories: 170, protein: 6, carbs: 24, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Strawberry Mango Smoothie',
+          ingredients: ['1 cup strawberries', '1 cup mango', '1 cup whole milk', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend strawberries and mango first, then add milk and protein powder.',
+          calories: 200, protein: 16, carbs: 22, fat: 6, cholesterol: 0
+        },
+        {
+          name: 'Pineapple Almond Smoothie',
+          ingredients: ['1 cup pineapple', '1 cup whole milk', '2 tbsp peanut butter', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend pineapple and milk first, then add peanut butter and protein powder.',
+          calories: 220, protein: 18, carbs: 24, fat: 10, cholesterol: 0
+        },
+        {
+          name: 'Raspberry Almond Smoothie',
+          ingredients: ['1 cup raspberries', '1 cup whole milk', '2 tbsp peanut butter', '1 scoop vanilla protein', '1 tbsp honey'],
+          instructions: 'Blend raspberries and milk first, then add peanut butter and protein powder.',
+          calories: 210, protein: 18, carbs: 22, fat: 10, cholesterol: 0
+        },
+        {
+          name: 'Blueberry Mango Smoothie',
+          ingredients: ['1 cup blueberries', '1 cup mango', '1 cup apple juice', '1 tbsp chia seeds', '1 tbsp honey'],
+          instructions: 'Blend blueberries and mango first, then add apple juice and remaining ingredients.',
+          calories: 180, protein: 6, carbs: 24, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Strawberry Pineapple Smoothie',
+          ingredients: ['1 cup strawberries', '1 cup pineapple', '1 cup apple juice', '1 tbsp chia seeds', '1 tbsp honey'],
+          instructions: 'Blend strawberries and pineapple first, then add apple juice and remaining ingredients.',
+          calories: 170, protein: 6, carbs: 22, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Mango Spinach Smoothie',
+          ingredients: ['1 cup mango', '2 cups spinach', '1 cup apple juice', '1 tbsp flax seeds', '1 tbsp honey'],
+          instructions: 'Blend spinach and apple juice first, then add mango and remaining ingredients.',
+          calories: 160, protein: 8, carbs: 20, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Pineapple Spinach Smoothie',
+          ingredients: ['1 cup pineapple', '2 cups spinach', '1 cup apple juice', '1 tbsp chia seeds', '1 tbsp honey'],
+          instructions: 'Blend spinach and apple juice first, then add pineapple and remaining ingredients.',
+          calories: 150, protein: 8, carbs: 18, fat: 4, cholesterol: 0
+        },
+        {
+          name: 'Raspberry Spinach Smoothie',
+          ingredients: ['1 cup raspberries', '2 cups spinach', '1 cup apple juice', '1 tbsp flax seeds', '1 tbsp honey'],
+          instructions: 'Blend spinach and apple juice first, then add raspberries and remaining ingredients.',
+          calories: 160, protein: 8, carbs: 20, fat: 4, cholesterol: 0
         }
       ]
     };
@@ -1099,6 +1617,7 @@ class WeightLossManager {
     return {
       name: selectedSmoothie.name,
       ingredients: selectedSmoothie.ingredients,
+      instructions: selectedSmoothie.instructions,
       calories: Math.round(selectedSmoothie.calories * calorieRatio),
       protein: Math.round(selectedSmoothie.protein * calorieRatio),
       carbs: Math.round(selectedSmoothie.carbs * calorieRatio),
@@ -1226,6 +1745,12 @@ class WeightLossManager {
               </div>
               <div><strong>${exercise.name}</strong></div>
               <div><em>Duration: ${exercise.duration}</em></div>
+              ${exercise.instructions ? `
+                <div class="exercise-instructions">
+                  <strong>Instructions:</strong>
+                  <p>${exercise.instructions}</p>
+                </div>
+              ` : ''}
             </div>
           </div>
         `).join('')}
@@ -1344,6 +1869,12 @@ class WeightLossManager {
               </div>
               <div><strong>${exercise.name}</strong></div>
               <div><em>Duration: ${exercise.duration}</em></div>
+              ${exercise.instructions ? `
+                <div class="exercise-instructions">
+                  <strong>Instructions:</strong>
+                  <p>${exercise.instructions}</p>
+                </div>
+              ` : ''}
             </div>
           `).join('')}
           
