@@ -45,7 +45,14 @@
         setPTRVisible(true, 'Refreshing...', '⟳');
         setTimeout(() => {
           setPTRVisible(false);
-          window.location.reload();
+          // Notify service worker about pull-to-refresh
+          if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({
+              type: 'PULL_TO_REFRESH'
+            });
+          }
+          // Force reload to get latest version
+          window.location.reload(true);
         }, 500);
       } else {
         setPTRVisible(false);

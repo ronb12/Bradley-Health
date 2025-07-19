@@ -1,7 +1,7 @@
 // Bradley Health Service Worker
-const CACHE_NAME = 'bradley-health-v1.1.2';
-const STATIC_CACHE = 'bradley-health-static-v1.1.2';
-const DYNAMIC_CACHE = 'bradley-health-dynamic-v1.1.2';
+const CACHE_NAME = 'bradley-health-v1.1.3';
+const STATIC_CACHE = 'bradley-health-static-v1.1.3';
+const DYNAMIC_CACHE = 'bradley-health-dynamic-v1.1.3';
 
 // Files to cache immediately
 const STATIC_FILES = [
@@ -316,6 +316,31 @@ self.addEventListener('message', (event) => {
     if (event.ports && event.ports[0]) {
       event.ports[0].postMessage({ version: CACHE_NAME });
     }
+  }
+  
+  if (event.data && event.data.type === 'PULL_TO_REFRESH') {
+    // Handle pull-to-refresh update
+    event.waitUntil(
+      caches.keys()
+        .then((cacheNames) => {
+          return Promise.all(
+            cacheNames.map((cacheName) => {
+              if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
+                console.log('Service Worker: Deleting old cache during pull-to-refresh:', cacheName);
+                return caches.delete(cacheName);
+              }
+            })
+          );
+        })
+        .then(() => {
+          console.log('Service Worker: Pull-to-refresh cache cleanup completed');
+          // Force update by clearing all caches and reloading
+          return self.clients.claim();
+        })
+        .catch((error) => {
+          console.error('Service Worker: Error during pull-to-refresh cleanup:', error);
+        })
+    );
   }
 });
 
