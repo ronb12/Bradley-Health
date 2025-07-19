@@ -2271,3 +2271,6 @@ class WeightLossManager {
     setTimeout(() => printWindow.print(), 500);
   }
 }
+
+// Initialize Weight Loss Manager
+window.weightLossManager = new WeightLossManager();
