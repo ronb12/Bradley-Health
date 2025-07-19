@@ -361,6 +361,8 @@ class DashboardManager {
     
     // This will be handled by the mood-tracker.js module
     if (window.moodTracker) {
+      // Reset event listeners to ensure they work correctly
+      window.moodTracker.resetEventListeners();
       window.moodTracker.loadMoodEntries();
     }
   }

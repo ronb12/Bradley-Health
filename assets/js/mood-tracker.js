@@ -11,20 +11,18 @@ class MoodTracker {
   }
 
   init() {
-    // Get current user from auth manager
-    if (window.authManager) {
-      this.currentUser = window.authManager.getCurrentUser();
-      if (this.currentUser) {
-        this.loadMoodEntries();
-        this.loadMoodFactors();
-      }
-    }
-
+    console.log('Initializing MoodTracker...');
+    this.setupAuthListener();
     this.setupEventListeners();
     this.setupMoodChart();
-    
-    // Listen for authentication state changes
-    this.setupAuthListener();
+    this.loadMoodFactors();
+  }
+
+  // Reset event listeners setup flag - call this when switching to mood tab
+  resetEventListeners() {
+    console.log('Resetting mood tracker event listeners...');
+    this.eventListenersSetup = false;
+    this.setupEventListeners();
   }
 
   setupAuthListener() {
@@ -57,14 +55,28 @@ class MoodTracker {
     // Add mood entry form
     const moodForm = document.getElementById('moodEntryForm');
     if (moodForm) {
+      // Remove any existing listeners
+      moodForm.removeEventListener('submit', this.addMoodEntry);
       moodForm.addEventListener('submit', (e) => this.addMoodEntry(e));
       console.log('Mood entry form event listener added');
     }
 
     // Quick mood buttons - now just set the mood level in the detailed form
     const quickMoodBtns = document.querySelectorAll('.mood-btn');
-    quickMoodBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => this.setMoodLevel(e));
+    console.log(`Found ${quickMoodBtns.length} quick mood buttons`);
+    
+    quickMoodBtns.forEach((btn, index) => {
+      // Remove any existing listeners by cloning the element
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode.replaceChild(newBtn, btn);
+      
+      // Add new listener
+      newBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log(`Quick mood button ${index + 1} clicked, mood: ${newBtn.dataset.mood}`);
+        this.setMoodLevel(e);
+      });
     });
     console.log(`Quick mood button event listeners added for ${quickMoodBtns.length} buttons`);
 
@@ -83,6 +95,8 @@ class MoodTracker {
   }
 
   setMoodLevel(e) {
+    console.log('setMoodLevel called');
+    
     // Remove previous selection
     document.querySelectorAll('.mood-btn').forEach(btn => {
       btn.classList.remove('selected');
@@ -92,6 +106,7 @@ class MoodTracker {
     e.target.classList.add('selected');
     
     const mood = parseInt(e.target.dataset.mood);
+    console.log(`Setting mood level to: ${mood}`);
     
     // Set the mood level in the detailed form
     const moodLevel = document.getElementById('moodLevel');
@@ -101,6 +116,8 @@ class MoodTracker {
       moodLevel.value = mood;
       moodValue.textContent = mood;
       console.log(`Mood level set to ${mood} in detailed form`);
+    } else {
+      console.warn('Could not find mood level elements');
     }
     
     // Remove selection after a short delay
