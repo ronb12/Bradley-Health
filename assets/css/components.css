@@ -890,7 +890,8 @@ input[type="range"]::-moz-range-thumb {
 
 .profile-form,
 .emergency-form {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
 }
 
@@ -916,6 +917,51 @@ input[type="range"]::-moz-range-thumb {
 
 .setting-item:last-child {
   border-bottom: none;
+}
+
+/* Height Input Group Styles */
+.height-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.height-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.height-field input {
+  width: 60px;
+  text-align: center;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.height-field label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Responsive height input */
+@media (max-width: 480px) {
+  .height-input-group {
+    gap: 5px;
+  }
+  
+  .height-field input {
+    width: 50px;
+    font-size: 12px;
+  }
+  
+  .height-field label {
+    font-size: 11px;
+  }
 }
 
 /* ===== TOAST NOTIFICATIONS ===== */

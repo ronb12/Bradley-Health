@@ -81,13 +81,27 @@ class ProfileManager {
       const nameInput = profileForm.querySelector('[name="name"]');
       const ageInput = profileForm.querySelector('[name="age"]');
       const weightInput = profileForm.querySelector('[name="weight"]');
-      const heightInput = profileForm.querySelector('[name="height"]');
+      const heightFeetInput = profileForm.querySelector('[name="heightFeet"]');
+      const heightInchesInput = profileForm.querySelector('[name="heightInches"]');
       const conditionsInput = profileForm.querySelector('[name="medicalConditions"]');
 
       if (nameInput) nameInput.value = this.userProfile.name || '';
       if (ageInput) ageInput.value = this.userProfile.age || '';
       if (weightInput) weightInput.value = this.userProfile.weight || '';
-      if (heightInput) heightInput.value = this.userProfile.height || '';
+      
+      // Handle height - convert from stored format to feet and inches
+      if (this.userProfile.height) {
+        const heightInInches = this.userProfile.height;
+        const feet = Math.floor(heightInInches / 12);
+        const inches = heightInInches % 12;
+        
+        if (heightFeetInput) heightFeetInput.value = feet;
+        if (heightInchesInput) heightInchesInput.value = inches;
+      } else {
+        if (heightFeetInput) heightFeetInput.value = '';
+        if (heightInchesInput) heightInchesInput.value = '';
+      }
+      
       if (conditionsInput) conditionsInput.value = this.userProfile.medicalConditions || '';
     }
 
@@ -140,11 +154,18 @@ class ProfileManager {
     
     const formData = new FormData(e.target);
     
+    // Convert feet and inches to total inches for storage
+    const heightFeet = parseInt(formData.get('heightFeet')) || 0;
+    const heightInches = parseInt(formData.get('heightInches')) || 0;
+    const totalHeightInches = (heightFeet * 12) + heightInches;
+    
     const profileData = {
       name: formData.get('name'),
       age: formData.get('age') ? parseInt(formData.get('age')) : null,
       weight: formData.get('weight') ? parseFloat(formData.get('weight')) : null,
-      height: formData.get('height') ? parseFloat(formData.get('height')) : null,
+      height: totalHeightInches > 0 ? totalHeightInches : null, // Store as total inches
+      heightFeet: heightFeet > 0 ? heightFeet : null, // Also store feet for convenience
+      heightInches: heightInches > 0 ? heightInches : null, // Also store inches for convenience
       medicalConditions: formData.get('medicalConditions'),
       updatedAt: new Date()
     };
