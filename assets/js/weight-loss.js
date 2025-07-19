@@ -294,9 +294,11 @@ class WeightLossManager {
     };
 
     for (let day = 1; day <= planDuration; day++) {
-      // Vary meal types to include smoothies and different combinations
-      const includeSmoothie = Math.random() < 0.3; // 30% chance of smoothie
+      // Vary meal types to include smoothies, juices, and different combinations
+      const includeSmoothie = Math.random() < 0.25; // 25% chance of smoothie
+      const includeJuice = Math.random() < 0.25; // 25% chance of juice
       const smoothieMeal = Math.random() < 0.5 ? 'breakfast' : 'snack'; // Smoothie for breakfast or snack
+      const juiceMeal = Math.random() < 0.5 ? 'breakfast' : 'snack'; // Juice for breakfast or snack
       
       const dayPlan = {
         day: day,
@@ -309,11 +311,21 @@ class WeightLossManager {
         dayPlan.meals.lunch = this.generateMeal('lunch', dailyCalories * 0.35, this.weightGoal.restrictions);
         dayPlan.meals.dinner = this.generateMeal('dinner', dailyCalories * 0.35, this.weightGoal.restrictions);
         dayPlan.meals.snack = this.generateMeal('snack', dailyCalories * 0.10, this.weightGoal.restrictions);
+      } else if (includeJuice && juiceMeal === 'breakfast') {
+        dayPlan.meals.breakfast = this.generateMeal('juice', dailyCalories * 0.20, this.weightGoal.restrictions);
+        dayPlan.meals.lunch = this.generateMeal('lunch', dailyCalories * 0.35, this.weightGoal.restrictions);
+        dayPlan.meals.dinner = this.generateMeal('dinner', dailyCalories * 0.35, this.weightGoal.restrictions);
+        dayPlan.meals.snack = this.generateMeal('snack', dailyCalories * 0.10, this.weightGoal.restrictions);
       } else if (includeSmoothie && smoothieMeal === 'snack') {
         dayPlan.meals.breakfast = this.generateMeal('breakfast', dailyCalories * 0.25, this.weightGoal.restrictions);
         dayPlan.meals.lunch = this.generateMeal('lunch', dailyCalories * 0.35, this.weightGoal.restrictions);
         dayPlan.meals.dinner = this.generateMeal('dinner', dailyCalories * 0.30, this.weightGoal.restrictions);
         dayPlan.meals.snack = this.generateMeal('smoothie', dailyCalories * 0.10, this.weightGoal.restrictions);
+      } else if (includeJuice && juiceMeal === 'snack') {
+        dayPlan.meals.breakfast = this.generateMeal('breakfast', dailyCalories * 0.25, this.weightGoal.restrictions);
+        dayPlan.meals.lunch = this.generateMeal('lunch', dailyCalories * 0.35, this.weightGoal.restrictions);
+        dayPlan.meals.dinner = this.generateMeal('dinner', dailyCalories * 0.30, this.weightGoal.restrictions);
+        dayPlan.meals.snack = this.generateMeal('juice', dailyCalories * 0.10, this.weightGoal.restrictions);
       } else {
         // Standard meal distribution
         dayPlan.meals.breakfast = this.generateMeal('breakfast', dailyCalories * 0.25, this.weightGoal.restrictions);
@@ -329,9 +341,13 @@ class WeightLossManager {
   }
 
   generateMeal(mealType, targetCalories, restrictions) {
-    // Handle smoothie meals separately
+    // Handle smoothie and juice meals separately
     if (mealType === 'smoothie') {
       return this.generateSmoothie(targetCalories, restrictions);
+    }
+    
+    if (mealType === 'juice') {
+      return this.generateJuice(targetCalories, restrictions);
     }
 
     const lowCholesterol = restrictions && restrictions.toLowerCase().includes('cholesterol');
@@ -1052,8 +1068,8 @@ class WeightLossManager {
       // Add print smoothies only button
       const printSmoothiesButton = document.createElement('button');
       printSmoothiesButton.className = 'btn btn-primary print-smoothies-btn';
-      printSmoothiesButton.innerHTML = '🥤 Print Smoothies Only';
-      printSmoothiesButton.onclick = () => this.printSmoothiesOnly(this.mealPlan);
+      printSmoothiesButton.innerHTML = '🥤🍹 Print Beverages Only';
+      printSmoothiesButton.onclick = () => this.printBeveragesOnly(this.mealPlan);
       mealPlanCard.appendChild(printSmoothiesButton);
     }
   }
@@ -1772,6 +1788,251 @@ class WeightLossManager {
     };
   }
 
+  generateJuice(targetCalories, restrictions) {
+    const lowCholesterol = restrictions && restrictions.toLowerCase().includes('cholesterol');
+    
+    const juiceRecipes = {
+      lowCholesterol: [
+        {
+          name: 'Green Detox Juice',
+          ingredients: ['2 large kale leaves', '1 cucumber', '2 celery stalks', '1 green apple', '1/2 lemon', '1 inch fresh ginger'],
+          instructions: 'Wash all ingredients thoroughly. Juice kale first, then cucumber, celery, apple, lemon, and ginger. Strain if desired.',
+          calories: 120, protein: 4, carbs: 24, fat: 1, cholesterol: 0,
+          benefits: 'Detoxifying, anti-inflammatory, rich in vitamins A, C, and K'
+        },
+        {
+          name: 'Carrot Apple Ginger Juice',
+          ingredients: ['4 large carrots', '2 apples', '1 inch fresh ginger', '1/2 lemon'],
+          instructions: 'Wash carrots and apples. Juice carrots first, then apples, ginger, and lemon. Serve immediately.',
+          calories: 140, protein: 3, carbs: 32, fat: 1, cholesterol: 0,
+          benefits: 'Immune boosting, digestive health, rich in beta-carotene'
+        },
+        {
+          name: 'Beetroot Berry Juice',
+          ingredients: ['1 medium beetroot', '1 cup strawberries', '1 apple', '1/2 lemon', '1 inch fresh ginger'],
+          instructions: 'Wash beetroot and cut into chunks. Juice beetroot first, then berries, apple, lemon, and ginger.',
+          calories: 130, protein: 4, carbs: 28, fat: 1, cholesterol: 0,
+          benefits: 'Blood pressure support, antioxidant rich, natural energy boost'
+        },
+        {
+          name: 'Citrus Immunity Juice',
+          ingredients: ['2 oranges', '1 grapefruit', '1 lemon', '1 inch fresh turmeric', '1 inch fresh ginger'],
+          instructions: 'Peel citrus fruits. Juice oranges, grapefruit, lemon, turmeric, and ginger. Strain pulp if desired.',
+          calories: 150, protein: 3, carbs: 34, fat: 1, cholesterol: 0,
+          benefits: 'Immune system support, vitamin C rich, anti-inflammatory'
+        },
+        {
+          name: 'Cucumber Mint Juice',
+          ingredients: ['2 large cucumbers', '1 bunch fresh mint', '1 lime', '1 green apple'],
+          instructions: 'Wash cucumbers and mint. Juice cucumbers first, then mint, lime, and apple. Serve chilled.',
+          calories: 110, protein: 3, carbs: 22, fat: 1, cholesterol: 0,
+          benefits: 'Hydrating, cooling, digestive support, natural diuretic'
+        },
+        {
+          name: 'Pineapple Turmeric Juice',
+          ingredients: ['1/2 fresh pineapple', '1 inch fresh turmeric', '1 inch fresh ginger', '1 lemon', '1 apple'],
+          instructions: 'Cut pineapple into chunks. Juice pineapple, turmeric, ginger, lemon, and apple.',
+          calories: 140, protein: 2, carbs: 30, fat: 1, cholesterol: 0,
+          benefits: 'Anti-inflammatory, digestive health, natural pain relief'
+        },
+        {
+          name: 'Spinach Apple Juice',
+          ingredients: ['2 cups spinach', '2 apples', '1 cucumber', '1/2 lemon', '1 inch fresh ginger'],
+          instructions: 'Wash spinach thoroughly. Juice spinach first, then apples, cucumber, lemon, and ginger.',
+          calories: 120, protein: 4, carbs: 26, fat: 1, cholesterol: 0,
+          benefits: 'Iron rich, detoxifying, blood sugar support'
+        },
+        {
+          name: 'Watermelon Mint Juice',
+          ingredients: ['4 cups watermelon', '1 bunch fresh mint', '1 lime', '1 cucumber'],
+          instructions: 'Remove watermelon rind. Juice watermelon, mint, lime, and cucumber. Serve immediately.',
+          calories: 130, protein: 3, carbs: 28, fat: 1, cholesterol: 0,
+          benefits: 'Hydrating, electrolyte rich, natural cooling effect'
+        },
+        {
+          name: 'Celery Apple Juice',
+          ingredients: ['6 celery stalks', '2 apples', '1/2 lemon', '1 inch fresh ginger'],
+          instructions: 'Wash celery thoroughly. Juice celery first, then apples, lemon, and ginger.',
+          calories: 110, protein: 2, carbs: 24, fat: 1, cholesterol: 0,
+          benefits: 'Blood pressure support, anti-inflammatory, digestive health'
+        },
+        {
+          name: 'Berry Blast Juice',
+          ingredients: ['1 cup strawberries', '1 cup blueberries', '1 cup raspberries', '1 apple', '1/2 lemon'],
+          instructions: 'Wash all berries. Juice berries first, then apple and lemon. Strain seeds if desired.',
+          calories: 140, protein: 3, carbs: 30, fat: 1, cholesterol: 0,
+          benefits: 'Antioxidant rich, heart health, cognitive support'
+        },
+        {
+          name: 'Kale Apple Lemon Juice',
+          ingredients: ['4 large kale leaves', '2 apples', '1 lemon', '1 inch fresh ginger'],
+          instructions: 'Wash kale thoroughly. Juice kale first, then apples, lemon, and ginger.',
+          calories: 120, protein: 4, carbs: 24, fat: 1, cholesterol: 0,
+          benefits: 'Detoxifying, vitamin K rich, bone health support'
+        },
+        {
+          name: 'Orange Carrot Juice',
+          ingredients: ['3 large carrots', '2 oranges', '1 apple', '1/2 lemon'],
+          instructions: 'Wash carrots. Juice carrots first, then oranges, apple, and lemon.',
+          calories: 150, protein: 3, carbs: 34, fat: 1, cholesterol: 0,
+          benefits: 'Vision support, immune boosting, skin health'
+        },
+        {
+          name: 'Ginger Lemonade Juice',
+          ingredients: ['4 lemons', '2 apples', '2 inches fresh ginger', '1 cucumber'],
+          instructions: 'Peel lemons. Juice lemons, apples, ginger, and cucumber. Dilute with water if too strong.',
+          calories: 120, protein: 2, carbs: 26, fat: 1, cholesterol: 0,
+          benefits: 'Digestive support, immune boosting, natural detox'
+        },
+        {
+          name: 'Beet Apple Juice',
+          ingredients: ['1 medium beetroot', '2 apples', '1/2 lemon', '1 inch fresh ginger'],
+          instructions: 'Wash beetroot and cut into chunks. Juice beetroot first, then apples, lemon, and ginger.',
+          calories: 140, protein: 3, carbs: 30, fat: 1, cholesterol: 0,
+          benefits: 'Blood pressure support, endurance enhancement, liver health'
+        },
+        {
+          name: 'Cucumber Apple Juice',
+          ingredients: ['2 large cucumbers', '2 apples', '1/2 lemon', '1 inch fresh ginger'],
+          instructions: 'Wash cucumbers. Juice cucumbers first, then apples, lemon, and ginger.',
+          calories: 110, protein: 2, carbs: 24, fat: 1, cholesterol: 0,
+          benefits: 'Hydrating, digestive support, natural diuretic'
+        }
+      ],
+      regular: [
+        {
+          name: 'Tropical Paradise Juice',
+          ingredients: ['1/2 fresh pineapple', '2 oranges', '1 mango', '1/2 lemon', '1 inch fresh ginger'],
+          instructions: 'Cut pineapple and mango into chunks. Juice pineapple, oranges, mango, lemon, and ginger.',
+          calories: 160, protein: 3, carbs: 36, fat: 1, cholesterol: 0,
+          benefits: 'Immune boosting, digestive health, natural energy'
+        },
+        {
+          name: 'Red Power Juice',
+          ingredients: ['1 medium beetroot', '1 cup strawberries', '1 apple', '1/2 lemon', '1 inch fresh ginger'],
+          instructions: 'Wash beetroot and cut into chunks. Juice beetroot first, then berries, apple, lemon, and ginger.',
+          calories: 140, protein: 4, carbs: 30, fat: 1, cholesterol: 0,
+          benefits: 'Blood pressure support, antioxidant rich, natural energy'
+        },
+        {
+          name: 'Green Machine Juice',
+          ingredients: ['2 large kale leaves', '1 cucumber', '2 celery stalks', '1 green apple', '1/2 lemon', '1 inch fresh ginger'],
+          instructions: 'Wash all ingredients thoroughly. Juice kale first, then cucumber, celery, apple, lemon, and ginger.',
+          calories: 120, protein: 4, carbs: 24, fat: 1, cholesterol: 0,
+          benefits: 'Detoxifying, anti-inflammatory, rich in vitamins'
+        },
+        {
+          name: 'Citrus Blast Juice',
+          ingredients: ['2 oranges', '1 grapefruit', '1 lemon', '1 lime', '1 inch fresh ginger'],
+          instructions: 'Peel all citrus fruits. Juice oranges, grapefruit, lemon, lime, and ginger.',
+          calories: 150, protein: 3, carbs: 34, fat: 1, cholesterol: 0,
+          benefits: 'Immune system support, vitamin C rich, digestive health'
+        },
+        {
+          name: 'Berry Antioxidant Juice',
+          ingredients: ['1 cup strawberries', '1 cup blueberries', '1 cup raspberries', '1 apple', '1/2 lemon'],
+          instructions: 'Wash all berries. Juice berries first, then apple and lemon. Strain seeds if desired.',
+          calories: 140, protein: 3, carbs: 30, fat: 1, cholesterol: 0,
+          benefits: 'Antioxidant rich, heart health, cognitive support'
+        },
+        {
+          name: 'Carrot Ginger Juice',
+          ingredients: ['4 large carrots', '2 inches fresh ginger', '1 apple', '1/2 lemon'],
+          instructions: 'Wash carrots. Juice carrots first, then ginger, apple, and lemon.',
+          calories: 130, protein: 3, carbs: 28, fat: 1, cholesterol: 0,
+          benefits: 'Vision support, digestive health, immune boosting'
+        },
+        {
+          name: 'Apple Cinnamon Juice',
+          ingredients: ['3 apples', '1/2 lemon', '1 inch fresh ginger', '1/4 tsp ground cinnamon'],
+          instructions: 'Wash apples. Juice apples, lemon, and ginger. Stir in cinnamon before serving.',
+          calories: 120, protein: 1, carbs: 26, fat: 1, cholesterol: 0,
+          benefits: 'Blood sugar support, digestive health, warming effect'
+        },
+        {
+          name: 'Pineapple Ginger Juice',
+          ingredients: ['1/2 fresh pineapple', '2 inches fresh ginger', '1 apple', '1/2 lemon'],
+          instructions: 'Cut pineapple into chunks. Juice pineapple, ginger, apple, and lemon.',
+          calories: 140, protein: 2, carbs: 30, fat: 1, cholesterol: 0,
+          benefits: 'Anti-inflammatory, digestive support, natural energy'
+        },
+        {
+          name: 'Watermelon Lime Juice',
+          ingredients: ['4 cups watermelon', '2 limes', '1 cucumber', '1 inch fresh mint'],
+          instructions: 'Remove watermelon rind. Juice watermelon, limes, cucumber, and mint.',
+          calories: 130, protein: 3, carbs: 28, fat: 1, cholesterol: 0,
+          benefits: 'Hydrating, electrolyte rich, natural cooling'
+        },
+        {
+          name: 'Celery Ginger Juice',
+          ingredients: ['6 celery stalks', '2 inches fresh ginger', '1 apple', '1/2 lemon'],
+          instructions: 'Wash celery thoroughly. Juice celery first, then ginger, apple, and lemon.',
+          calories: 110, protein: 2, carbs: 24, fat: 1, cholesterol: 0,
+          benefits: 'Blood pressure support, anti-inflammatory, digestive health'
+        },
+        {
+          name: 'Orange Turmeric Juice',
+          ingredients: ['3 oranges', '1 inch fresh turmeric', '1 inch fresh ginger', '1 apple'],
+          instructions: 'Peel oranges. Juice oranges, turmeric, ginger, and apple.',
+          calories: 150, protein: 3, carbs: 34, fat: 1, cholesterol: 0,
+          benefits: 'Anti-inflammatory, immune boosting, natural pain relief'
+        },
+        {
+          name: 'Beet Carrot Juice',
+          ingredients: ['1 medium beetroot', '3 large carrots', '1 apple', '1/2 lemon'],
+          instructions: 'Wash beetroot and carrots. Juice beetroot first, then carrots, apple, and lemon.',
+          calories: 150, protein: 4, carbs: 32, fat: 1, cholesterol: 0,
+          benefits: 'Blood pressure support, vision health, natural energy'
+        },
+        {
+          name: 'Cucumber Mint Lime Juice',
+          ingredients: ['2 large cucumbers', '1 bunch fresh mint', '2 limes', '1 green apple'],
+          instructions: 'Wash cucumbers and mint. Juice cucumbers first, then mint, limes, and apple.',
+          calories: 110, protein: 3, carbs: 22, fat: 1, cholesterol: 0,
+          benefits: 'Hydrating, cooling, digestive support, natural diuretic'
+        },
+        {
+          name: 'Kale Apple Ginger Juice',
+          ingredients: ['4 large kale leaves', '2 apples', '1 inch fresh ginger', '1/2 lemon'],
+          instructions: 'Wash kale thoroughly. Juice kale first, then apples, ginger, and lemon.',
+          calories: 120, protein: 4, carbs: 24, fat: 1, cholesterol: 0,
+          benefits: 'Detoxifying, vitamin K rich, bone health support'
+        },
+        {
+          name: 'Strawberry Lemonade Juice',
+          ingredients: ['2 cups strawberries', '3 lemons', '1 apple', '1 inch fresh ginger'],
+          instructions: 'Wash strawberries. Juice strawberries, lemons, apple, and ginger.',
+          calories: 130, protein: 3, carbs: 28, fat: 1, cholesterol: 0,
+          benefits: 'Antioxidant rich, immune boosting, natural energy'
+        },
+        {
+          name: 'Ginger Lemon Honey Juice',
+          ingredients: ['4 lemons', '2 inches fresh ginger', '1 apple', '1 tbsp raw honey'],
+          instructions: 'Peel lemons. Juice lemons, ginger, and apple. Stir in honey before serving.',
+          calories: 140, protein: 2, carbs: 30, fat: 1, cholesterol: 0,
+          benefits: 'Digestive support, immune boosting, natural detox'
+        }
+      ]
+    };
+
+    const templates = juiceRecipes[lowCholesterol ? 'lowCholesterol' : 'regular'];
+    const selectedJuice = templates[Math.floor(Math.random() * templates.length)];
+    
+    // Adjust portion size to match target calories
+    const calorieRatio = targetCalories / selectedJuice.calories;
+    return {
+      name: selectedJuice.name,
+      ingredients: selectedJuice.ingredients,
+      instructions: selectedJuice.instructions,
+      benefits: selectedJuice.benefits,
+      calories: Math.round(selectedJuice.calories * calorieRatio),
+      protein: Math.round(selectedJuice.protein * calorieRatio),
+      carbs: Math.round(selectedJuice.carbs * calorieRatio),
+      fat: Math.round(selectedJuice.fat * calorieRatio),
+      cholesterol: Math.round(selectedJuice.cholesterol * calorieRatio)
+    };
+  }
+
   printMealPlan(mealPlan) {
     const printWindow = window.open('', '_blank');
     const printContent = `
@@ -2262,6 +2523,277 @@ class WeightLossManager {
               ` : ''}
             </div>
           `).join('')}
+        </div>
+      </body>
+      </html>
+    `;
+    
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 500);
+  }
+
+  printBeveragesOnly(mealPlan) {
+    if (!mealPlan || !mealPlan.days) {
+      this.showToast('No meal plan available to print', 'error');
+      return;
+    }
+
+    // Collect all smoothies and juices from the meal plan
+    const beverages = [];
+    mealPlan.days.forEach((day, dayIndex) => {
+      Object.entries(day.meals).forEach(([mealType, meal]) => {
+        // Look for smoothies and juices by checking if they have ingredients and instructions
+        if (meal.ingredients && meal.instructions && meal.ingredients.length > 0) {
+          const isJuice = meal.benefits && meal.name.toLowerCase().includes('juice');
+          const isSmoothie = meal.name.toLowerCase().includes('smoothie');
+          
+          beverages.push({
+            day: dayIndex + 1,
+            mealType: mealType, // Add the meal type for reference
+            beverageType: isJuice ? 'juice' : isSmoothie ? 'smoothie' : 'beverage',
+            name: meal.name,
+            calories: meal.calories,
+            ingredients: meal.ingredients,
+            instructions: meal.instructions,
+            benefits: meal.benefits || '',
+            protein: meal.protein,
+            carbs: meal.carbs,
+            fat: meal.fat
+          });
+        }
+      });
+    });
+
+    if (beverages.length === 0) {
+      this.showToast('No smoothies or juices found in the meal plan', 'error');
+      return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Healthy Beverages - Bradley Health App</title>
+        <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            line-height: 1.6;
+          }
+          .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 20px;
+          }
+          .beverage-item { 
+            border: 2px solid #e9ecef; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 10px;
+            page-break-inside: avoid;
+            background: #f8f9fa;
+          }
+          .beverage-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+          }
+          .beverage-name { 
+            font-size: 1.3em; 
+            font-weight: bold; 
+            color: #007bff;
+          }
+          .beverage-calories { 
+            background: #28a745; 
+            color: white; 
+            padding: 5px 10px; 
+            border-radius: 15px;
+            font-weight: bold;
+          }
+          .beverage-day { 
+            background: #6c757d; 
+            color: white; 
+            padding: 3px 8px; 
+            border-radius: 10px;
+            font-size: 0.9em;
+            margin-right: 10px;
+          }
+          .beverage-type { 
+            background: #17a2b8; 
+            color: white; 
+            padding: 3px 8px; 
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin-right: 10px;
+          }
+          .ingredients-section { 
+            margin: 15px 0; 
+          }
+          .ingredients-list { 
+            list-style: none; 
+            padding: 0; 
+          }
+          .ingredients-list li { 
+            padding: 5px 0; 
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 20px;
+          }
+          .ingredients-list li:before { 
+            content: "🥤"; 
+            position: absolute; 
+            left: 0; 
+          }
+          .instructions-section { 
+            margin: 15px 0; 
+            padding: 15px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 5px;
+          }
+          .benefits-section { 
+            margin: 15px 0; 
+            padding: 15px;
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            border-radius: 5px;
+          }
+          .macros { 
+            display: flex; 
+            gap: 15px; 
+            margin-top: 15px;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+          }
+          .macro { 
+            font-weight: bold; 
+            color: #495057;
+          }
+          .summary { 
+            background: #d1ecf1; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 10px;
+            border-left: 4px solid #17a2b8;
+          }
+          .tips { 
+            background: #d4edda; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+          }
+          @media print { 
+            body { margin: 0; }
+            .beverage-item { 
+              border: 1px solid #000; 
+              margin: 10px 0;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>🥤🍹 Healthy Beverage Collection</h1>
+          <p>Complete smoothie and juice recipes from your personalized meal plan</p>
+          <p><strong>Generated by Bradley Health App</strong></p>
+          <p><em>Total Beverages: ${beverages.length}</em></p>
+        </div>
+        
+        <div class="summary">
+          <h2>📊 Beverage Summary</h2>
+          <p><strong>Total Beverages:</strong> ${beverages.length}</p>
+          <p><strong>Smoothies:</strong> ${beverages.filter(b => b.beverageType === 'smoothie').length}</p>
+          <p><strong>Juices:</strong> ${beverages.filter(b => b.beverageType === 'juice').length}</p>
+          <p><strong>Average Calories:</strong> ${Math.round(beverages.reduce((sum, b) => sum + b.calories, 0) / beverages.length)} calories</p>
+          <p><strong>Plan Duration:</strong> ${mealPlan.totalDays} days</p>
+        </div>
+        
+        ${beverages.map((beverage, index) => `
+          <div class="beverage-item">
+            <div class="beverage-header">
+              <div>
+                <span class="beverage-day">Day ${beverage.day} (${beverage.mealType})</span>
+                <span class="beverage-type">${beverage.beverageType.toUpperCase()}</span>
+                <span class="beverage-name">${beverage.name}</span>
+              </div>
+              <span class="beverage-calories">${beverage.calories} cal</span>
+            </div>
+            
+            <div class="ingredients-section">
+              <h3>📝 Ingredients:</h3>
+              <ul class="ingredients-list">
+                ${beverage.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+              </ul>
+            </div>
+            
+            ${beverage.instructions ? `
+              <div class="instructions-section">
+                <h3>👨‍🍳 Instructions:</h3>
+                <p>${beverage.instructions}</p>
+              </div>
+            ` : ''}
+            
+            ${beverage.benefits ? `
+              <div class="benefits-section">
+                <h3>💚 Health Benefits:</h3>
+                <p>${beverage.benefits}</p>
+              </div>
+            ` : ''}
+            
+            <div class="macros">
+              <span class="macro">Protein: ${beverage.protein}g</span>
+              <span class="macro">Carbs: ${beverage.carbs}g</span>
+              <span class="macro">Fat: ${beverage.fat}g</span>
+            </div>
+          </div>
+        `).join('')}
+        
+        <div class="tips">
+          <h2>💡 Beverage Making Tips</h2>
+          <h3>🥤 Smoothie Tips:</h3>
+          <ul>
+            <li><strong>Blending Order:</strong> Start with liquids, add soft fruits, then frozen ingredients</li>
+            <li><strong>Texture:</strong> Add ice cubes for a thicker, colder smoothie</li>
+            <li><strong>Sweetness:</strong> Use ripe bananas or dates for natural sweetness</li>
+            <li><strong>Protein:</strong> Add protein powder, Greek yogurt, or nut butter for extra protein</li>
+          </ul>
+          
+          <h3>🍹 Juice Tips:</h3>
+          <ul>
+            <li><strong>Fresh is Best:</strong> Use fresh, organic produce for maximum nutrition</li>
+            <li><strong>Drink Immediately:</strong> Consume within 15 minutes for best taste and nutrition</li>
+            <li><strong>Start Slow:</strong> Begin with milder juices if new to juicing</li>
+            <li><strong>Storage:</strong> Store in airtight container in refrigerator if needed (max 24 hours)</li>
+            <li><strong>Cleaning:</strong> Clean juicer immediately after use for best maintenance</li>
+          </ul>
+        </div>
+        
+        <div class="summary">
+          <h2>📋 Shopping List</h2>
+          <p><strong>Common Ingredients:</strong></p>
+          <ul>
+            <li>Fresh or frozen berries (strawberries, blueberries, raspberries)</li>
+            <li>Bananas (fresh or frozen)</li>
+            <li>Greek yogurt or plant-based yogurt</li>
+            <li>Almond milk, coconut milk, or regular milk</li>
+            <li>Spinach, kale, or other leafy greens</li>
+            <li>Carrots, beets, and other root vegetables</li>
+            <li>Fresh ginger, turmeric, and herbs</li>
+            <li>Citrus fruits (lemons, limes, oranges)</li>
+            <li>Protein powder (whey, plant-based, or collagen)</li>
+            <li>Chia seeds, flax seeds, or hemp seeds</li>
+            <li>Nut butters (peanut, almond, or cashew)</li>
+            <li>Honey, maple syrup, or dates for sweetness</li>
+          </ul>
         </div>
       </body>
       </html>
