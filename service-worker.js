@@ -1,17 +1,22 @@
 // Bradley Health Service Worker
-const CACHE_NAME = 'bradley-health-v1.1.3';
-const STATIC_CACHE = 'bradley-health-static-v1.1.3';
-const DYNAMIC_CACHE = 'bradley-health-dynamic-v1.1.3';
+const CACHE_NAME = 'bradley-health-v1.1.4';
+const STATIC_CACHE = 'bradley-health-static-v1.1.4';
+const DYNAMIC_CACHE = 'bradley-health-dynamic-v1.1.4';
 
-// Files to cache immediately
+// Files to cache immediately - only include files that actually exist
 const STATIC_FILES = [
   '/',
   '/index.html',
   '/manifest.json',
   '/assets/favicon.svg',
+  '/assets/favicon.ico',
   '/assets/icon-192.png',
   '/assets/icon-512.png',
+  '/assets/icon-144.png',
+  '/assets/icon-96.png',
+  '/assets/icon-72.png',
   '/assets/apple-touch-icon.png',
+  '/assets/apple-touch-icon.svg',
   '/assets/css/components.css',
   '/assets/css/layout.css',
   '/assets/css/theme.css',
@@ -29,7 +34,13 @@ const STATIC_FILES = [
   '/assets/js/profile-manager.js',
   '/assets/js/legal.js',
   '/assets/js/pwa-install.js',
-  '/assets/js/pull-to-refresh.js'
+  '/assets/js/pull-to-refresh.js',
+  '/assets/js/nutrition-tracker.js',
+  '/assets/js/weight-loss.js',
+  '/assets/js/health-insights.js',
+  '/assets/js/dme-manager.js',
+  '/assets/js/medical-report.js',
+  '/assets/js/limb-care.js'
 ];
 
 // Install event - cache static files
@@ -43,7 +54,7 @@ self.addEventListener('install', (event) => {
         // Cache files individually to handle failures gracefully
         const cachePromises = STATIC_FILES.map(file => {
           return cache.add(file).catch(error => {
-            console.warn(`Service Worker: Failed to cache ${file}:`, error);
+            console.warn(`Service Worker: Failed to cache ${file}:`, error.message);
             return null; // Continue with other files even if one fails
           });
         });
@@ -51,7 +62,11 @@ self.addEventListener('install', (event) => {
       })
       .then((results) => {
         const successfulCaches = results.filter(result => result !== null).length;
+        const failedCaches = STATIC_FILES.length - successfulCaches;
         console.log(`Service Worker: ${successfulCaches}/${STATIC_FILES.length} static files cached successfully`);
+        if (failedCaches > 0) {
+          console.log(`Service Worker: ${failedCaches} files failed to cache (this is normal in development)`);
+        }
         return self.skipWaiting();
       })
       .catch((error) => {
@@ -126,21 +141,34 @@ async function handleSameOriginRequest(request) {
     
     // Cache successful responses
     if (networkResponse.ok) {
-      const cache = await caches.open(DYNAMIC_CACHE);
-      cache.put(request, networkResponse.clone());
+      try {
+        const cache = await caches.open(DYNAMIC_CACHE);
+        await cache.put(request, networkResponse.clone());
+      } catch (cacheError) {
+        console.warn('Service Worker: Failed to cache response:', cacheError.message);
+      }
     }
     
     return networkResponse;
   } catch (error) {
-    console.error('Service Worker: Error handling same-origin request:', error);
+    console.warn('Service Worker: Network request failed for:', request.url, error.message);
     
     // Return offline page if available
-    const offlineResponse = await caches.match('/offline.html');
-    if (offlineResponse) {
-      return offlineResponse;
+    try {
+      const offlineResponse = await caches.match('/offline.html');
+      if (offlineResponse) {
+        return offlineResponse;
+      }
+    } catch (offlineError) {
+      console.warn('Service Worker: Failed to load offline page:', offlineError.message);
     }
     
-    throw error;
+    // Return a simple offline response
+    return new Response('Offline - Please check your connection', {
+      status: 503,
+      statusText: 'Service Unavailable',
+      headers: { 'Content-Type': 'text/plain' }
+    });
   }
 }
 
@@ -149,7 +177,7 @@ async function handleFirebaseRequest(request) {
   try {
     return await fetch(request);
   } catch (error) {
-    console.error('Service Worker: Firebase request failed:', error);
+    console.warn('Service Worker: Firebase request failed:', request.url, error.message);
     throw error;
   }
 }
@@ -168,13 +196,17 @@ async function handleCDNRequest(request) {
     
     // Cache successful responses
     if (networkResponse.ok) {
-      const cache = await caches.open(DYNAMIC_CACHE);
-      cache.put(request, networkResponse.clone());
+      try {
+        const cache = await caches.open(DYNAMIC_CACHE);
+        await cache.put(request, networkResponse.clone());
+      } catch (cacheError) {
+        console.warn('Service Worker: Failed to cache CDN response:', cacheError.message);
+      }
     }
     
     return networkResponse;
   } catch (error) {
-    console.error('Service Worker: CDN request failed:', error);
+    console.warn('Service Worker: CDN request failed:', request.url, error.message);
     throw error;
   }
 }
@@ -184,7 +216,7 @@ async function handleExternalRequest(request) {
   try {
     return await fetch(request);
   } catch (error) {
-    console.error('Service Worker: External request failed:', error);
+    console.warn('Service Worker: External request failed:', request.url, error.message);
     throw error;
   }
 }
