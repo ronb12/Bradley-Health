@@ -84,6 +84,7 @@ class ProfileManager {
       const heightFeetInput = profileForm.querySelector('[name="heightFeet"]');
       const heightInchesInput = profileForm.querySelector('[name="heightInches"]');
       const conditionsInput = profileForm.querySelector('[name="medicalConditions"]');
+      const allergiesInput = profileForm.querySelector('[name="allergies"]');
 
       if (nameInput) nameInput.value = this.userProfile.name || '';
       if (ageInput) ageInput.value = this.userProfile.age || '';
@@ -103,6 +104,7 @@ class ProfileManager {
       }
       
       if (conditionsInput) conditionsInput.value = this.userProfile.medicalConditions || '';
+      if (allergiesInput) allergiesInput.value = this.userProfile.allergies || '';
     }
 
     // Populate emergency contact form
@@ -167,6 +169,7 @@ class ProfileManager {
       heightFeet: heightFeet > 0 ? heightFeet : null, // Also store feet for convenience
       heightInches: heightInches > 0 ? heightInches : null, // Also store inches for convenience
       medicalConditions: formData.get('medicalConditions'),
+      allergies: formData.get('allergies'),
       updatedAt: new Date()
     };
 
