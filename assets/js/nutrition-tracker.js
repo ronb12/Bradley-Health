@@ -47,13 +47,14 @@ class NutritionTracker {
             this.cholesterolEntries = [];
             this.renderMealHistory();
             this.renderCholesterolHistory();
+            this.updateNutritionOverview();
             this.initialized = false;
           }
         });
         
-        // Get initial user state
+        // Get initial user state - only load if not already loaded
         this.currentUser = window.authManager.getCurrentUser();
-        if (this.currentUser) {
+        if (this.currentUser && !this.initialized) {
           console.log('Nutrition Tracker: User already authenticated, loading data');
           this.loadNutritionData();
           this.setupEventListeners();
@@ -650,11 +651,14 @@ class NutritionTracker {
 
   // Helper method to update nutrition overview
   async updateNutritionOverview() {
+    console.log('=== UPDATING NUTRITION OVERVIEW ===');
     const today = new Date().toISOString().split('T')[0];
     const dailyStats = await this.calculateDailyCholesterolIntake(today);
+    console.log('Daily cholesterol intake:', dailyStats);
     
     // Update daily calories (total calories for today)
     const dailyCalories = document.getElementById('dailyCalories');
+    console.log('Daily calories element found:', !!dailyCalories);
     if (dailyCalories) {
       // Calculate today's total calories
       let todayCalories = 0;
@@ -665,21 +669,26 @@ class NutritionTracker {
           todayCalories += meal.estimatedCalories || 0;
         }
       });
+      console.log('Today\'s calories calculated:', todayCalories);
       dailyCalories.textContent = todayCalories > 0 ? todayCalories : '--';
     }
 
     // Update total meals count
     const totalMeals = document.getElementById('totalMeals');
+    console.log('Total meals element found:', !!totalMeals);
     if (totalMeals) {
       totalMeals.textContent = this.meals.length;
+      console.log('Total meals count updated:', this.meals.length);
     }
 
     // Update cholesterol level
     const cholesterolLevel = document.getElementById('cholesterolLevel');
+    console.log('Cholesterol level element found:', !!cholesterolLevel);
     if (cholesterolLevel) {
       if (dailyStats === 0) {
         cholesterolLevel.textContent = 'No data';
         cholesterolLevel.style.color = '#6c757d';
+        console.log('Cholesterol level set to: No data');
       } else if (dailyStats > 0) {
         // Check daily intake limits
         const limitCheck = this.checkCholesterolLimits(dailyStats);
@@ -692,6 +701,7 @@ class NutritionTracker {
         } else {
           cholesterolLevel.style.color = '#28a745';
         }
+        console.log('Cholesterol level updated:', `${dailyStats} mg (est.)`, limitCheck.status);
       }
     }
 
@@ -992,6 +1002,7 @@ class NutritionTracker {
     }
 
     try {
+      console.log('Loading nutrition data for user:', this.currentUser.uid);
       const mealsSnapshot = await this.db.collection('meals')
         .where('userId', '==', this.currentUser.uid)
         .orderBy('timestamp', 'desc')
@@ -1005,6 +1016,7 @@ class NutritionTracker {
 
       mealsSnapshot.docs.forEach(doc => {
         const meal = doc.data();
+        meal.id = doc.id; // Ensure meal has ID
         this.meals.push(meal);
         if (meal.hasNutritionData) {
           totalCholesterol += meal.estimatedCholesterol || 0;
@@ -1014,9 +1026,13 @@ class NutritionTracker {
         }
       });
 
-      this.updateNutritionOverview();
+      console.log(`Loaded ${this.meals.length} meals, ${mealsWithData} with nutrition data`);
+      console.log('Total nutrition loaded:', { totalCholesterol, totalCalories, totalFat });
+
+      // Update UI in correct order
       this.renderMealHistory();
       this.renderCholesterolHistory();
+      this.updateNutritionOverview();
     } catch (error) {
       console.error('Error loading nutrition data:', error);
       this.showToast('Error loading nutrition data', 'error');
