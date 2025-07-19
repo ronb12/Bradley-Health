@@ -2449,6 +2449,52 @@ input[type="range"]::-moz-range-thumb {
   }
 }
 
+/* Card Headers with Action Buttons */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+.card-header .btn {
+  font-size: 0.9rem;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.card-header .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile responsive for card headers */
+@media (max-width: 768px) {
+  .card-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .card-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .card-header .btn {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+}
+
 .back-to-summary {
   text-align: center;
   padding: 20px 0;

@@ -451,6 +451,15 @@ class WeightLossManager {
     });
 
     mealPlanCard.style.display = 'block';
+    
+    // Add print button if not already present
+    if (!mealPlanCard.querySelector('.print-plan-btn')) {
+      const printButton = document.createElement('button');
+      printButton.className = 'btn btn-secondary print-plan-btn';
+      printButton.innerHTML = '🖨️ Print Meal Plan';
+      printButton.onclick = () => this.printMealPlan(mealPlan);
+      mealPlanCard.appendChild(printButton);
+    }
   }
 
   displayExercisePlan(exercisePlan) {
@@ -527,16 +536,27 @@ class WeightLossManager {
       goalWeightElement.textContent = `${this.weightGoal.goalWeight} lbs`;
     }
 
-    // Update current weight (latest entry)
+    // Update current weight (latest entry or goal's current weight)
     const currentWeightElement = document.getElementById('currentWeight');
-    if (currentWeightElement && this.weightEntries.length > 0) {
-      currentWeightElement.textContent = `${this.weightEntries[0].weight} lbs`;
+    if (currentWeightElement) {
+      if (this.weightEntries.length > 0) {
+        currentWeightElement.textContent = `${this.weightEntries[0].weight} lbs`;
+      } else {
+        // Use the current weight from the weight goal if no entries exist
+        currentWeightElement.textContent = `${this.weightGoal.currentWeight} lbs`;
+      }
     }
 
     // Calculate progress
     const progressElement = document.getElementById('weightProgress');
-    if (progressElement && this.weightEntries.length > 0) {
-      const currentWeight = this.weightEntries[0].weight;
+    if (progressElement) {
+      let currentWeight;
+      if (this.weightEntries.length > 0) {
+        currentWeight = this.weightEntries[0].weight;
+      } else {
+        currentWeight = this.weightGoal.currentWeight;
+      }
+      
       const weightLost = this.weightGoal.currentWeight - currentWeight;
       const progressPercent = Math.round((weightLost / this.weightGoal.weightToLose) * 100);
       progressElement.textContent = `${Math.max(0, progressPercent)}%`;
@@ -603,6 +623,228 @@ class WeightLossManager {
     } else {
       console.log(`${type.toUpperCase()}: ${message}`);
     }
+  }
+
+  printMealPlan(mealPlan) {
+    const printWindow = window.open('', '_blank');
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Weight Loss Meal Plan</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          .header { text-align: center; margin-bottom: 30px; }
+          .summary { background: #f5f5f5; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+          .day-plan { margin-bottom: 30px; page-break-inside: avoid; }
+          .meal-item { border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px; }
+          .meal-header { display: flex; justify-content: space-between; font-weight: bold; }
+          .meal-macros { color: #666; font-size: 0.9em; margin-top: 5px; }
+          .macro { margin-right: 15px; }
+          @media print { body { margin: 0; } }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>🤖 AI-Generated Weight Loss Meal Plan</h1>
+          <p>Personalized nutrition plan for your weight loss journey</p>
+        </div>
+        
+        <div class="summary">
+          <h2>Daily Nutrition Targets</h2>
+          <p><strong>Daily Calories:</strong> ${mealPlan.dailyCalories} calories</p>
+          <p><strong>Protein:</strong> ${mealPlan.macros.protein}g</p>
+          <p><strong>Carbohydrates:</strong> ${mealPlan.macros.carbs}g</p>
+          <p><strong>Fat:</strong> ${mealPlan.macros.fat}g</p>
+        </div>
+        
+        ${mealPlan.days.map((day, index) => `
+          <div class="day-plan">
+            <h2>Day ${index + 1}</h2>
+            ${Object.entries(day.meals).map(([mealType, meal]) => `
+              <div class="meal-item">
+                <div class="meal-header">
+                  <span>${mealType.charAt(0).toUpperCase() + mealType.slice(1)}</span>
+                  <span>${meal.calories} calories</span>
+                </div>
+                <div><strong>${meal.name}</strong></div>
+                <div class="meal-macros">
+                  <span class="macro">Protein: ${meal.protein}g</span>
+                  <span class="macro">Carbs: ${meal.carbs}g</span>
+                  <span class="macro">Fat: ${meal.fat}g</span>
+                  ${meal.cholesterol > 0 ? `<span class="macro">Cholesterol: ${meal.cholesterol}mg</span>` : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `).join('')}
+      </body>
+      </html>
+    `;
+    
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 500);
+  }
+
+  printExercisePlan(exercisePlan) {
+    const printWindow = window.open('', '_blank');
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Weight Loss Exercise Plan</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          .header { text-align: center; margin-bottom: 30px; }
+          .summary { background: #f5f5f5; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+          .exercise-day { margin-bottom: 30px; page-break-inside: avoid; }
+          .exercise-item { border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px; }
+          .exercise-header { display: flex; justify-content: space-between; font-weight: bold; }
+          @media print { body { margin: 0; } }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>🏃‍♂️ AI-Generated Weight Loss Exercise Plan</h1>
+          <p>Personalized fitness plan for your weight loss journey</p>
+        </div>
+        
+        <div class="summary">
+          <h2>Weekly Exercise Summary</h2>
+          <p><strong>Weekly Workouts:</strong> ${exercisePlan.weeklyWorkouts}</p>
+          <p><strong>Weekly Calories Burned:</strong> ${exercisePlan.weeklyCaloriesBurned}</p>
+          <p><strong>Focus Areas:</strong> ${exercisePlan.focus}</p>
+        </div>
+        
+        ${exercisePlan.exercises.map((exercise, index) => `
+          <div class="exercise-day">
+            <h2>Day ${index + 1}</h2>
+            <div class="exercise-item">
+              <div class="exercise-header">
+                <span>${exercise.type}</span>
+                <span>${exercise.calories} calories</span>
+              </div>
+              <div><strong>${exercise.name}</strong></div>
+              <div><em>Duration: ${exercise.duration}</em></div>
+            </div>
+          </div>
+        `).join('')}
+      </body>
+      </html>
+    `;
+    
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 500);
+  }
+
+  printFullWeightLossPlan() {
+    if (!this.weightGoal || !this.mealPlan || !this.exercisePlan) {
+      this.showToast('Please generate a weight loss plan first', 'error');
+      return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Complete Weight Loss Plan</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          .header { text-align: center; margin-bottom: 30px; }
+          .goal-summary { background: #e3f2fd; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+          .section { margin-bottom: 30px; page-break-inside: avoid; }
+          .meal-item, .exercise-item { border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px; }
+          .meal-header, .exercise-header { display: flex; justify-content: space-between; font-weight: bold; }
+          .meal-macros { color: #666; font-size: 0.9em; margin-top: 5px; }
+          .macro { margin-right: 15px; }
+          @media print { body { margin: 0; } }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>🎯 Complete Weight Loss Journey Plan</h1>
+          <p>Your personalized AI-generated weight loss strategy</p>
+        </div>
+        
+        <div class="goal-summary">
+          <h2>Your Weight Loss Goal</h2>
+          <p><strong>Starting Weight:</strong> ${this.weightGoal.currentWeight} lbs</p>
+          <p><strong>Goal Weight:</strong> ${this.weightGoal.goalWeight} lbs</p>
+          <p><strong>Weight to Lose:</strong> ${this.weightGoal.weightToLose} lbs</p>
+          <p><strong>Weekly Loss Rate:</strong> ${this.weightGoal.weeklyRate} lbs/week</p>
+          <p><strong>Timeline:</strong> ${this.weightGoal.weeksToGoal} weeks</p>
+          <p><strong>Activity Level:</strong> ${this.weightGoal.activityLevel}</p>
+          ${this.weightGoal.restrictions ? `<p><strong>Dietary Restrictions:</strong> ${this.weightGoal.restrictions}</p>` : ''}
+        </div>
+        
+        <div class="section">
+          <h2>🤖 Daily Nutrition Plan</h2>
+          <p><strong>Daily Calories:</strong> ${this.mealPlan.dailyCalories} calories</p>
+          <p><strong>Protein:</strong> ${this.mealPlan.macros.protein}g | <strong>Carbs:</strong> ${this.mealPlan.macros.carbs}g | <strong>Fat:</strong> ${this.mealPlan.macros.fat}g</p>
+          
+          ${this.mealPlan.days.map((day, index) => `
+            <h3>Day ${index + 1}</h3>
+            ${Object.entries(day.meals).map(([mealType, meal]) => `
+              <div class="meal-item">
+                <div class="meal-header">
+                  <span>${mealType.charAt(0).toUpperCase() + mealType.slice(1)}</span>
+                  <span>${meal.calories} calories</span>
+                </div>
+                <div><strong>${meal.name}</strong></div>
+                <div class="meal-macros">
+                  <span class="macro">Protein: ${meal.protein}g</span>
+                  <span class="macro">Carbs: ${meal.carbs}g</span>
+                  <span class="macro">Fat: ${meal.fat}g</span>
+                  ${meal.cholesterol > 0 ? `<span class="macro">Cholesterol: ${meal.cholesterol}mg</span>` : ''}
+                </div>
+              </div>
+            `).join('')}
+          `).join('')}
+        </div>
+        
+        <div class="section">
+          <h2>🏃‍♂️ Weekly Exercise Plan</h2>
+          <p><strong>Weekly Workouts:</strong> ${this.exercisePlan.weeklyWorkouts}</p>
+          <p><strong>Weekly Calories Burned:</strong> ${this.exercisePlan.weeklyCaloriesBurned}</p>
+          <p><strong>Focus Areas:</strong> ${this.exercisePlan.focus}</p>
+          
+          ${this.exercisePlan.exercises.map((exercise, index) => `
+            <h3>Day ${index + 1}</h3>
+            <div class="exercise-item">
+              <div class="exercise-header">
+                <span>${exercise.type}</span>
+                <span>${exercise.calories} calories</span>
+              </div>
+              <div><strong>${exercise.name}</strong></div>
+              <div><em>Duration: ${exercise.duration}</em></div>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="section">
+          <h2>📝 Tips for Success</h2>
+          <ul>
+            <li>Track your weight weekly to monitor progress</li>
+            <li>Stay consistent with your meal and exercise plan</li>
+            <li>Drink plenty of water throughout the day</li>
+            <li>Get adequate sleep (7-9 hours per night)</li>
+            <li>Be patient - sustainable weight loss takes time</li>
+            <li>Adjust the plan if needed based on your progress</li>
+          </ul>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 500);
   }
 }
 

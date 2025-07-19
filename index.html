@@ -1099,7 +1099,12 @@
         <div class="weight-loss-container">
           <!-- Weight Loss Overview -->
           <div class="card weight-loss-overview">
-            <h2>Weight Loss Journey</h2>
+            <div class="card-header">
+              <h2>Weight Loss Journey</h2>
+              <button class="btn btn-primary" onclick="window.weightLossManager.printFullWeightLossPlan()">
+                🖨️ Print Full Plan
+              </button>
+            </div>
             <div class="weight-metrics">
               <div class="metric">
                 <span class="metric-icon">🎯</span>
@@ -1173,7 +1178,12 @@
 
           <!-- AI-Generated Meal Plan -->
           <div class="card ai-meal-plan" id="aiMealPlanCard" style="display: none;">
-            <h2>🤖 AI-Generated Meal Plan</h2>
+            <div class="card-header">
+              <h2>🤖 AI-Generated Meal Plan</h2>
+              <button class="btn btn-secondary" onclick="window.weightLossManager.printMealPlan(window.weightLossManager.mealPlan)">
+                🖨️ Print Meal Plan
+              </button>
+            </div>
             <div class="meal-plan-summary">
               <div class="plan-metrics">
                 <div class="plan-metric">
@@ -1218,7 +1228,12 @@
 
           <!-- AI-Generated Exercise Plan -->
           <div class="card ai-exercise-plan" id="aiExercisePlanCard" style="display: none;">
-            <h2>🏃‍♂️ AI-Generated Exercise Plan</h2>
+            <div class="card-header">
+              <h2>🏃‍♂️ AI-Generated Exercise Plan</h2>
+              <button class="btn btn-secondary" onclick="window.weightLossManager.printExercisePlan(window.weightLossManager.exercisePlan)">
+                🖨️ Print Exercise Plan
+              </button>
+            </div>
             <div class="exercise-plan-summary">
               <div class="plan-metrics">
                 <div class="plan-metric">
