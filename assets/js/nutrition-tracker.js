@@ -653,11 +653,28 @@ class NutritionTracker {
     const today = new Date().toISOString().split('T')[0];
     const dailyStats = await this.calculateDailyCholesterolIntake(today);
     
-    const dailyCholesterol = document.getElementById('dailyCholesterol');
-    if (dailyCholesterol) {
-      dailyCholesterol.textContent = dailyStats > 0 ? dailyStats : '--';
+    // Update daily calories (total calories for today)
+    const dailyCalories = document.getElementById('dailyCalories');
+    if (dailyCalories) {
+      // Calculate today's total calories
+      let todayCalories = 0;
+      this.meals.forEach(meal => {
+        const mealDate = new Date(meal.timestamp);
+        const todayDate = new Date(today);
+        if (mealDate.toDateString() === todayDate.toDateString() && meal.hasNutritionData) {
+          todayCalories += meal.estimatedCalories || 0;
+        }
+      });
+      dailyCalories.textContent = todayCalories > 0 ? todayCalories : '--';
     }
 
+    // Update total meals count
+    const totalMeals = document.getElementById('totalMeals');
+    if (totalMeals) {
+      totalMeals.textContent = this.meals.length;
+    }
+
+    // Update cholesterol level
     const cholesterolLevel = document.getElementById('cholesterolLevel');
     if (cholesterolLevel) {
       if (dailyStats === 0) {
@@ -678,7 +695,7 @@ class NutritionTracker {
       }
     }
 
-    // Calculate total nutrition from all meals
+    // Calculate total nutrition from all meals for potential future use
     let totalCholesterol = 0;
     let totalCalories = 0;
     let totalFat = 0;
@@ -693,26 +710,15 @@ class NutritionTracker {
       }
     });
 
-    const totalCholesterolElement = document.getElementById('totalCholesterol');
-    if (totalCholesterolElement) {
-      totalCholesterolElement.textContent = totalCholesterol > 0 ? totalCholesterol : '--';
-    }
-
-    const totalCaloriesElement = document.getElementById('totalCalories');
-    if (totalCaloriesElement) {
-      totalCaloriesElement.textContent = totalCalories > 0 ? totalCalories : '--';
-    }
-
-    const totalFatElement = document.getElementById('totalFat');
-    if (totalFatElement) {
-      totalFatElement.textContent = totalFat > 0 ? totalFat : '--';
-    }
-
-    const averageCholesterolElement = document.getElementById('averageCholesterol');
-    if (averageCholesterolElement) {
-      const average = mealsWithData > 0 ? Math.round(totalCholesterol / mealsWithData) : 0;
-      averageCholesterolElement.textContent = average > 0 ? average : '--';
-    }
+    // Store totals for potential future use or debugging
+    console.log('Nutrition Overview Updated:', {
+      dailyCholesterol: dailyStats,
+      totalMeals: this.meals.length,
+      totalCholesterol,
+      totalCalories,
+      totalFat,
+      mealsWithData
+    });
   }
 
   // Enhanced meal history display with nutrition info
