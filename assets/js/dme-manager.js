@@ -1,9 +1,24 @@
 class DMEManager {
   constructor() {
-    this.db = firebase.firestore();
-    this.currentUser = null;
-    this.dmeItems = [];
-    this.init();
+    // Wait for Firebase to be ready
+    if (firebase && firebase.firestore) {
+      this.db = firebase.firestore();
+      this.currentUser = null;
+      this.dmeItems = [];
+      this.init();
+    } else {
+      // Retry after a short delay
+      setTimeout(() => {
+        if (firebase && firebase.firestore) {
+          this.db = firebase.firestore();
+          this.currentUser = null;
+          this.dmeItems = [];
+          this.init();
+        } else {
+          console.error('Firebase not available for DME manager');
+        }
+      }, 1000);
+    }
   }
 
   init() {
@@ -231,6 +246,12 @@ class DMEManager {
     
     if (!this.currentUser) {
       alert('Please log in to add equipment');
+      return;
+    }
+
+    // Check if Firebase is ready
+    if (!firebase || !firebase.firestore || !firebase.firestore.Timestamp) {
+      alert('Firebase is not ready. Please wait a moment and try again.');
       return;
     }
 
