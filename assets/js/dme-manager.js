@@ -256,19 +256,45 @@ class DMEManager {
     }
 
     const formData = new FormData(e.target);
+    
+    // Create timestamp - use Firestore timestamp if available, otherwise use JavaScript Date
+    let timestamp, dateAcquired;
+    try {
+      if (firebase && firebase.firestore && firebase.firestore.Timestamp) {
+        timestamp = firebase.firestore.Timestamp.now();
+        dateAcquired = firebase.firestore.Timestamp.now();
+      } else {
+        timestamp = new Date();
+        dateAcquired = new Date();
+      }
+    } catch (error) {
+      console.warn('Firebase timestamp not available, using JavaScript Date:', error);
+      timestamp = new Date();
+      dateAcquired = new Date();
+    }
+    
     const dmeData = {
       userId: this.currentUser.uid,
       name: formData.get('name'),
       type: formData.get('type'),
       status: formData.get('status'),
       notes: formData.get('notes') || '',
-      dateAcquired: window.firebaseServices.db.Timestamp.now(),
-      timestamp: window.firebaseServices.db.Timestamp.now()
+      dateAcquired: dateAcquired,
+      timestamp: timestamp
     };
 
     // Add last maintenance date if provided
     if (formData.get('lastMaintenance')) {
-      dmeData.lastMaintenance = window.firebaseServices.db.Timestamp.fromDate(new Date(formData.get('lastMaintenance')));
+      try {
+        if (firebase && firebase.firestore && firebase.firestore.Timestamp) {
+          dmeData.lastMaintenance = firebase.firestore.Timestamp.fromDate(new Date(formData.get('lastMaintenance')));
+        } else {
+          dmeData.lastMaintenance = new Date(formData.get('lastMaintenance'));
+        }
+      } catch (error) {
+        console.warn('Error creating maintenance timestamp, using JavaScript Date:', error);
+        dmeData.lastMaintenance = new Date(formData.get('lastMaintenance'));
+      }
     }
 
     try {
@@ -301,7 +327,18 @@ class DMEManager {
       value: parseFloat(formData.get('value')) || 0,
       serialNumber: formData.get('serialNumber') || '',
       notes: formData.get('notes') || '',
-      timestamp: firebase.firestore.Timestamp.now()
+      timestamp: (() => {
+        try {
+          if (firebase && firebase.firestore && firebase.firestore.Timestamp) {
+            return firebase.firestore.Timestamp.now();
+          } else {
+            return new Date();
+          }
+        } catch (error) {
+          console.warn('Firebase timestamp not available, using JavaScript Date:', error);
+          return new Date();
+        }
+      })()
     };
 
     // Add optional dates if provided
@@ -357,7 +394,18 @@ class DMEManager {
     try {
       await this.db.collection('durableMedicalEquipment').doc(itemId).update({
         status: status,
-        lastUpdated: firebase.firestore.Timestamp.now()
+        lastUpdated: (() => {
+          try {
+            if (firebase && firebase.firestore && firebase.firestore.Timestamp) {
+              return firebase.firestore.Timestamp.now();
+            } else {
+              return new Date();
+            }
+          } catch (error) {
+            console.warn('Firebase timestamp not available, using JavaScript Date:', error);
+            return new Date();
+          }
+        })()
       });
       this.loadDMEData();
       showNotification('Status updated!', 'success');
