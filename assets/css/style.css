@@ -1,3 +1,17 @@
+/* CSS Variables */
+:root {
+  --primary-color: #4f46e5;
+  --danger-color: #dc3545;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --text-color: #333;
+  --text-muted: #6c757d;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --card-bg: #ffffff;
+  --border-color: #dee2e6;
+}
+
 /* Meal History Styling */
 .meal-entry {
   background: var(--card-bg);
@@ -56,16 +70,22 @@
 
 .btn-edit, .btn-delete {
   background: none;
-  border: none;
-  padding: 6px 8px;
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 0.9em;
+  font-size: 0.85em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 60px;
+  justify-content: center;
 }
 
 .btn-edit {
   color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .btn-edit:hover {
@@ -75,11 +95,26 @@
 
 .btn-delete {
   color: var(--danger-color);
+  border-color: var(--danger-color);
 }
 
 .btn-delete:hover {
   background: var(--danger-color);
   color: white;
+}
+
+.btn-text {
+  font-weight: 500;
+}
+
+/* Hide icon if Font Awesome not loaded */
+.btn-edit i, .btn-delete i {
+  font-size: 0.9em;
+}
+
+/* Fallback for when icons don't load */
+.btn-edit i:not([class*="fa-"]), .btn-delete i:not([class*="fa-"]) {
+  display: none;
 }
 
 .history-content h4 {

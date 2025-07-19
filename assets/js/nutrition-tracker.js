@@ -719,9 +719,11 @@ class NutritionTracker {
               <div class="action-buttons">
                 <button class="btn-edit" onclick="nutritionTracker.editMeal(${index})" title="Edit meal">
                   <i class="fas fa-edit"></i>
+                  <span class="btn-text">Edit</span>
                 </button>
                 <button class="btn-delete" onclick="nutritionTracker.deleteMeal(${index})" title="Delete meal">
                   <i class="fas fa-trash"></i>
+                  <span class="btn-text">Delete</span>
                 </button>
               </div>
             </div>
