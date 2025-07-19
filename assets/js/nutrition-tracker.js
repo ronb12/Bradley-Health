@@ -388,7 +388,7 @@ class NutritionTracker {
             console.log(`Found online: ${word} → ${onlineResult.name} (${onlineResult.category})`);
             foodsFound.push({
               food: onlineResult.name,
-              portion: this.estimatePortionSize(word, mealNotes),
+              portion: portionEstimates[onlineResult.name] || 100,
               cholesterol: onlineResult.cholesterol,
               calories: onlineResult.calories,
               fat: onlineResult.fat,
