@@ -61,6 +61,47 @@ class MoodTracker {
     if (factorsForm) {
       factorsForm.addEventListener('submit', (e) => this.addMoodFactor(e));
     }
+
+    // Range input event listeners for real-time value updates
+    this.setupRangeInputs();
+  }
+
+  setupRangeInputs() {
+    // Mood level
+    const moodLevel = document.getElementById('moodLevel');
+    const moodValue = document.getElementById('moodValue');
+    if (moodLevel && moodValue) {
+      moodLevel.addEventListener('input', (e) => {
+        moodValue.textContent = e.target.value;
+      });
+    }
+
+    // Energy level
+    const energyLevel = document.getElementById('energyLevel');
+    const energyValue = document.getElementById('energyValue');
+    if (energyLevel && energyValue) {
+      energyLevel.addEventListener('input', (e) => {
+        energyValue.textContent = e.target.value;
+      });
+    }
+
+    // Stress level
+    const stressLevel = document.getElementById('stressLevel');
+    const stressValue = document.getElementById('stressValue');
+    if (stressLevel && stressValue) {
+      stressLevel.addEventListener('input', (e) => {
+        stressValue.textContent = e.target.value;
+      });
+    }
+
+    // Sleep level
+    const sleepLevel = document.getElementById('sleepLevel');
+    const sleepValue = document.getElementById('sleepValue');
+    if (sleepLevel && sleepValue) {
+      sleepLevel.addEventListener('input', (e) => {
+        sleepValue.textContent = e.target.value;
+      });
+    }
   }
 
   async addMoodEntry(e) {
@@ -86,6 +127,16 @@ class MoodTracker {
       userId: this.currentUser.uid
     };
 
+    // Debug logging to verify all values are captured
+    console.log('Mood entry data:', {
+      mood: moodEntry.mood,
+      energy: moodEntry.energy,
+      stress: moodEntry.stress,
+      sleep: moodEntry.sleep,
+      notes: moodEntry.notes,
+      timestamp: moodEntry.timestamp
+    });
+
     try {
       this.showLoading('Saving mood entry...');
       await this.db.collection('moodEntries').add(moodEntry);
@@ -93,6 +144,7 @@ class MoodTracker {
       this.loadMoodEntries();
       e.target.reset();
     } catch (error) {
+      console.error('Error saving mood entry:', error);
       this.showToast('Error saving mood entry', 'error');
     } finally {
       this.hideLoading();
