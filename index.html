@@ -805,6 +805,35 @@
               <button class="btn btn-secondary" id="exportData">Export All Data</button>
             </div>
           </div>
+
+          <!-- Medical Reports -->
+          <div class="card medical-reports">
+            <h2>Medical Reports</h2>
+            <div class="report-options">
+              <p>Generate comprehensive medical reports for healthcare providers.</p>
+              
+              <div class="report-periods">
+                <h3>Select Report Period:</h3>
+                <div class="period-buttons">
+                  <button class="btn btn-outline" onclick="generateMedicalReport('7days')">Last 7 Days</button>
+                  <button class="btn btn-outline" onclick="generateMedicalReport('30days')">Last 30 Days</button>
+                  <button class="btn btn-outline" onclick="generateMedicalReport('90days')">Last 90 Days</button>
+                  <button class="btn btn-outline" onclick="generateMedicalReport('1year')">Last Year</button>
+                </div>
+              </div>
+
+              <div class="report-preview" id="reportPreview" style="display: none;">
+                <h3>Report Preview</h3>
+                <div id="reportSummary" class="report-summary">
+                  <!-- Report summary will be displayed here -->
+                </div>
+                <div class="report-actions">
+                  <button class="btn btn-primary" onclick="exportMedicalReportPDF()">Export as PDF</button>
+                  <button class="btn btn-secondary" onclick="downloadMedicalReportJSON()">Download JSON</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
@@ -842,6 +871,7 @@
   <script src="assets/js/limb-care.js"></script>
   <script src="assets/js/profile-manager.js"></script>
   <script src="assets/js/health-insights.js"></script>
+  <script src="assets/js/medical-report.js"></script>
   <script src="assets/js/charts.js"></script>
   <script src="assets/js/export.js"></script>
   <script src="assets/js/notifications.js"></script>
@@ -869,6 +899,164 @@
     window.addEventListener('unhandledrejection', (event) => {
       console.error('Unhandled promise rejection:', event.reason);
     });
+
+    // Medical Report Functions
+    async function generateMedicalReport(period) {
+      try {
+        // Show loading state
+        const preview = document.getElementById('reportPreview');
+        const summary = document.getElementById('reportSummary');
+        
+        preview.style.display = 'block';
+        summary.innerHTML = '<p>Generating report...</p>';
+        
+        // Generate the report
+        const report = await window.medicalReportGenerator.generateComprehensiveReport(period);
+        
+        // Display report summary
+        displayReportSummary(report);
+        
+        // Store report for export
+        window.currentMedicalReport = report;
+        
+      } catch (error) {
+        console.error('Error generating medical report:', error);
+        document.getElementById('reportSummary').innerHTML = 
+          '<p class="report-alert">Error generating report. Please try again.</p>';
+      }
+    }
+
+    function displayReportSummary(report) {
+      const summary = document.getElementById('reportSummary');
+      
+      let html = `
+        <h4>Report Summary</h4>
+        <div class="report-metric">
+          <span class="report-metric-label">Patient:</span>
+          <span class="report-metric-value">${report.patientDemographics.name || 'Not provided'}</span>
+        </div>
+        <div class="report-metric">
+          <span class="report-metric-label">Report Period:</span>
+          <span class="report-metric-value">${new Date(report.reportInfo.dateRange.start).toLocaleDateString()} - ${new Date(report.reportInfo.dateRange.end).toLocaleDateString()}</span>
+        </div>
+        <div class="report-metric">
+          <span class="report-metric-label">Overall Health Status:</span>
+          <span class="report-metric-value">${report.executiveSummary.overallHealthStatus}</span>
+        </div>
+      `;
+
+      // Add key findings
+      if (report.executiveSummary.keyFindings.length > 0) {
+        html += `
+          <h4>Key Findings:</h4>
+          <ul>
+            ${report.executiveSummary.keyFindings.map(finding => `<li>${finding}</li>`).join('')}
+          </ul>
+        `;
+      }
+
+      // Add critical alerts
+      if (report.executiveSummary.criticalAlerts.length > 0) {
+        html += `
+          <h4>Critical Alerts:</h4>
+          ${report.executiveSummary.criticalAlerts.map(alert => 
+            `<div class="report-alert">${alert}</div>`
+          ).join('')}
+        `;
+      }
+
+      // Add blood pressure summary
+      if (report.bloodPressure.summary && !report.bloodPressure.summary.message) {
+        html += `
+          <h4>Blood Pressure Summary:</h4>
+          <div class="report-metric">
+            <span class="report-metric-label">Average BP:</span>
+            <span class="report-metric-value">${report.bloodPressure.summary.averageSystolic}/${report.bloodPressure.summary.averageDiastolic} mmHg</span>
+          </div>
+          <div class="report-metric">
+            <span class="report-metric-label">Total Readings:</span>
+            <span class="report-metric-value">${report.bloodPressure.summary.totalReadings}</span>
+          </div>
+          <div class="report-metric">
+            <span class="report-metric-label">High Readings:</span>
+            <span class="report-metric-value">${report.bloodPressure.summary.highReadings} (${report.bloodPressure.summary.highReadingsPercentage}%)</span>
+          </div>
+        `;
+      }
+
+      // Add medication summary
+      if (report.medications.summary && !report.medications.summary.message) {
+        html += `
+          <h4>Medications:</h4>
+          <div class="report-metric">
+            <span class="report-metric-label">Active Medications:</span>
+            <span class="report-metric-value">${report.medications.summary.activeMedications}</span>
+          </div>
+        `;
+      }
+
+      // Add mental health summary
+      if (report.mentalHealth.summary && !report.mentalHealth.summary.message) {
+        html += `
+          <h4>Mental Health Summary:</h4>
+          <div class="report-metric">
+            <span class="report-metric-label">Average Mood:</span>
+            <span class="report-metric-value">${report.mentalHealth.summary.averageMood}/10</span>
+          </div>
+          <div class="report-metric">
+            <span class="report-metric-label">Average Stress:</span>
+            <span class="report-metric-value">${report.mentalHealth.summary.averageStress}/10</span>
+          </div>
+        `;
+      }
+
+      // Add recommendations
+      if (report.recommendations.length > 0) {
+        html += `
+          <h4>Recommendations:</h4>
+          <ul>
+            ${report.recommendations.slice(0, 5).map(rec => 
+              `<li><strong>${rec.category}:</strong> ${rec.recommendation}</li>`
+            ).join('')}
+          </ul>
+        `;
+      }
+
+      summary.innerHTML = html;
+    }
+
+    async function exportMedicalReportPDF() {
+      try {
+        if (window.currentMedicalReport) {
+          await window.medicalReportGenerator.exportReportAsPDF();
+        } else {
+          alert('Please generate a report first');
+        }
+      } catch (error) {
+        console.error('Error exporting PDF:', error);
+        alert('Error exporting PDF. Please try again.');
+      }
+    }
+
+    function downloadMedicalReportJSON() {
+      try {
+        if (window.currentMedicalReport) {
+          const dataStr = JSON.stringify(window.currentMedicalReport, null, 2);
+          const dataBlob = new Blob([dataStr], {type: 'application/json'});
+          const url = URL.createObjectURL(dataBlob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `medical-report-${new Date().toISOString().split('T')[0]}.json`;
+          link.click();
+          URL.revokeObjectURL(url);
+        } else {
+          alert('Please generate a report first');
+        }
+      } catch (error) {
+        console.error('Error downloading JSON:', error);
+        alert('Error downloading report. Please try again.');
+      }
+    }
   </script>
 </body>
 </html> 
