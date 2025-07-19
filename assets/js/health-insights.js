@@ -1300,23 +1300,93 @@ class HealthInsights {
 
     if (this.insights.length === 0) {
       insightsContainer.innerHTML = `
-        <div class="no-insights">
-          <div class="no-insights-icon">📊</div>
-          <h3>No Health Insights Yet</h3>
-          <p>Keep logging your health data to receive personalized insights and recommendations!</p>
-          <div class="insights-tips">
-            <p><strong>Start by logging:</strong></p>
-            <ul>
-              <li>Blood pressure readings</li>
-              <li>Daily mood and energy levels</li>
-              <li>Medication intake</li>
-              <li>Limb care assessments</li>
-            </ul>
+        <div class="insights-summary">
+          <div class="summary-header">
+            <span class="summary-icon">📊</span>
+            <h3>Health Insights</h3>
+          </div>
+          <div class="summary-content">
+            <p>Start logging health data to receive personalized insights</p>
           </div>
         </div>
       `;
       return;
     }
+
+    // Create compact summary
+    const alertCount = this.insights.filter(i => i.severity === 'alert').length;
+    const warningCount = this.insights.filter(i => i.severity === 'warning').length;
+    const infoCount = this.insights.filter(i => i.severity === 'info').length;
+    const successCount = this.insights.filter(i => i.severity === 'success').length;
+
+    // Get top 3 most important insights
+    const topInsights = this.insights.slice(0, 3);
+
+    const summaryElement = document.createElement('div');
+    summaryElement.className = 'insights-summary';
+    
+    let summaryHTML = `
+      <div class="summary-header">
+        <span class="summary-icon">🧠</span>
+        <h3>Health Insights</h3>
+        <div class="insights-stats">
+          ${alertCount > 0 ? `<span class="stat alert">${alertCount}</span>` : ''}
+          ${warningCount > 0 ? `<span class="stat warning">${warningCount}</span>` : ''}
+          ${infoCount > 0 ? `<span class="stat info">${infoCount}</span>` : ''}
+          ${successCount > 0 ? `<span class="stat success">${successCount}</span>` : ''}
+        </div>
+      </div>
+      <div class="summary-content">
+        <div class="health-score-compact">
+          <div class="score-circle-compact ${this.getHealthScoreClass()}">
+            <span class="score-value">${this.healthScore}</span>
+          </div>
+          <div class="score-info">
+            <span class="score-label">Health Score</span>
+            <span class="score-description">${this.getHealthScoreDescription()}</span>
+          </div>
+        </div>
+    `;
+
+    if (topInsights.length > 0) {
+      summaryHTML += '<div class="top-insights">';
+      topInsights.forEach(insight => {
+        summaryHTML += `
+          <div class="insight-summary ${insight.severity}">
+            <span class="insight-icon-small">${insight.icon}</span>
+            <div class="insight-text">
+              <strong>${insight.title}</strong>
+              <span class="insight-brief">${insight.message.substring(0, 60)}${insight.message.length > 60 ? '...' : ''}</span>
+            </div>
+          </div>
+        `;
+      });
+      summaryHTML += '</div>';
+    }
+
+    if (this.insights.length > 3) {
+      summaryHTML += `
+        <div class="more-insights">
+          <span class="more-count">+${this.insights.length - 3} more insights</span>
+          <button class="btn-view-all" onclick="window.healthInsights.showAllInsights()">View All</button>
+        </div>
+      `;
+    }
+
+    summaryHTML += '</div>';
+    summaryElement.innerHTML = summaryHTML;
+    insightsContainer.appendChild(summaryElement);
+  }
+
+  showAllInsights() {
+    const insightsContainer = document.getElementById('insightsList');
+    if (!insightsContainer) return;
+
+    // Sort insights by severity
+    const severityOrder = { 'alert': 4, 'warning': 3, 'info': 2, 'success': 1 };
+    this.insights.sort((a, b) => severityOrder[b.severity] - severityOrder[a.severity]);
+
+    insightsContainer.innerHTML = '';
 
     this.insights.forEach(insight => {
       const insightElement = document.createElement('div');
@@ -1339,6 +1409,16 @@ class HealthInsights {
       `;
       insightsContainer.appendChild(insightElement);
     });
+
+    // Add back button
+    const backButton = document.createElement('div');
+    backButton.className = 'back-to-summary';
+    backButton.innerHTML = `
+      <button class="btn-back" onclick="window.healthInsights.displayInsights()">
+        ← Back to Summary
+      </button>
+    `;
+    insightsContainer.appendChild(backButton);
   }
 
   displayRecommendations() {
@@ -1349,12 +1429,76 @@ class HealthInsights {
 
     if (this.recommendations.length === 0) {
       recommendationsContainer.innerHTML = `
-        <div class="no-recommendations">
-          <p>No specific recommendations at this time.</p>
+        <div class="recommendations-summary">
+          <div class="summary-header">
+            <span class="summary-icon">🤖</span>
+            <h3>AI Recommendations</h3>
+          </div>
+          <div class="summary-content">
+            <p>No specific recommendations at this time</p>
+          </div>
         </div>
       `;
       return;
     }
+
+    // Get top 3 most important recommendations
+    const topRecommendations = this.recommendations.slice(0, 3);
+    const highPriorityCount = this.recommendations.filter(r => r.priority === 'high').length;
+    const dataDrivenCount = this.recommendations.filter(r => r.dataDriven).length;
+
+    const summaryElement = document.createElement('div');
+    summaryElement.className = 'recommendations-summary';
+    
+    let summaryHTML = `
+      <div class="summary-header">
+        <span class="summary-icon">🤖</span>
+        <h3>AI Recommendations</h3>
+        <div class="recommendations-stats">
+          ${highPriorityCount > 0 ? `<span class="stat high">${highPriorityCount}</span>` : ''}
+          ${dataDrivenCount > 0 ? `<span class="stat ai">${dataDrivenCount}</span>` : ''}
+        </div>
+      </div>
+      <div class="summary-content">
+    `;
+
+    if (topRecommendations.length > 0) {
+      summaryHTML += '<div class="top-recommendations">';
+      topRecommendations.forEach(rec => {
+        const metricIcon = this.getMetricIcon(rec.metric);
+        summaryHTML += `
+          <div class="recommendation-summary ${rec.priority}">
+            <span class="recommendation-icon-small">${metricIcon}</span>
+            <div class="recommendation-text">
+              <strong>${rec.title}</strong>
+              <span class="recommendation-brief">${rec.description.substring(0, 80)}${rec.description.length > 80 ? '...' : ''}</span>
+              ${rec.dataDriven ? '<span class="ai-indicator">AI</span>' : ''}
+            </div>
+          </div>
+        `;
+      });
+      summaryHTML += '</div>';
+    }
+
+    if (this.recommendations.length > 3) {
+      summaryHTML += `
+        <div class="more-recommendations">
+          <span class="more-count">+${this.recommendations.length - 3} more recommendations</span>
+          <button class="btn-view-all" onclick="window.healthInsights.showAllRecommendations()">View All</button>
+        </div>
+      `;
+    }
+
+    summaryHTML += '</div>';
+    summaryElement.innerHTML = summaryHTML;
+    recommendationsContainer.appendChild(summaryElement);
+  }
+
+  showAllRecommendations() {
+    const recommendationsContainer = document.getElementById('recommendationsList');
+    if (!recommendationsContainer) return;
+
+    recommendationsContainer.innerHTML = '';
 
     // Add AI-driven header
     const aiHeader = document.createElement('div');
@@ -1395,6 +1539,16 @@ class HealthInsights {
       `;
       recommendationsContainer.appendChild(recElement);
     });
+
+    // Add back button
+    const backButton = document.createElement('div');
+    backButton.className = 'back-to-summary';
+    backButton.innerHTML = `
+      <button class="btn-back" onclick="window.healthInsights.displayRecommendations()">
+        ← Back to Summary
+      </button>
+    `;
+    recommendationsContainer.appendChild(backButton);
   }
 
   getMetricIcon(metric) {
@@ -1450,6 +1604,20 @@ class HealthInsights {
     if (minutes < 60) return `${minutes} minutes ago`;
     if (hours < 24) return `${hours} hours ago`;
     return `${days} days ago`;
+  }
+
+  getHealthScoreClass() {
+    if (this.healthScore >= 80) return 'excellent';
+    if (this.healthScore >= 60) return 'good';
+    if (this.healthScore >= 40) return 'fair';
+    return 'poor';
+  }
+
+  getHealthScoreDescription() {
+    if (this.healthScore >= 80) return 'Excellent health';
+    if (this.healthScore >= 60) return 'Good health';
+    if (this.healthScore >= 40) return 'Fair health';
+    return 'Needs attention';
   }
 
   async refreshInsights() {

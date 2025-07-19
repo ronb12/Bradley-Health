@@ -2143,6 +2143,211 @@ input[type="range"]::-moz-range-thumb {
   gap: 15px;
 }
 
+/* Compact Insights Summary */
+.insights-summary {
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.summary-icon {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.summary-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.insights-stats {
+  display: flex;
+  gap: 8px;
+}
+
+.stat {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 20px;
+  text-align: center;
+}
+
+.stat.alert {
+  background: #dc3545;
+  color: white;
+}
+
+.stat.warning {
+  background: #ffc107;
+  color: #212529;
+}
+
+.stat.info {
+  background: #17a2b8;
+  color: white;
+}
+
+.stat.success {
+  background: #28a745;
+  color: white;
+}
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.top-insights {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.insight-summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.5);
+  transition: all 0.2s ease;
+}
+
+.insight-summary:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateX(2px);
+}
+
+.insight-summary.alert {
+  border-left-color: #dc3545;
+  background: rgba(220, 53, 69, 0.05);
+}
+
+.insight-summary.warning {
+  border-left-color: #ffc107;
+  background: rgba(255, 193, 7, 0.05);
+}
+
+.insight-summary.info {
+  border-left-color: #17a2b8;
+  background: rgba(23, 162, 184, 0.05);
+}
+
+.insight-summary.success {
+  border-left-color: #28a745;
+  background: rgba(40, 167, 69, 0.05);
+}
+
+.insight-icon-small {
+  font-size: 16px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+}
+
+.insight-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.insight-text strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.insight-brief {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.more-insights {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-top: 1px solid var(--border-color);
+}
+
+.more-count {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.btn-view-all {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-view-all:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.back-to-summary {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.btn-back {
+  background: var(--secondary-color);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+  background: var(--secondary-dark);
+  border-color: var(--primary-color);
+}
+
 .insight-item {
   background: var(--card-bg);
   border: 2px solid var(--border-color);
@@ -2330,6 +2535,182 @@ input[type="range"]::-moz-range-thumb {
   display: flex;
   flex-direction: column;
   gap: 15px;
+}
+
+/* Compact Recommendations Summary */
+.recommendations-summary {
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.recommendations-stats {
+  display: flex;
+  gap: 8px;
+}
+
+.stat.high {
+  background: #dc3545;
+  color: white;
+}
+
+.stat.ai {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.top-recommendations {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recommendation-summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.5);
+  transition: all 0.2s ease;
+}
+
+.recommendation-summary:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateX(2px);
+}
+
+.recommendation-summary.high {
+  border-left-color: #dc3545;
+  background: rgba(220, 53, 69, 0.05);
+}
+
+.recommendation-summary.medium {
+  border-left-color: #ffc107;
+  background: rgba(255, 193, 7, 0.05);
+}
+
+.recommendation-summary.low {
+  border-left-color: #28a745;
+  background: rgba(40, 167, 69, 0.05);
+}
+
+.recommendation-icon-small {
+  font-size: 16px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+}
+
+.recommendation-text {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.recommendation-text strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.recommendation-brief {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  display: block;
+}
+
+.ai-indicator {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.more-recommendations {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Compact Health Score */
+.health-score-compact {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  margin-bottom: 15px;
+  border: 1px solid var(--border-color);
+}
+
+.score-circle-compact {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.score-circle-compact.excellent {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.score-circle-compact.good {
+  background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+}
+
+.score-circle-compact.fair {
+  background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+}
+
+.score-circle-compact.poor {
+  background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+}
+
+.score-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.score-info .score-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.score-info .score-description {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
 }
 
 .ai-recommendations-header {
@@ -2584,6 +2965,53 @@ input[type="range"]::-moz-range-thumb {
     flex-direction: column;
     align-items: flex-start;
     gap: 5px;
+  }
+
+  /* Compact summary mobile styles */
+  .summary-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .insights-stats,
+  .recommendations-stats {
+    align-self: flex-start;
+  }
+
+  .insight-summary,
+  .recommendation-summary {
+    padding: 10px;
+  }
+
+  .insight-icon-small,
+  .recommendation-icon-small {
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+  }
+
+  .more-insights,
+  .more-recommendations {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .btn-view-all {
+    align-self: flex-start;
+  }
+
+  .health-score-compact {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .score-circle-compact {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
   }
 }
 
