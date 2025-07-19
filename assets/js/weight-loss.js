@@ -1925,16 +1925,26 @@ class WeightLossManager {
   }
 
   printSmoothiesOnly(mealPlan) {
+    console.log('printSmoothiesOnly called with mealPlan:', mealPlan);
+    console.log('this.mealPlan:', this.mealPlan);
+    
     if (!mealPlan || !mealPlan.days) {
+      console.log('No meal plan or days found');
       this.showToast('No meal plan available to print', 'error');
       return;
     }
 
+    console.log('Meal plan days:', mealPlan.days.length);
+    console.log('First day meals:', mealPlan.days[0]?.meals);
+
     // Collect all smoothies from the meal plan
     const smoothies = [];
     mealPlan.days.forEach((day, dayIndex) => {
+      console.log(`Day ${dayIndex + 1} meals:`, day.meals);
       Object.entries(day.meals).forEach(([mealType, meal]) => {
+        console.log(`Meal type: ${mealType}, Meal:`, meal);
         if (mealType === 'smoothie' && meal.ingredients) {
+          console.log(`Found smoothie on day ${dayIndex + 1}:`, meal);
           smoothies.push({
             day: dayIndex + 1,
             name: meal.name,
@@ -1948,6 +1958,8 @@ class WeightLossManager {
         }
       });
     });
+
+    console.log('Total smoothies found:', smoothies.length);
 
     if (smoothies.length === 0) {
       this.showToast('No smoothies found in the meal plan', 'error');
