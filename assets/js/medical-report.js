@@ -75,8 +75,12 @@ class MedicalReportGenerator {
         limbCare: { assessments: [], summary: { message: 'No data available' } },
         weight: { entries: [], summary: { message: 'No data available' } },
         sleep: { entries: [], summary: { message: 'No data available' } },
+        physicalActivity: { entries: [], summary: { message: 'No data available' } },
+        nutrition: { entries: [], summary: { message: 'No data available' } },
+        medicalHistory: { history: [], summary: { message: 'No data available' } },
         emergency: { contacts: [], protocols: [] },
-        insights: []
+        insights: [],
+        dataQuality: {} // Added for data quality metrics
       };
 
       // Collect all health data with individual error handling
@@ -116,9 +120,24 @@ class MedicalReportGenerator {
         console.error('Error collecting emergency data:', error);
       });
       
+      await this.collectPhysicalActivityData(userId, startDate, endDate).catch(error => {
+        console.error('Error collecting physical activity data:', error);
+      });
+      
+      await this.collectNutritionData(userId, startDate, endDate).catch(error => {
+        console.error('Error collecting nutrition data:', error);
+      });
+      
+      await this.collectMedicalHistoryData(userId).catch(error => {
+        console.error('Error collecting medical history data:', error);
+      });
+      
       await this.collectHealthInsights(userId).catch(error => {
         console.error('Error collecting health insights:', error);
       });
+
+      // Calculate data quality metrics
+      this.reportData.dataQuality = this.calculateDataQualityMetrics();
 
       // Generate the report
       const report = this.formatReport(reportDate, startDate, endDate);
@@ -389,6 +408,122 @@ class MedicalReportGenerator {
     }
   }
 
+  async collectPhysicalActivityData(userId, startDate, endDate) {
+    try {
+      const activitySnapshot = await this.db.collection('physicalActivity')
+        .where('userId', '==', userId)
+        .where('timestamp', '>=', startDate)
+        .where('timestamp', '<=', endDate)
+        .orderBy('timestamp', 'desc')
+        .get();
+
+      const activityEntries = activitySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp.toDate()
+      }));
+
+      this.reportData.physicalActivity = {
+        entries: activityEntries,
+        summary: this.analyzePhysicalActivity(activityEntries),
+        trends: activityEntries.length > 0 ? this.calculateTrend(activityEntries.map(a => a.duration)) : 'no data'
+      };
+    } catch (error) {
+      console.error('Error collecting physical activity data:', error);
+      this.reportData.physicalActivity = {
+        entries: [],
+        summary: { message: 'Error loading physical activity data' },
+        trends: 'error'
+      };
+    }
+  }
+
+  async collectNutritionData(userId, startDate, endDate) {
+    try {
+      const nutritionSnapshot = await this.db.collection('nutritionEntries')
+        .where('userId', '==', userId)
+        .where('timestamp', '>=', startDate)
+        .where('timestamp', '<=', endDate)
+        .orderBy('timestamp', 'desc')
+        .get();
+
+      const nutritionEntries = nutritionSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp.toDate()
+      }));
+
+      // Get dietary restrictions from profile
+      const profileDoc = await this.db.collection('profiles').doc(userId).get();
+      const profileData = profileDoc.exists ? profileDoc.data() : {};
+
+      this.reportData.nutrition = {
+        entries: nutritionEntries,
+        summary: this.analyzeNutritionData(nutritionEntries),
+        dietaryRestrictions: profileData.dietaryRestrictions || [],
+        foodAllergies: profileData.foodAllergies || [],
+        supplements: profileData.supplements || [],
+        trends: nutritionEntries.length > 0 ? this.calculateTrend(nutritionEntries.map(n => n.calories)) : 'no data'
+      };
+    } catch (error) {
+      console.error('Error collecting nutrition data:', error);
+      this.reportData.nutrition = {
+        entries: [],
+        summary: { message: 'Error loading nutrition data' },
+        dietaryRestrictions: [],
+        foodAllergies: [],
+        supplements: [],
+        trends: 'error'
+      };
+    }
+  }
+
+  async collectMedicalHistoryData(userId) {
+    try {
+      const historySnapshot = await this.db.collection('medicalHistory')
+        .where('userId', '==', userId)
+        .orderBy('date', 'desc')
+        .get();
+
+      const medicalHistory = historySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        date: doc.data().date.toDate()
+      }));
+
+      // Get family history from profile
+      const profileDoc = await this.db.collection('profiles').doc(userId).get();
+      const profileData = profileDoc.exists ? profileDoc.data() : {};
+
+      // Get immunization records
+      const immunizationSnapshot = await this.db.collection('immunizations')
+        .where('userId', '==', userId)
+        .orderBy('date', 'desc')
+        .get();
+
+      const immunizations = immunizationSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        date: doc.data().date.toDate()
+      }));
+
+      this.reportData.medicalHistory = {
+        history: medicalHistory,
+        familyHistory: profileData.familyHistory || [],
+        immunizations: immunizations,
+        summary: this.analyzeMedicalHistory(medicalHistory, immunizations)
+      };
+    } catch (error) {
+      console.error('Error collecting medical history data:', error);
+      this.reportData.medicalHistory = {
+        history: [],
+        familyHistory: [],
+        immunizations: [],
+        summary: { message: 'Error loading medical history data' }
+      };
+    }
+  }
+
   analyzeBloodPressure(readings) {
     if (!readings || readings.length === 0) {
       return { message: 'No blood pressure readings available' };
@@ -558,6 +693,102 @@ class MedicalReportGenerator {
     };
   }
 
+  analyzePhysicalActivity(entries) {
+    if (!entries || entries.length === 0) {
+      return { message: 'No physical activity entries available' };
+    }
+
+    const durations = entries.map(e => e.duration);
+    const intensities = entries.map(e => e.intensity);
+    const types = entries.map(e => e.type);
+    const calories = entries.map(e => e.caloriesBurned);
+
+    const avgDuration = durations.reduce((a, b) => a + b, 0) / durations.length;
+    const avgIntensity = intensities.reduce((a, b) => a + b, 0) / intensities.length;
+    const totalCalories = calories.reduce((a, b) => a + b, 0);
+    const avgCalories = totalCalories / entries.length;
+
+    // Group activities by type
+    const activityTypes = {};
+    types.forEach(type => {
+      activityTypes[type] = (activityTypes[type] || 0) + 1;
+    });
+
+    // Calculate weekly activity
+    const weeklyMinutes = avgDuration * entries.length / 4; // Assuming 4 weeks
+    const weeklyRecommendation = 150; // WHO recommendation
+    const meetsRecommendation = weeklyMinutes >= weeklyRecommendation;
+
+    return {
+      totalEntries: entries.length,
+      averageDuration: Math.round(avgDuration),
+      averageIntensity: Math.round(avgIntensity * 10) / 10,
+      totalCaloriesBurned: Math.round(totalCalories),
+      averageCaloriesPerSession: Math.round(avgCalories),
+      weeklyActivityMinutes: Math.round(weeklyMinutes),
+      meetsWeeklyRecommendation: meetsRecommendation,
+      activityTypes: activityTypes,
+      activityTrend: this.calculateTrend(durations)
+    };
+  }
+
+  analyzeNutritionData(entries) {
+    if (!entries || entries.length === 0) {
+      return { message: 'No nutrition entries available' };
+    }
+
+    const calories = entries.map(e => e.calories);
+    const proteins = entries.map(e => e.protein);
+    const carbs = entries.map(e => e.carbs);
+    const fats = entries.map(e => e.fat);
+    const fiber = entries.map(e => e.fiber);
+    const water = entries.map(e => e.water);
+
+    const avgCalories = calories.reduce((a, b) => a + b, 0) / calories.length;
+    const avgProtein = proteins.reduce((a, b) => a + b, 0) / proteins.length;
+    const avgCarbs = carbs.reduce((a, b) => a + b, 0) / carbs.length;
+    const avgFat = fats.reduce((a, b) => a + b, 0) / fats.length;
+    const avgFiber = fiber.reduce((a, b) => a + b, 0) / fiber.length;
+    const avgWater = water.reduce((a, b) => a + b, 0) / water.length;
+
+    // Calculate macronutrient percentages
+    const totalMacros = avgProtein + avgCarbs + avgFat;
+    const proteinPercentage = totalMacros > 0 ? Math.round((avgProtein / totalMacros) * 100) : 0;
+    const carbPercentage = totalMacros > 0 ? Math.round((avgCarbs / totalMacros) * 100) : 0;
+    const fatPercentage = totalMacros > 0 ? Math.round((avgFat / totalMacros) * 100) : 0;
+
+    return {
+      totalEntries: entries.length,
+      averageCalories: Math.round(avgCalories),
+      averageProtein: Math.round(avgProtein),
+      averageCarbs: Math.round(avgCarbs),
+      averageFat: Math.round(avgFat),
+      averageFiber: Math.round(avgFiber),
+      averageWater: Math.round(avgWater),
+      proteinPercentage: proteinPercentage,
+      carbPercentage: carbPercentage,
+      fatPercentage: fatPercentage,
+      nutritionTrend: this.calculateTrend(calories)
+    };
+  }
+
+  analyzeMedicalHistory(history, immunizations) {
+    if (!history || history.length === 0) {
+      return { message: 'No medical history data available' };
+    }
+
+    const recentConditions = history.slice(0, 5); // Last 5 medical conditions
+    const recentImmunizations = immunizations.slice(0, 5); // Last 5 immunizations
+
+    return {
+      totalHistory: history.length,
+      recentConditions: recentConditions.length,
+      recentImmunizations: recentImmunizations.length,
+      latestCondition: history[0],
+      latestImmunization: immunizations[0]
+    };
+  }
+
   categorizeBP(systolic, diastolic) {
     if (systolic < 120 && diastolic < 80) return 'Normal';
     if (systolic < 130 && diastolic < 80) return 'Elevated';
@@ -614,6 +845,8 @@ class MedicalReportGenerator {
     const weight = this.reportData.weight || {};
     const sleep = this.reportData.sleep || {};
     const emergency = this.reportData.emergency || {};
+    const medicalHistory = this.reportData.medicalHistory || {};
+    const dataQuality = this.reportData.dataQuality || {}; // Added data quality metrics
 
     const report = {
       reportInfo: {
@@ -626,7 +859,7 @@ class MedicalReportGenerator {
         patientAge: profile.age || 'Not provided'
       },
       
-      executiveSummary: this.generateExecutiveSummary(bp, meds, mood, goals, weight, sleep, insights),
+      executiveSummary: this.generateExecutiveSummary(bp, meds, mood, goals, weight, sleep, this.reportData.physicalActivity, this.reportData.nutrition, insights),
       
       patientDemographics: {
         name: profile.name,
@@ -686,15 +919,24 @@ class MedicalReportGenerator {
         medicalAlert: emergency.medicalAlert
       },
       
+      medicalHistory: {
+        summary: medicalHistory.summary,
+        recentConditions: medicalHistory.recentConditions,
+        recentImmunizations: medicalHistory.recentImmunizations,
+        latestCondition: medicalHistory.latestCondition,
+        latestImmunization: medicalHistory.latestImmunization
+      },
+      
       healthInsights: insights,
       
-      recommendations: this.generateRecommendations(bp, meds, mood, goals, weight, sleep, insights)
+      recommendations: this.generateRecommendations(bp, meds, mood, goals, weight, sleep, this.reportData.physicalActivity, this.reportData.nutrition, insights),
+      dataQuality: dataQuality // Added data quality metrics to report
     };
 
     return report;
   }
 
-  generateExecutiveSummary(bp, meds, mood, goals, weight, sleep, insights) {
+  generateExecutiveSummary(bp, meds, mood, goals, weight, sleep, physicalActivity, nutrition, insights) {
     const summary = {
       overallHealthStatus: 'Good',
       keyFindings: [],
@@ -745,6 +987,18 @@ class MedicalReportGenerator {
       summary.recommendations.push('Ensure adequate sleep for optimal health');
     }
 
+    // Physical Activity Analysis
+    if (physicalActivity.summary && !physicalActivity.summary.meetsWeeklyRecommendation) {
+      summary.keyFindings.push('Physical activity is below recommended weekly levels');
+      summary.recommendations.push('Aim for at least 150 minutes of moderate activity per week');
+    }
+
+    // Nutrition Analysis
+    if (nutrition.summary && nutrition.summary.averageCalories < 1200) {
+      summary.keyFindings.push('Caloric intake may be below recommended levels');
+      summary.recommendations.push('Consult with a nutritionist for dietary guidance');
+    }
+
     // Insights Analysis
     insights.forEach(insight => {
       if (insight.severity === 'alert') {
@@ -756,7 +1010,7 @@ class MedicalReportGenerator {
     return summary;
   }
 
-  generateRecommendations(bp, meds, mood, goals, weight, sleep, insights) {
+  generateRecommendations(bp, meds, mood, goals, weight, sleep, physicalActivity, nutrition, insights) {
     const recommendations = [];
 
     // Blood Pressure Recommendations
@@ -801,6 +1055,24 @@ class MedicalReportGenerator {
         category: 'Sleep',
         priority: 'High',
         recommendation: 'Ensure adequate sleep for optimal health'
+      });
+    }
+
+    // Physical Activity Recommendations
+    if (physicalActivity.summary && !physicalActivity.summary.meetsWeeklyRecommendation) {
+      recommendations.push({
+        category: 'Physical Activity',
+        priority: 'Medium',
+        recommendation: 'Aim for at least 150 minutes of moderate activity per week'
+      });
+    }
+
+    // Nutrition Recommendations
+    if (nutrition.summary && nutrition.summary.averageCalories < 1200) {
+      recommendations.push({
+        category: 'Nutrition',
+        priority: 'Medium',
+        recommendation: 'Consult with a nutritionist for dietary guidance'
       });
     }
 
@@ -994,9 +1266,188 @@ class MedicalReportGenerator {
             ` : ''}
           </div>
         </div>
+
+        <div class="section">
+          <h2>Medical History</h2>
+          ${report.medicalHistory.summary.message ? 
+            `<p>${report.medicalHistory.summary.message}</p>` :
+            `<div class="summary-box">
+              <p><strong>Total Medical History:</strong> ${report.medicalHistory.totalHistory}</p>
+              <p><strong>Recent Conditions:</strong> ${report.medicalHistory.recentConditions}</p>
+              <p><strong>Recent Immunizations:</strong> ${report.medicalHistory.recentImmunizations}</p>
+              <p><strong>Latest Condition:</strong> ${report.medicalHistory.latestCondition ? new Date(report.medicalHistory.latestCondition.date).toLocaleDateString() : 'N/A'}</p>
+              <p><strong>Latest Immunization:</strong> ${report.medicalHistory.latestImmunization ? new Date(report.medicalHistory.latestImmunization.date).toLocaleDateString() : 'N/A'}</p>
+            </div>`
+          }
+        </div>
+
+        <div class="section">
+          <h2>Physical Activity Summary</h2>
+          ${report.physicalActivity.summary.message ? 
+            `<p>${report.physicalActivity.summary.message}</p>` :
+            `<div class="summary-box">
+              <p><strong>Average Duration:</strong> ${report.physicalActivity.summary.averageDuration} minutes</p>
+              <p><strong>Average Intensity:</strong> ${report.physicalActivity.summary.averageIntensity}/10</p>
+              <p><strong>Total Calories Burned:</strong> ${report.physicalActivity.summary.totalCaloriesBurned}</p>
+              <p><strong>Weekly Activity:</strong> ${report.physicalActivity.summary.weeklyActivityMinutes} minutes</p>
+              <p><strong>Meets Weekly Recommendation:</strong> ${report.physicalActivity.summary.meetsWeeklyRecommendation ? 'Yes' : 'No'}</p>
+            </div>`
+          }
+        </div>
+
+        <div class="section">
+          <h2>Nutrition Summary</h2>
+          ${report.nutrition.summary.message ? 
+            `<p>${report.nutrition.summary.message}</p>` :
+            `<div class="summary-box">
+              <p><strong>Average Calories:</strong> ${report.nutrition.summary.averageCalories}</p>
+              <p><strong>Protein:</strong> ${report.nutrition.summary.averageProtein}g (${report.nutrition.summary.proteinPercentage}%)</p>
+              <p><strong>Carbohydrates:</strong> ${report.nutrition.summary.averageCarbs}g (${report.nutrition.summary.carbPercentage}%)</p>
+              <p><strong>Fat:</strong> ${report.nutrition.summary.averageFat}g (${report.nutrition.summary.fatPercentage}%)</p>
+              <p><strong>Fiber:</strong> ${report.nutrition.summary.averageFiber}g</p>
+              <p><strong>Water:</strong> ${report.nutrition.summary.averageWater} oz</p>
+            </div>`
+          }
+        </div>
+
+        <div class="section">
+          <h2>Data Quality Metrics</h2>
+          <div class="summary-box">
+            <p><strong>Overall Score:</strong> ${report.dataQuality.overallScore}%</p>
+            <p><strong>Completeness:</strong></p>
+            <ul>
+              <li>Profile: ${report.dataQuality.completeness.profile}%</li>
+              <li>Blood Pressure: ${report.dataQuality.completeness.bloodPressure}%</li>
+              <li>Medications: ${report.dataQuality.completeness.medications}%</li>
+              <li>Mood: ${report.dataQuality.completeness.mood}%</li>
+              <li>Goals: ${report.dataQuality.completeness.goals}%</li>
+              <li>Limb Care: ${report.dataQuality.completeness.limbCare}%</li>
+              <li>Weight: ${report.dataQuality.completeness.weight}%</li>
+              <li>Sleep: ${report.dataQuality.completeness.sleep}%</li>
+              <li>Physical Activity: ${report.dataQuality.completeness.physicalActivity}%</li>
+              <li>Nutrition: ${report.dataQuality.completeness.nutrition}%</li>
+              <li>Medical History: ${report.dataQuality.completeness.medicalHistory}%</li>
+            </ul>
+            <p><strong>Consistency:</strong></p>
+            <ul>
+              <li>Blood Pressure Trends: ${report.dataQuality.consistency.bloodPressureTrend}</li>
+              <li>Mood Trends: ${report.dataQuality.consistency.moodTrend}</li>
+              <li>Weight Trends: ${report.dataQuality.consistency.weightTrend}</li>
+              <li>Sleep Trends: ${report.dataQuality.consistency.sleepTrend}</li>
+              <li>Physical Activity Trends: ${report.dataQuality.consistency.physicalActivityTrend}</li>
+              <li>Nutrition Trends: ${report.dataQuality.consistency.nutritionTrend}</li>
+            </ul>
+            <p><strong>Reliability:</strong></p>
+            <ul>
+              <li>Blood Pressure Readings: ${report.dataQuality.reliability.bloodPressureReadings}</li>
+              <li>Mood Entries: ${report.dataQuality.reliability.moodEntries}</li>
+              <li>Weight Entries: ${report.dataQuality.reliability.weightEntries}</li>
+              <li>Sleep Entries: ${report.dataQuality.reliability.sleepEntries}</li>
+              <li>Physical Activity Entries: ${report.dataQuality.reliability.physicalActivityEntries}</li>
+              <li>Nutrition Entries: ${report.dataQuality.reliability.nutritionEntries}</li>
+            </ul>
+            <p><strong>Recommendations:</strong></p>
+            <ul>
+              ${report.dataQuality.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
       </body>
       </html>
     `;
+  }
+
+  calculateDataQualityMetrics() {
+    const metrics = {
+      overallScore: 0,
+      completeness: {},
+      consistency: {},
+      reliability: {},
+      recommendations: []
+    };
+
+    // Calculate completeness scores for each data type
+    const dataTypes = {
+      profile: this.reportData.profile,
+      bloodPressure: this.reportData.bloodPressure,
+      medications: this.reportData.medications,
+      mood: this.reportData.mood,
+      goals: this.reportData.goals,
+      limbCare: this.reportData.limbCare,
+      weight: this.reportData.weight,
+      sleep: this.reportData.sleep,
+      physicalActivity: this.reportData.physicalActivity,
+      nutrition: this.reportData.nutrition,
+      medicalHistory: this.reportData.medicalHistory
+    };
+
+    let totalCompleteness = 0;
+    let dataTypeCount = 0;
+
+    Object.keys(dataTypes).forEach(type => {
+      const data = dataTypes[type];
+      let completeness = 0;
+
+      if (data && Object.keys(data).length > 0) {
+        if (type === 'profile') {
+          completeness = this.calculateProfileCompleteness(data);
+        } else if (data.entries && data.entries.length > 0) {
+          completeness = Math.min(100, (data.entries.length / 10) * 100); // 10+ entries = 100%
+        } else if (data.readings && data.readings.length > 0) {
+          completeness = Math.min(100, (data.readings.length / 10) * 100);
+        } else if (data.current && data.current.length > 0) {
+          completeness = 100; // Has current data
+        } else {
+          completeness = 0;
+        }
+      }
+
+      metrics.completeness[type] = Math.round(completeness);
+      totalCompleteness += completeness;
+      dataTypeCount++;
+    });
+
+    metrics.overallScore = Math.round(totalCompleteness / dataTypeCount);
+
+    // Generate recommendations based on data quality
+    if (metrics.overallScore < 50) {
+      metrics.recommendations.push('Consider adding more health data to improve report quality');
+    }
+    if (metrics.completeness.profile < 80) {
+      metrics.recommendations.push('Complete your profile information for better health insights');
+    }
+    if (metrics.completeness.bloodPressure < 30) {
+      metrics.recommendations.push('Add more blood pressure readings for trend analysis');
+    }
+    if (metrics.completeness.mood < 30) {
+      metrics.recommendations.push('Track your mood more frequently for mental health insights');
+    }
+
+    return metrics;
+  }
+
+  calculateProfileCompleteness(profile) {
+    const requiredFields = ['name', 'age', 'weight', 'height', 'medicalConditions', 'allergies'];
+    const optionalFields = ['emergencyContact', 'familyHistory', 'dietaryRestrictions'];
+    
+    let completeness = 0;
+    let totalFields = requiredFields.length + optionalFields.length;
+    let filledFields = 0;
+
+    requiredFields.forEach(field => {
+      if (profile[field] && profile[field] !== 'Not provided' && profile[field] !== 'None reported') {
+        filledFields += 1.5; // Weight required fields more heavily
+      }
+    });
+
+    optionalFields.forEach(field => {
+      if (profile[field] && profile[field].length > 0) {
+        filledFields += 0.5;
+      }
+    });
+
+    completeness = Math.min(100, (filledFields / (requiredFields.length * 1.5 + optionalFields.length * 0.5)) * 100);
+    return completeness;
   }
 }
 
