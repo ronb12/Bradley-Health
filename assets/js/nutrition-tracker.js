@@ -1220,8 +1220,25 @@ class NutritionTracker {
     );
 
     sortedMeals.forEach(meal => {
-      const date = new Date(meal.timestamp).toLocaleDateString();
-      const time = new Date(meal.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      // Handle different timestamp formats
+      let mealDate;
+      if (meal.timestamp && meal.timestamp.toDate) {
+        // Firestore timestamp
+        mealDate = meal.timestamp.toDate();
+      } else if (meal.timestamp) {
+        // Regular date object or string
+        mealDate = new Date(meal.timestamp);
+      } else {
+        mealDate = new Date(); // Fallback to current date
+      }
+
+      // Check if date is valid
+      if (isNaN(mealDate.getTime())) {
+        mealDate = new Date(); // Fallback to current date if invalid
+      }
+
+      const date = mealDate.toLocaleDateString();
+      const time = mealDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
       const cholesterolValue = Math.round(meal.estimatedCholesterol);
       
       cholesterolHistoryList.innerHTML += `
@@ -1233,7 +1250,7 @@ class NutritionTracker {
           <div class="entry-meal">
             <strong>Meal:</strong> ${meal.name} (${meal.type})
             ${meal.foodsFound && meal.foodsFound.length > 0 ? 
-              `<br><small>Foods detected: ${meal.foodsFound.join(', ')}</small>` : ''}
+              `<br><small>Foods detected: ${this.formatFoodsFound(meal.foodsFound)}</small>` : ''}
           </div>
           ${meal.notes ? `<div class="entry-notes">${meal.notes}</div>` : ''}
           <div class="entry-nutrition">
@@ -1250,6 +1267,33 @@ class NutritionTracker {
     if (value < 200) return 'cholesterol-normal';
     if (value < 300) return 'cholesterol-borderline';
     return 'cholesterol-high';
+  }
+
+  formatFoodsFound(foodsFound) {
+    if (!foodsFound || !Array.isArray(foodsFound)) {
+      return '';
+    }
+
+    const foodNames = foodsFound.map(food => {
+      if (typeof food === 'string') {
+        return food;
+      } else if (food && typeof food === 'object') {
+        // Handle different food object formats
+        if (food.food) {
+          return food.food;
+        } else if (food.name) {
+          return food.name;
+        } else if (food.foodName) {
+          return food.foodName;
+        } else {
+          return 'Unknown food';
+        }
+      } else {
+        return 'Unknown food';
+      }
+    });
+
+    return foodNames.join(', ');
   }
 
 
