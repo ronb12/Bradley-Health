@@ -4706,3 +4706,123 @@ input[type="range"]::-moz-range-thumb {
     font-size: 0.8rem;
   }
 }
+
+/* Medication Dropdown Styles */
+.medication-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin-top: 2px;
+}
+
+.dropdown-category {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dropdown-category:last-child {
+  border-bottom: none;
+}
+
+.dropdown-category-header {
+  background: var(--primary-color);
+  color: white;
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dropdown-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover,
+.dropdown-item.active {
+  background: var(--primary-color-light);
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item .med-name {
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 2px;
+}
+
+.dropdown-item .med-dosage {
+  font-size: 0.85em;
+  color: var(--text-secondary);
+}
+
+/* Ensure the input container has relative positioning */
+#medName {
+  position: relative;
+}
+
+#medName:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color-light);
+}
+
+/* Auto-complete container styles (keeping for compatibility) */
+.auto-complete-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin-top: 2px;
+}
+
+.auto-complete-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s ease;
+}
+
+.auto-complete-item:hover,
+.auto-complete-item.active {
+  background: var(--primary-color-light);
+}
+
+.auto-complete-item:last-child {
+  border-bottom: none;
+}
+
+.auto-complete-item .med-name {
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 2px;
+}
+
+.auto-complete-item .med-category {
+  font-size: 0.85em;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.auto-complete-item .med-dosage {
+  font-size: 0.85em;
+  color: var(--text-secondary);
+}

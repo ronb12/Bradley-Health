@@ -95,113 +95,125 @@ class MedicationManager {
       console.log('Medication Manager: medName input not found');
       return;
     }
-    console.log('Medication Manager: Setting up auto-complete for medName input');
 
-    // Create auto-complete container
-    const autoCompleteContainer = document.createElement('div');
-    autoCompleteContainer.id = 'medicationAutoComplete';
-    autoCompleteContainer.className = 'auto-complete-container';
-    autoCompleteContainer.style.display = 'none';
-    medNameInput.parentNode.appendChild(autoCompleteContainer);
-    console.log('Medication Manager: Auto-complete container created and appended');
+    console.log('Medication Manager: Setting up medication dropdown');
 
-    let currentFocus = -1;
-    let filteredMedications = [];
+    // Create dropdown container
+    const dropdownContainer = document.createElement('div');
+    dropdownContainer.id = 'medicationDropdown';
+    dropdownContainer.className = 'medication-dropdown';
+    dropdownContainer.style.display = 'none';
+    medNameInput.parentNode.appendChild(dropdownContainer);
 
-    medNameInput.addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase().trim();
-      console.log('Medication Manager: Input event triggered with query:', query);
-      
-      if (query.length < 2) {
-        autoCompleteContainer.style.display = 'none';
-        return;
-      }
-
-      // Get medications from database
-      if (window.medicationDatabase) {
-        console.log('Medication Manager: Database found, searching...');
-        filteredMedications = window.medicationDatabase.searchMedications(query);
-        this.showAutoCompleteSuggestions(filteredMedications, autoCompleteContainer, medNameInput);
-      } else {
-        console.log('Medication Manager: Database not found! window.medicationDatabase:', window.medicationDatabase);
-      }
+    // Show dropdown when input is focused
+    medNameInput.addEventListener('focus', () => {
+      this.showMedicationDropdown(dropdownContainer, medNameInput);
     });
 
-    medNameInput.addEventListener('keydown', (e) => {
-      const items = autoCompleteContainer.getElementsByClassName('auto-complete-item');
-      
-      if (e.key === 'ArrowDown') {
-        currentFocus++;
-        this.addActive(items, currentFocus);
-      } else if (e.key === 'ArrowUp') {
-        currentFocus--;
-        this.addActive(items, currentFocus);
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        if (currentFocus > -1) {
-          if (items[currentFocus]) {
-            this.selectMedication(items[currentFocus], medNameInput, autoCompleteContainer);
-          }
-        }
-      } else if (e.key === 'Escape') {
-        autoCompleteContainer.style.display = 'none';
-        currentFocus = -1;
-      }
-    });
-
-    // Close auto-complete when clicking outside
+    // Hide dropdown when clicking outside
     document.addEventListener('click', (e) => {
-      if (!medNameInput.contains(e.target) && !autoCompleteContainer.contains(e.target)) {
-        autoCompleteContainer.style.display = 'none';
-        currentFocus = -1;
+      if (!medNameInput.contains(e.target) && !dropdownContainer.contains(e.target)) {
+        dropdownContainer.style.display = 'none';
+      }
+    });
+
+    // Handle keyboard navigation
+    medNameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter') {
+        e.preventDefault();
+        this.handleDropdownNavigation(e.key, dropdownContainer, medNameInput);
       }
     });
   }
 
-  showAutoCompleteSuggestions(medications, container, input) {
-    console.log('Medication Manager: showAutoCompleteSuggestions called with', medications.length, 'medications');
-    
-    if (medications.length === 0) {
-      container.style.display = 'none';
-      console.log('Medication Manager: No medications found, hiding container');
+  showMedicationDropdown(container, input) {
+    if (!window.medicationDatabase) {
+      console.log('Medication Manager: Database not available');
       return;
     }
 
+    const medications = window.medicationDatabase.medications;
     container.innerHTML = '';
-    medications.slice(0, 8).forEach((med, index) => {
-      const item = document.createElement('div');
-      item.className = 'auto-complete-item';
-      item.innerHTML = `
-        <div class="med-name">${med.name}</div>
-        <div class="med-category">${med.category}</div>
-        <div class="med-dosage">${med.dosage}</div>
-      `;
-      
-      item.addEventListener('click', () => {
-        this.selectMedication(item, input, container);
-      });
-      
-      container.appendChild(item);
+
+    // Group medications by category
+    const groupedMeds = {};
+    medications.forEach(med => {
+      if (!groupedMeds[med.category]) {
+        groupedMeds[med.category] = [];
+      }
+      groupedMeds[med.category].push(med);
     });
-    
+
+    // Create dropdown content
+    Object.keys(groupedMeds).forEach(category => {
+      const categoryDiv = document.createElement('div');
+      categoryDiv.className = 'dropdown-category';
+      
+      const categoryHeader = document.createElement('div');
+      categoryHeader.className = 'dropdown-category-header';
+      categoryHeader.textContent = category;
+      categoryDiv.appendChild(categoryHeader);
+
+      groupedMeds[category].forEach(med => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        item.innerHTML = `
+          <div class="med-name">${med.name}</div>
+          <div class="med-dosage">${med.dosage}</div>
+        `;
+        
+        item.addEventListener('click', () => {
+          this.selectMedicationFromDropdown(med, input, container);
+        });
+        
+        categoryDiv.appendChild(item);
+      });
+
+      container.appendChild(categoryDiv);
+    });
+
     container.style.display = 'block';
-    console.log('Medication Manager: Auto-complete container shown with', medications.length, 'items');
   }
 
-  selectMedication(item, input, container) {
-    const medName = item.querySelector('.med-name').textContent;
-    const medCategory = item.querySelector('.med-category').textContent;
-    const medDosage = item.querySelector('.med-dosage').textContent;
-    
-    input.value = medName;
+  selectMedicationFromDropdown(medication, input, container) {
+    input.value = medication.name;
     
     // Auto-fill dosage if available
     const dosageInput = document.getElementById('medDosage');
-    if (dosageInput && medDosage) {
-      dosageInput.value = medDosage.split(',')[0].trim(); // Take first dosage option
+    if (dosageInput && medication.dosage) {
+      const firstDosage = medication.dosage.split(',')[0].trim();
+      dosageInput.value = firstDosage;
     }
     
     container.style.display = 'none';
+    console.log('Medication Manager: Selected', medication.name);
+  }
+
+  handleDropdownNavigation(key, container, input) {
+    const items = container.querySelectorAll('.dropdown-item');
+    const currentActive = container.querySelector('.dropdown-item.active');
+    
+    if (key === 'Enter' && currentActive) {
+      const medName = currentActive.querySelector('.med-name').textContent;
+      const medDosage = currentActive.querySelector('.med-dosage').textContent;
+      this.selectMedicationFromDropdown({ name: medName, dosage: medDosage }, input, container);
+      return;
+    }
+
+    let nextIndex = 0;
+    if (currentActive) {
+      const currentIndex = Array.from(items).indexOf(currentActive);
+      if (key === 'ArrowDown') {
+        nextIndex = (currentIndex + 1) % items.length;
+      } else if (key === 'ArrowUp') {
+        nextIndex = currentIndex === 0 ? items.length - 1 : currentIndex - 1;
+      }
+    }
+
+    items.forEach(item => item.classList.remove('active'));
+    if (items[nextIndex]) {
+      items[nextIndex].classList.add('active');
+    }
   }
 
   addActive(items, currentFocus) {
@@ -245,8 +257,10 @@ class MedicationManager {
     try {
       this.showLoading('Adding medication...');
       await this.db.collection('medications').add(medication);
-      this.showToast('Medication added successfully!', 'success');
-      this.loadMedications();
+      // Update UI
+      this.renderMedicationList();
+      
+      // Reset form
       e.target.reset();
     } catch (error) {
       console.error('Error adding medication:', error);
