@@ -172,6 +172,14 @@ service cloud.firestore {
         isRequestOwner(request.resource.data.userId);
     }
     
+    // Cholesterol history - users can only access their own cholesterol history data
+    match /cholesterolHistory/{entryId} {
+      allow read, write, update, delete: if isAuthenticated() && 
+        (resource == null || isResourceOwner(resource.data.userId));
+      allow create: if isAuthenticated() && 
+        isRequestOwner(request.resource.data.userId);
+    }
+    
     // Weight entries - users can only access their own weight data
     match /weightEntries/{entryId} {
       allow read, write, update, delete: if isAuthenticated() && 
