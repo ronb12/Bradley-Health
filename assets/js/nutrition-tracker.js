@@ -769,13 +769,9 @@ class NutritionTracker {
         const limitCheck = this.checkCholesterolLimits(totalCholesterol);
         cholesterolLevel.textContent = `${Math.round(totalCholesterol)} mg (est.)`;
         
-        if (limitCheck.status === 'exceeded') {
-          cholesterolLevel.style.color = '#dc3545';
-        } else if (limitCheck.status === 'warning') {
-          cholesterolLevel.style.color = '#ffc107';
-        } else {
-          cholesterolLevel.style.color = '#28a745';
-        }
+        // Set color to black for the number
+        cholesterolLevel.style.color = '#000000';
+        
         console.log('Cholesterol level updated:', `${Math.round(totalCholesterol)} mg (est.)`, limitCheck.status);
       }
     }
