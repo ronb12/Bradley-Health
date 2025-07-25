@@ -994,32 +994,36 @@
             </div>
           </div>
 
-          <!-- Cholesterol Monitoring -->
-          <div class="card cholesterol-monitoring">
-            <h2>Cholesterol Monitoring</h2>
-            <form id="cholesterolForm" class="cholesterol-form">
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="cholesterolDate">Date</label>
-                  <input type="date" id="cholesterolDate" name="date" required>
+          <!-- Cholesterol Information -->
+          <div class="card cholesterol-info">
+            <h2>🍽️ Automatic Cholesterol Tracking</h2>
+            <div class="cholesterol-explanation">
+              <p><strong>How it works:</strong> Cholesterol is automatically calculated from the foods you eat when you add meals. The system analyzes your meal descriptions and identifies cholesterol-containing foods like eggs, cheese, meat, and dairy products.</p>
+              
+              <div class="info-section">
+                <h3>📊 Daily Cholesterol Limits</h3>
+                <div class="limit-grid">
+                  <div class="limit-item">
+                    <span class="limit-value">300mg</span>
+                    <span class="limit-label">General Population</span>
+                  </div>
+                  <div class="limit-item">
+                    <span class="limit-value">200mg</span>
+                    <span class="limit-label">High Risk/Heart Disease</span>
+                  </div>
                 </div>
-                <div class="form-group">
-                  <label for="cholesterolTime">Time</label>
-                  <input type="time" id="cholesterolTime" name="time" required>
-                </div>
               </div>
-              <div class="form-group">
-                <label for="cholesterolValue">Cholesterol Level (mg/dL)</label>
-                <input type="number" id="cholesterolValue" name="value" min="0" max="1000" step="0.1" required>
+              
+              <div class="info-section">
+                <h3>🔍 How to Track Cholesterol</h3>
+                <ol>
+                  <li>Add meals using the "Add New Meal" form above</li>
+                  <li>Include food items in your meal description (e.g., "eggs and bacon", "cheese sandwich")</li>
+                  <li>The system will automatically calculate cholesterol content</li>
+                  <li>View your cholesterol history below</li>
+                </ol>
               </div>
-              <div class="form-group">
-                <label for="cholesterolNotes">Notes</label>
-                <textarea id="cholesterolNotes" name="notes" rows="2"></textarea>
-              </div>
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Log Cholesterol</button>
-              </div>
-            </form>
+            </div>
           </div>
 
           <!-- Cholesterol Management Guide -->
@@ -1094,33 +1098,7 @@
             </div>
           </div>
 
-          <!-- Hidden forms for editing and deleting cholesterol entries -->
-          <form id="updateCholesterolForm" class="cholesterol-form" style="display: none;">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="updateCholesterolValue">Cholesterol Level (mg/dL)</label>
-                <input type="number" id="updateCholesterolValue" name="value" min="0" max="1000" step="0.1" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="updateCholesterolNotes">Notes</label>
-              <textarea id="updateCholesterolNotes" name="notes" rows="2"></textarea>
-            </div>
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary">Update Entry</button>
-              <button type="button" class="btn btn-secondary" onclick="this.closest('form').style.display='none'">Cancel</button>
-            </div>
-          </form>
 
-          <form id="deleteCholesterolForm" class="cholesterol-form" style="display: none;">
-            <div class="form-group">
-              <p>Are you sure you want to delete this cholesterol entry?</p>
-            </div>
-            <div class="form-actions">
-              <button type="submit" class="btn btn-danger">Delete Entry</button>
-              <button type="button" class="btn btn-secondary" onclick="this.closest('form').style.display='none'">Cancel</button>
-            </div>
-          </form>
         </div>
       </section>
 
