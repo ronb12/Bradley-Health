@@ -706,46 +706,19 @@ class NutritionTracker {
     
     console.log('Total cholesterol from all meals:', totalCholesterol, 'from', mealsWithCholesterol, 'meals');
     
-    // Update daily calories (total calories for today)
+    // Update total calories from all meals
     const dailyCalories = document.getElementById('dailyCalories');
     console.log('Daily calories element found:', !!dailyCalories);
     if (dailyCalories) {
-      // Calculate today's total calories using same date logic
-      let todayCalories = 0;
+      // Calculate total calories from all meals
+      let totalCalories = 0;
       this.meals.forEach(meal => {
-        try {
-          // Handle different timestamp formats
-          let mealDate;
-          if (meal.timestamp && meal.timestamp.toDate) {
-            // Firestore timestamp
-            mealDate = meal.timestamp.toDate();
-          } else if (meal.timestamp) {
-            // Regular date object or string
-            mealDate = new Date(meal.timestamp);
-          } else {
-            console.log('No timestamp found for meal:', meal.name);
-            return;
-          }
-
-          // Check if date is valid
-          if (isNaN(mealDate.getTime())) {
-            console.log('Invalid timestamp for meal:', meal.name, meal.timestamp);
-            return;
-          }
-
-          const mealDateString = mealDate.toISOString().split('T')[0];
-          console.log(`Meal: ${meal.name}, date: ${mealDateString}, today: ${today}, match: ${mealDateString === today}`);
-          
-          if (mealDateString === today && meal.hasNutritionData) {
-            todayCalories += meal.estimatedCalories || 0;
-            console.log(`Added ${meal.estimatedCalories} calories from meal: ${meal.name}`);
-          }
-        } catch (error) {
-          console.error('Error processing meal timestamp for calories:', error, meal);
+        if (meal.hasNutritionData) {
+          totalCalories += meal.estimatedCalories || 0;
         }
       });
-      console.log('Today\'s calories calculated:', todayCalories);
-      dailyCalories.textContent = todayCalories > 0 ? todayCalories : '--';
+      console.log('Total calories calculated:', totalCalories);
+      dailyCalories.textContent = totalCalories > 0 ? Math.round(totalCalories) : '--';
     }
 
     // Update total meals count
