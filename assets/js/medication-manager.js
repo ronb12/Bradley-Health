@@ -91,7 +91,11 @@ class MedicationManager {
 
   setupMedicationAutoComplete() {
     const medNameInput = document.getElementById('medName');
-    if (!medNameInput) return;
+    if (!medNameInput) {
+      console.log('Medication Manager: medName input not found');
+      return;
+    }
+    console.log('Medication Manager: Setting up auto-complete for medName input');
 
     // Create auto-complete container
     const autoCompleteContainer = document.createElement('div');
@@ -99,12 +103,14 @@ class MedicationManager {
     autoCompleteContainer.className = 'auto-complete-container';
     autoCompleteContainer.style.display = 'none';
     medNameInput.parentNode.appendChild(autoCompleteContainer);
+    console.log('Medication Manager: Auto-complete container created and appended');
 
     let currentFocus = -1;
     let filteredMedications = [];
 
     medNameInput.addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase().trim();
+      console.log('Medication Manager: Input event triggered with query:', query);
       
       if (query.length < 2) {
         autoCompleteContainer.style.display = 'none';
@@ -113,8 +119,11 @@ class MedicationManager {
 
       // Get medications from database
       if (window.medicationDatabase) {
+        console.log('Medication Manager: Database found, searching...');
         filteredMedications = window.medicationDatabase.searchMedications(query);
         this.showAutoCompleteSuggestions(filteredMedications, autoCompleteContainer, medNameInput);
+      } else {
+        console.log('Medication Manager: Database not found! window.medicationDatabase:', window.medicationDatabase);
       }
     });
 
@@ -150,8 +159,11 @@ class MedicationManager {
   }
 
   showAutoCompleteSuggestions(medications, container, input) {
+    console.log('Medication Manager: showAutoCompleteSuggestions called with', medications.length, 'medications');
+    
     if (medications.length === 0) {
       container.style.display = 'none';
+      console.log('Medication Manager: No medications found, hiding container');
       return;
     }
 
@@ -173,6 +185,7 @@ class MedicationManager {
     });
     
     container.style.display = 'block';
+    console.log('Medication Manager: Auto-complete container shown with', medications.length, 'items');
   }
 
   selectMedication(item, input, container) {
