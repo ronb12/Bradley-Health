@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bradley Health - Comprehensive Health Monitoring</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Bradley Health">
+  <meta name="application-name" content="Bradley Health">
+  <meta name="msapplication-TileColor" content="#4f46e5">
+  <meta name="msapplication-config" content="none">
+  
+  <!-- Apple Store Compliance -->
+  <meta name="apple-itunes-app" content="app-argument=health-monitoring">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  
+  <!-- Security and Privacy -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+  
+  <!-- Description and Keywords -->
+  <meta name="description" content="Bradley Health - Comprehensive health monitoring app for tracking blood pressure, medications, mood, and wellness goals">
+  <meta name="keywords" content="health, monitoring, blood pressure, medications, mood tracking, wellness, fitness">
+  <meta name="author" content="Bradley Health">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Bradley Health">
+  <meta property="og:description" content="Comprehensive health monitoring app">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bradley-health.web.app">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bradley Health">
+  <meta name="twitter:description" content="Comprehensive health monitoring app">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  
+  <!-- Icons -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+  
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js"></script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!-- Pull-to-Refresh Indicator -->
+  <div id="pullToRefresh" style="display:none;position:fixed;top:0;left:0;width:100vw;height:60px;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg-secondary);color:var(--primary-color);font-size:1.5rem;transition:opacity 0.2s;opacity:0;">
+    <span id="ptrIcon">↓</span> <span id="ptrText" style="margin-left:10px;font-size:1rem;">Pull to refresh</span>
+  </div>
+
+  <!-- Loading Screen -->
+  <div id="loading" class="loading-screen" style="display: none;">
+    <div class="loading-spinner"></div>
+    <p id="loadingMessage">Loading...</p>
+  </div>
+
+  <!-- Authentication Section -->
+  <div id="authSection" class="auth-section">
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Bradley Health</h1>
+        <p>Sign in to access your health dashboard</p>
+      </div>
+      
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Login</button>
+        <button class="auth-tab" data-tab="register">Register</button>
+      </div>
+      
+      <!-- Login Form -->
+      <form id="loginForm" class="auth-form active">
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Sign In</button>
+      </form>
+      
+      <!-- Registration Form -->
+      <form id="registerForm" class="auth-form">
+        <div class="form-group">
+          <label for="registerName">Full Name</label>
+          <input type="text" id="registerName" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="registerEmail">Email</label>
+          <input type="email" id="registerEmail" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="registerPassword">Password</label>
+          <input type="password" id="registerPassword" name="password" required>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main App Section -->
+  <div id="userSection" class="app-container" style="display: none;">
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="header-content">
+        <div class="header-left">
+          <h1>Bradley Health</h1>
+          <p>Comprehensive Health Monitoring</p>
+        </div>
+        <div id="userInfo" class="user-info">
+          <!-- User info will be populated by auth manager -->
+        </div>
+      </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <div class="tab-container">
+      <nav class="tab-navigation" id="tabNav">
+        <button class="tab-button active" data-tab="dashboard">
+          <span class="tab-icon">📊</span>
+          <span class="tab-text">Dashboard</span>
+        </button>
+        <button class="tab-button" data-tab="blood-pressure">
+          <span class="tab-icon">❤️</span>
+          <span class="tab-text">Blood Pressure</span>
+        </button>
+        <button class="tab-button" data-tab="medications">
+          <span class="tab-icon">💊</span>
+          <span class="tab-text">Medications</span>
+        </button>
+        <button class="tab-button" data-tab="mood">
+          <span class="tab-icon">😊</span>
+          <span class="tab-text">Mood</span>
+        </button>
+        <button class="tab-button" data-tab="goals">
+          <span class="tab-icon">🎯</span>
+          <span class="tab-text">Goals</span>
+        </button>
+        <button class="tab-button" data-tab="limb-care">
+          <span class="tab-icon">🦵</span>
+          <span class="tab-text">Limb Care</span>
+        </button>
+        <button class="tab-button" data-tab="dme">
+          <span class="tab-icon">🦽</span>
+          <span class="tab-text">DME</span>
+        </button>
+        <button class="tab-button" data-tab="health-insights">
+          <span class="tab-icon">🧠</span>
+          <span class="tab-text">Health Insights</span>
+        </button>
+        <button class="tab-button" data-tab="nutrition">
+          <span class="tab-icon">🥗</span>
+          <span class="tab-text">Nutrition</span>
+        </button>
+        <button class="tab-button" data-tab="weight-loss">
+          <span class="tab-icon">⚖️</span>
+          <span class="tab-text">Weight Loss</span>
+        </button>
+        <button class="tab-button" data-tab="profile">
+          <span class="tab-icon">👤</span>
+          <span class="tab-text">Profile</span>
+        </button>
+      </nav>
+
+      <!-- Dashboard Tab -->
+      <section class="tab-content active" id="dashboard">
+        <div class="dashboard-grid">
+          <!-- Health Overview Card -->
+          <div class="card health-overview">
+            <h2>Health Overview</h2>
+            <div class="health-metrics">
+              <div class="metric">
+                <span class="metric-icon">❤️</span>
+                <span class="metric-label">Blood Pressure</span>
+                <span class="metric-value" id="bpOverview">--/--</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">💊</span>
+                <span class="metric-label">Medications</span>
+                <span class="metric-value" id="medOverview">0</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">😊</span>
+                <span class="metric-label">Mood</span>
+                <span class="metric-value" id="moodOverview">--</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">🦵</span>
+                <span class="metric-label">Limb Health</span>
+                <span class="metric-value" id="limbOverview">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions Card -->
+          <div class="card quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="action-buttons">
+              <button class="action-btn" onclick="switchToTab('blood-pressure')">
+                <span class="action-icon">➕</span>
+                <span>Add BP Reading</span>
+              </button>
+              <button class="action-btn" onclick="switchToTab('medications')">
+                <span class="action-icon">💊</span>
+                <span>Add Medication</span>
+              </button>
+              <button class="action-btn" onclick="switchToTab('mood')">
+                <span class="action-icon">😊</span>
+                <span>Log Mood</span>
+              </button>
+              <button class="action-btn" onclick="switchToTab('goals')">
+                <span class="action-icon">🎯</span>
+                <span>Set Goal</span>
+              </button>
+              <button class="action-btn" onclick="switchToTab('limb-care')">
+                <span class="action-icon">🦵</span>
+                <span>Limb Assessment</span>
+              </button>
+              <button class="action-btn" onclick="switchToTab('dme')">
+                <span class="action-icon">🦽</span>
+                <span>Manage Equipment</span>
+              </button>
+              <button class="action-btn" onclick="switchToTab('health-insights')">
+                <span class="action-icon">🧠</span>
+                <span>Health Insights</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Charts Card -->
+          <div class="card charts-section">
+            <h2>Health Trends</h2>
+            <div class="chart-container">
+              <canvas id="healthChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Blood Pressure Chart Card -->
+          <div class="card bp-chart-section">
+            <h2>Blood Pressure Trends</h2>
+            <div class="chart-container">
+              <canvas id="bpChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Medication Adherence Chart Card -->
+          <div class="card medication-chart-section">
+            <h2>Medication Adherence</h2>
+            <div class="chart-container">
+              <canvas id="medicationChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Alerts Card -->
+          <div class="card alerts-section">
+            <h2>Alerts & Reminders</h2>
+            <div id="alertsList" class="alerts-list">
+              <!-- Alerts will be populated dynamically -->
+            </div>
+          </div>
+
+
+        </div>
+      </section>
+
+      <!-- Blood Pressure Tab -->
+      <section class="tab-content" id="blood-pressure">
+        <div class="bp-container">
+          <!-- Current Reading -->
+          <div class="card current-reading">
+            <h2>Current Reading</h2>
+            <div class="bp-display">
+              <div class="bp-value">
+                <span class="systolic" id="currentSystolic">--</span>
+                <span class="separator">/</span>
+                <span class="diastolic" id="currentDiastolic">--</span>
+              </div>
+              <div class="bp-unit">mmHg</div>
+              <div class="bp-status" id="currentStatus">--</div>
+            </div>
+            <p class="reading-time" id="lastReadingTime">No readings yet</p>
+          </div>
+
+          <!-- Add Reading Form -->
+          <div class="card add-reading">
+            <h2>Add New Reading</h2>
+            <form id="bpForm" class="bp-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="systolic">Systolic</label>
+                  <input type="number" id="systolic" name="systolic" min="70" max="200" required>
+                </div>
+                <div class="form-group">
+                  <label for="diastolic">Diastolic</label>
+                  <input type="number" id="diastolic" name="diastolic" min="40" max="130" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="pulse">Pulse Rate (Optional)</label>
+                <input type="number" id="pulse" name="pulse" min="40" max="200">
+              </div>
+              <div class="form-group">
+                <label for="bpNotes">Notes</label>
+                <textarea id="bpNotes" name="notes" rows="3"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Reading</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- BP History -->
+          <div class="card bp-history">
+            <h2>Reading History</h2>
+            <div id="bpHistoryList" class="history-list">
+              <!-- History will be populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Medications Tab -->
+      <section class="tab-content" id="medications">
+        <div class="medications-container">
+          <!-- Add Medication -->
+          <div class="card add-medication">
+            <h2>Add Medication</h2>
+            <form id="addMedicationForm" class="med-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="medName">Medication Name</label>
+                  <input type="text" id="medName" name="name" required>
+                </div>
+                <div class="form-group">
+                  <label for="medDosage">Dosage</label>
+                  <input type="text" id="medDosage" name="dosage" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="medFrequency">Frequency</label>
+                  <select id="medFrequency" name="frequency" required>
+                    <option value="">Select frequency</option>
+                    <option value="daily">Daily</option>
+                    <option value="twice-daily">Twice Daily</option>
+                    <option value="three-times-daily">Three Times Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="as-needed">As Needed</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="medTime">Time of Day</label>
+                  <input type="time" id="medTime" name="timeOfDay">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="medInstructions">Instructions</label>
+                <textarea id="medInstructions" name="instructions" rows="3"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Add Medication</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Medication List -->
+          <div class="card medication-list">
+            <h2>Current Medications</h2>
+            <div id="medicationList" class="med-list">
+              <!-- Medications will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Reminders -->
+          <div class="card reminders-section">
+            <h2>Medication Reminders</h2>
+            <div id="reminderList" class="reminder-list">
+              <!-- Reminders will be populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mood Tab -->
+      <section class="tab-content" id="mood">
+        <div class="mood-container">
+          <!-- Quick Mood Entry -->
+          <div class="card quick-mood">
+            <h2>How are you feeling?</h2>
+            <div class="mood-buttons">
+              <button class="mood-btn" data-mood="1">😢</button>
+              <button class="mood-btn" data-mood="3">😔</button>
+              <button class="mood-btn" data-mood="5">😐</button>
+              <button class="mood-btn" data-mood="7">🙂</button>
+              <button class="mood-btn" data-mood="9">😊</button>
+            </div>
+          </div>
+
+          <!-- Detailed Mood Entry -->
+          <div class="card detailed-mood">
+            <h2>Detailed Mood Entry</h2>
+            <form id="moodEntryForm" class="mood-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="moodLevel">Mood Level (1-10)</label>
+                  <input type="range" id="moodLevel" name="mood" min="1" max="10" value="5">
+                  <span id="moodValue">5</span>
+                </div>
+                <div class="form-group">
+                  <label for="energyLevel">Energy Level (1-10)</label>
+                  <input type="range" id="energyLevel" name="energy" min="1" max="10" value="5">
+                  <span id="energyValue">5</span>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="stressLevel">Stress Level (1-10)</label>
+                  <input type="range" id="stressLevel" name="stress" min="1" max="10" value="5">
+                  <span id="stressValue">5</span>
+                </div>
+                <div class="form-group">
+                  <label for="sleepLevel">Sleep Quality (1-10)</label>
+                  <input type="range" id="sleepLevel" name="sleep" min="1" max="10" value="5">
+                  <span id="sleepValue">5</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="moodNotes">How are you feeling today?</label>
+                <textarea id="moodNotes" name="notes" rows="3"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Mood</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Mood History -->
+          <div class="card mood-history">
+            <h2>Mood History</h2>
+            <div id="moodEntriesList" class="mood-list">
+              <!-- Mood entries will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Mood Chart -->
+          <div class="card mood-chart">
+            <h2>Mood Trends</h2>
+            <canvas id="moodChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Goals Tab -->
+      <section class="tab-content" id="goals">
+        <div class="goals-container">
+          <!-- Add Goal -->
+          <div class="card add-goal">
+            <h2>Set New Goal</h2>
+            <form id="addGoalForm" class="goal-form">
+              <div class="form-group">
+                <label for="goalTitle">Goal Title</label>
+                <input type="text" id="goalTitle" name="title" required>
+              </div>
+              <div class="form-group">
+                <label for="goalCategory">Category</label>
+                <select id="goalCategory" name="category" required>
+                  <option value="">Select category</option>
+                  <option value="blood-pressure">Blood Pressure</option>
+                  <option value="medication">Medication</option>
+                  <option value="exercise">Exercise</option>
+                  <option value="diet">Diet</option>
+                  <option value="mental-health">Mental Health</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="goalTarget">Target</label>
+                <input type="text" id="goalTarget" name="target" required>
+              </div>
+              <div class="form-group">
+                <label for="goalDeadline">Deadline</label>
+                <input type="date" id="goalDeadline" name="deadline" required>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Set Goal</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Goals List -->
+          <div class="card goals-list">
+            <h2>Your Goals</h2>
+            <div id="goalsList" class="goal-list">
+              <!-- Goals will be populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Limb Care Tab -->
+      <section class="tab-content" id="limb-care">
+        <div class="limb-care-container">
+          <!-- Daily Limb Assessment -->
+          <div class="card daily-assessment">
+            <h2>Daily Limb Assessment</h2>
+            <form id="limbAssessmentForm" class="limb-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="assessmentDate">Date</label>
+                  <input type="date" id="assessmentDate" name="date" required>
+                </div>
+                <div class="form-group">
+                  <label for="assessmentTime">Time</label>
+                  <input type="time" id="assessmentTime" name="time" required>
+                </div>
+              </div>
+              
+              <!-- Limb Configuration -->
+              <div class="limb-config-section">
+                <h3>Configure Your Limbs</h3>
+                <div class="limb-config">
+                  <div class="form-group">
+                    <label for="limbCount">Number of Amputated Limbs</label>
+                    <select id="limbCount" name="limbCount" required>
+                      <option value="">Select count</option>
+                      <option value="1">1 Limb</option>
+                      <option value="2">2 Limbs</option>
+                      <option value="3">3 Limbs</option>
+                      <option value="4">4 Limbs</option>
+                    </select>
+                  </div>
+                  <div id="limbTypesContainer" class="limb-types-container" style="display: none;">
+                    <!-- Limb type selections will be generated here -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dynamic Limb Assessments -->
+              <div id="limbAssessmentsContainer" class="limb-assessments-container">
+                <!-- Individual limb assessments will be generated here -->
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Assessment</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Prosthetic Care -->
+          <div class="card prosthetic-care">
+            <h2>Prosthetic Care</h2>
+            <div id="prostheticSetupMessage" class="setup-message" style="display: none;">
+              <p>⚠️ Please configure your limbs in the Daily Assessment section first to use prosthetic care tracking.</p>
+            </div>
+            <form id="prostheticForm" class="prosthetic-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="prostheticLimb">Limb</label>
+                  <select id="prostheticLimb" name="limb" required>
+                    <option value="">Select limb</option>
+                    <!-- Options will be populated dynamically -->
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="prostheticFit">Fit Quality</label>
+                  <select id="prostheticFit" name="fit" required>
+                    <option value="">Select fit</option>
+                    <option value="excellent">Excellent</option>
+                    <option value="good">Good</option>
+                    <option value="fair">Fair</option>
+                    <option value="poor">Poor</option>
+                    <option value="uncomfortable">Uncomfortable</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="wearTime">Wear Time (hours)</label>
+                  <input type="number" id="wearTime" name="wearTime" min="0" max="24" step="0.5">
+                </div>
+                <div class="form-group">
+                  <label for="cleaningDone">Cleaning Done</label>
+                  <select id="cleaningDone" name="cleaningDone">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                    <option value="partial">Partial</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="prostheticNotes">Prosthetic Notes</label>
+                <textarea id="prostheticNotes" name="notes" rows="3" placeholder="Describe any issues, adjustments needed, or maintenance"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Log Prosthetic Care</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Pain & Comfort Tracking -->
+          <div class="card pain-tracking">
+            <h2>Pain & Comfort Tracking</h2>
+            <form id="painForm" class="pain-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="painLevel">Pain Level (1-10)</label>
+                  <input type="range" id="painLevel" name="painLevel" min="1" max="10" value="1">
+                  <span id="painLevelValue">1</span>
+                </div>
+                <div class="form-group">
+                  <label for="painType">Pain Type</label>
+                  <select id="painType" name="painType">
+                    <option value="">Select type</option>
+                    <option value="phantom">Phantom Pain</option>
+                    <option value="residual">Residual Limb Pain</option>
+                    <option value="prosthetic">Prosthetic Discomfort</option>
+                    <option value="back">Back Pain</option>
+                    <option value="shoulder">Shoulder Pain</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="painLocation">Pain Location</label>
+                <input type="text" id="painLocation" name="painLocation" placeholder="e.g., left residual limb, right shoulder">
+              </div>
+              <div class="form-group">
+                <label for="painNotes">Pain Notes</label>
+                <textarea id="painNotes" name="notes" rows="3" placeholder="Describe the pain, triggers, or relief methods"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Log Pain</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Care Reminders -->
+          <div class="card care-reminders">
+            <h2>Care Reminders</h2>
+            <form id="reminderForm" class="reminder-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="reminderType">Reminder Type</label>
+                  <select id="reminderType" name="type" required>
+                    <option value="">Select type</option>
+                    <option value="limb-inspection">Limb Inspection</option>
+                    <option value="prosthetic-cleaning">Prosthetic Cleaning</option>
+                    <option value="pressure-relief">Pressure Relief</option>
+                    <option value="stretching">Stretching Exercise</option>
+                    <option value="massage">Massage/Desensitization</option>
+                    <option value="appointment">Medical Appointment</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="reminderFrequency">Frequency</label>
+                  <select id="reminderFrequency" name="frequency" required>
+                    <option value="">Select frequency</option>
+                    <option value="daily">Daily</option>
+                    <option value="twice-daily">Twice Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="reminderTime">Time</label>
+                <input type="time" id="reminderTime" name="time" required>
+              </div>
+              <div class="form-group">
+                <label for="reminderNotes">Notes</label>
+                <textarea id="reminderNotes" name="notes" rows="2" placeholder="Additional details about the reminder"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Set Reminder</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Limb Care History -->
+          <div class="card limb-history">
+            <h2>Limb Care History</h2>
+            <div id="limbHistoryList" class="history-list">
+              <!-- History will be populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DME Management Tab -->
+      <section class="tab-content" id="dme">
+        <div class="dme-container">
+          <!-- DME Overview -->
+          <div class="card dme-overview">
+            <div class="section-header">
+              <h2><i class="fas fa-wheelchair"></i> My Equipment</h2>
+              <button class="btn btn-primary" onclick="showQuickAddModal()">
+                <i class="fas fa-plus"></i> Add Equipment
+              </button>
+            </div>
+            
+            <!-- Quick Status Overview -->
+            <div class="dme-quick-status">
+              <div class="status-card working">
+                <div class="status-icon">✅</div>
+                <div class="status-info">
+                  <h3>Working Well</h3>
+                  <p id="dme-working-count">0 items</p>
+                </div>
+              </div>
+              <div class="status-card needs-attention">
+                <div class="status-icon">⚠️</div>
+                <div class="status-info">
+                  <h3>Needs Attention</h3>
+                  <p id="dme-issues-count">0 items</p>
+                </div>
+              </div>
+              <div class="status-card maintenance">
+                <div class="status-icon">🔧</div>
+                <div class="status-info">
+                  <h3>Maintenance Due</h3>
+                  <p id="dme-maintenance-count">0 items</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Quick Alerts -->
+            <div class="dme-alerts" id="dme-alerts">
+              <!-- Maintenance alerts will be populated here -->
+            </div>
+          </div>
+
+          <!-- Quick Add Equipment -->
+          <div class="card quick-add-dme">
+            <h2>Quick Add Equipment</h2>
+            <form id="quickAddDMEForm" class="quick-dme-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="quickDmeName">What's it called?</label>
+                  <input type="text" id="quickDmeName" name="name" placeholder="e.g., My wheelchair, Left prosthetic" required>
+                </div>
+                <div class="form-group">
+                  <label for="quickDmeType">What type is it?</label>
+                  <select id="quickDmeType" name="type" required>
+                    <option value="">Choose type</option>
+                    <option value="wheelchair">Wheelchair</option>
+                    <option value="walker">Walker</option>
+                    <option value="crutches">Crutches</option>
+                    <option value="cane">Cane</option>
+                    <option value="prosthetic">Prosthetic</option>
+                    <option value="orthotic">Brace/Orthotic</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="quickDmeStatus">How is it working?</label>
+                  <select id="quickDmeStatus" name="status" required>
+                    <option value="working">Working well</option>
+                    <option value="minor-issues">Minor issues</option>
+                    <option value="needs-repair">Needs repair</option>
+                    <option value="broken">Broken</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="quickDmeLastService">When was it last serviced?</label>
+                  <input type="date" id="quickDmeLastService" name="lastMaintenance">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="quickDmeNotes">Any notes or issues?</label>
+                <textarea id="quickDmeNotes" name="notes" rows="2" placeholder="Describe any problems, discomfort, or things to remember"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Add Equipment</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- My Equipment List -->
+          <div class="card my-equipment">
+            <h2>My Equipment</h2>
+            <div id="dmeEquipmentList" class="equipment-grid">
+              <!-- Equipment cards will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Provider Contact -->
+          <div class="card provider-contact">
+            <h2>Need Help?</h2>
+            <div class="contact-options">
+              <button class="contact-btn" onclick="contactProvider('maintenance')">
+                <span class="contact-icon">🔧</span>
+                <span>Schedule Maintenance</span>
+              </button>
+              <button class="contact-btn" onclick="contactProvider('repair')">
+                <span class="contact-icon">🛠️</span>
+                <span>Report Problem</span>
+              </button>
+              <button class="contact-btn" onclick="contactProvider('adjustment')">
+                <span class="contact-icon">⚙️</span>
+                <span>Request Adjustment</span>
+              </button>
+              <button class="contact-btn" onclick="contactProvider('emergency')">
+                <span class="contact-icon">🚨</span>
+                <span>Emergency Issue</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Health Insights Tab -->
+      <section class="tab-content" id="health-insights">
+        <div class="health-insights-container">
+          <!-- Insights Overview -->
+          <div class="card insights-overview">
+            <div class="section-header">
+              <h2><i class="fas fa-brain"></i> Health Insights</h2>
+              <button class="btn btn-secondary" onclick="window.healthInsights.refreshInsights()">
+                <i class="fas fa-refresh"></i> Refresh
+              </button>
+            </div>
+            <p class="insights-description">
+              AI-powered analysis of your health data to provide personalized insights and recommendations.
+            </p>
+          </div>
+
+          <!-- Insights List -->
+          <div class="card insights-list-card">
+            <h3>Your Health Insights</h3>
+            <div id="insightsList" class="insights-list">
+              <!-- Health insights will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Recommendations -->
+          <div class="card recommendations-card">
+            <h3>Personalized Recommendations</h3>
+            <div id="recommendationsList" class="recommendations-list">
+              <!-- Recommendations will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Health Score -->
+          <div class="card health-score-card">
+            <h3>Overall Health Score</h3>
+            <div class="health-score-display">
+              <div class="score-circle">
+                <span id="healthScoreValue">--</span>
+                <span class="score-label">/ 100</span>
+              </div>
+              <div class="score-description">
+                <p>Based on your recent health data and trends</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Nutrition Tab -->
+      <section class="tab-content" id="nutrition">
+        <div class="nutrition-container">
+          <!-- Nutrition Overview -->
+          <div class="card nutrition-overview">
+            <h2>Nutrition Overview</h2>
+            <div class="nutrition-metrics">
+              <div class="metric">
+                <span class="metric-icon">🥗</span>
+                <span class="metric-label">Daily Calories</span>
+                <span class="metric-value" id="dailyCalories">--</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">🍽️</span>
+                <span class="metric-label">Meals</span>
+                <span class="metric-value" id="totalMeals">0</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">🧀</span>
+                <span class="metric-label">Cholesterol</span>
+                <span class="metric-value" id="cholesterolLevel">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Food Database Info -->
+          <div class="card food-database-info">
+            <h3>🤖 AI-Powered Nutrition Analysis</h3>
+            <p>Our system automatically calculates estimated cholesterol, calories, and fat content from your meal descriptions using a comprehensive food database.</p>
+            <p><strong>How it works:</strong> When you log a meal, our AI searches for food items in your description and calculates nutrition based on standard portion sizes. You can also specify amounts like "2 eggs", "1 cup milk", or "100g chicken".</p>
+            
+            <div class="food-examples">
+              <div class="food-category">
+                <h4>High Cholesterol Foods</h4>
+                <ul>
+                  <li>Eggs (373mg/100g)</li>
+                  <li>Butter (215mg/100g)</li>
+                  <li>Shrimp (195mg/100g)</li>
+                  <li>Cheese (105mg/100g)</li>
+                </ul>
+              </div>
+              <div class="food-category">
+                <h4>Low Cholesterol Foods</h4>
+                <ul>
+                  <li>Fruits & Vegetables (0mg)</li>
+                  <li>Grains (0mg)</li>
+                  <li>Legumes (0mg)</li>
+                  <li>Plant-based proteins (0mg)</li>
+                </ul>
+              </div>
+              <div class="food-category">
+                <h4>Example Meal Logs</h4>
+                <ul>
+                  <li>"Scrambled eggs with toast"</li>
+                  <li>"Grilled chicken 200g"</li>
+                  <li>"Salmon with rice"</li>
+                  <li>"Vegetable stir fry"</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Meal -->
+          <div class="card add-meal">
+            <h2>Add New Meal</h2>
+            <form id="addMealForm" class="meal-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="mealName">Meal Name</label>
+                  <input type="text" id="mealName" name="mealName" required>
+                </div>
+                <div class="form-group">
+                  <label for="date">Date</label>
+                  <input type="date" id="date" name="date" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="time">Time</label>
+                <input type="time" id="time" name="time" required>
+              </div>
+              <div class="form-group">
+                <label for="mealType">Meal Type</label>
+                <select id="mealType" name="mealType" required>
+                  <option value="">Select type</option>
+                  <option value="Breakfast">Breakfast</option>
+                  <option value="Lunch">Lunch</option>
+                  <option value="Dinner">Dinner</option>
+                  <option value="Snack">Snack</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="mealNotes">Notes</label>
+                <textarea id="mealNotes" name="mealNotes" rows="2"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Add Meal</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Meal History -->
+          <div class="card meal-history">
+            <h2>Meal History</h2>
+            <div id="mealHistoryList" class="history-list">
+              <!-- History will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Cholesterol Monitoring -->
+          <div class="card cholesterol-monitoring">
+            <h2>Cholesterol Monitoring</h2>
+            <form id="cholesterolForm" class="cholesterol-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="cholesterolDate">Date</label>
+                  <input type="date" id="cholesterolDate" name="date" required>
+                </div>
+                <div class="form-group">
+                  <label for="cholesterolTime">Time</label>
+                  <input type="time" id="cholesterolTime" name="time" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="cholesterolValue">Cholesterol Level (mg/dL)</label>
+                <input type="number" id="cholesterolValue" name="value" min="0" max="1000" step="0.1" required>
+              </div>
+              <div class="form-group">
+                <label for="cholesterolNotes">Notes</label>
+                <textarea id="cholesterolNotes" name="notes" rows="2"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Log Cholesterol</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Cholesterol Management Guide -->
+          <div class="card cholesterol-management">
+            <h2>🎯 Cholesterol Management Guide</h2>
+            <div class="cholesterol-tips">
+              <div class="tip-section">
+                <h3>Daily Limits</h3>
+                <div class="limit-grid">
+                  <div class="limit-item">
+                    <span class="limit-value">300mg</span>
+                    <span class="limit-label">General Population</span>
+                  </div>
+                  <div class="limit-item">
+                    <span class="limit-value">200mg</span>
+                    <span class="limit-label">High Risk/Heart Disease</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="tip-section">
+                <h3>Quick Substitutions</h3>
+                <div class="substitution-list">
+                  <div class="substitution-item">
+                    <span class="food-high">Eggs (373mg)</span>
+                    <span class="arrow">→</span>
+                    <span class="food-low">Egg whites (0mg)</span>
+                  </div>
+                  <div class="substitution-item">
+                    <span class="food-high">Butter (215mg)</span>
+                    <span class="arrow">→</span>
+                    <span class="food-low">Olive oil (0mg)</span>
+                  </div>
+                  <div class="substitution-item">
+                    <span class="food-high">Cheese (105mg)</span>
+                    <span class="arrow">→</span>
+                    <span class="food-low">Nutritional yeast (0mg)</span>
+                  </div>
+                  <div class="substitution-item">
+                    <span class="food-high">Bacon (97mg)</span>
+                    <span class="arrow">→</span>
+                    <span class="food-low">Turkey bacon (25mg)</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="tip-section">
+                <h3>Cholesterol-Lowering Foods</h3>
+                <div class="food-categories">
+                  <div class="food-category">
+                    <h4>🥬 Fiber-Rich Foods</h4>
+                    <p>Oats, beans, fruits, vegetables</p>
+                  </div>
+                  <div class="food-category">
+                    <h4>🐟 Omega-3 Sources</h4>
+                    <p>Salmon, walnuts, flaxseeds</p>
+                  </div>
+                  <div class="food-category">
+                    <h4>🥑 Healthy Fats</h4>
+                    <p>Avocados, nuts, olive oil</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cholesterol History -->
+          <div class="card cholesterol-history">
+            <h2>Cholesterol History</h2>
+            <div id="cholesterolEntriesList" class="cholesterol-list">
+              <!-- Cholesterol entries will be populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Weight Loss Tab -->
+      <section class="tab-content" id="weight-loss">
+        <div class="weight-loss-container">
+          <!-- Weight Loss Overview -->
+          <div class="card weight-loss-overview">
+            <div class="card-header">
+              <h2>Weight Loss Journey</h2>
+              <button class="btn btn-primary" onclick="window.weightLossManager.printFullWeightLossPlan()">
+                🖨️ Print Full Plan
+              </button>
+            </div>
+            <div class="weight-metrics">
+              <div class="metric">
+                <span class="metric-icon">🎯</span>
+                <span class="metric-label">Goal Weight</span>
+                <span class="metric-value" id="goalWeight">--</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">📊</span>
+                <span class="metric-label">Current Weight</span>
+                <span class="metric-value" id="currentWeight">--</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">📈</span>
+                <span class="metric-label">Progress</span>
+                <span class="metric-value" id="weightProgress">--</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">⏱️</span>
+                <span class="metric-label">Timeline</span>
+                <span class="metric-value" id="weightTimeline">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weight Goal Setup -->
+          <div class="card weight-goal-setup">
+            <h2>Set Your Weight Loss Goal</h2>
+            <form id="weightGoalForm" class="weight-goal-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="currentWeightInput">Current Weight (lbs)</label>
+                  <input type="number" id="currentWeightInput" name="currentWeight" min="100" max="500" step="0.1" required>
+                </div>
+                <div class="form-group">
+                  <label for="goalWeightInput">Goal Weight (lbs)</label>
+                  <input type="number" id="goalWeightInput" name="goalWeight" min="100" max="500" step="0.1" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="weightLossRate">Weekly Loss Rate</label>
+                  <select id="weightLossRate" name="rate" required>
+                    <option value="">Select rate</option>
+                    <option value="0.5">0.5 lbs/week (Slow & Steady)</option>
+                    <option value="1">1 lb/week (Recommended)</option>
+                    <option value="1.5">1.5 lbs/week (Moderate)</option>
+                    <option value="2">2 lbs/week (Aggressive)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="activityLevel">Activity Level</label>
+                  <select id="activityLevel" name="activity" required>
+                    <option value="">Select level</option>
+                    <option value="sedentary">Sedentary (Little exercise)</option>
+                    <option value="light">Lightly Active (1-3 days/week)</option>
+                    <option value="moderate">Moderately Active (3-5 days/week)</option>
+                    <option value="active">Very Active (6-7 days/week)</option>
+                    <option value="athlete">Athlete (Daily intense exercise)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="dietaryRestrictions">Dietary Restrictions</label>
+                <textarea id="dietaryRestrictions" name="restrictions" rows="2" placeholder="Any food allergies, preferences, or restrictions (e.g., vegetarian, gluten-free, low-cholesterol)"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Generate AI Plan</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- AI-Generated Meal Plan -->
+          <div class="card ai-meal-plan" id="aiMealPlanCard" style="display: none;">
+            <div class="card-header">
+              <h2>🤖 AI-Generated Meal Plan</h2>
+              <button class="btn btn-secondary" onclick="window.weightLossManager.printMealPlan(window.weightLossManager.mealPlan)">
+                🖨️ Print Meal Plan
+              </button>
+            </div>
+            <div class="meal-plan-summary">
+              <div class="plan-metrics">
+                <div class="plan-metric">
+                  <span class="metric-label">Daily Calories</span>
+                  <span class="metric-value" id="dailyCalorieTarget">--</span>
+                </div>
+                <div class="plan-metric">
+                  <span class="metric-label">Protein (g)</span>
+                  <span class="metric-value" id="proteinTarget">--</span>
+                </div>
+                <div class="plan-metric">
+                  <span class="metric-label">Carbs (g)</span>
+                  <span class="metric-value" id="carbsTarget">--</span>
+                </div>
+                <div class="plan-metric">
+                  <span class="metric-label">Fat (g)</span>
+                  <span class="metric-value" id="fatTarget">--</span>
+                </div>
+              </div>
+              <div id="mealPlanInfo"></div>
+            </div>
+            <div class="meal-plan-days">
+              <div class="day-plan" id="day1Plan">
+                <h3>Day 1</h3>
+                <div class="meals-container">
+                  <!-- Meals will be populated by AI -->
+                </div>
+              </div>
+              <div class="day-plan" id="day2Plan">
+                <h3>Day 2</h3>
+                <div class="meals-container">
+                  <!-- Meals will be populated by AI -->
+                </div>
+              </div>
+              <div class="day-plan" id="day3Plan">
+                <h3>Day 3</h3>
+                <div class="meals-container">
+                  <!-- Meals will be populated by AI -->
+                </div>
+              </div>
+              <div class="day-plan" id="day4Plan">
+                <h3>Day 4</h3>
+                <div class="meals-container">
+                  <!-- Meals will be populated by AI -->
+                </div>
+              </div>
+              <div class="day-plan" id="day5Plan">
+                <h3>Day 5</h3>
+                <div class="meals-container">
+                  <!-- Meals will be populated by AI -->
+                </div>
+              </div>
+              <div class="day-plan" id="day6Plan">
+                <h3>Day 6</h3>
+                <div class="meals-container">
+                  <!-- Meals will be populated by AI -->
+                </div>
+              </div>
+              <div class="day-plan" id="day7Plan">
+                <h3>Day 7</h3>
+                <div class="meals-container">
+                  <!-- Meals will be populated by AI -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI-Generated Exercise Plan -->
+          <div class="card ai-exercise-plan" id="aiExercisePlanCard" style="display: none;">
+            <div class="card-header">
+              <h2>🏃‍♂️ AI-Generated Exercise Plan</h2>
+              <button class="btn btn-secondary" onclick="window.weightLossManager.printExercisePlan(window.weightLossManager.exercisePlan)">
+                🖨️ Print Exercise Plan
+              </button>
+            </div>
+            <div class="exercise-plan-summary">
+              <div class="plan-metrics">
+                <div class="plan-metric">
+                  <span class="metric-label">Weekly Workouts</span>
+                  <span class="metric-value" id="weeklyWorkouts">--</span>
+                </div>
+                <div class="plan-metric">
+                  <span class="metric-label">Calories Burned</span>
+                  <span class="metric-value" id="weeklyCaloriesBurned">--</span>
+                </div>
+                <div class="plan-metric">
+                  <span class="metric-label">Focus Areas</span>
+                  <span class="metric-value" id="exerciseFocus">--</span>
+                </div>
+              </div>
+              <div id="exercisePlanInfo"></div>
+            </div>
+            <div class="exercise-schedule">
+              <div class="exercise-day" id="exerciseDay1">
+                <h3>Day 1</h3>
+                <div class="exercises-container">
+                  <!-- Exercises will be populated by AI -->
+                </div>
+              </div>
+              <div class="exercise-day" id="exerciseDay2">
+                <h3>Day 2</h3>
+                <div class="exercises-container">
+                  <!-- Exercises will be populated by AI -->
+                </div>
+              </div>
+              <div class="exercise-day" id="exerciseDay3">
+                <h3>Day 3</h3>
+                <div class="exercises-container">
+                  <!-- Exercises will be populated by AI -->
+                </div>
+              </div>
+              <div class="exercise-day" id="exerciseDay4">
+                <h3>Day 4</h3>
+                <div class="exercises-container">
+                  <!-- Exercises will be populated by AI -->
+                </div>
+              </div>
+              <div class="exercise-day" id="exerciseDay5">
+                <h3>Day 5</h3>
+                <div class="exercises-container">
+                  <!-- Exercises will be populated by AI -->
+                </div>
+              </div>
+              <div class="exercise-day" id="exerciseDay6">
+                <h3>Day 6</h3>
+                <div class="exercises-container">
+                  <!-- Exercises will be populated by AI -->
+                </div>
+              </div>
+              <div class="exercise-day" id="exerciseDay7">
+                <h3>Day 7</h3>
+                <div class="exercises-container">
+                  <!-- Exercises will be populated by AI -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weight Tracking -->
+          <div class="card weight-tracking">
+            <h2>Track Your Progress</h2>
+            <form id="weightTrackingForm" class="weight-tracking-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="weightDate">Date</label>
+                  <input type="date" id="weightDate" name="date" required>
+                </div>
+                <div class="form-group">
+                  <label for="weightValue">Weight (lbs)</label>
+                  <input type="number" id="weightValue" name="weight" min="100" max="500" step="0.1" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="weightNotes">Notes</label>
+                <textarea id="weightNotes" name="notes" rows="2" placeholder="How you're feeling, any challenges, or achievements"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Log Weight</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Weight History -->
+          <div class="card weight-history">
+            <h2>Weight History</h2>
+            <div id="weightHistoryList" class="weight-list">
+              <!-- Weight entries will be populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Profile Tab -->
+      <section class="tab-content" id="profile">
+        <div class="profile-container">
+          <!-- Profile Information -->
+          <div class="card profile-info">
+            <h2>Profile Information</h2>
+            <form id="profileForm" class="profile-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="profileName">Full Name</label>
+                  <input type="text" id="profileName" name="name" required>
+                </div>
+                <div class="form-group">
+                  <label for="profileAge">Age</label>
+                  <input type="number" id="profileAge" name="age" min="1" max="120">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="profileWeight">Weight (lbs)</label>
+                  <input type="number" id="profileWeight" name="weight" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label for="profileHeight">Height</label>
+                  <div class="height-input-group">
+                    <div class="height-field">
+                      <input type="number" id="profileHeightFeet" name="heightFeet" min="0" max="8" placeholder="0">
+                      <label for="profileHeightFeet">ft</label>
+                    </div>
+                    <div class="height-field">
+                      <input type="number" id="profileHeightInches" name="heightInches" min="0" max="11" placeholder="0">
+                      <label for="profileHeightInches">in</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="profileConditions">Medical Conditions</label>
+                <textarea id="profileConditions" name="medicalConditions" rows="3" placeholder="List any medical conditions, chronic illnesses, or health issues"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="profileAllergies">Allergies</label>
+                <textarea id="profileAllergies" name="allergies" rows="3" placeholder="List any allergies (medications, foods, environmental, etc.)"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Update Profile</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Emergency Contact -->
+          <div class="card emergency-contact">
+            <h2>Emergency Contact</h2>
+            <form id="emergencyForm" class="emergency-form">
+              <div class="form-group">
+                <label for="emergencyName">Contact Name</label>
+                <input type="text" id="emergencyName" name="emergencyName">
+              </div>
+              <div class="form-group">
+                <label for="emergencyPhone">Phone Number</label>
+                <input type="tel" id="emergencyPhone" name="emergencyPhone">
+              </div>
+              <div class="form-group">
+                <label for="emergencyRelationship">Relationship</label>
+                <input type="text" id="emergencyRelationship" name="emergencyRelationship">
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Contact</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Settings -->
+          <div class="card settings">
+            <h2>App Settings</h2>
+            <div class="settings-options">
+              <div class="setting-item">
+                <label for="themeToggle">Dark Mode</label>
+                <input type="checkbox" id="themeToggle" class="toggle">
+              </div>
+              <div class="setting-item">
+                <label for="notificationsToggle">Notifications</label>
+                <input type="checkbox" id="notificationsToggle" class="toggle" checked>
+              </div>
+              <div class="setting-item">
+                <label for="unitsToggle">Units (Metric/Imperial)</label>
+                <select id="unitsToggle">
+                  <option value="metric">Metric</option>
+                  <option value="imperial">Imperial</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Legal Links -->
+          <div class="card legal-links">
+            <h2>Legal</h2>
+            <div class="legal-options">
+              <a href="#" class="legal-link" onclick="showPrivacyPolicy()">Privacy Policy</a>
+              <a href="#" class="legal-link" onclick="showTermsOfService()">Terms of Service</a>
+              <a href="#" class="legal-link" onclick="showDataUsage()">Data Usage</a>
+              <a href="#" class="legal-link" onclick="showHIPAACompliance()">HIPAA Compliance</a>
+            </div>
+          </div>
+          
+          <!-- Data Export -->
+          <div class="card data-export">
+            <h2>Data Export</h2>
+            <div class="setting-group">
+              <p>Export all your health data for backup or transfer.</p>
+              <button class="btn btn-secondary" id="exportData">Export All Data</button>
+            </div>
+          </div>
+
+          <!-- Medical Reports -->
+          <div class="card medical-reports">
+            <h2>Medical Reports</h2>
+            <div class="report-options">
+              <p>Generate comprehensive medical reports for healthcare providers.</p>
+              
+              <div class="report-periods">
+                <h3>Select Report Period:</h3>
+                <div class="period-buttons">
+                  <button class="btn btn-outline" onclick="generateMedicalReport('7days')">Last 7 Days</button>
+                  <button class="btn btn-outline" onclick="generateMedicalReport('30days')">Last 30 Days</button>
+                  <button class="btn btn-outline" onclick="generateMedicalReport('90days')">Last 90 Days</button>
+                  <button class="btn btn-outline" onclick="generateMedicalReport('1year')">Last Year</button>
+                </div>
+              </div>
+
+              <div class="report-preview" id="reportPreview" style="display: none;">
+                <h3>Report Preview</h3>
+                <div id="reportSummary" class="report-summary">
+                  <!-- Report summary will be displayed here -->
+                </div>
+                <div class="report-actions">
+                  <button class="btn btn-primary" onclick="exportMedicalReportPDF()">Export as PDF</button>
+                  <button class="btn btn-secondary" onclick="downloadMedicalReportJSON()">Download JSON</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- PWA Installation Prompt -->
+  <div id="pwaInstallPrompt" class="pwa-install-prompt" style="display: none;">
+    <div class="pwa-prompt-content">
+      <div class="pwa-prompt-icon">
+        <img src="assets/favicon.svg" alt="Bradley Health" width="48" height="48">
+      </div>
+      <div class="pwa-prompt-text">
+        <h3>Install Bradley Health</h3>
+        <p>Add to your home screen for quick access</p>
+      </div>
+      <div class="pwa-prompt-actions">
+        <button id="pwaInstallBtn" class="btn btn-primary">Install</button>
+        <button id="pwaDismissBtn" class="btn btn-secondary">Not Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/theme-manager.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/dashboard.js"></script>
+  <script src="assets/js/blood-pressure.js"></script>
+  <script src="assets/js/medication-manager.js"></script>
+  <script src="assets/js/mood-tracker.js"></script>
+  <script src="assets/js/goals-manager.js"></script>
+  <script src="assets/js/limb-care.js"></script>
+  <script src="assets/js/dme-manager.js"></script>
+  <script src="assets/js/profile-manager.js"></script>
+  <script src="assets/js/health-insights.js"></script>
+  <script src="assets/js/medical-report.js"></script>
+  <script src="assets/js/charts.js"></script>
+  <script src="assets/js/export.js"></script>
+  <script src="assets/js/notifications.js"></script>
+  <script src="assets/js/legal.js"></script>
+  <script src="assets/js/pwa-install.js"></script>
+  <script src="assets/js/pull-to-refresh.js"></script>
+  <script src="assets/js/nutrition-tracker.js"></script>
+  <script src="assets/js/weight-loss.js"></script>
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then((registration) => {
+            console.log('Service Worker registered successfully:', registration);
+          })
+          .catch((error) => {
+            console.error('Service Worker registration failed:', error);
+          });
+      });
+    }
+    
+    // Global error handler
+    window.addEventListener('error', (event) => {
+      console.error('Global error:', event.error);
+    });
+    
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('Unhandled promise rejection:', event.reason);
+    });
+
+    // Medical Report Functions
+    async function generateMedicalReport(period) {
+      try {
+        // Show loading state
+        const preview = document.getElementById('reportPreview');
+        const summary = document.getElementById('reportSummary');
+        
+        preview.style.display = 'block';
+        summary.innerHTML = '<p>Checking authentication...</p>';
+        
+        // Check if user is authenticated
+        if (!window.authManager || !window.authManager.getUserId()) {
+          summary.innerHTML = '<p class="report-alert">Please sign in to generate medical reports.</p>';
+          return;
+        }
+        
+        summary.innerHTML = '<p>Generating comprehensive medical report...</p>';
+        
+        // Generate the report
+        const report = await window.medicalReportGenerator.generateComprehensiveReport(period);
+        
+        // Display report summary
+        displayReportSummary(report);
+        
+        // Store report for export
+        window.currentMedicalReport = report;
+        
+      } catch (error) {
+        console.error('Error generating medical report:', error);
+        const errorMessage = error.message.includes('timeout') 
+          ? 'Authentication timeout. Please refresh the page and try again.'
+          : 'Error generating report. Please try again.';
+        document.getElementById('reportSummary').innerHTML = 
+          `<p class="report-alert">${errorMessage}</p>`;
+      }
+    }
+
+    function displayReportSummary(report) {
+      const summary = document.getElementById('reportSummary');
+      
+      let html = `
+        <h4>Report Summary</h4>
+        <div class="report-metric">
+          <span class="report-metric-label">Patient:</span>
+          <span class="report-metric-value">${report.patientDemographics.name || 'Not provided'}</span>
+        </div>
+        <div class="report-metric">
+          <span class="report-metric-label">Report Period:</span>
+          <span class="report-metric-value">${new Date(report.reportInfo.dateRange.start).toLocaleDateString()} - ${new Date(report.reportInfo.dateRange.end).toLocaleDateString()}</span>
+        </div>
+        <div class="report-metric">
+          <span class="report-metric-label">Overall Health Status:</span>
+          <span class="report-metric-value">${report.executiveSummary.overallHealthStatus}</span>
+        </div>
+      `;
+
+      // Add key findings
+      if (report.executiveSummary.keyFindings.length > 0) {
+        html += `
+          <h4>Key Findings:</h4>
+          <ul>
+            ${report.executiveSummary.keyFindings.map(finding => `<li>${finding}</li>`).join('')}
+          </ul>
+        `;
+      }
+
+      // Add critical alerts
+      if (report.executiveSummary.criticalAlerts.length > 0) {
+        html += `
+          <h4>Critical Alerts:</h4>
+          ${report.executiveSummary.criticalAlerts.map(alert => 
+            `<div class="report-alert">${alert}</div>`
+          ).join('')}
+        `;
+      }
+
+      // Add blood pressure summary
+      if (report.bloodPressure.summary && !report.bloodPressure.summary.message) {
+        html += `
+          <h4>Blood Pressure Summary:</h4>
+          <div class="report-metric">
+            <span class="report-metric-label">Average BP:</span>
+            <span class="report-metric-value">${report.bloodPressure.summary.averageSystolic}/${report.bloodPressure.summary.averageDiastolic} mmHg</span>
+          </div>
+          <div class="report-metric">
+            <span class="report-metric-label">Total Readings:</span>
+            <span class="report-metric-value">${report.bloodPressure.summary.totalReadings}</span>
+          </div>
+          <div class="report-metric">
+            <span class="report-metric-label">High Readings:</span>
+            <span class="report-metric-value">${report.bloodPressure.summary.highReadings} (${report.bloodPressure.summary.highReadingsPercentage}%)</span>
+          </div>
+        `;
+      }
+
+      // Add medication summary
+      if (report.medications.summary && !report.medications.summary.message) {
+        html += `
+          <h4>Medications:</h4>
+          <div class="report-metric">
+            <span class="report-metric-label">Active Medications:</span>
+            <span class="report-metric-value">${report.medications.summary.activeMedications}</span>
+          </div>
+        `;
+      }
+
+      // Add mental health summary
+      if (report.mentalHealth.summary && !report.mentalHealth.summary.message) {
+        html += `
+          <h4>Mental Health Summary:</h4>
+          <div class="report-metric">
+            <span class="report-metric-label">Average Mood:</span>
+            <span class="report-metric-value">${report.mentalHealth.summary.averageMood}/10</span>
+          </div>
+          <div class="report-metric">
+            <span class="report-metric-label">Average Stress:</span>
+            <span class="report-metric-value">${report.mentalHealth.summary.averageStress}/10</span>
+          </div>
+        `;
+      }
+
+      // Add recommendations
+      if (report.recommendations.length > 0) {
+        html += `
+          <h4>Recommendations:</h4>
+          <ul>
+            ${report.recommendations.slice(0, 5).map(rec => 
+              `<li><strong>${rec.category}:</strong> ${rec.recommendation}</li>`
+            ).join('')}
+          </ul>
+        `;
+      }
+
+      summary.innerHTML = html;
+    }
+
+    async function exportMedicalReportPDF() {
+      try {
+        if (window.currentMedicalReport) {
+          await window.medicalReportGenerator.exportReportAsPDF();
+        } else {
+          alert('Please generate a report first');
+        }
+      } catch (error) {
+        console.error('Error exporting PDF:', error);
+        alert('Error exporting PDF. Please try again.');
+      }
+    }
+
+    function downloadMedicalReportJSON() {
+      try {
+        if (window.currentMedicalReport) {
+          const dataStr = JSON.stringify(window.currentMedicalReport, null, 2);
+          const dataBlob = new Blob([dataStr], {type: 'application/json'});
+          const url = URL.createObjectURL(dataBlob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `medical-report-${new Date().toISOString().split('T')[0]}.json`;
+          link.click();
+          URL.revokeObjectURL(url);
+        } else {
+          alert('Please generate a report first');
+        }
+      } catch (error) {
+        console.error('Error downloading JSON:', error);
+        alert('Error downloading report. Please try again.');
+      }
+    }
+  </script>
+</body>
+</html> 

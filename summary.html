@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bradley Health - Daily Summary</title>
+  <link rel="stylesheet" href="assets/style.css" />
+
+  <!-- Firebase + Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-init.js"></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+    }
+    header {
+      background-color: #2c7a7b;
+      color: white;
+      padding: 1.5em;
+      text-align: center;
+    }
+    main {
+      max-width: 700px;
+      margin: 2em auto;
+      background: white;
+      padding: 2em;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .card {
+      background: #edf2f7;
+      border-left: 5px solid #2c7a7b;
+      padding: 1em;
+      margin-bottom: 1.5em;
+      border-radius: 8px;
+    }
+    canvas {
+      margin-top: 2em;
+      background: #fff;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Bradley Health</h1>
+    <p>Daily Summary</p>
+  </header>
+
+  <main>
+    <div class="card" id="bpCard">Loading latest BP reading...</div>
+    <div class="card" id="rollCard">Loading distance rolled today...</div>
+    <div class="card" id="caloriesCard">Loading calories burned today...</div>
+
+    <h3>7-Day Health Trends</h3>
+    <canvas id="summaryChart" height="120"></canvas>
+  </main>
+
+  <script>
+    async function loadSummary() {
+      if (!currentUser) return;
+
+      const uid = currentUser.uid;
+      const today = new Date().toISOString().split('T')[0];
+
+      const bpSnap = await db.collection("bpReadings")
+        .where("uid", "==", uid)
+        .orderBy("date", "desc")
+        .limit(1).get();
+
+      if (!bpSnap.empty) {
+        const d = bpSnap.docs[0].data();
+        const status = getStatus(d.systolic, d.diastolic);
+        const tip = getTips(status);
+        document.getElementById("bpCard").innerHTML =
+          `<strong>Latest BP:</strong> ${d.systolic}/${d.diastolic} - <strong>Status:</strong> ${status}<br><em>${tip}</em>`;
+      }
+
+      const rollSnap = await db.collection("rollDistances")
+        .where("uid", "==", uid)
+        .where("date", "==", today).get();
+
+      let totalRoll = 0;
+      rollSnap.forEach(doc => totalRoll += parseFloat(doc.data().distance));
+      document.getElementById("rollCard").innerHTML = `<strong>Distance Rolled Today:</strong> ${totalRoll.toFixed(2)} m`;
+
+      const MET = 2.5, weight = 80;
+      const hours = (totalRoll / 1000) / 3.2;
+      const cals = MET * weight * hours;
+      document.getElementById("caloriesCard").innerHTML = `<strong>Calories Burned:</strong> ${cals.toFixed(1)} kcal`;
+
+      const days = [], bpTrend = [], rollTrend = [];
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dayStr = date.toISOString().split('T')[0];
+        days.push(dayStr);
+
+        const bpDay = await db.collection("bpReadings")
+          .where("uid", "==", uid)
+          .where("date", "==", dayStr).limit(1).get();
+        bpTrend.push(bpDay.empty ? null : bpDay.docs[0].data().systolic);
+
+        const rollDay = await db.collection("rollDistances")
+          .where("uid", "==", uid)
+          .where("date", "==", dayStr).get();
+        let rollTotal = 0;
+        rollDay.forEach(doc => rollTotal += parseFloat(doc.data().distance));
+        rollTrend.push(rollTotal || null);
+      }
+
+      const ctx = document.getElementById("summaryChart").getContext("2d");
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: days,
+          datasets: [
+            {
+              label: "Systolic BP",
+              data: bpTrend,
+              borderColor: "red",
+              fill: false
+            },
+            {
+              label: "Distance Rolled (m)",
+              data: rollTrend,
+              borderColor: "blue",
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: "bottom" }
+          }
+        }
+      });
+    }
+
+    function getStatus(s, d) {
+      if (s >= 180 || d >= 120) return "Crisis";
+      if (s >= 140 || d >= 90) return "Stage 2";
+      if (s >= 130 || d >= 80) return "Stage 1";
+      if (s >= 120 && d < 80) return "Elevated";
+      return "Normal";
+    }
+
+    function getTips(status) {
+      const tips = {
+        Normal: ["Keep up the healthy lifestyle!"],
+        Elevated: ["Consider reducing salt intake and increasing activity."],
+        Stage1: ["Monitor regularly and consider seeing a provider."],
+        Stage2: ["High BP detected — consult a doctor."],
+        Crisis: ["Immediate medical attention is needed!"]
+      };
+      return tips[status][0];
+    }
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        loadSummary();
+      }
+    });
+  </script>
+</body>
+</html>
