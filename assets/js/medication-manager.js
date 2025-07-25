@@ -1,16 +1,16 @@
 // Medication Management System
 class MedicationManager {
   constructor() {
-    this.currentUser = null;
-    this.medications = [];
-    this.reminders = [];
+      this.currentUser = null;
+      this.medications = [];
+      this.reminders = [];
     this.initialized = false;
     
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.init());
     } else {
-      this.init();
+          this.init();
     }
   }
 
@@ -278,12 +278,12 @@ class MedicationManager {
         .where('userId', '==', this.currentUser.uid)
         .orderBy('createdAt', 'desc')
         .get();
-      
+
       this.medications = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
-      
+
       this.renderMedicationList();
     } catch (error) {
       console.error('Error loading medications:', error);
@@ -291,22 +291,53 @@ class MedicationManager {
     }
   }
 
+  formatTimeTo12Hour(timeString) {
+    if (!timeString) return '';
+    
+    // Handle different time formats
+    let time = timeString;
+    
+    // If it's already in 12-hour format with AM/PM, return as is
+    if (timeString.toLowerCase().includes('am') || timeString.toLowerCase().includes('pm')) {
+      return timeString;
+    }
+    
+    // If it's a time input value (HH:MM format)
+    if (timeString.includes(':')) {
+      const [hours, minutes] = timeString.split(':');
+      const hour = parseInt(hours);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+      return `${displayHour}:${minutes} ${ampm}`;
+    }
+    
+    // If it's just a number (hour only)
+    if (!isNaN(timeString)) {
+      const hour = parseInt(timeString);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+      return `${displayHour}:00 ${ampm}`;
+    }
+    
+    return timeString; // Return original if we can't parse it
+  }
+
   renderMedicationList() {
     const medList = document.getElementById('medicationList');
     if (!medList) return;
-    
+
     if (this.medications.length === 0) {
       medList.innerHTML = '<p class="no-data">No medications added yet. Add your first medication above.</p>';
       return;
     }
-    
+
     medList.innerHTML = this.medications.map(med => `
       <div class="medication-item" data-id="${med.id}">
         <div class="med-info">
           <h4>${med.name}</h4>
           <p><strong>Dosage:</strong> ${med.dosage}</p>
           <p><strong>Frequency:</strong> ${med.frequency}</p>
-          ${med.timeOfDay ? `<p><strong>Time:</strong> ${med.timeOfDay}</p>` : ''}
+          ${med.timeOfDay ? `<p><strong>Time:</strong> ${this.formatTimeTo12Hour(med.timeOfDay)}</p>` : ''}
           ${med.instructions ? `<p><strong>Instructions:</strong> ${med.instructions}</p>` : ''}
         </div>
         <div class="med-actions">
@@ -324,7 +355,7 @@ class MedicationManager {
 
   async deleteMedication(medId) {
     if (!confirm('Are you sure you want to delete this medication?')) return;
-    
+
     try {
       await this.db.collection('medications').doc(medId).delete();
       this.showToast('Medication deleted successfully', 'success');
@@ -338,7 +369,7 @@ class MedicationManager {
   async editMedication(medId) {
     const medication = this.medications.find(m => m.id === medId);
     if (!medication) return;
-    
+
     // Populate form for editing
     const form = document.getElementById('addMedicationForm');
     if (form) {
@@ -436,12 +467,12 @@ class MedicationManager {
         .where('userId', '==', this.currentUser.uid)
         .orderBy('createdAt', 'desc')
         .get();
-      
+
       this.reminders = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
-      
+
       this.renderReminders();
     } catch (error) {
       console.error('Error loading reminders:', error);
@@ -451,24 +482,24 @@ class MedicationManager {
   renderReminders() {
     const reminderList = document.getElementById('reminderList');
     if (!reminderList) return;
-    
+
     if (this.reminders.length === 0) {
       reminderList.innerHTML = '<p class="no-data">No reminders set yet.</p>';
       return;
     }
-    
+
     reminderList.innerHTML = this.reminders.map(reminder => `
-      <div class="reminder-item" data-id="${reminder.id}">
-        <div class="reminder-info">
+        <div class="reminder-item" data-id="${reminder.id}">
+          <div class="reminder-info">
           <h4>${reminder.type}</h4>
           <p><strong>Frequency:</strong> ${reminder.frequency}</p>
           <p><strong>Time:</strong> ${reminder.time}</p>
           ${reminder.notes ? `<p><strong>Notes:</strong> ${reminder.notes}</p>` : ''}
-        </div>
-        <div class="reminder-actions">
+          </div>
+          <div class="reminder-actions">
           <button onclick="window.medicationManager.toggleReminder('${reminder.id}')" class="btn btn-secondary">
             ${reminder.active ? 'Disable' : 'Enable'}
-          </button>
+            </button>
           <button onclick="window.medicationManager.deleteReminder('${reminder.id}')" class="btn btn-danger">Delete</button>
         </div>
       </div>
@@ -478,7 +509,7 @@ class MedicationManager {
   async toggleReminder(reminderId) {
     const reminder = this.reminders.find(r => r.id === reminderId);
     if (!reminder) return;
-    
+
     try {
       await this.db.collection('reminders').doc(reminderId).update({
         active: !reminder.active
@@ -493,7 +524,7 @@ class MedicationManager {
 
   async deleteReminder(reminderId) {
     if (!confirm('Are you sure you want to delete this reminder?')) return;
-    
+
     try {
       await this.db.collection('reminders').doc(reminderId).delete();
       this.showToast('Reminder deleted successfully', 'success');
@@ -507,7 +538,7 @@ class MedicationManager {
   checkDueMedications() {
     const now = new Date();
     const currentTime = now.getHours() * 60 + now.getMinutes();
-    
+
     this.medications.forEach(med => {
       if (med.timeOfDay && med.active) {
         const [hours, minutes] = med.timeOfDay.split(':').map(Number);
@@ -529,7 +560,7 @@ class MedicationManager {
         icon: '/assets/favicon.svg'
       });
     }
-    
+
     this.showToast(`Reminder: Take ${medication.name}`, 'info');
   }
 
@@ -559,4 +590,4 @@ class MedicationManager {
 }
 
 // Initialize medication manager
-window.medicationManager = new MedicationManager(); 
+  window.medicationManager = new MedicationManager();
