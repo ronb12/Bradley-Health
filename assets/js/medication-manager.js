@@ -73,6 +73,9 @@ class MedicationManager {
       addMedForm.addEventListener('submit', (e) => this.addMedication(e));
     }
 
+    // Setup medication name auto-complete
+    this.setupMedicationAutoComplete();
+
     // Medication list
     const medList = document.getElementById('medicationList');
     if (medList) {
@@ -83,6 +86,124 @@ class MedicationManager {
     const reminderForm = document.getElementById('reminderForm');
     if (reminderForm) {
       reminderForm.addEventListener('submit', (e) => this.setupReminder(e));
+    }
+  }
+
+  setupMedicationAutoComplete() {
+    const medNameInput = document.getElementById('medName');
+    if (!medNameInput) return;
+
+    // Create auto-complete container
+    const autoCompleteContainer = document.createElement('div');
+    autoCompleteContainer.id = 'medicationAutoComplete';
+    autoCompleteContainer.className = 'auto-complete-container';
+    autoCompleteContainer.style.display = 'none';
+    medNameInput.parentNode.appendChild(autoCompleteContainer);
+
+    let currentFocus = -1;
+    let filteredMedications = [];
+
+    medNameInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      
+      if (query.length < 2) {
+        autoCompleteContainer.style.display = 'none';
+        return;
+      }
+
+      // Get medications from database
+      if (window.medicationDatabase) {
+        filteredMedications = window.medicationDatabase.searchMedications(query);
+        this.showAutoCompleteSuggestions(filteredMedications, autoCompleteContainer, medNameInput);
+      }
+    });
+
+    medNameInput.addEventListener('keydown', (e) => {
+      const items = autoCompleteContainer.getElementsByClassName('auto-complete-item');
+      
+      if (e.key === 'ArrowDown') {
+        currentFocus++;
+        this.addActive(items, currentFocus);
+      } else if (e.key === 'ArrowUp') {
+        currentFocus--;
+        this.addActive(items, currentFocus);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (currentFocus > -1) {
+          if (items[currentFocus]) {
+            this.selectMedication(items[currentFocus], medNameInput, autoCompleteContainer);
+          }
+        }
+      } else if (e.key === 'Escape') {
+        autoCompleteContainer.style.display = 'none';
+        currentFocus = -1;
+      }
+    });
+
+    // Close auto-complete when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!medNameInput.contains(e.target) && !autoCompleteContainer.contains(e.target)) {
+        autoCompleteContainer.style.display = 'none';
+        currentFocus = -1;
+      }
+    });
+  }
+
+  showAutoCompleteSuggestions(medications, container, input) {
+    if (medications.length === 0) {
+      container.style.display = 'none';
+      return;
+    }
+
+    container.innerHTML = '';
+    medications.slice(0, 8).forEach((med, index) => {
+      const item = document.createElement('div');
+      item.className = 'auto-complete-item';
+      item.innerHTML = `
+        <div class="med-name">${med.name}</div>
+        <div class="med-category">${med.category}</div>
+        <div class="med-dosage">${med.dosage}</div>
+      `;
+      
+      item.addEventListener('click', () => {
+        this.selectMedication(item, input, container);
+      });
+      
+      container.appendChild(item);
+    });
+    
+    container.style.display = 'block';
+  }
+
+  selectMedication(item, input, container) {
+    const medName = item.querySelector('.med-name').textContent;
+    const medCategory = item.querySelector('.med-category').textContent;
+    const medDosage = item.querySelector('.med-dosage').textContent;
+    
+    input.value = medName;
+    
+    // Auto-fill dosage if available
+    const dosageInput = document.getElementById('medDosage');
+    if (dosageInput && medDosage) {
+      dosageInput.value = medDosage.split(',')[0].trim(); // Take first dosage option
+    }
+    
+    container.style.display = 'none';
+  }
+
+  addActive(items, currentFocus) {
+    if (!items) return false;
+    
+    this.removeActive(items);
+    if (currentFocus >= items.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (items.length - 1);
+    
+    items[currentFocus].classList.add('auto-complete-active');
+  }
+
+  removeActive(items) {
+    for (let i = 0; i < items.length; i++) {
+      items[i].classList.remove('auto-complete-active');
     }
   }
 

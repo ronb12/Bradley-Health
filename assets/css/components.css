@@ -4606,3 +4606,103 @@ input[type="range"]::-moz-range-thumb {
   padding: 2rem;
   font-style: italic;
 }
+
+/* ===== MEDICATION AUTO-COMPLETE STYLES ===== */
+.auto-complete-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.auto-complete-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.auto-complete-item:hover,
+.auto-complete-item.auto-complete-active {
+  background-color: #f8f9fa;
+}
+
+.auto-complete-item:last-child {
+  border-bottom: none;
+}
+
+.auto-complete-item .med-name {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.auto-complete-item .med-category {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 2px;
+}
+
+.auto-complete-item .med-dosage {
+  font-size: 0.875rem;
+  color: #888;
+  font-style: italic;
+}
+
+/* Dark mode support for auto-complete */
+@media (prefers-color-scheme: dark) {
+  .auto-complete-container {
+    background: #2d3748;
+    border-color: #4a5568;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .auto-complete-item {
+    border-bottom-color: #4a5568;
+  }
+  
+  .auto-complete-item:hover,
+  .auto-complete-item.auto-complete-active {
+    background-color: #4a5568;
+  }
+  
+  .auto-complete-item .med-name {
+    color: #e2e8f0;
+  }
+  
+  .auto-complete-item .med-category {
+    color: #a0aec0;
+  }
+  
+  .auto-complete-item .med-dosage {
+    color: #718096;
+  }
+}
+
+/* Mobile responsive auto-complete */
+@media (max-width: 768px) {
+  .auto-complete-container {
+    max-height: 250px;
+  }
+  
+  .auto-complete-item {
+    padding: 10px 12px;
+  }
+  
+  .auto-complete-item .med-name {
+    font-size: 0.9rem;
+  }
+  
+  .auto-complete-item .med-category,
+  .auto-complete-item .med-dosage {
+    font-size: 0.8rem;
+  }
+}
