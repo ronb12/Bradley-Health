@@ -707,9 +707,9 @@ class NutritionTracker {
     console.log('Total cholesterol from all meals:', totalCholesterol, 'from', mealsWithCholesterol, 'meals');
     
     // Update total calories from all meals
-    const dailyCalories = document.getElementById('dailyCalories');
-    console.log('Daily calories element found:', !!dailyCalories);
-    if (dailyCalories) {
+    const totalCaloriesElement = document.getElementById('totalCalories');
+    console.log('Total calories element found:', !!totalCaloriesElement);
+    if (totalCaloriesElement) {
       // Calculate total calories from all meals
       let totalCalories = 0;
       this.meals.forEach(meal => {
@@ -718,7 +718,79 @@ class NutritionTracker {
         }
       });
       console.log('Total calories calculated:', totalCalories);
-      dailyCalories.textContent = totalCalories > 0 ? Math.round(totalCalories) : '--';
+      totalCaloriesElement.textContent = totalCalories > 0 ? Math.round(totalCalories) : '--';
+    }
+
+    // Update today's calories
+    const todayCaloriesElement = document.getElementById('todayCalories');
+    console.log('Today calories element found:', !!todayCaloriesElement);
+    if (todayCaloriesElement) {
+      const today = new Date().toISOString().split('T')[0];
+      let todayCalories = 0;
+      
+      this.meals.forEach(meal => {
+        try {
+          let mealDate;
+          if (meal.timestamp && meal.timestamp.toDate) {
+            mealDate = meal.timestamp.toDate();
+          } else if (meal.timestamp) {
+            mealDate = new Date(meal.timestamp);
+          } else {
+            return;
+          }
+
+          if (isNaN(mealDate.getTime())) {
+            return;
+          }
+
+          const mealDateString = mealDate.toISOString().split('T')[0];
+          if (mealDateString === today && meal.hasNutritionData) {
+            todayCalories += meal.estimatedCalories || 0;
+          }
+        } catch (error) {
+          console.error('Error processing meal timestamp for today calories:', error, meal);
+        }
+      });
+      console.log('Today\'s calories calculated:', todayCalories);
+      todayCaloriesElement.textContent = todayCalories > 0 ? Math.round(todayCalories) : '--';
+    }
+
+    // Update this month's calories
+    const monthlyCaloriesElement = document.getElementById('monthlyCalories');
+    console.log('Monthly calories element found:', !!monthlyCaloriesElement);
+    if (monthlyCaloriesElement) {
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+      let monthlyCalories = 0;
+      
+      this.meals.forEach(meal => {
+        try {
+          let mealDate;
+          if (meal.timestamp && meal.timestamp.toDate) {
+            mealDate = meal.timestamp.toDate();
+          } else if (meal.timestamp) {
+            mealDate = new Date(meal.timestamp);
+          } else {
+            return;
+          }
+
+          if (isNaN(mealDate.getTime())) {
+            return;
+          }
+
+          // Check if meal is from current month and year
+          if (mealDate.getMonth() === currentMonth && 
+              mealDate.getFullYear() === currentYear && 
+              meal.hasNutritionData) {
+            monthlyCalories += meal.estimatedCalories || 0;
+          }
+        } catch (error) {
+          console.error('Error processing meal timestamp for monthly calories:', error, meal);
+        }
+      });
+      console.log('Monthly calories calculated:', monthlyCalories);
+      monthlyCaloriesElement.textContent = monthlyCalories > 0 ? Math.round(monthlyCalories) : '--';
     }
 
     // Update total meals count
