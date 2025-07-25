@@ -692,8 +692,19 @@ class NutritionTracker {
     console.log('=== UPDATING NUTRITION OVERVIEW ===');
     const today = new Date().toISOString().split('T')[0];
     console.log('Today\'s date:', today);
-    const dailyStats = await this.calculateDailyCholesterolIntake(today);
-    console.log('Daily cholesterol intake:', dailyStats);
+    
+    // Calculate total cholesterol from all meals (not just today)
+    let totalCholesterol = 0;
+    let mealsWithCholesterol = 0;
+    
+    this.meals.forEach(meal => {
+      if (meal.hasNutritionData && meal.estimatedCholesterol > 0) {
+        totalCholesterol += meal.estimatedCholesterol;
+        mealsWithCholesterol++;
+      }
+    });
+    
+    console.log('Total cholesterol from all meals:', totalCholesterol, 'from', mealsWithCholesterol, 'meals');
     
     // Update daily calories (total calories for today)
     const dailyCalories = document.getElementById('dailyCalories');
@@ -749,14 +760,14 @@ class NutritionTracker {
     const cholesterolLevel = document.getElementById('cholesterolLevel');
     console.log('Cholesterol level element found:', !!cholesterolLevel);
     if (cholesterolLevel) {
-      if (dailyStats === 0) {
+      if (totalCholesterol === 0) {
         cholesterolLevel.textContent = 'No data';
         cholesterolLevel.style.color = '#6c757d';
         console.log('Cholesterol level set to: No data');
-      } else if (dailyStats > 0) {
-        // Check daily intake limits
-        const limitCheck = this.checkCholesterolLimits(dailyStats);
-        cholesterolLevel.textContent = `${dailyStats} mg (est.)`;
+      } else if (totalCholesterol > 0) {
+        // Check total intake limits
+        const limitCheck = this.checkCholesterolLimits(totalCholesterol);
+        cholesterolLevel.textContent = `${Math.round(totalCholesterol)} mg (est.)`;
         
         if (limitCheck.status === 'exceeded') {
           cholesterolLevel.style.color = '#dc3545';
@@ -765,19 +776,17 @@ class NutritionTracker {
         } else {
           cholesterolLevel.style.color = '#28a745';
         }
-        console.log('Cholesterol level updated:', `${dailyStats} mg (est.)`, limitCheck.status);
+        console.log('Cholesterol level updated:', `${Math.round(totalCholesterol)} mg (est.)`, limitCheck.status);
       }
     }
 
     // Calculate total nutrition from all meals for potential future use
-    let totalCholesterol = 0;
     let totalCalories = 0;
     let totalFat = 0;
     let mealsWithData = 0;
 
     this.meals.forEach(meal => {
       if (meal.hasNutritionData) {
-        totalCholesterol += meal.estimatedCholesterol || 0;
         totalCalories += meal.estimatedCalories || 0;
         totalFat += meal.estimatedFat || 0;
         mealsWithData++;
@@ -786,9 +795,8 @@ class NutritionTracker {
 
     // Store totals for potential future use or debugging
     console.log('Nutrition Overview Updated:', {
-      dailyCholesterol: dailyStats,
-      totalMeals: this.meals.length,
       totalCholesterol,
+      totalMeals: this.meals.length,
       totalCalories,
       totalFat,
       mealsWithData
