@@ -1099,6 +1099,8 @@ class NutritionTracker {
 
     try {
       console.log('Loading nutrition data for user:', this.currentUser.uid);
+      
+      // Load meals data
       const mealsSnapshot = await this.db.collection('meals')
         .where('userId', '==', this.currentUser.uid)
         .orderBy('timestamp', 'desc')
@@ -1125,6 +1127,9 @@ class NutritionTracker {
       console.log(`Loaded ${this.meals.length} meals, ${mealsWithData} with nutrition data`);
       console.log('Total nutrition loaded:', { totalCholesterol, totalCalories, totalFat });
 
+      // Load cholesterol data
+      await this.loadCholesterolData();
+
       // Update UI in correct order
       this.renderMealHistory();
       this.renderCholesterolHistory();
@@ -1132,6 +1137,34 @@ class NutritionTracker {
     } catch (error) {
       console.error('Error loading nutrition data:', error);
       this.showToast('Error loading nutrition data', 'error');
+    }
+  }
+
+  // Helper method to load cholesterol data from database
+  async loadCholesterolData() {
+    if (!this.currentUser || !this.currentUser.uid) {
+      console.log('No current user, cannot load cholesterol data.');
+      return;
+    }
+
+    try {
+      console.log('Loading cholesterol data for user:', this.currentUser.uid);
+      const cholesterolSnapshot = await this.db.collection('cholesterolHistory')
+        .where('userId', '==', this.currentUser.uid)
+        .orderBy('timestamp', 'desc')
+        .get();
+
+      this.cholesterolEntries = [];
+      cholesterolSnapshot.docs.forEach(doc => {
+        const entry = doc.data();
+        entry.id = doc.id; // Ensure entry has ID
+        this.cholesterolEntries.push(entry);
+      });
+
+      console.log(`Loaded ${this.cholesterolEntries.length} cholesterol entries`);
+    } catch (error) {
+      console.error('Error loading cholesterol data:', error);
+      this.showToast('Error loading cholesterol data', 'error');
     }
   }
 
@@ -1219,7 +1252,7 @@ class NutritionTracker {
           ${entry.notes ? `<div class="entry-notes">${entry.notes}</div>` : ''}
           <div class="entry-actions">
             <button onclick="window.nutritionTracker.editCholesterolEntry('${entry.id || ''}')" class="btn btn-secondary btn-sm">Edit</button>
-            <button onclick="window.nutritionTracker.deleteCholesterolEntry('${entry.id || ''}')" class="btn btn-danger btn-sm">Delete</button>
+            <button onclick="window.nutritionTracker.confirmDeleteCholesterolEntry('${entry.id || ''}')" class="btn btn-danger btn-sm">Delete</button>
           </div>
         </div>
       `;
@@ -1302,6 +1335,43 @@ class NutritionTracker {
     } catch (error) {
       console.error('Error updating cholesterol entry:', error);
       this.showToast('Error updating cholesterol entry', 'error');
+    }
+  }
+
+  // Helper method to edit a cholesterol entry
+  editCholesterolEntry(entryId) {
+    const entry = this.cholesterolEntries.find(e => e.id === entryId);
+    if (!entry) {
+      this.showToast('Cholesterol entry not found', 'error');
+      return;
+    }
+
+    // Populate the update form with existing data
+    const updateForm = document.getElementById('updateCholesterolForm');
+    const valueInput = document.getElementById('updateCholesterolValue');
+    const notesInput = document.getElementById('updateCholesterolNotes');
+
+    if (updateForm && valueInput && notesInput) {
+      valueInput.value = entry.value;
+      notesInput.value = entry.notes || '';
+      updateForm.dataset.entryId = entryId;
+      updateForm.style.display = 'block';
+      
+      // Scroll to form
+      updateForm.scrollIntoView({ behavior: 'smooth' });
+      this.showToast('Edit mode activated - update the cholesterol details and click "Update Entry"', 'info');
+    }
+  }
+
+  // Helper method to confirm deletion of a cholesterol entry
+  confirmDeleteCholesterolEntry(entryId) {
+    const deleteForm = document.getElementById('deleteCholesterolForm');
+    if (deleteForm) {
+      deleteForm.dataset.entryId = entryId;
+      deleteForm.style.display = 'block';
+      
+      // Scroll to form
+      deleteForm.scrollIntoView({ behavior: 'smooth' });
     }
   }
 
@@ -1466,11 +1536,12 @@ class NutritionTracker {
       updateCholesterolForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const entryId = updateCholesterolForm.dataset.entryId;
-        const value = document.getElementById('cholesterolValue').value;
-        const notes = document.getElementById('cholesterolNotes').value;
+        const value = document.getElementById('updateCholesterolValue').value;
+        const notes = document.getElementById('updateCholesterolNotes').value;
         await this.updateCholesterolEntry(entryId, value, notes);
         updateCholesterolForm.reset();
         updateCholesterolForm.dataset.entryId = ''; // Clear entryId after update
+        updateCholesterolForm.style.display = 'none'; // Hide the form
       });
     }
 
@@ -1482,6 +1553,7 @@ class NutritionTracker {
         await this.deleteCholesterolEntry(entryId);
         deleteCholesterolForm.reset();
         deleteCholesterolForm.dataset.entryId = ''; // Clear entryId after delete
+        deleteCholesterolForm.style.display = 'none'; // Hide the form
       });
     }
   }
