@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug App Icon - Bradley Health</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+        .icon-test {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .icon-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+        .icon-item h3 {
+            margin-top: 0;
+            color: #60a5fa;
+        }
+        .icon-display {
+            width: 80px;
+            height: 80px;
+            margin: 1rem auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: #3b82f6;
+        }
+        .icon-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        .pwa-prompt-test {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #60a5fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .pwa-prompt-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .pwa-prompt-icon {
+            flex-shrink: 0;
+        }
+        .pwa-prompt-icon img {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            object-fit: contain;
+        }
+        .pwa-prompt-text h3 {
+            margin: 0 0 0.5rem 0;
+            color: white;
+        }
+        .pwa-prompt-text p {
+            margin: 0;
+            color: #e5e7eb;
+        }
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .error h4 {
+            margin-top: 0;
+            color: #ef4444;
+        }
+        .success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .success h4 {
+            margin-top: 0;
+            color: #22c55e;
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .icon-size {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        .icon-size img {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug App Icon Issue</h1>
+        
+        <div class="section">
+            <h2>📱 Current PWA Install Prompt</h2>
+            <div class="pwa-prompt-test">
+                <div class="pwa-prompt-content">
+                    <div class="pwa-prompt-icon">
+                        <img src="assets/apple-touch-icon.png?v=1757110176" alt="Bradley Health App Icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div style="display: none; width: 48px; height: 48px; background: #ef4444; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">❌</div>
+                    </div>
+                    <div class="pwa-prompt-text">
+                        <h3>Install Bradley Health</h3>
+                        <p>Get quick access to your health dashboard on your device</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🎨 Available App Icons</h2>
+            <div class="icon-grid">
+                <div class="icon-size">
+                    <img src="assets/apple-touch-icon.png?v=1757110176" alt="180x180" onerror="this.style.display='none'">
+                    <div>180x180</div>
+                    <div>Apple Touch</div>
+                </div>
+                <div class="icon-size">
+                    <img src="assets/icon-192.png?v=1757110176" alt="192x192" onerror="this.style.display='none'">
+                    <div>192x192</div>
+                    <div>Standard PWA</div>
+                </div>
+                <div class="icon-size">
+                    <img src="assets/icon-512.png?v=1757110176" alt="512x512" onerror="this.style.display='none'">
+                    <div>512x512</div>
+                    <div>High-res PWA</div>
+                </div>
+                <div class="icon-size">
+                    <img src="assets/favicon.svg?v=1757110176" alt="SVG" onerror="this.style.display='none'">
+                    <div>SVG</div>
+                    <div>Scalable</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔧 Icon Loading Test</h2>
+            <div id="loadingTest">Testing icon loading...</div>
+        </div>
+        
+        <div class="section">
+            <h2>📋 Expected vs Actual</h2>
+            <div class="icon-test">
+                <div class="icon-item">
+                    <h3>Expected Design</h3>
+                    <div class="icon-display">
+                        <div style="width: 100%; height: 100%; background: #3b82f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; position: relative;">
+                            <div style="color: #ef4444; font-size: 24px;">❤️</div>
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 2px; background: white; border-radius: 1px; box-shadow: -8px -8px 0 0 white, 8px -8px 0 0 white, -4px -4px 0 0 white, 4px -4px 0 0 white;"></div>
+                        </div>
+                    </div>
+                    <p>Red heart with blue background and white ECG line</p>
+                </div>
+                <div class="icon-item">
+                    <h3>Current Icon</h3>
+                    <div class="icon-display">
+                        <img src="assets/apple-touch-icon.png?v=1757110176" alt="Current Icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div style="display: none; width: 100%; height: 100%; background: #ef4444; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">❌</div>
+                    </div>
+                    <p>What's actually being loaded</p>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <button onclick="window.location.href='/'">🏠 Back to App</button>
+            <button onclick="window.location.reload()">🔄 Refresh Test</button>
+        </div>
+    </div>
+
+    <script>
+        // Test icon loading
+        function testIconLoading() {
+            const testDiv = document.getElementById('loadingTest');
+            const iconUrl = 'assets/apple-touch-icon.png?v=1757110176';
+            
+            const img = new Image();
+            img.onload = function() {
+                testDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Icon Loading Success</h4>
+                        <p>Icon loaded successfully from: ${iconUrl}</p>
+                        <p>Dimensions: ${img.naturalWidth}x${img.naturalHeight}</p>
+                    </div>
+                `;
+            };
+            img.onerror = function() {
+                testDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Icon Loading Failed</h4>
+                        <p>Failed to load icon from: ${iconUrl}</p>
+                        <p>This could be due to:</p>
+                        <ul>
+                            <li>File doesn't exist</li>
+                            <li>Incorrect path</li>
+                            <li>Server error</li>
+                            <li>Cache issues</li>
+                        </ul>
+                    </div>
+                `;
+            };
+            img.src = iconUrl;
+        }
+        
+        // Run test when page loads
+        window.addEventListener('load', testIconLoading);
+    </script>
+</body>
+</html>
