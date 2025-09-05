@@ -1378,7 +1378,11 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .pwa-prompt-icon img {
+  width: 48px;
+  height: 48px;
   border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  object-fit: contain;
 }
 
 .heart-icon {
