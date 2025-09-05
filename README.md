@@ -64,9 +64,10 @@ A modern web application for comprehensive health monitoring, including blood pr
 
 ## 🌐 Live Demo
 
-**✅ Correct URL**: https://ronb12.github.io/Bradley-Health/
+**🚀 Primary URL (Firebase Hosting)**: https://bradley-health.web.app
+**📱 Alternative URL (GitHub Pages)**: https://ronb12.github.io/Bradley-Health/
 
-> **Note**: If you're redirected from `https://ronb12.github.io/index.html`, you'll be automatically taken to the correct Bradley Health app URL.
+> **Note**: The Firebase-hosted version is the primary deployment with automatic updates. The GitHub Pages version is maintained as a backup.
 
 ## 🚀 Getting Started
 
@@ -109,49 +110,119 @@ A modern web application for comprehensive health monitoring, including blood pr
 
 ### Production Deployment
 
-1. **Build for production**
+#### 🚀 Automatic Deployment (Recommended)
+
+Bradley Health is configured for **automatic deployment** to Firebase Hosting:
+
+1. **Make changes** to your code
+2. **Commit and push** to main branch:
    ```bash
-   npm run build
+   git add .
+   git commit -m "Your changes"
+   git push origin main
+   ```
+3. **Automatic deployment** happens via GitHub Actions
+4. **Live site updates** at https://bradley-health.web.app
+
+#### 🛠️ Manual Deployment
+
+1. **Quick deploy**:
+   ```bash
+   ./deploy-to-firebase.sh
    ```
 
-2. **Deploy to your hosting service**
-   - Firebase Hosting
-   - Netlify
-   - Vercel
-   - GitHub Pages
+2. **Step-by-step**:
+   ```bash
+   ./sync-to-public.sh
+   firebase deploy --only hosting
+   ```
+
+#### 📋 Deployment Options
+
+- **Firebase Hosting** (Primary) - https://bradley-health.web.app
+- **GitHub Pages** (Backup) - https://ronb12.github.io/Bradley-Health/
+- **Local Development** - http://localhost:8000
 
 ## 📁 Project Structure
 
 ```
 bradley-health/
-├── assets/
+├── assets/                  # Application assets
 │   ├── css/                 # Stylesheets
 │   │   ├── components.css   # Main component styles
-│   │   ├── blood-pressure.css
-│   │   ├── theme.css
-│   │   └── layout.css
+│   │   ├── theme.css        # Theme management
+│   │   └── layout.css       # Layout styles
 │   ├── js/                  # JavaScript modules
 │   │   ├── auth.js          # Authentication system
 │   │   ├── dashboard.js     # Main dashboard logic
 │   │   ├── blood-pressure.js # BP tracking
 │   │   ├── medication-manager.js # Medication management
 │   │   ├── mood-tracker.js  # Mood tracking
+│   │   ├── nutrition-tracker.js # Nutrition tracking
+│   │   ├── weight-loss.js   # Weight management
 │   │   ├── charts.js        # Data visualization
 │   │   ├── export.js        # Data export
 │   │   ├── notifications.js # Push notifications
 │   │   └── firebase-config.js # Firebase setup
-│   ├── icons/               # App icons
-│   ├── screenshots/         # App screenshots
-│   └── images/              # Other images
-├── __tests__/               # Test files
-├── functions/               # Firebase Cloud Functions
+│   └── icons/               # App icons and images
+├── public/                  # Firebase hosting directory
+│   ├── index.html          # Main app (deployed version)
+│   ├── manifest.json       # PWA manifest
+│   ├── service-worker.js   # Service worker
+│   ├── offline.html        # Offline page
+│   └── assets/             # Copied assets for deployment
+├── .github/workflows/       # GitHub Actions
+│   ├── firebase-hosting-merge.yml      # Auto-deploy on merge
+│   └── firebase-hosting-pull-request.yml # PR previews
+├── scripts/                 # Utility scripts
+│   ├── package.json        # Script dependencies
+│   └── *.js               # Firebase management scripts
 ├── index.html              # Main app entry point
 ├── manifest.json           # PWA manifest
 ├── service-worker.js       # Service worker
+├── offline.html            # Offline support page
 ├── firebase.json           # Firebase configuration
-├── package.json            # Dependencies
+├── firestore.rules         # Database security rules
+├── firestore-indexes.json  # Database indexes
+├── sync-to-public.sh       # File sync script
+├── deploy-to-firebase.sh   # Deployment script
+├── DEPLOYMENT.md           # Deployment guide
 └── README.md              # This file
 ```
+
+## 🆕 Recent Updates & Improvements
+
+### ✅ Version 1.1.1 - Latest Release
+
+#### 🚀 **Automatic Deployment System**
+- **GitHub Actions** configured for automatic deployment
+- **Firebase Hosting** integration with live site at https://bradley-health.web.app
+- **PR Previews** for testing changes before merging
+- **File Sync Scripts** for seamless deployment management
+
+#### 🔧 **Service Worker & PWA Enhancements**
+- **Fixed caching issues** for local development and production
+- **Offline support** with beautiful offline page
+- **Smart path detection** for development vs production environments
+- **Improved error handling** and graceful degradation
+
+#### 🔥 **Firebase Integration Improvements**
+- **Enhanced error handling** for Firestore connection issues
+- **Better offline/online state management**
+- **Improved authentication flow** with proper error messages
+- **Optimized database queries** and caching
+
+#### 📱 **User Experience Improvements**
+- **Fixed service worker caching** for all static assets
+- **Improved PWA installation** experience
+- **Better error messages** and user feedback
+- **Enhanced offline functionality**
+
+### 📊 **Deployment Status**
+- **✅ Firebase Hosting**: https://bradley-health.web.app (Primary)
+- **✅ GitHub Pages**: https://ronb12.github.io/Bradley-Health/ (Backup)
+- **✅ Local Development**: http://localhost:8000
+- **✅ Automatic Deployment**: Configured and active
 
 ## 🛠️ Technology Stack
 
@@ -169,9 +240,9 @@ bradley-health/
 - **Firebase Hosting**: Static hosting
 
 ### Development Tools
-- **Jest**: Testing framework
-- **ESLint**: Code linting
-- **Prettier**: Code formatting
+- **GitHub Actions**: Automated deployment
+- **Firebase CLI**: Deployment management
+- **Service Worker**: Offline functionality
 - **Git**: Version control
 
 ## 📱 Usage Guide
@@ -271,12 +342,33 @@ npm run test:coverage
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 🚀 Deployment Scripts
+
+### Quick Commands
+
+```bash
+# Deploy to Firebase (recommended)
+./deploy-to-firebase.sh
+
+# Sync files to public directory
+./sync-to-public.sh
+
+# Start local development server
+python3 -m http.server 8000
+```
+
+### GitHub Actions
+
+- **Automatic Deployment**: Push to `main` branch triggers deployment
+- **PR Previews**: Pull requests create preview deployments
+- **Status Monitoring**: Check deployment status in GitHub Actions tab
+
 ## 🆘 Support
 
-- **Documentation**: [Wiki](https://github.com/your-username/bradley-health/wiki)
-- **Issues**: [GitHub Issues](https://github.com/your-username/bradley-health/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/bradley-health/discussions)
-- **Email**: support@bradley-health.com
+- **Live Demo**: https://bradley-health.web.app
+- **GitHub Issues**: [Report Issues](https://github.com/ronb12/Bradley-Health/issues)
+- **Firebase Console**: [Monitor Deployment](https://console.firebase.google.com/project/bradley-health/hosting)
+- **GitHub Actions**: [Deployment Status](https://github.com/ronb12/Bradley-Health/actions)
 
 ## 🙏 Acknowledgments
 
@@ -310,30 +402,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Bradley Health** - Empowering better health through technology.
 
 *Built with ❤️ for better health outcomes*
-
-## 📈 Future Enhancements
-
-- [ ] Push notifications for reminders
-- [ ] Data export functionality
-- [ ] Integration with health devices
-- [ ] Advanced analytics
-- [ ] Family member sharing
-- [ ] Emergency contact integration
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 🆘 Support
-
-If you encounter any issues or have questions, please open an issue on GitHub.
 
 ---
 
