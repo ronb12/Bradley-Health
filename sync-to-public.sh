@@ -24,6 +24,10 @@ cp -f *.html public/ 2>/dev/null || true
 echo "📄 Copying additional JS files..."
 cp -f *.js public/ 2>/dev/null || true
 
+# Copy JSON configuration files
+echo "📄 Copying JSON configuration files..."
+cp -f content.json public/ 2>/dev/null || true
+
 # Ensure proper permissions
 echo "🔐 Setting proper permissions..."
 chmod -R 755 public/
