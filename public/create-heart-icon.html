@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bradley Health - Heart Icon Generator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .icon-preview {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        .icon-size {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        .icon-size h3 {
+            margin: 0 0 1rem 0;
+        }
+        .download-section {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+        .instructions h3 {
+            margin-top: 0;
+        }
+        .instructions ol {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>❤️ Bradley Health - Heart Icon Generator</h1>
+        
+        <div class="instructions">
+            <h3>📱 PWA Installation Instructions</h3>
+            <ol>
+                <li><strong>Desktop (Chrome/Edge):</strong> Look for the install button (⊕) in the address bar</li>
+                <li><strong>Desktop (Firefox):</strong> Click the menu button → "Install"</li>
+                <li><strong>iOS Safari:</strong> Tap the share button → "Add to Home Screen"</li>
+                <li><strong>Android Chrome:</strong> Tap the menu → "Add to Home Screen" or "Install App"</li>
+            </ol>
+        </div>
+        
+        <div class="icon-preview">
+            <div class="icon-size">
+                <h3>72x72</h3>
+                <div id="icon-72"></div>
+            </div>
+            <div class="icon-size">
+                <h3>96x96</h3>
+                <div id="icon-96"></div>
+            </div>
+            <div class="icon-size">
+                <h3>144x144</h3>
+                <div id="icon-144"></div>
+            </div>
+            <div class="icon-size">
+                <h3>192x192</h3>
+                <div id="icon-192"></div>
+            </div>
+            <div class="icon-size">
+                <h3>512x512</h3>
+                <div id="icon-512"></div>
+            </div>
+        </div>
+        
+        <div class="download-section">
+            <button onclick="downloadAllIcons()">📥 Download All Icons</button>
+            <button onclick="updateManifest()">🔄 Update Manifest</button>
+            <button onclick="testPWA()">🧪 Test PWA Installation</button>
+        </div>
+        
+        <div class="instructions">
+            <h3>🔧 How to Use</h3>
+            <ol>
+                <li>Click "Download All Icons" to save all PNG files</li>
+                <li>Replace the existing icon files in the assets/ folder</li>
+                <li>Click "Update Manifest" to update the manifest.json</li>
+                <li>Test the PWA installation on your device</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Create the heart with lifeline SVG
+        function createHeartIcon(size) {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', size);
+            svg.setAttribute('height', size);
+            svg.setAttribute('viewBox', '0 0 100 100');
+            
+            // Background circle
+            const bg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            bg.setAttribute('cx', '50');
+            bg.setAttribute('cy', '50');
+            bg.setAttribute('r', '48');
+            bg.setAttribute('fill', '#ffffff');
+            bg.setAttribute('stroke', '#e5e7eb');
+            bg.setAttribute('stroke-width', '2');
+            svg.appendChild(bg);
+            
+            // Heart shape
+            const heart = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            heart.setAttribute('d', 'M50,85 C50,85 20,60 20,40 C20,25 30,15 45,15 C50,15 50,20 50,20 C50,20 50,15 55,15 C70,15 80,25 80,40 C80,60 50,85 50,85 Z');
+            heart.setAttribute('fill', '#ef4444');
+            heart.setAttribute('stroke', '#dc2626');
+            heart.setAttribute('stroke-width', '2');
+            svg.appendChild(heart);
+            
+            // Lifeline (ECG line) going through the heart
+            const lifeline = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            lifeline.setAttribute('d', 'M15,50 Q25,35 35,50 Q45,65 55,50 Q65,35 75,50 Q80,55 85,50');
+            lifeline.setAttribute('fill', 'none');
+            lifeline.setAttribute('stroke', '#ffffff');
+            lifeline.setAttribute('stroke-width', '3');
+            lifeline.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(lifeline);
+            
+            // Small ECG spikes
+            const spike1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            spike1.setAttribute('x1', '25');
+            spike1.setAttribute('y1', '45');
+            spike1.setAttribute('x2', '25');
+            spike1.setAttribute('y2', '35');
+            spike1.setAttribute('stroke', '#ffffff');
+            spike1.setAttribute('stroke-width', '2');
+            spike1.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(spike1);
+            
+            const spike2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            spike2.setAttribute('x1', '45');
+            spike2.setAttribute('y1', '35');
+            spike2.setAttribute('x2', '45');
+            spike2.setAttribute('y2', '25');
+            spike2.setAttribute('stroke', '#ffffff');
+            spike2.setAttribute('stroke-width', '2');
+            spike2.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(spike2);
+            
+            const spike3 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            spike3.setAttribute('x1', '65');
+            spike3.setAttribute('y1', '45');
+            spike3.setAttribute('x2', '65');
+            spike3.setAttribute('y2', '35');
+            spike3.setAttribute('stroke', '#ffffff');
+            spike3.setAttribute('stroke-width', '2');
+            spike3.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(spike3);
+            
+            return svg;
+        }
+        
+        // Convert SVG to PNG
+        function svgToPng(svg, size, filename) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const img = new Image();
+            
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, size, size);
+                const pngData = canvas.toDataURL('image/png');
+                
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = pngData;
+                link.click();
+            };
+            
+            img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+        }
+        
+        // Generate all icon sizes
+        function generateIcons() {
+            const sizes = [72, 96, 144, 192, 512];
+            
+            sizes.forEach(size => {
+                const svg = createHeartIcon(100); // Create at 100x100 for scaling
+                const container = document.getElementById(`icon-${size}`);
+                container.innerHTML = '';
+                
+                // Scale the SVG for display
+                svg.setAttribute('width', '64');
+                svg.setAttribute('height', '64');
+                svg.style.borderRadius = '8px';
+                svg.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+                
+                container.appendChild(svg);
+            });
+        }
+        
+        // Download all icons
+        function downloadAllIcons() {
+            const sizes = [72, 96, 144, 192, 512];
+            
+            sizes.forEach((size, index) => {
+                setTimeout(() => {
+                    const svg = createHeartIcon(100);
+                    svgToPng(svg, size, `icon-${size}.png`);
+                }, index * 500); // Stagger downloads
+            });
+            
+            // Also create apple touch icon
+            setTimeout(() => {
+                const svg = createHeartIcon(100);
+                svgToPng(svg, 180, 'apple-touch-icon.png');
+            }, sizes.length * 500);
+        }
+        
+        // Update manifest.json
+        function updateManifest() {
+            const manifest = {
+                "name": "Bradley Health",
+                "short_name": "Bradley Health",
+                "description": "Comprehensive health monitoring app for blood pressure, medications, mood tracking, and wellness goals",
+                "start_url": "./",
+                "display": "standalone",
+                "background_color": "#ffffff",
+                "theme_color": "#ef4444",
+                "orientation": "portrait-primary",
+                "scope": "./",
+                "lang": "en",
+                "categories": ["health", "medical", "lifestyle"],
+                "icons": [
+                    {
+                        "src": "assets/icon-72.png",
+                        "sizes": "72x72",
+                        "type": "image/png",
+                        "purpose": "any"
+                    },
+                    {
+                        "src": "assets/icon-96.png",
+                        "sizes": "96x96",
+                        "type": "image/png",
+                        "purpose": "any"
+                    },
+                    {
+                        "src": "assets/icon-144.png",
+                        "sizes": "144x144",
+                        "type": "image/png",
+                        "purpose": "any"
+                    },
+                    {
+                        "src": "assets/icon-192.png",
+                        "sizes": "192x192",
+                        "type": "image/png",
+                        "purpose": "any maskable"
+                    },
+                    {
+                        "src": "assets/icon-512.png",
+                        "sizes": "512x512",
+                        "type": "image/png",
+                        "purpose": "any maskable"
+                    },
+                    {
+                        "src": "assets/apple-touch-icon.png",
+                        "sizes": "180x180",
+                        "type": "image/png",
+                        "purpose": "any"
+                    }
+                ],
+                "shortcuts": [
+                    {
+                        "name": "Add BP Reading",
+                        "short_name": "BP Reading",
+                        "description": "Quickly add a new blood pressure reading",
+                        "url": "./?tab=blood-pressure",
+                        "icons": [{"src": "assets/icon-96.png", "sizes": "96x96"}]
+                    },
+                    {
+                        "name": "Log Mood",
+                        "short_name": "Mood",
+                        "description": "Quickly log your current mood",
+                        "url": "./?tab=mood",
+                        "icons": [{"src": "assets/icon-96.png", "sizes": "96x96"}]
+                    },
+                    {
+                        "name": "Medications",
+                        "short_name": "Meds",
+                        "description": "View and manage medications",
+                        "url": "./?tab=medications",
+                        "icons": [{"src": "assets/icon-96.png", "sizes": "96x96"}]
+                    }
+                ],
+                "developer": {
+                    "name": "Bradley Virtual Solutions, LLC",
+                    "url": "https://github.com/ronb12/Bradley-Health"
+                },
+                "version": "1.1.1"
+            };
+            
+            const blob = new Blob([JSON.stringify(manifest, null, 2)], {type: 'application/json'});
+            const link = document.createElement('a');
+            link.download = 'manifest.json';
+            link.href = URL.createObjectURL(blob);
+            link.click();
+        }
+        
+        // Test PWA installation
+        function testPWA() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered:', registration);
+                        alert('✅ Service Worker registered! PWA is ready for installation.');
+                    })
+                    .catch(error => {
+                        console.error('Service Worker registration failed:', error);
+                        alert('❌ Service Worker registration failed. Check console for details.');
+                    });
+            } else {
+                alert('❌ Service Worker not supported in this browser.');
+            }
+        }
+        
+        // Generate icons on page load
+        window.addEventListener('load', generateIcons);
+    </script>
+</body>
+</html>
