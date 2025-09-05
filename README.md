@@ -41,6 +41,30 @@ A modern web application for comprehensive health monitoring, including blood pr
 - **Cycle Predictions**: Smart predictions for periods and ovulation
 - **Symptom Tracking**: Comprehensive symptom logging and analysis
 
+### 🦵 Limb Care & Medical Equipment
+- **Limb Assessment**: Comprehensive limb health monitoring and tracking
+- **Prosthetic Care**: Prosthetic device maintenance and care reminders
+- **Pain Tracking**: Detailed pain level monitoring and trend analysis
+- **DME Management**: Durable medical equipment tracking and maintenance
+- **Care Reminders**: Automated reminders for limb care routines
+- **Health Monitoring**: Specialized tracking for mobility-related health
+
+### 🍎 Nutrition & Weight Management
+- **Meal Tracking**: Comprehensive nutrition logging and analysis
+- **Weight Monitoring**: Weight loss progress tracking and goal setting
+- **Cholesterol Tracking**: Cardiovascular health monitoring
+- **Nutritional Insights**: AI-powered nutrition recommendations
+- **Weight Loss Plans**: Personalized meal and exercise plans
+- **Health Metrics**: BMI, body fat, and other health indicators
+
+### 📊 Health Insights & Analytics
+- **Advanced Analytics**: AI-powered health trend analysis
+- **Predictive Insights**: Health risk assessment and recommendations
+- **Data Visualization**: Interactive charts and health reports
+- **Medical Reports**: Comprehensive health summaries for healthcare providers
+- **Health Trends**: Long-term health pattern analysis
+- **Risk Assessment**: Early warning system for health issues
+
 ### 🎯 Goal Setting & Achievement
 - **Health Goals**: Set and track wellness objectives
 - **Progress Monitoring**: Visual progress indicators
@@ -169,11 +193,20 @@ bradley-health/
 │   │   ├── medication-manager.js # Medication management
 │   │   ├── mood-tracker.js  # Mood tracking
 │   │   ├── womens-health.js # Women's health tracking
+│   │   ├── limb-care.js     # Limb care and assessment
+│   │   ├── dme-manager.js   # Durable medical equipment
 │   │   ├── nutrition-tracker.js # Nutrition tracking
 │   │   ├── weight-loss.js   # Weight management
+│   │   ├── health-insights.js # Health analytics and insights
+│   │   ├── profile-manager.js # User profile management
+│   │   ├── goals-manager.js # Goal setting and tracking
 │   │   ├── charts.js        # Data visualization
 │   │   ├── export.js        # Data export
 │   │   ├── notifications.js # Push notifications
+│   │   ├── pwa-update.js    # PWA update management
+│   │   ├── theme-manager.js # Theme and UI management
+│   │   ├── medical-report.js # Medical report generation
+│   │   ├── legal.js         # Legal and compliance
 │   │   └── firebase-config.js # Firebase setup
 │   └── icons/               # App icons and images
 ├── public/                  # Firebase hosting directory
@@ -330,11 +363,30 @@ The app uses the following Firestore collections:
 - `womensHealth_hormonal` - PCOS and thyroid health data
 - `womensHealth_preventive` - Well-woman exams and vaccinations
 
-#### Additional Collections
-- `limbCare` - Limb care assessments
-- `dmeEquipment` - Durable medical equipment tracking
-- `nutritionEntries` - Nutrition and meal tracking
-- `weightEntries` - Weight loss and tracking data
+#### Limb Care & Medical Equipment Collections
+- `limbAssessments` - Limb assessment data
+- `prostheticCare` - Prosthetic care tracking
+- `painTracking` - Pain tracking data
+- `careReminders` - Care-specific reminders
+- `durableMedicalEquipment` - DME tracking
+
+#### Nutrition & Weight Management Collections
+- `meals` - Meal tracking and nutrition data
+- `cholesterolEntries` - Cholesterol monitoring
+- `weightEntries` - Weight tracking data
+- `weightGoals` - Weight loss goals
+- `weightLossPlans` - AI-generated meal/exercise plans
+- `nutritionEntries` - General nutrition tracking
+
+#### Additional Health Collections
+- `physicalActivity` - Exercise tracking
+- `sleepEntries` - Sleep tracking
+- `medicalHistory` - Medical history records
+- `immunizations` - Immunization records
+- `healthMetrics` - Health metrics data
+- `settings` - App settings
+- `reminders` - Reminder notifications
+- `exports` - Data exports
 
 ### Notification Settings
 ```javascript
