@@ -228,6 +228,15 @@ class AuthManager {
     }
   }
 
+  requestNotificationPermission() {
+    if (window.notificationManager) {
+      window.notificationManager.requestPermissionFromUserGesture();
+    } else {
+      console.log('Notification manager not available');
+      this.showToast('Notification system not available', 'error');
+    }
+  }
+
   updateUI(user) {
     const authSection = document.getElementById('authSection');
     const userSection = document.getElementById('userSection');
@@ -240,12 +249,20 @@ class AuthManager {
       if (userInfo) {
         userInfo.innerHTML = `
           <span>Welcome, ${user.displayName || user.email}</span>
+          <button id="notificationBtn" class="btn btn-outline" title="Enable notifications">
+            <i class="fas fa-bell"></i>
+          </button>
           <button id="logoutBtn" class="btn btn-secondary">Logout</button>
         `;
         // Re-attach logout button event
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
           logoutBtn.addEventListener('click', () => this.logout());
+        }
+        // Add notification button event
+        const notificationBtn = document.getElementById('notificationBtn');
+        if (notificationBtn) {
+          notificationBtn.addEventListener('click', () => this.requestNotificationPermission());
         }
       }
       

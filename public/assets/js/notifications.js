@@ -31,7 +31,7 @@ class NotificationManager {
     
     this.checkPermission();
     this.setupEventListeners();
-    this.requestNotificationPermission();
+    // Don't request permission automatically - wait for user gesture
     this.setupMessaging();
   }
 
@@ -55,11 +55,55 @@ class NotificationManager {
         
         if (permission === 'granted') {
           this.setupPushNotifications();
+          console.log('Notification permission granted');
+        } else {
+          console.log('Notification permission denied');
         }
       } catch (error) {
         console.error('Error requesting notification permission:', error);
       }
     }
+  }
+
+  // Method to request permission from user gesture (button click, etc.)
+  requestPermissionFromUserGesture() {
+    if ('Notification' in window) {
+      if (this.permission === 'default') {
+        this.requestNotificationPermission();
+      } else if (this.permission === 'denied') {
+        console.log('Notification permission was denied. Please enable in browser settings.');
+        // Show user instructions to enable notifications
+        this.showNotificationInstructions();
+      } else {
+        console.log('Notification permission already granted');
+      }
+    } else {
+      console.log('Notifications not supported in this browser');
+    }
+  }
+
+  showNotificationInstructions() {
+    // Create a simple instruction modal or alert
+    const instructions = document.createElement('div');
+    instructions.innerHTML = `
+      <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                  background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                  z-index: 10000; max-width: 400px; text-align: center;">
+        <h3>Enable Notifications</h3>
+        <p>To receive health reminders, please enable notifications in your browser:</p>
+        <ol style="text-align: left; margin: 10px 0;">
+          <li>Click the notification icon in your browser's address bar</li>
+          <li>Select "Allow" for notifications</li>
+          <li>Refresh the page</li>
+        </ol>
+        <button onclick="this.parentElement.parentElement.remove()" 
+                style="background: #4f46e5; color: white; border: none; padding: 8px 16px; 
+                       border-radius: 4px; cursor: pointer; margin-top: 10px;">
+          Got it
+        </button>
+      </div>
+    `;
+    document.body.appendChild(instructions);
   }
 
   async setupPushNotifications() {
