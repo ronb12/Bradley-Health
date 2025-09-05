@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dark Mode Test - Bradley Health</title>
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <style>
+    .test-container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 20px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      background-color: var(--bg-secondary);
+    }
+    .test-button {
+      margin: 10px;
+      padding: 10px 20px;
+      background-color: var(--primary-color);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: var(--radius-md);
+      background-color: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+    .success { background-color: var(--success-color); color: var(--white); }
+    .error { background-color: var(--error-color); color: var(--white); }
+    .info { background-color: var(--info-color); color: var(--white); }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1>Bradley Health - Dark Mode & Auth Test</h1>
+    
+    <div class="test-section">
+      <h2>Dark Mode Test</h2>
+      <p>Current theme: <span id="currentTheme">Loading...</span></p>
+      <button class="test-button" onclick="testDarkMode()">Toggle Dark Mode</button>
+      <button class="test-button" onclick="testSystemTheme()">Test System Theme Detection</button>
+      <div id="darkModeStatus" class="status"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Authentication Test</h2>
+      <p>Auth status: <span id="authStatus">Loading...</span></p>
+      <p>User ID: <span id="userId">Loading...</span></p>
+      <button class="test-button" onclick="testAuth()">Test Authentication</button>
+      <div id="authTestStatus" class="status"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Theme Manager Test</h2>
+      <p>Theme Manager loaded: <span id="themeManagerStatus">Loading...</span></p>
+      <button class="test-button" onclick="testThemeManager()">Test Theme Manager</button>
+      <div id="themeManagerTestStatus" class="status"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Local Storage Test</h2>
+      <p>Stored theme: <span id="storedTheme">Loading...</span></p>
+      <button class="test-button" onclick="clearThemeStorage()">Clear Theme Storage</button>
+      <div id="storageStatus" class="status"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>CSS Variables Test</h2>
+      <div id="cssVariablesTest">
+        <p>Background: <span id="bgColor">Loading...</span></p>
+        <p>Text Color: <span id="textColor">Loading...</span></p>
+        <p>Border Color: <span id="borderColor">Loading...</span></p>
+      </div>
+      <button class="test-button" onclick="testCSSVariables()">Test CSS Variables</button>
+    </div>
+  </div>
+
+  <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/theme-manager.js"></script>
+  <script src="assets/js/auth.js"></script>
+  
+  <script>
+    // Test functions
+    function updateStatus(elementId, message, type = 'info') {
+      const element = document.getElementById(elementId);
+      element.textContent = message;
+      element.className = `status ${type}`;
+    }
+
+    function testDarkMode() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      if (window.themeManager) {
+        window.themeManager.setTheme(newTheme);
+        updateStatus('darkModeStatus', `Theme switched to: ${newTheme}`, 'success');
+      } else {
+        updateStatus('darkModeStatus', 'Theme manager not available', 'error');
+      }
+      
+      updateDisplay();
+    }
+
+    function testSystemTheme() {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      updateStatus('darkModeStatus', `System prefers: ${prefersDark ? 'dark' : 'light'} mode`, 'info');
+    }
+
+    function testAuth() {
+      if (window.authManager) {
+        const isAuth = window.authManager.isAuthenticated();
+        const user = window.authManager.getCurrentUser();
+        const userId = window.authManager.getUserId();
+        
+        updateStatus('authTestStatus', 
+          `Authenticated: ${isAuth}, User: ${user ? user.email : 'None'}, ID: ${userId || 'None'}`, 
+          isAuth ? 'success' : 'info'
+        );
+      } else {
+        updateStatus('authTestStatus', 'Auth manager not available', 'error');
+      }
+    }
+
+    function testThemeManager() {
+      if (window.themeManager) {
+        const currentTheme = window.themeManager.getCurrentTheme();
+        const isDark = window.themeManager.isDarkMode();
+        updateStatus('themeManagerTestStatus', 
+          `Theme: ${currentTheme}, Dark Mode: ${isDark}`, 'success');
+      } else {
+        updateStatus('themeManagerTestStatus', 'Theme manager not available', 'error');
+      }
+    }
+
+    function clearThemeStorage() {
+      localStorage.removeItem('theme');
+      updateStatus('storageStatus', 'Theme storage cleared', 'info');
+      updateDisplay();
+    }
+
+    function testCSSVariables() {
+      const computedStyle = getComputedStyle(document.documentElement);
+      const bgColor = computedStyle.getPropertyValue('--bg-primary').trim();
+      const textColor = computedStyle.getPropertyValue('--text-primary').trim();
+      const borderColor = computedStyle.getPropertyValue('--border-color').trim();
+      
+      document.getElementById('bgColor').textContent = bgColor;
+      document.getElementById('textColor').textContent = textColor;
+      document.getElementById('borderColor').textContent = borderColor;
+    }
+
+    function updateDisplay() {
+      // Update all display elements
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      document.getElementById('currentTheme').textContent = currentTheme;
+      
+      const storedTheme = localStorage.getItem('theme') || 'none';
+      document.getElementById('storedTheme').textContent = storedTheme;
+      
+      if (window.themeManager) {
+        document.getElementById('themeManagerStatus').textContent = 'Loaded';
+      } else {
+        document.getElementById('themeManagerStatus').textContent = 'Not loaded';
+      }
+      
+      if (window.authManager) {
+        const isAuth = window.authManager.isAuthenticated();
+        document.getElementById('authStatus').textContent = isAuth ? 'Authenticated' : 'Not authenticated';
+        document.getElementById('userId').textContent = window.authManager.getUserId() || 'None';
+      } else {
+        document.getElementById('authStatus').textContent = 'Not available';
+        document.getElementById('userId').textContent = 'None';
+      }
+      
+      testCSSVariables();
+    }
+
+    // Initialize display
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(updateDisplay, 1000); // Wait for managers to initialize
+      
+      // Update display every 2 seconds to catch changes
+      setInterval(updateDisplay, 2000);
+    });
+  </script>
+</body>
+</html> 
