@@ -162,5 +162,6 @@
     "url": "https://github.com/ronb12/Bradley-Health"
   },
   "version": "1.1.1",
-  "minimum_version": "1.0.0"
+  "minimum_version": "1.0.0",
+  "content": "./content.json"
 } 
