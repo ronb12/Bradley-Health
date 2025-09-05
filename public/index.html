@@ -25,6 +25,9 @@
   <link rel="apple-touch-icon-precomposed" href="assets/apple-touch-icon.png?v=1757110177">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=1757110177">
   
+  <!-- Chrome on iOS fallback -->
+  <link rel="icon" type="image/png" sizes="180x180" href="assets/apple-touch-icon.png?v=1757110177">
+  
   <!-- Apple Store Compliance -->
   <meta name="apple-itunes-app" content="app-argument=health-monitoring">
   
@@ -1564,6 +1567,53 @@
   </div>
 
   <!-- Scripts -->
+  <script>
+    // Detect Chrome on iOS and show warning
+    function detectChromeOnIOS() {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isChrome = /CriOS|Chrome/.test(navigator.userAgent);
+      
+      if (isIOS && isChrome) {
+        // Show a subtle notification about using Safari for better PWA support
+        setTimeout(() => {
+          const notification = document.createElement('div');
+          notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(59, 130, 246, 0.95);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            font-size: 14px;
+            text-align: center;
+            max-width: 90%;
+            backdrop-filter: blur(10px);
+          `;
+          notification.innerHTML = `
+            <div>🍎 For best PWA experience on iOS, use Safari instead of Chrome</div>
+            <div style="font-size: 12px; margin-top: 4px; opacity: 0.9;">
+              <a href="ios-chrome-fix.html" style="color: white; text-decoration: underline;">Learn more</a>
+            </div>
+          `;
+          document.body.appendChild(notification);
+          
+          // Auto-hide after 8 seconds
+          setTimeout(() => {
+            if (notification.parentNode) {
+              notification.parentNode.removeChild(notification);
+            }
+          }, 8000);
+        }, 3000);
+      }
+    }
+    
+    // Run detection when page loads
+    window.addEventListener('load', detectChromeOnIOS);
+  </script>
   <script src="assets/js/firebase-config.js"></script>
   <script src="assets/js/theme-manager.js"></script>
   <script src="assets/js/auth.js"></script>
