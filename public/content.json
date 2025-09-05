@@ -2,60 +2,109 @@
   "name": "Bradley Health",
   "short_name": "Bradley Health",
   "description": "Comprehensive health monitoring app for blood pressure, medications, mood tracking, and wellness goals",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#3b82f6",
-  "theme_color": "#3b82f6",
-  "orientation": "portrait-primary",
-  "scope": "./",
-  "lang": "en",
-  "categories": ["health", "medical", "lifestyle"],
+  "version": "1.1.1",
+  "author": "Bradley Virtual Solutions, LLC",
+  "homepage_url": "https://bradley-health.web.app",
+  "repository_url": "https://github.com/ronb12/Bradley-Health",
+  "license": "MIT",
+  "keywords": [
+    "health",
+    "medical",
+    "blood pressure",
+    "medications",
+    "mood tracking",
+    "wellness",
+    "PWA",
+    "progressive web app"
+  ],
+  "categories": [
+    "health",
+    "medical",
+    "lifestyle",
+    "productivity"
+  ],
+  "screenshots": [
+    {
+      "src": "assets/screenshots/dashboard.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Bradley Health Dashboard"
+    },
+    {
+      "src": "assets/screenshots/mobile-dashboard.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile Dashboard View"
+    }
+  ],
   "icons": [
     {
-      "src": "assets/icon-72.png?v=1757110176",
+      "src": "assets/icon-72.png?v=1.1.1",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/icon-96.png?v=1757110176",
+      "src": "assets/icon-96.png?v=1.1.1",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/icon-144.png?v=1757110176",
+      "src": "assets/icon-144.png?v=1.1.1",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/icon-192.png?v=1757110176",
+      "src": "assets/icon-192.png?v=1.1.1",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "assets/icon-512.png?v=1757110176",
+      "src": "assets/icon-512.png?v=1.1.1",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "assets/apple-touch-icon.png?v=1757110176",
+      "src": "assets/apple-touch-icon.png?v=1.1.1",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/favicon.svg?v=1757110176",
+      "src": "assets/favicon.svg?v=1.1.1",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ],
-  "apple-touch-icon": "assets/apple-touch-icon.png?v=1757110176",
-  "apple-touch-icon-sizes": "180x180",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#3b82f6",
+  "background_color": "#3b82f6",
+  "scope": "./",
+  "lang": "en-US",
+  "dir": "ltr",
+  "features": [
+    "Cross Platform",
+    "Offline Support",
+    "Push Notifications",
+    "Health Data Tracking",
+    "Medication Reminders",
+    "Mood Monitoring",
+    "Goal Setting",
+    "Data Export",
+    "Blood Pressure Monitoring",
+    "Nutrition Tracking",
+    "Weight Management",
+    "Limb Care Tracking"
+  ],
   "shortcuts": [
     {
       "name": "Add BP Reading",
@@ -149,21 +198,16 @@
     "service_worker": "service-worker.js",
     "type": "module"
   },
-  "features": [
-    "Cross Platform",
-    "Offline Support",
-    "Push Notifications",
-    "Health Data Tracking",
-    "Medication Reminders",
-    "Mood Monitoring",
-    "Goal Setting",
-    "Data Export"
-  ],
   "developer": {
     "name": "Bradley Virtual Solutions, LLC",
-    "url": "https://github.com/ronb12/Bradley-Health"
+    "url": "https://github.com/ronb12/Bradley-Health",
+    "email": "support@bradleyvirtualsolutions.com"
   },
-  "version": "1.1.1",
   "minimum_version": "1.0.0",
-  "content": "./content.json"
-} 
+  "last_updated": "2025-09-05T21:41:46Z",
+  "build_info": {
+    "build_time": "2025-09-05T21:41:46Z",
+    "git_commit": "0335f5f",
+    "git_branch": "main"
+  }
+}
