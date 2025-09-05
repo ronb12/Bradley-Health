@@ -185,6 +185,10 @@
           <span class="tab-icon">😊</span>
           <span class="tab-text">Mood</span>
         </button>
+        <button class="tab-button" data-tab="womens-health">
+          <span class="tab-icon">👩</span>
+          <span class="tab-text">Women's Health</span>
+        </button>
         <button class="tab-button" data-tab="goals">
           <span class="tab-icon">🎯</span>
           <span class="tab-text">Goals</span>
@@ -499,6 +503,496 @@
           <div class="card mood-chart">
             <h2>Mood Trends</h2>
             <canvas id="moodChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Women's Health Tab -->
+      <section class="tab-content" id="womens-health">
+        <div class="womens-health-container">
+          <!-- Women's Health Overview -->
+          <div class="card womens-health-overview">
+            <h2>Women's Health Overview</h2>
+            <div class="health-metrics">
+              <div class="metric">
+                <span class="metric-icon">🩸</span>
+                <span class="metric-label">Cycle Day</span>
+                <span class="metric-value" id="cycleDay">--</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">📅</span>
+                <span class="metric-label">Next Period</span>
+                <span class="metric-value" id="nextPeriod">--</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">🥚</span>
+                <span class="metric-label">Ovulation</span>
+                <span class="metric-value" id="ovulationDay">--</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">🏥</span>
+                <span class="metric-label">Next Checkup</span>
+                <span class="metric-value" id="nextCheckup">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Menstrual Cycle Tracking -->
+          <div class="card menstrual-tracking">
+            <h2>Menstrual Cycle Tracking</h2>
+            <form id="menstrualForm" class="menstrual-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="cycleDate">Date</label>
+                  <input type="date" id="cycleDate" name="date" autocomplete="off" required>
+                </div>
+                <div class="form-group">
+                  <label for="cycleType">Cycle Event</label>
+                  <select id="cycleType" name="type" required>
+                    <option value="">Select event</option>
+                    <option value="period-start">Period Started</option>
+                    <option value="period-end">Period Ended</option>
+                    <option value="ovulation">Ovulation</option>
+                    <option value="spotting">Spotting</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="flowIntensity">Flow Intensity</label>
+                  <select id="flowIntensity" name="flowIntensity">
+                    <option value="">Select intensity</option>
+                    <option value="light">Light</option>
+                    <option value="normal">Normal</option>
+                    <option value="heavy">Heavy</option>
+                    <option value="very-heavy">Very Heavy</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="cycleSymptoms">Symptoms</label>
+                  <div class="checkbox-group">
+                    <label class="checkbox-label">
+                      <input type="checkbox" name="symptoms" value="cramps">
+                      <span>Cramps</span>
+                    </label>
+                    <label class="checkbox-label">
+                      <input type="checkbox" name="symptoms" value="bloating">
+                      <span>Bloating</span>
+                    </label>
+                    <label class="checkbox-label">
+                      <input type="checkbox" name="symptoms" value="mood-swings">
+                      <span>Mood Swings</span>
+                    </label>
+                    <label class="checkbox-label">
+                      <input type="checkbox" name="symptoms" value="headache">
+                      <span>Headache</span>
+                    </label>
+                    <label class="checkbox-label">
+                      <input type="checkbox" name="symptoms" value="fatigue">
+                      <span>Fatigue</span>
+                    </label>
+                    <label class="checkbox-label">
+                      <input type="checkbox" name="symptoms" value="breast-tenderness">
+                      <span>Breast Tenderness</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="cycleNotes">Notes</label>
+                <textarea id="cycleNotes" name="notes" rows="3" placeholder="Any additional observations about your cycle"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Log Cycle Event</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Cycle Calendar -->
+          <div class="card cycle-calendar">
+            <h2>Cycle Calendar</h2>
+            <div id="cycleCalendar" class="calendar-container">
+              <!-- Calendar will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Reproductive Health -->
+          <div class="card reproductive-health">
+            <h2>Reproductive Health</h2>
+            <div class="reproductive-sections">
+              <!-- Contraception -->
+              <div class="reproductive-section">
+                <h3>Contraception</h3>
+                <form id="contraceptionForm" class="contraception-form">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="contraceptionType">Type</label>
+                      <select id="contraceptionType" name="type" required>
+                        <option value="">Select type</option>
+                        <option value="pill">Birth Control Pill</option>
+                        <option value="iud">IUD</option>
+                        <option value="implant">Implant</option>
+                        <option value="patch">Patch</option>
+                        <option value="ring">Vaginal Ring</option>
+                        <option value="injection">Injection</option>
+                        <option value="condom">Condom</option>
+                        <option value="none">None</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="contraceptionStartDate">Start Date</label>
+                      <input type="date" id="contraceptionStartDate" name="startDate" autocomplete="off">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="contraceptionNotes">Notes</label>
+                    <textarea id="contraceptionNotes" name="notes" rows="2" placeholder="Brand, dosage, side effects, etc."></textarea>
+                  </div>
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Add Contraception</button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Fertility Tracking -->
+              <div class="reproductive-section">
+                <h3>Fertility Tracking</h3>
+                <form id="fertilityForm" class="fertility-form">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="basalTemp">Basal Body Temperature (°F)</label>
+                      <input type="number" id="basalTemp" name="basalTemp" min="95" max="100" step="0.1" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                      <label for="cervicalMucus">Cervical Mucus</label>
+                      <select id="cervicalMucus" name="cervicalMucus">
+                        <option value="">Select consistency</option>
+                        <option value="dry">Dry</option>
+                        <option value="sticky">Sticky</option>
+                        <option value="creamy">Creamy</option>
+                        <option value="watery">Watery</option>
+                        <option value="egg-white">Egg White</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="ovulationTest">Ovulation Test Result</label>
+                    <select id="ovulationTest" name="ovulationTest">
+                      <option value="">Select result</option>
+                      <option value="negative">Negative</option>
+                      <option value="positive">Positive</option>
+                      <option value="not-tested">Not Tested</option>
+                    </select>
+                  </div>
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Log Fertility Data</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Breast Health -->
+          <div class="card breast-health">
+            <h2>Breast Health</h2>
+            <div class="breast-health-sections">
+              <!-- Self-Exam Reminder -->
+              <div class="breast-section">
+                <h3>Self-Exam Reminder</h3>
+                <div class="reminder-info">
+                  <p>Perform breast self-exam monthly, 3-5 days after your period ends.</p>
+                  <div class="reminder-actions">
+                    <button class="btn btn-primary" onclick="setBreastExamReminder()">Set Monthly Reminder</button>
+                    <button class="btn btn-secondary" onclick="markBreastExamDone()">Mark as Done</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mammogram Tracking -->
+              <div class="breast-section">
+                <h3>Mammogram Tracking</h3>
+                <form id="mammogramForm" class="mammogram-form">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="mammogramDate">Date</label>
+                      <input type="date" id="mammogramDate" name="date" autocomplete="off" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="mammogramResult">Result</label>
+                      <select id="mammogramResult" name="result" required>
+                        <option value="">Select result</option>
+                        <option value="normal">Normal</option>
+                        <option value="abnormal">Abnormal</option>
+                        <option value="incomplete">Incomplete</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="mammogramNotes">Notes</label>
+                    <textarea id="mammogramNotes" name="notes" rows="2" placeholder="Any follow-up needed, recommendations, etc."></textarea>
+                  </div>
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Add Mammogram</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gynecological Health -->
+          <div class="card gynecological-health">
+            <h2>Gynecological Health</h2>
+            <div class="gyn-sections">
+              <!-- Pap Smear -->
+              <div class="gyn-section">
+                <h3>Pap Smear & Cervical Cancer Screening</h3>
+                <form id="papSmearForm" class="pap-smear-form">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="papSmearDate">Date</label>
+                      <input type="date" id="papSmearDate" name="date" autocomplete="off" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="papSmearResult">Result</label>
+                      <select id="papSmearResult" name="result" required>
+                        <option value="">Select result</option>
+                        <option value="normal">Normal</option>
+                        <option value="abnormal">Abnormal</option>
+                        <option value="inconclusive">Inconclusive</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="papSmearNotes">Notes</label>
+                    <textarea id="papSmearNotes" name="notes" rows="2" placeholder="Follow-up recommendations, HPV test results, etc."></textarea>
+                  </div>
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Add Pap Smear</button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- STI Testing -->
+              <div class="gyn-section">
+                <h3>STI Testing</h3>
+                <form id="stiTestForm" class="sti-test-form">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="stiTestDate">Date</label>
+                      <input type="date" id="stiTestDate" name="date" autocomplete="off" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="stiTestType">Test Type</label>
+                      <select id="stiTestType" name="testType" required>
+                        <option value="">Select test</option>
+                        <option value="comprehensive">Comprehensive Panel</option>
+                        <option value="hiv">HIV</option>
+                        <option value="chlamydia">Chlamydia</option>
+                        <option value="gonorrhea">Gonorrhea</option>
+                        <option value="syphilis">Syphilis</option>
+                        <option value="hpv">HPV</option>
+                        <option value="herpes">Herpes</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="stiTestResult">Result</label>
+                    <select id="stiTestResult" name="result" required>
+                      <option value="">Select result</option>
+                      <option value="negative">Negative</option>
+                      <option value="positive">Positive</option>
+                      <option value="pending">Pending</option>
+                    </select>
+                  </div>
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Add STI Test</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hormonal Health -->
+          <div class="card hormonal-health">
+            <h2>Hormonal Health</h2>
+            <div class="hormonal-sections">
+              <!-- PCOS Management -->
+              <div class="hormonal-section">
+                <h3>PCOS Management</h3>
+                <form id="pcosForm" class="pcos-form">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="pcosWeight">Weight (lbs)</label>
+                      <input type="number" id="pcosWeight" name="weight" min="100" max="500" step="0.1" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                      <label for="pcosInsulin">Insulin Resistance</label>
+                      <select id="pcosInsulin" name="insulinResistance">
+                        <option value="">Select level</option>
+                        <option value="none">None</option>
+                        <option value="mild">Mild</option>
+                        <option value="moderate">Moderate</option>
+                        <option value="severe">Severe</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="pcosSymptoms">PCOS Symptoms</label>
+                    <div class="checkbox-group">
+                      <label class="checkbox-label">
+                        <input type="checkbox" name="pcosSymptoms" value="irregular-periods">
+                        <span>Irregular Periods</span>
+                      </label>
+                      <label class="checkbox-label">
+                        <input type="checkbox" name="pcosSymptoms" value="excess-hair">
+                        <span>Excess Hair Growth</span>
+                      </label>
+                      <label class="checkbox-label">
+                        <input type="checkbox" name="pcosSymptoms" value="acne">
+                        <span>Acne</span>
+                      </label>
+                      <label class="checkbox-label">
+                        <input type="checkbox" name="pcosSymptoms" value="weight-gain">
+                        <span>Weight Gain</span>
+                      </label>
+                      <label class="checkbox-label">
+                        <input type="checkbox" name="pcosSymptoms" value="hair-loss">
+                        <span>Hair Loss</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Log PCOS Data</button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Thyroid Health -->
+              <div class="hormonal-section">
+                <h3>Thyroid Health</h3>
+                <form id="thyroidForm" class="thyroid-form">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="thyroidTSH">TSH Level</label>
+                      <input type="number" id="thyroidTSH" name="tsh" min="0" max="20" step="0.01" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                      <label for="thyroidT4">T4 Level</label>
+                      <input type="number" id="thyroidT4" name="t4" min="0" max="20" step="0.1" autocomplete="off">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="thyroidSymptoms">Thyroid Symptoms</label>
+                    <div class="checkbox-group">
+                      <label class="checkbox-label">
+                        <input type="checkbox" name="thyroidSymptoms" value="fatigue">
+                        <span>Fatigue</span>
+                      </label>
+                      <label class="checkbox-label">
+                        <input type="checkbox" name="thyroidSymptoms" value="weight-changes">
+                        <span>Weight Changes</span>
+                      </label>
+                      <label class="checkbox-label">
+                        <input type="checkbox" name="thyroidSymptoms" value="mood-changes">
+                        <span>Mood Changes</span>
+                      </label>
+                      <label class="checkbox-label">
+                        <input type="checkbox" name="thyroidSymptoms" value="temperature-sensitivity">
+                        <span>Temperature Sensitivity</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Log Thyroid Data</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preventive Care -->
+          <div class="card preventive-care">
+            <h2>Preventive Care</h2>
+            <div class="preventive-sections">
+              <!-- Annual Checkup -->
+              <div class="preventive-section">
+                <h3>Annual Well-Woman Exam</h3>
+                <form id="wellWomanForm" class="well-woman-form">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="wellWomanDate">Date</label>
+                      <input type="date" id="wellWomanDate" name="date" autocomplete="off" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="wellWomanProvider">Provider</label>
+                      <input type="text" id="wellWomanProvider" name="provider" autocomplete="off" placeholder="Doctor's name">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="wellWomanNotes">Notes</label>
+                    <textarea id="wellWomanNotes" name="notes" rows="3" placeholder="Any findings, recommendations, or follow-up needed"></textarea>
+                  </div>
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Add Checkup</button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Vaccination Tracking -->
+              <div class="preventive-section">
+                <h3>Vaccination Tracking</h3>
+                <form id="vaccinationForm" class="vaccination-form">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="vaccineType">Vaccine Type</label>
+                      <select id="vaccineType" name="type" required>
+                        <option value="">Select vaccine</option>
+                        <option value="hpv">HPV</option>
+                        <option value="flu">Flu</option>
+                        <option value="covid">COVID-19</option>
+                        <option value="tdap">Tdap</option>
+                        <option value="mmr">MMR</option>
+                        <option value="varicella">Varicella</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="vaccineDate">Date</label>
+                      <input type="date" id="vaccineDate" name="date" autocomplete="off" required>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="vaccineNextDue">Next Due Date</label>
+                    <input type="date" id="vaccineNextDue" name="nextDue" autocomplete="off">
+                  </div>
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Add Vaccination</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Women's Health History -->
+          <div class="card womens-health-history">
+            <h2>Health History</h2>
+            <div id="womensHealthHistoryList" class="history-list">
+              <!-- History will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Hormonal Mood Tracking (Links to existing mood tab) -->
+          <div class="card hormonal-mood">
+            <h2>Hormonal Mood Tracking</h2>
+            <div class="hormonal-mood-info">
+              <p>Track mood changes related to your menstrual cycle and hormonal fluctuations.</p>
+              <div class="mood-link-actions">
+                <button class="btn btn-primary" onclick="switchToTab('mood')">
+                  <span class="btn-icon">😊</span>
+                  Go to Mood Tracking
+                </button>
+                <p class="mood-link-note">Your mood data will be correlated with your cycle data for better insights.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1639,6 +2133,7 @@
   <script src="assets/js/pull-to-refresh.js"></script>
   <script src="assets/js/nutrition-tracker.js"></script>
   <script src="assets/js/weight-loss.js"></script>
+  <script src="assets/js/womens-health.js"></script>
   <script>
     // Register Service Worker
     if ('serviceWorker' in navigator) {

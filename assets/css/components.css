@@ -26,6 +26,398 @@ legend {
   font-size: 14px;
 }
 
+/* ===== WOMEN'S HEALTH STYLES ===== */
+.womens-health-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.womens-health-overview .health-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.womens-health-overview .metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.womens-health-overview .metric-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.womens-health-overview .metric-label {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 5px;
+}
+
+.womens-health-overview .metric-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Menstrual Cycle Tracking */
+.menstrual-form .checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.checkbox-label:hover {
+  background: #e2e8f0;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin: 0;
+}
+
+/* Cycle Calendar */
+.calendar-container {
+  margin-top: 20px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.calendar-header {
+  text-align: center;
+  font-weight: 600;
+  color: #475569;
+  padding: 10px 5px;
+  background: #e2e8f0;
+  border-radius: 4px;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.calendar-day:hover {
+  background: #f1f5f9;
+}
+
+.calendar-day.today {
+  background: #dbeafe;
+  border: 2px solid #3b82f6;
+}
+
+.calendar-day.cycle-period-start {
+  background: #fecaca;
+  color: #dc2626;
+}
+
+.calendar-day.cycle-period-end {
+  background: #fed7d7;
+  color: #e53e3e;
+}
+
+.calendar-day.cycle-ovulation {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.calendar-day.cycle-spotting {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+.cycle-indicator {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 0.8rem;
+}
+
+/* Reproductive Health */
+.reproductive-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.reproductive-section {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.reproductive-section h3 {
+  margin-bottom: 15px;
+  color: #1e293b;
+  font-size: 1.1rem;
+}
+
+/* Breast Health */
+.breast-health-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.breast-section {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.breast-section h3 {
+  margin-bottom: 15px;
+  color: #1e293b;
+  font-size: 1.1rem;
+}
+
+.reminder-info {
+  text-align: center;
+}
+
+.reminder-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+/* Gynecological Health */
+.gyn-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.gyn-section {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.gyn-section h3 {
+  margin-bottom: 15px;
+  color: #1e293b;
+  font-size: 1.1rem;
+}
+
+/* Hormonal Health */
+.hormonal-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.hormonal-section {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.hormonal-section h3 {
+  margin-bottom: 15px;
+  color: #1e293b;
+  font-size: 1.1rem;
+}
+
+/* Preventive Care */
+.preventive-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.preventive-section {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.preventive-section h3 {
+  margin-bottom: 15px;
+  color: #1e293b;
+  font-size: 1.1rem;
+}
+
+/* Hormonal Mood Tracking */
+.hormonal-mood {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #f59e0b;
+}
+
+.hormonal-mood-info {
+  text-align: center;
+}
+
+.mood-link-actions {
+  margin-top: 20px;
+}
+
+.mood-link-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+}
+
+.mood-link-note {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* History Display */
+.history-item {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+
+.history-item:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.history-category {
+  font-weight: 600;
+  color: #3b82f6;
+  font-size: 0.9rem;
+}
+
+.history-date {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.history-content {
+  color: #374151;
+}
+
+.cycle-event, .reproductive-event, .breast-event, .gyn-event, .hormonal-event, .preventive-event {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.flow-intensity, .basal-temp, .cervical-mucus, .result, .weight, .tsh, .provider, .next-due {
+  display: inline-block;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.symptoms, .notes {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-top: 5px;
+}
+
+.no-data {
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  padding: 40px 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .womens-health-container {
+    padding: 10px;
+  }
+  
+  .womens-health-overview .health-metrics {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .reproductive-sections,
+  .breast-health-sections,
+  .gyn-sections,
+  .hormonal-sections,
+  .preventive-sections {
+    grid-template-columns: 1fr;
+  }
+  
+  .menstrual-form .checkbox-group {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .calendar-grid {
+    gap: 1px;
+    padding: 5px;
+  }
+  
+  .calendar-day {
+    font-size: 0.8rem;
+  }
+  
+  .reminder-actions {
+    flex-direction: column;
+  }
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
