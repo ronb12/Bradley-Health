@@ -19,10 +19,10 @@ class WomensHealthManager {
 
   async init() {
     try {
-      // Wait for auth to be ready
-      if (window.authManager) {
+      // Wait for Firebase services to be ready
+      if (window.firebaseServices && window.firebaseServices.db && window.authManager) {
         this.userId = window.authManager.getUserId();
-        this.db = window.authManager.getFirestore();
+        this.db = window.firebaseServices.db;
         
         if (this.userId) {
           await this.loadWomensHealthData();
@@ -30,7 +30,7 @@ class WomensHealthManager {
           this.updateOverview();
         }
       } else {
-        // Wait for auth manager to be ready
+        // Wait for Firebase services to be ready
         setTimeout(() => this.init(), 1000);
       }
     } catch (error) {
@@ -87,6 +87,14 @@ class WomensHealthManager {
 
       this.updateHistoryDisplay();
       this.updateCycleCalendar();
+      console.log('Women\'s health data loaded successfully:', {
+        cycleData: this.cycleData.length,
+        reproductiveHealth: this.reproductiveHealth.length,
+        breastHealth: this.breastHealth.length,
+        gynecologicalHealth: this.gynecologicalHealth.length,
+        hormonalHealth: this.hormonalHealth.length,
+        preventiveCare: this.preventiveCare.length
+      });
     } catch (error) {
       console.error('Error loading women\'s health data:', error);
     }
@@ -169,6 +177,7 @@ class WomensHealthManager {
       };
 
       await this.db.collection('womensHealth_cycle').add(data);
+      console.log('Menstrual cycle data saved to Firebase:', data);
       await this.loadWomensHealthData();
       this.showToast('Cycle event logged successfully!', 'success');
       e.target.reset();
