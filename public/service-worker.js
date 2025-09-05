@@ -1,7 +1,7 @@
 // Bradley Health Service Worker
-const CACHE_NAME = 'bradley-health-v1.1.4';
-const STATIC_CACHE = 'bradley-health-static-v1.1.4';
-const DYNAMIC_CACHE = 'bradley-health-dynamic-v1.1.4';
+const CACHE_NAME = 'bradley-health-v1.1.5';
+const STATIC_CACHE = 'bradley-health-static-v1.1.5';
+const DYNAMIC_CACHE = 'bradley-health-dynamic-v1.1.5';
 
 // Files to cache immediately - only include files that actually exist
 // Check if we're in development (localhost) or production (GitHub Pages)

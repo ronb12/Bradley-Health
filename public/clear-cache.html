@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Cache - Bradley Health</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 2rem;
+        }
+        .status {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            text-align: left;
+        }
+        .instructions h3 {
+            margin-top: 0;
+        }
+        .instructions ol {
+            text-align: left;
+        }
+        button {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #dc2626;
+        }
+        .icon-test {
+            margin: 2rem 0;
+        }
+        .icon-test img {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            margin: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Clear Cache - Bradley Health</h1>
+        
+        <div class="status">
+            <h3>✅ Cache Clearing Instructions</h3>
+            <p>Follow these steps to see the new heart icons:</p>
+        </div>
+        
+        <div class="instructions">
+            <h3>🖥️ Desktop Browsers:</h3>
+            <ol>
+                <li><strong>Chrome/Edge:</strong> Press Ctrl+Shift+R (Windows) or Cmd+Shift+R (Mac)</li>
+                <li><strong>Firefox:</strong> Press Ctrl+F5 (Windows) or Cmd+Shift+R (Mac)</li>
+                <li><strong>Safari:</strong> Press Cmd+Option+R (Mac)</li>
+                <li><strong>Alternative:</strong> Open Developer Tools (F12) → Right-click refresh button → "Empty Cache and Hard Reload"</li>
+            </ol>
+            
+            <h3>📱 Mobile Browsers:</h3>
+            <ol>
+                <li><strong>Chrome:</strong> Settings → Privacy and Security → Clear browsing data → Cached images and files</li>
+                <li><strong>Safari:</strong> Settings → Safari → Clear History and Website Data</li>
+                <li><strong>Alternative:</strong> Close and reopen the browser app completely</li>
+            </ol>
+        </div>
+        
+        <div class="icon-test">
+            <h3>🧪 Test New Icons:</h3>
+            <img src="assets/icon-192.png?v=1.1.1" alt="192x192" onerror="this.style.display='none'">
+            <img src="assets/icon-512.png?v=1.1.1" alt="512x512" onerror="this.style.display='none'">
+            <img src="assets/apple-touch-icon.png?v=1.1.1" alt="180x180" onerror="this.style.display='none'">
+            <img src="assets/favicon.svg?v=1.1.1" alt="favicon" onerror="this.style.display='none'">
+        </div>
+        
+        <div>
+            <button onclick="clearAllCaches()">🗑️ Clear All Caches</button>
+            <button onclick="window.location.href='/'">🏠 Back to App</button>
+            <button onclick="window.location.reload()">🔄 Refresh Page</button>
+        </div>
+        
+        <div class="status" style="margin-top: 2rem;">
+            <h3>💡 Pro Tip:</h3>
+            <p>If you still see "W" icons, try opening the app in an incognito/private window to bypass all caches!</p>
+        </div>
+    </div>
+
+    <script>
+        async function clearAllCaches() {
+            try {
+                // Clear service worker cache
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(
+                        cacheNames.map(cacheName => caches.delete(cacheName))
+                    );
+                    console.log('✅ All caches cleared');
+                }
+                
+                // Clear localStorage and sessionStorage
+                localStorage.clear();
+                sessionStorage.clear();
+                console.log('✅ Storage cleared');
+                
+                // Unregister service worker
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(
+                        registrations.map(registration => registration.unregister())
+                    );
+                    console.log('✅ Service workers unregistered');
+                }
+                
+                alert('✅ All caches cleared! The page will now reload.');
+                window.location.reload();
+                
+            } catch (error) {
+                console.error('❌ Error clearing caches:', error);
+                alert('❌ Error clearing caches. Please try manual cache clearing.');
+            }
+        }
+        
+        // Check if icons are loading
+        window.addEventListener('load', () => {
+            const images = document.querySelectorAll('img');
+            let loadedCount = 0;
+            let totalCount = images.length;
+            
+            images.forEach(img => {
+                img.onload = () => {
+                    loadedCount++;
+                    if (loadedCount === totalCount) {
+                        console.log('✅ All icons loaded successfully!');
+                    }
+                };
+                img.onerror = () => {
+                    console.error('❌ Failed to load icon:', img.src);
+                };
+            });
+        });
+    </script>
+</body>
+</html>
