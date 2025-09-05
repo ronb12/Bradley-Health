@@ -1,7 +1,7 @@
 // Bradley Health Service Worker
-const CACHE_NAME = 'bradley-health-v1.1.5';
-const STATIC_CACHE = 'bradley-health-static-v1.1.5';
-const DYNAMIC_CACHE = 'bradley-health-dynamic-v1.1.5';
+const CACHE_NAME = 'bradley-health-v1.1.6';
+const STATIC_CACHE = 'bradley-health-static-v1.1.6';
+const DYNAMIC_CACHE = 'bradley-health-dynamic-v1.1.6';
 
 // Files to cache immediately - only include files that actually exist
 // Check if we're in development (localhost) or production (GitHub Pages)
@@ -345,6 +345,7 @@ self.addEventListener('message', (event) => {
   console.log('Service Worker: Message received:', event.data);
   
   if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('Service Worker: Skipping waiting and taking control');
     self.skipWaiting();
   }
   
