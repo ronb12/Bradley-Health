@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Correct Icons Test - Bradley Health</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .icon-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        .icon-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+        }
+        .icon-item h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 16px;
+        }
+        .icon-item p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        .status {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .design-specs {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+        .design-specs h3 {
+            margin-top: 0;
+        }
+        .design-specs ul {
+            text-align: left;
+        }
+        .color-preview {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            justify-content: center;
+        }
+        .color-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>❤️ Correct Icons Test - Bradley Health</h1>
+        
+        <div class="status">
+            <h3>✅ Icons Updated with Correct Design!</h3>
+            <p>Red heart, blue background, white ECG lifeline going through the heart</p>
+        </div>
+        
+        <div class="design-specs">
+            <h3>🎨 Design Specifications:</h3>
+            <ul>
+                <li><strong>Background:</strong> Blue (#3b82f6)</li>
+                <li><strong>Heart:</strong> Red (#ef4444) with darker red outline (#dc2626)</li>
+                <li><strong>Lifeline:</strong> White ECG line with spikes going through the heart</li>
+                <li><strong>Format:</strong> PNG with RGB (no transparency for iOS compatibility)</li>
+                <li><strong>Sizes:</strong> All standard PWA and iOS sizes</li>
+            </ul>
+            
+            <div class="color-preview">
+                <div class="color-box" style="background: #3b82f6;">Blue</div>
+                <div class="color-box" style="background: #ef4444;">Red</div>
+                <div class="color-box" style="background: #ffffff; color: #000;">White</div>
+            </div>
+        </div>
+        
+        <div class="icon-grid">
+            <div class="icon-item">
+                <img src="assets/icon-72.png?v=1.1.1" alt="72x72" onerror="this.style.display='none'">
+                <h3>72x72</h3>
+                <p>Small Android</p>
+            </div>
+            <div class="icon-item">
+                <img src="assets/icon-96.png?v=1.1.1" alt="96x96" onerror="this.style.display='none'">
+                <h3>96x96</h3>
+                <p>Medium Android</p>
+            </div>
+            <div class="icon-item">
+                <img src="assets/icon-144.png?v=1.1.1" alt="144x144" onerror="this.style.display='none'">
+                <h3>144x144</h3>
+                <p>Large Android</p>
+            </div>
+            <div class="icon-item">
+                <img src="assets/icon-192.png?v=1.1.1" alt="192x192" onerror="this.style.display='none'">
+                <h3>192x192</h3>
+                <p>Standard PWA</p>
+            </div>
+            <div class="icon-item">
+                <img src="assets/icon-512.png?v=1.1.1" alt="512x512" onerror="this.style.display='none'">
+                <h3>512x512</h3>
+                <p>High-res PWA</p>
+            </div>
+            <div class="icon-item">
+                <img src="assets/apple-touch-icon.png?v=1.1.1" alt="180x180" onerror="this.style.display='none'">
+                <h3>180x180</h3>
+                <p>Apple Touch</p>
+            </div>
+            <div class="icon-item">
+                <img src="assets/favicon.ico" alt="favicon" onerror="this.style.display='none'">
+                <h3>Favicon</h3>
+                <p>Browser Tab</p>
+            </div>
+            <div class="icon-item">
+                <img src="assets/favicon.svg?v=1.1.1" alt="favicon svg" onerror="this.style.display='none'">
+                <h3>SVG</h3>
+                <p>Scalable Vector</p>
+            </div>
+        </div>
+        
+        <div class="status">
+            <h3>📱 iPhone Testing Instructions:</h3>
+            <ol style="text-align: left;">
+                <li>Open Safari on your iPhone</li>
+                <li>Visit https://bradley-health.web.app</li>
+                <li>Tap the Share button (square with arrow)</li>
+                <li>Select "Add to Home Screen"</li>
+                <li>Check that the icon shows: <strong>Blue background, red heart, white lifeline</strong></li>
+            </ol>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <button onclick="window.location.href='/'">🏠 Back to Main App</button>
+            <button onclick="window.location.reload()">🔄 Refresh Icons</button>
+        </div>
+    </div>
+
+    <script>
+        // Check if icons are loading properly
+        window.addEventListener('load', () => {
+            const images = document.querySelectorAll('img');
+            let loadedCount = 0;
+            let totalCount = images.length;
+            
+            images.forEach(img => {
+                img.onload = () => {
+                    loadedCount++;
+                    if (loadedCount === totalCount) {
+                        console.log('✅ All correct icons loaded successfully!');
+                    }
+                };
+                img.onerror = () => {
+                    console.error('❌ Failed to load icon:', img.src);
+                };
+            });
+        });
+    </script>
+</body>
+</html>
