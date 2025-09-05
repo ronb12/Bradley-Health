@@ -54,6 +54,8 @@
       "purpose": "any maskable"
     }
   ],
+  "apple-touch-icon": "assets/apple-touch-icon.png?v=1.1.1",
+  "apple-touch-icon-sizes": "180x180",
   "shortcuts": [
     {
       "name": "Add BP Reading",
