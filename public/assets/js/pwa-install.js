@@ -15,7 +15,7 @@ class PWAInstallManager {
       console.log('PWA: beforeinstallprompt event fired');
       e.preventDefault();
       this.deferredPrompt = e;
-      this.showInstallPrompt();
+      // Don't show immediately - wait for user to be logged in
     });
 
     // Listen for successful installation
@@ -24,6 +24,9 @@ class PWAInstallManager {
       this.hideInstallPrompt();
       this.showToast('Bradley Health has been installed successfully!', 'success');
     });
+
+    // Listen for auth state changes
+    this.setupAuthListener();
 
     // Handle install button click
     if (this.installBtn) {
@@ -52,6 +55,11 @@ class PWAInstallManager {
 
     // Don't show if app is already installed
     if (this.isStandalone()) {
+      return;
+    }
+
+    // Don't show if user is not logged in
+    if (!this.isUserLoggedIn()) {
       return;
     }
 
@@ -131,6 +139,40 @@ class PWAInstallManager {
       window.showToast(message, type);
     } else {
       console.log(`Toast: ${message}`);
+    }
+  }
+
+  // Check if user is logged in
+  isUserLoggedIn() {
+    // Check if auth manager exists and user is logged in
+    if (window.authManager && window.authManager.currentUser) {
+      return true;
+    }
+    
+    // Fallback: check Firebase auth directly
+    if (window.firebaseServices && window.firebaseServices.auth) {
+      return window.firebaseServices.auth.currentUser !== null;
+    }
+    
+    return false;
+  }
+
+  // Setup auth state listener
+  setupAuthListener() {
+    // Listen for auth state changes
+    if (window.firebaseServices && window.firebaseServices.auth) {
+      window.firebaseServices.auth.onAuthStateChanged((user) => {
+        if (user && this.deferredPrompt) {
+          // User just logged in and we have a deferred prompt
+          console.log('PWA: User logged in, showing install prompt');
+          setTimeout(() => {
+            this.showInstallPrompt();
+          }, 2000); // Wait 2 seconds after login
+        } else if (!user) {
+          // User logged out, hide install prompt
+          this.hideInstallPrompt();
+        }
+      });
     }
   }
 
