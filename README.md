@@ -31,6 +31,16 @@ A modern web application for comprehensive health monitoring, including blood pr
 - **Mental Health Insights**: AI-powered mood analysis and recommendations
 - **Activity Correlation**: Link activities to mood changes
 
+### 👩 Women's Health Tracking
+- **Menstrual Cycle Tracking**: Complete cycle monitoring with calendar visualization
+- **Reproductive Health**: Contraception management and fertility tracking
+- **Breast Health**: Self-exam reminders and mammogram tracking
+- **Gynecological Health**: Pap smear and STI testing records
+- **Hormonal Health**: PCOS and thyroid management tools
+- **Preventive Care**: Well-woman exams and vaccination tracking
+- **Cycle Predictions**: Smart predictions for periods and ovulation
+- **Symptom Tracking**: Comprehensive symptom logging and analysis
+
 ### 🎯 Goal Setting & Achievement
 - **Health Goals**: Set and track wellness objectives
 - **Progress Monitoring**: Visual progress indicators
@@ -158,6 +168,7 @@ bradley-health/
 │   │   ├── blood-pressure.js # BP tracking
 │   │   ├── medication-manager.js # Medication management
 │   │   ├── mood-tracker.js  # Mood tracking
+│   │   ├── womens-health.js # Women's health tracking
 │   │   ├── nutrition-tracker.js # Nutrition tracking
 │   │   ├── weight-loss.js   # Weight management
 │   │   ├── charts.js        # Data visualization
@@ -192,7 +203,24 @@ bradley-health/
 
 ## 🆕 Recent Updates & Improvements
 
-### ✅ Version 1.1.1 - Latest Release
+### ✅ Version 1.2.0 - Latest Release
+
+#### 👩 **Women's Health Tab - NEW!**
+- **Comprehensive Women's Health Tracking**: Complete menstrual cycle, reproductive health, and preventive care
+- **Menstrual Cycle Calendar**: Visual calendar with color-coded cycle events and predictions
+- **Reproductive Health Management**: Contraception tracking and fertility monitoring
+- **Breast Health Monitoring**: Self-exam reminders and mammogram tracking
+- **Gynecological Health Records**: Pap smear and STI testing management
+- **Hormonal Health Tools**: PCOS and thyroid health tracking
+- **Preventive Care Tracking**: Well-woman exams and vaccination records
+- **Smart Mood Integration**: Links to existing mood tab for hormonal mood tracking
+- **Privacy-Focused Design**: Secure handling of sensitive health information
+
+#### 🔧 **Accessibility Improvements**
+- **Fixed Label Associations**: Corrected all form label accessibility issues
+- **Enhanced Screen Reader Support**: Improved navigation for assistive technologies
+- **WCAG Compliance**: Full compliance with web accessibility guidelines
+- **Better Form Structure**: Proper fieldset/legend usage for grouped controls
 
 #### 🚀 **Automatic Deployment System**
 - **GitHub Actions** configured for automatic deployment
@@ -211,12 +239,14 @@ bradley-health/
 - **Better offline/online state management**
 - **Improved authentication flow** with proper error messages
 - **Optimized database queries** and caching
+- **Women's Health Collections**: 6 dedicated Firebase collections for comprehensive data storage
 
 #### 📱 **User Experience Improvements**
 - **Fixed service worker caching** for all static assets
 - **Improved PWA installation** experience
 - **Better error messages** and user feedback
 - **Enhanced offline functionality**
+- **Beautiful UI Components**: Modern, responsive design for all new features
 
 ### 📊 **Deployment Status**
 - **✅ Firebase Hosting**: https://bradley-health.web.app (Primary)
@@ -281,6 +311,30 @@ const firebaseConfig = {
   appId: "your-app-id"
 };
 ```
+
+### Firebase Collections
+The app uses the following Firestore collections:
+
+#### Core Health Data
+- `bloodPressure` - Blood pressure readings
+- `medications` - Medication tracking
+- `moodEntries` - Mood and mental health data
+- `goals` - Health goals and objectives
+- `users` - User profiles and settings
+
+#### Women's Health Collections
+- `womensHealth_cycle` - Menstrual cycle tracking
+- `womensHealth_reproductive` - Contraception and fertility data
+- `womensHealth_breast` - Breast health and mammogram records
+- `womensHealth_gynecological` - Pap smear and STI testing
+- `womensHealth_hormonal` - PCOS and thyroid health data
+- `womensHealth_preventive` - Well-woman exams and vaccinations
+
+#### Additional Collections
+- `limbCare` - Limb care assessments
+- `dmeEquipment` - Durable medical equipment tracking
+- `nutritionEntries` - Nutrition and meal tracking
+- `weightEntries` - Weight loss and tracking data
 
 ### Notification Settings
 ```javascript
@@ -379,19 +433,25 @@ python3 -m http.server 8000
 
 ## 📈 Roadmap
 
-### Version 1.1
+### Version 1.3
+- [ ] Advanced women's health analytics
+- [ ] Pregnancy tracking features
+- [ ] Menopause support tools
+- [ ] Advanced cycle predictions with AI
+
+### Version 1.4
 - [ ] Wheelchair movement tracking
 - [ ] Advanced analytics dashboard
 - [ ] Integration with health devices
 - [ ] Family member access
 
-### Version 1.2
+### Version 1.5
 - [ ] AI-powered health insights
 - [ ] Telemedicine integration
 - [ ] Health insurance integration
 - [ ] Multi-language support
 
-### Version 1.3
+### Version 1.6
 - [ ] Wearable device integration
 - [ ] Advanced goal tracking
 - [ ] Social features
