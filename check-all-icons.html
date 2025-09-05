@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check All Icons - Bradley Health</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .icon-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+        .icon-item h3 {
+            margin-top: 0;
+            color: #60a5fa;
+        }
+        .icon-display {
+            width: 100px;
+            height: 100px;
+            margin: 1rem auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #3b82f6;
+            position: relative;
+            overflow: hidden;
+        }
+        .icon-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+        .pwa-prompt-test {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #60a5fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .pwa-prompt-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .pwa-prompt-icon {
+            flex-shrink: 0;
+        }
+        .pwa-prompt-icon img {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            object-fit: contain;
+        }
+        .pwa-prompt-text h3 {
+            margin: 0 0 0.5rem 0;
+            color: white;
+        }
+        .pwa-prompt-text p {
+            margin: 0;
+            color: #e5e7eb;
+        }
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .error h4 {
+            margin-top: 0;
+            color: #ef4444;
+        }
+        .success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .success h4 {
+            margin-top: 0;
+            color: #22c55e;
+        }
+        .icon-size-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .icon-size {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        .icon-size img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+        .status.loaded {
+            background: #22c55e;
+            color: white;
+        }
+        .status.failed {
+            background: #ef4444;
+            color: white;
+        }
+        .status.loading {
+            background: #f59e0b;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Check All Icons Status</h1>
+        
+        <div class="section">
+            <h2>📱 PWA Install Prompt Icon</h2>
+            <div class="pwa-prompt-test">
+                <div class="pwa-prompt-content">
+                    <div class="pwa-prompt-icon">
+                        <img src="assets/apple-touch-icon.png?v=1757110176" alt="Bradley Health App Icon" 
+                             onload="this.nextElementSibling.textContent='✅ Loaded'; this.nextElementSibling.className='status loaded';"
+                             onerror="this.style.display='none'; this.nextElementSibling.textContent='❌ Failed'; this.nextElementSibling.className='status failed';">
+                        <span class="status loading">Loading...</span>
+                    </div>
+                    <div class="pwa-prompt-text">
+                        <h3>Install Bradley Health</h3>
+                        <p>Get quick access to your health dashboard on your device</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🌐 Favicon Check</h2>
+            <div class="icon-grid">
+                <div class="icon-item">
+                    <h3>Favicon SVG</h3>
+                    <div class="icon-display">
+                        <img src="assets/favicon.svg?v=1757110176" alt="Favicon SVG" 
+                             onload="this.nextElementSibling.textContent='✅ Loaded'; this.nextElementSibling.className='status loaded';"
+                             onerror="this.style.display='none'; this.nextElementSibling.textContent='❌ Failed'; this.nextElementSibling.className='status failed';">
+                        <span class="status loading">Loading...</span>
+                    </div>
+                    <p>SVG Favicon</p>
+                </div>
+                <div class="icon-item">
+                    <h3>Favicon ICO</h3>
+                    <div class="icon-display">
+                        <img src="assets/favicon.ico?v=1757110176" alt="Favicon ICO" 
+                             onload="this.nextElementSibling.textContent='✅ Loaded'; this.nextElementSibling.className='status loaded';"
+                             onerror="this.style.display='none'; this.nextElementSibling.textContent='❌ Failed'; this.nextElementSibling.className='status failed';">
+                        <span class="status loading">Loading...</span>
+                    </div>
+                    <p>ICO Favicon</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📱 App Icons Check</h2>
+            <div class="icon-size-grid">
+                <div class="icon-size">
+                    <img src="assets/apple-touch-icon.png?v=1757110176" alt="180x180" 
+                         onload="this.nextElementSibling.textContent='✅ Loaded'; this.nextElementSibling.className='status loaded';"
+                         onerror="this.style.display='none'; this.nextElementSibling.textContent='❌ Failed'; this.nextElementSibling.className='status failed';">
+                    <div>180x180</div>
+                    <div>Apple Touch</div>
+                    <span class="status loading">Loading...</span>
+                </div>
+                <div class="icon-size">
+                    <img src="assets/icon-192.png?v=1757110176" alt="192x192" 
+                         onload="this.nextElementSibling.textContent='✅ Loaded'; this.nextElementSibling.className='status loaded';"
+                         onerror="this.style.display='none'; this.nextElementSibling.textContent='❌ Failed'; this.nextElementSibling.className='status failed';">
+                    <div>192x192</div>
+                    <div>Standard PWA</div>
+                    <span class="status loading">Loading...</span>
+                </div>
+                <div class="icon-size">
+                    <img src="assets/icon-512.png?v=1757110176" alt="512x512" 
+                         onload="this.nextElementSibling.textContent='✅ Loaded'; this.nextElementSibling.className='status loaded';"
+                         onerror="this.style.display='none'; this.nextElementSibling.textContent='❌ Failed'; this.nextElementSibling.className='status failed';">
+                    <div>512x512</div>
+                    <div>High-res PWA</div>
+                    <span class="status loading">Loading...</span>
+                </div>
+                <div class="icon-size">
+                    <img src="assets/icon-144.png?v=1757110176" alt="144x144" 
+                         onload="this.nextElementSibling.textContent='✅ Loaded'; this.nextElementSibling.className='status loaded';"
+                         onerror="this.style.display='none'; this.nextElementSibling.textContent='❌ Failed'; this.nextElementSibling.className='status failed';">
+                    <div>144x144</div>
+                    <div>Medium PWA</div>
+                    <span class="status loading">Loading...</span>
+                </div>
+                <div class="icon-size">
+                    <img src="assets/icon-72.png?v=1757110176" alt="72x72" 
+                         onload="this.nextElementSibling.textContent='✅ Loaded'; this.nextElementSibling.className='status loaded';"
+                         onerror="this.style.display='none'; this.nextElementSibling.textContent='❌ Failed'; this.nextElementSibling.className='status failed';">
+                    <div>72x72</div>
+                    <div>Small PWA</div>
+                    <span class="status loading">Loading...</span>
+                </div>
+                <div class="icon-size">
+                    <img src="assets/icon-96.png?v=1757110176" alt="96x96" 
+                         onload="this.nextElementSibling.textContent='✅ Loaded'; this.nextElementSibling.className='status loaded';"
+                         onerror="this.style.display='none'; this.nextElementSibling.textContent='❌ Failed'; this.nextElementSibling.className='status failed';">
+                    <div>96x96</div>
+                    <div>Medium PWA</div>
+                    <span class="status loading">Loading...</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔧 Icon Analysis</h2>
+            <div id="iconAnalysis">Analyzing icons...</div>
+        </div>
+        
+        <div class="section">
+            <h2>📋 Expected vs Current</h2>
+            <div class="icon-grid">
+                <div class="icon-item">
+                    <h3>Expected Design</h3>
+                    <div class="icon-display">
+                        <div style="width: 100%; height: 100%; background: #3b82f6; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+                            <div style="color: #ef4444; font-size: 24px;">❤️</div>
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 2px; background: white; border-radius: 1px; box-shadow: -8px -8px 0 0 white, 8px -8px 0 0 white, -4px -4px 0 0 white, 4px -4px 0 0 white;"></div>
+                            <div style="color: white; font-size: 8px; font-weight: bold; margin-top: 5px; text-align: center;">
+                                <div>Bradley</div>
+                                <div>Health</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p>Red heart + blue background + white ECG line + "Bradley Health" text</p>
+                </div>
+                <div class="icon-item">
+                    <h3>Current Icon</h3>
+                    <div class="icon-display">
+                        <img src="assets/apple-touch-icon.png?v=1757110176" alt="Current Icon" 
+                             onload="this.nextElementSibling.textContent='✅ Loaded'; this.nextElementSibling.className='status loaded';"
+                             onerror="this.style.display='none'; this.nextElementSibling.textContent='❌ Failed'; this.nextElementSibling.className='status failed';">
+                        <span class="status loading">Loading...</span>
+                    </div>
+                    <p>What's actually being loaded</p>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <button onclick="window.location.href='/'">🏠 Back to App</button>
+            <button onclick="window.location.href='create-branded-icon.html'">🎨 Generate New Icons</button>
+            <button onclick="window.location.reload()">🔄 Refresh Check</button>
+        </div>
+    </div>
+
+    <script>
+        // Analyze icons
+        function analyzeIcons() {
+            const analysisDiv = document.getElementById('iconAnalysis');
+            const icons = [
+                { name: 'apple-touch-icon.png', url: 'assets/apple-touch-icon.png?v=1757110176' },
+                { name: 'favicon.svg', url: 'assets/favicon.svg?v=1757110176' },
+                { name: 'favicon.ico', url: 'assets/favicon.ico?v=1757110176' },
+                { name: 'icon-192.png', url: 'assets/icon-192.png?v=1757110176' },
+                { name: 'icon-512.png', url: 'assets/icon-512.png?v=1757110176' }
+            ];
+            
+            let loadedCount = 0;
+            let failedCount = 0;
+            
+            icons.forEach(icon => {
+                const img = new Image();
+                img.onload = function() {
+                    loadedCount++;
+                    updateAnalysis();
+                };
+                img.onerror = function() {
+                    failedCount++;
+                    updateAnalysis();
+                };
+                img.src = icon.url;
+            });
+            
+            function updateAnalysis() {
+                if (loadedCount + failedCount === icons.length) {
+                    let html = '<div class="';
+                    if (failedCount === 0) {
+                        html += 'success"><h4>✅ All Icons Loaded Successfully</h4>';
+                    } else if (loadedCount > 0) {
+                        html += 'error"><h4>⚠️ Some Icons Failed to Load</h4>';
+                    } else {
+                        html += 'error"><h4>❌ All Icons Failed to Load</h4>';
+                    }
+                    
+                    html += `<p>Loaded: ${loadedCount}/${icons.length} icons</p>`;
+                    if (failedCount > 0) {
+                        html += '<p>Failed icons may need to be regenerated with the correct design.</p>';
+                    }
+                    html += '</div>';
+                    
+                    analysisDiv.innerHTML = html;
+                }
+            }
+        }
+        
+        // Run analysis when page loads
+        window.addEventListener('load', analyzeIcons);
+    </script>
+</body>
+</html>
