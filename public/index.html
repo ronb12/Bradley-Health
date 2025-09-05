@@ -52,9 +52,9 @@
   <meta name="twitter:description" content="Comprehensive health monitoring app">
   
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="assets/css/components.css">
-  <link rel="stylesheet" href="assets/css/theme.css">
-  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css?v=1757110178">
+  <link rel="stylesheet" href="assets/css/theme.css?v=1757110178">
+  <link rel="stylesheet" href="assets/css/layout.css?v=1757110178">
   
   <!-- Icons -->
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=1757110176">
@@ -119,11 +119,11 @@
       <form id="loginForm" class="auth-form active">
         <div class="form-group">
           <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" name="email" required>
+          <input type="email" id="loginEmail" name="email" autocomplete="email" required>
         </div>
         <div class="form-group">
           <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" name="password" required>
+          <input type="password" id="loginPassword" name="password" autocomplete="current-password" required>
         </div>
         <button type="submit" class="btn btn-primary">Sign In</button>
       </form>
@@ -132,19 +132,19 @@
       <form id="registerForm" class="auth-form">
         <div class="form-group">
           <label for="registerName">Full Name</label>
-          <input type="text" id="registerName" name="name" required>
+          <input type="text" id="registerName" name="name" autocomplete="name" required>
         </div>
         <div class="form-group">
           <label for="registerEmail">Email</label>
-          <input type="email" id="registerEmail" name="email" required>
+          <input type="email" id="registerEmail" name="email" autocomplete="email" required>
         </div>
         <div class="form-group">
           <label for="registerPassword">Password</label>
-          <input type="password" id="registerPassword" name="password" required>
+          <input type="password" id="registerPassword" name="password" autocomplete="new-password" required>
         </div>
         <div class="form-group">
           <label for="confirmPassword">Confirm Password</label>
-          <input type="password" id="confirmPassword" name="confirmPassword" required>
+          <input type="password" id="confirmPassword" name="confirmPassword" autocomplete="new-password" required>
         </div>
         <button type="submit" class="btn btn-primary">Create Account</button>
       </form>
@@ -341,16 +341,16 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="systolic">Systolic</label>
-                  <input type="number" id="systolic" name="systolic" min="70" max="200" required>
+                  <input type="number" id="systolic" name="systolic" min="70" max="200" autocomplete="off" required>
                 </div>
                 <div class="form-group">
                   <label for="diastolic">Diastolic</label>
-                  <input type="number" id="diastolic" name="diastolic" min="40" max="130" required>
+                  <input type="number" id="diastolic" name="diastolic" min="40" max="130" autocomplete="off" required>
                 </div>
               </div>
               <div class="form-group">
                 <label for="pulse">Pulse Rate (Optional)</label>
-                <input type="number" id="pulse" name="pulse" min="40" max="200">
+                <input type="number" id="pulse" name="pulse" min="40" max="200" autocomplete="off">
               </div>
               <div class="form-group">
                 <label for="bpNotes">Notes</label>
@@ -382,11 +382,11 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="medName">Medication Name</label>
-                  <input type="text" id="medName" name="name" required>
+                  <input type="text" id="medName" name="name" autocomplete="off" required>
                 </div>
                 <div class="form-group">
                   <label for="medDosage">Dosage</label>
-                  <input type="text" id="medDosage" name="dosage" required>
+                  <input type="text" id="medDosage" name="dosage" autocomplete="off" required>
                 </div>
               </div>
               <div class="form-row">
@@ -403,7 +403,7 @@
                 </div>
                 <div class="form-group">
                   <label for="medTime">Time of Day</label>
-                  <input type="time" id="medTime" name="timeOfDay">
+                  <input type="time" id="medTime" name="timeOfDay" autocomplete="off">
                 </div>
               </div>
               <div class="form-group">
@@ -512,7 +512,7 @@
             <form id="addGoalForm" class="goal-form">
               <div class="form-group">
                 <label for="goalTitle">Goal Title</label>
-                <input type="text" id="goalTitle" name="title" required>
+                <input type="text" id="goalTitle" name="title" autocomplete="off" required>
               </div>
               <div class="form-group">
                 <label for="goalCategory">Category</label>
@@ -527,11 +527,11 @@
               </div>
               <div class="form-group">
                 <label for="goalTarget">Target</label>
-                <input type="text" id="goalTarget" name="target" required>
+                <input type="text" id="goalTarget" name="target" autocomplete="off" required>
               </div>
               <div class="form-group">
                 <label for="goalDeadline">Deadline</label>
-                <input type="date" id="goalDeadline" name="deadline" required>
+                <input type="date" id="goalDeadline" name="deadline" autocomplete="off" required>
               </div>
               <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Set Goal</button>
@@ -559,11 +559,11 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="assessmentDate">Date</label>
-                  <input type="date" id="assessmentDate" name="date" required>
+                  <input type="date" id="assessmentDate" name="date" autocomplete="off" required>
                 </div>
                 <div class="form-group">
                   <label for="assessmentTime">Time</label>
-                  <input type="time" id="assessmentTime" name="time" required>
+                  <input type="time" id="assessmentTime" name="time" autocomplete="off" required>
                 </div>
               </div>
               
@@ -628,7 +628,7 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="wearTime">Wear Time (hours)</label>
-                  <input type="number" id="wearTime" name="wearTime" min="0" max="24" step="0.5">
+                  <input type="number" id="wearTime" name="wearTime" min="0" max="24" step="0.5" autocomplete="off">
                 </div>
                 <div class="form-group">
                   <label for="cleaningDone">Cleaning Done</label>
@@ -674,7 +674,7 @@
               </div>
               <div class="form-group">
                 <label for="painLocation">Pain Location</label>
-                <input type="text" id="painLocation" name="painLocation" placeholder="e.g., left residual limb, right shoulder">
+                <input type="text" id="painLocation" name="painLocation" placeholder="e.g., left residual limb, right shoulder" autocomplete="off">
               </div>
               <div class="form-group">
                 <label for="painNotes">Pain Notes</label>
@@ -717,7 +717,7 @@
               </div>
               <div class="form-group">
                 <label for="reminderTime">Time</label>
-                <input type="time" id="reminderTime" name="time" required>
+                <input type="time" id="reminderTime" name="time" autocomplete="off" required>
               </div>
               <div class="form-group">
                 <label for="reminderNotes">Notes</label>
@@ -789,7 +789,7 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="quickDmeName">What's it called?</label>
-                  <input type="text" id="quickDmeName" name="name" placeholder="e.g., My wheelchair, Left prosthetic" required>
+                  <input type="text" id="quickDmeName" name="name" placeholder="e.g., My wheelchair, Left prosthetic" autocomplete="off" required>
                 </div>
                 <div class="form-group">
                   <label for="quickDmeType">What type is it?</label>
@@ -817,7 +817,7 @@
                 </div>
                 <div class="form-group">
                   <label for="quickDmeLastService">When was it last serviced?</label>
-                  <input type="date" id="quickDmeLastService" name="lastMaintenance">
+                  <input type="date" id="quickDmeLastService" name="lastMaintenance" autocomplete="off">
                 </div>
               </div>
               <div class="form-group">
@@ -990,16 +990,16 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="mealName">Meal Name</label>
-                  <input type="text" id="mealName" name="mealName" required>
+                  <input type="text" id="mealName" name="mealName" autocomplete="off" required>
                 </div>
                 <div class="form-group">
                   <label for="date">Date</label>
-                  <input type="date" id="date" name="date" required>
+                  <input type="date" id="date" name="date" autocomplete="off" required>
                 </div>
               </div>
               <div class="form-group">
                 <label for="time">Time</label>
-                <input type="time" id="time" name="time" required>
+                <input type="time" id="time" name="time" autocomplete="off" required>
               </div>
               <div class="form-group">
                 <label for="mealType">Meal Type</label>
@@ -1179,11 +1179,11 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="currentWeightInput">Current Weight (lbs)</label>
-                  <input type="number" id="currentWeightInput" name="currentWeight" min="100" max="500" step="0.1" required>
+                  <input type="number" id="currentWeightInput" name="currentWeight" min="100" max="500" step="0.1" autocomplete="off" required>
                 </div>
                 <div class="form-group">
                   <label for="goalWeightInput">Goal Weight (lbs)</label>
-                  <input type="number" id="goalWeightInput" name="goalWeight" min="100" max="500" step="0.1" required>
+                  <input type="number" id="goalWeightInput" name="goalWeight" min="100" max="500" step="0.1" autocomplete="off" required>
                 </div>
               </div>
               <div class="form-row">
@@ -1372,11 +1372,11 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="weightDate">Date</label>
-                  <input type="date" id="weightDate" name="date" required>
+                  <input type="date" id="weightDate" name="date" autocomplete="off" required>
                 </div>
                 <div class="form-group">
                   <label for="weightValue">Weight (lbs)</label>
-                  <input type="number" id="weightValue" name="weight" min="100" max="500" step="0.1" required>
+                  <input type="number" id="weightValue" name="weight" min="100" max="500" step="0.1" autocomplete="off" required>
                 </div>
               </div>
               <div class="form-group">
@@ -1409,27 +1409,27 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="profileName">Full Name</label>
-                  <input type="text" id="profileName" name="name" required>
+                  <input type="text" id="profileName" name="name" autocomplete="name" required>
                 </div>
                 <div class="form-group">
                   <label for="profileAge">Age</label>
-                  <input type="number" id="profileAge" name="age" min="1" max="120">
+                  <input type="number" id="profileAge" name="age" min="1" max="120" autocomplete="off">
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group">
                   <label for="profileWeight">Weight (lbs)</label>
-                  <input type="number" id="profileWeight" name="weight" step="0.1">
+                  <input type="number" id="profileWeight" name="weight" step="0.1" autocomplete="off">
                 </div>
                 <div class="form-group">
                   <label>Height</label>
                   <div class="height-input-group">
                     <div class="height-field">
-                      <input type="number" id="profileHeightFeet" name="heightFeet" min="0" max="8" placeholder="0">
+                      <input type="number" id="profileHeightFeet" name="heightFeet" min="0" max="8" placeholder="0" autocomplete="off">
                       <label for="profileHeightFeet">ft</label>
                     </div>
                     <div class="height-field">
-                      <input type="number" id="profileHeightInches" name="heightInches" min="0" max="11" placeholder="0">
+                      <input type="number" id="profileHeightInches" name="heightInches" min="0" max="11" placeholder="0" autocomplete="off">
                       <label for="profileHeightInches">in</label>
                     </div>
                   </div>
@@ -1455,15 +1455,15 @@
             <form id="emergencyForm" class="emergency-form">
               <div class="form-group">
                 <label for="emergencyName">Contact Name</label>
-                <input type="text" id="emergencyName" name="emergencyName">
+                <input type="text" id="emergencyName" name="emergencyName" autocomplete="name">
               </div>
               <div class="form-group">
                 <label for="emergencyPhone">Phone Number</label>
-                <input type="tel" id="emergencyPhone" name="emergencyPhone">
+                <input type="tel" id="emergencyPhone" name="emergencyPhone" autocomplete="tel">
               </div>
               <div class="form-group">
                 <label for="emergencyRelationship">Relationship</label>
-                <input type="text" id="emergencyRelationship" name="emergencyRelationship">
+                <input type="text" id="emergencyRelationship" name="emergencyRelationship" autocomplete="off">
               </div>
               <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Save Contact</button>
@@ -1830,4 +1830,4 @@
     }
   </script>
 </body>
-</html>                     
+</html> 
