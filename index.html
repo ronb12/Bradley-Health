@@ -187,9 +187,9 @@
 
     <!-- Tab Navigation -->
     <div class="tab-container">
-      <nav class="tab-navigation" id="tabNav">
-        <button class="tab-button active" data-tab="dashboard">
-          <span class="tab-icon">📊</span>
+      <nav class="tab-navigation" id="tabNav" role="tablist" aria-label="Main navigation">
+        <button class="tab-button active" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="dashboard" tabindex="0">
+          <span class="tab-icon" aria-hidden="true">📊</span>
           <span class="tab-text">Dashboard</span>
         </button>
         <button class="tab-button" data-tab="blood-pressure">
@@ -239,7 +239,7 @@
       </nav>
 
       <!-- Dashboard Tab -->
-      <section class="tab-content active" id="dashboard">
+      <section class="tab-content active" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab" aria-hidden="false">
         <div class="dashboard-grid">
           <!-- Health Overview Card -->
           <div class="card health-overview">
@@ -2159,6 +2159,10 @@
   <script src="assets/js/nutrition-tracker.js"></script>
   <script src="assets/js/weight-loss.js"></script>
   <script src="assets/js/womens-health.js"></script>
+  <script src="assets/js/accessibility-enhancer.js"></script>
+  <script src="assets/js/performance-optimizer.js"></script>
+  <script src="assets/js/notification-manager.js"></script>
+  <script src="assets/js/mobile-enhancer.js"></script>
   <script>
     // Register Service Worker
     if ('serviceWorker' in navigator) {
