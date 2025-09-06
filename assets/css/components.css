@@ -487,6 +487,14 @@ body {
   margin-bottom: 10px;
 }
 
+.auth-header .tagline {
+  color: #3b82f6;
+  margin-bottom: 4px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  font-style: italic;
+}
+
 .auth-header p {
   color: #666;
   font-size: 1.1rem;
