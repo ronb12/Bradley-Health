@@ -21,10 +21,10 @@ function createIcon(size, fontSize) {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, size, size);
 
-    // Red Heart with gradient
-    const heartSize = size * 0.4;
+    // Red Heart centered and larger
+    const heartSize = size * 0.6; // Increased size
     const heartX = size / 2;
-    const heartY = size * 0.4;
+    const heartY = size / 2; // Centered vertically
     
     ctx.save();
     ctx.translate(heartX, heartY);
@@ -57,9 +57,9 @@ function createIcon(size, fontSize) {
     
     ctx.restore();
 
-    // Lifeline/Heartbeat with improved design
-    const lineY = size * 0.6;
-    const lineWidth = size * 0.8;
+    // Lifeline/Heartbeat inside the heart
+    const lineY = size / 2 - size * 0.05; // Positioned inside the heart
+    const lineWidth = size * 0.6; // Shorter line to fit inside heart
     const lineX = (size - lineWidth) / 2;
     
     // Reset shadow for line
@@ -67,7 +67,7 @@ function createIcon(size, fontSize) {
     ctx.shadowBlur = 0;
     
     ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = Math.max(3, size / 45);
+    ctx.lineWidth = Math.max(2, size / 60);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     
@@ -79,21 +79,21 @@ function createIcon(size, fontSize) {
     
     ctx.beginPath();
     ctx.moveTo(lineX, lineY);
-    ctx.lineTo(lineX + lineWidth * 0.1, lineY - size * 0.025);
+    ctx.lineTo(lineX + lineWidth * 0.1, lineY - size * 0.02);
     ctx.lineTo(lineX + lineWidth * 0.2, lineY);
-    ctx.lineTo(lineX + lineWidth * 0.3, lineY - size * 0.035);
+    ctx.lineTo(lineX + lineWidth * 0.3, lineY - size * 0.025);
     ctx.lineTo(lineX + lineWidth * 0.4, lineY);
-    ctx.lineTo(lineX + lineWidth * 0.5, lineY - size * 0.015);
+    ctx.lineTo(lineX + lineWidth * 0.5, lineY - size * 0.01);
     ctx.lineTo(lineX + lineWidth * 0.6, lineY);
-    ctx.lineTo(lineX + lineWidth * 0.7, lineY - size * 0.02);
+    ctx.lineTo(lineX + lineWidth * 0.7, lineY - size * 0.015);
     ctx.lineTo(lineX + lineWidth * 0.8, lineY);
-    ctx.lineTo(lineX + lineWidth * 0.9, lineY - size * 0.01);
+    ctx.lineTo(lineX + lineWidth * 0.9, lineY - size * 0.005);
     ctx.lineTo(lineX + lineWidth, lineY);
     ctx.stroke();
     
     // Add small circles at the ends with shadow
     ctx.fillStyle = '#ffffff';
-    const circleRadius = Math.max(2, size / 60);
+    const circleRadius = Math.max(1.5, size / 80);
     
     ctx.beginPath();
     ctx.arc(lineX, lineY, circleRadius, 0, 2 * Math.PI);
@@ -107,9 +107,9 @@ function createIcon(size, fontSize) {
     const dotPositions = [0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85];
     dotPositions.forEach(pos => {
         const dotX = lineX + lineWidth * pos;
-        const dotY = lineY - (pos % 2 === 0 ? size * 0.01 : size * 0.02);
+        const dotY = lineY - (pos % 2 === 0 ? size * 0.005 : size * 0.015);
         ctx.beginPath();
-        ctx.arc(dotX, dotY, Math.max(1, size / 120), 0, 2 * Math.PI);
+        ctx.arc(dotX, dotY, Math.max(0.8, size / 150), 0, 2 * Math.PI);
         ctx.fill();
     });
 
@@ -141,11 +141,11 @@ function createIcon(size, fontSize) {
 
 // Generate all icons
 iconSizes.forEach(icon => {
-    console.log(`Generating improved ${icon.name} (${icon.size}x${icon.size}) with font size ${icon.fontSize}px`);
+    console.log(`Generating centered ${icon.name} (${icon.size}x${icon.size}) with font size ${icon.fontSize}px`);
     const canvas = createIcon(icon.size, icon.fontSize);
     const buffer = canvas.toBuffer('image/png');
     fs.writeFileSync(`assets/${icon.name}`, buffer);
-    console.log(`✅ Created improved ${icon.name}`);
+    console.log(`✅ Created centered ${icon.name}`);
 });
 
-console.log('\n🎉 All improved icons generated successfully!');
+console.log('\n🎉 All centered icons generated successfully!');
