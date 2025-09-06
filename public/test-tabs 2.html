@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tab Navigation Test</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    .tab-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .tab-nav {
+      display: flex;
+      border-bottom: 2px solid #ddd;
+      margin-bottom: 20px;
+    }
+    
+    .tab-nav button {
+      padding: 10px 20px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 16px;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+    
+    .tab-nav button.active {
+      border-bottom-color: #1a56db;
+      color: #1a56db;
+      font-weight: bold;
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 1px solid #ddd;
+      padding: 10px;
+    }
+    
+    .mobile-nav-items {
+      display: flex;
+      justify-content: space-around;
+    }
+    
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: #666;
+      font-size: 12px;
+      padding: 5px;
+    }
+    
+    .mobile-nav-item.active {
+      color: #1a56db;
+    }
+    
+    @media (max-width: 768px) {
+      .tab-nav {
+        display: none;
+      }
+      
+      .mobile-nav {
+        display: block;
+      }
+      
+      body {
+        padding-bottom: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="tab-container">
+    <!-- Desktop Navigation -->
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+      <button class="tab-btn" data-tab="blood-pressure">Blood Pressure</button>
+      <button class="tab-btn" data-tab="medications">Medications</button>
+      <button class="tab-btn" data-tab="insights">Insights</button>
+      <button class="tab-btn" data-tab="profile">Profile</button>
+    </div>
+    
+    <!-- Tab Content -->
+    <div id="dashboard" class="tab-content active">
+      <h2>Dashboard</h2>
+      <p>This is the dashboard tab content. It shows an overview of your health data.</p>
+      <ul>
+        <li>Recent blood pressure readings</li>
+        <li>Medication reminders</li>
+        <li>Health score</li>
+        <li>Quick actions</li>
+      </ul>
+    </div>
+    
+    <div id="blood-pressure" class="tab-content">
+      <h2>Blood Pressure</h2>
+      <p>Track and monitor your blood pressure readings.</p>
+      <form>
+        <div>
+          <label>Systolic: <input type="number" placeholder="120"></label>
+        </div>
+        <div>
+          <label>Diastolic: <input type="number" placeholder="80"></label>
+        </div>
+        <button type="submit">Save Reading</button>
+      </form>
+    </div>
+    
+    <div id="medications" class="tab-content">
+      <h2>Medications</h2>
+      <p>Manage your medications and track adherence.</p>
+      <ul>
+        <li>Lisinopril 10mg - Daily at 8:00 AM</li>
+        <li>Metformin 500mg - Twice daily</li>
+        <li>Aspirin 81mg - Daily at bedtime</li>
+      </ul>
+    </div>
+    
+    <div id="insights" class="tab-content">
+      <h2>Insights</h2>
+      <p>Analytics and trends from your health data.</p>
+      <div>
+        <h3>Health Score: 85</h3>
+        <p>Your health score is good! Keep up the great work.</p>
+      </div>
+    </div>
+    
+    <div id="profile" class="tab-content">
+      <h2>Profile</h2>
+      <p>Manage your account settings and preferences.</p>
+      <div>
+        <label><input type="checkbox"> Dark Mode</label>
+      </div>
+      <div>
+        <label><input type="checkbox" checked> Notifications</label>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Mobile Navigation -->
+  <nav class="mobile-nav">
+    <div class="mobile-nav-items">
+      <a href="#dashboard" class="mobile-nav-item active" data-tab="dashboard">
+        <span>🏠</span>
+        <span>Home</span>
+      </a>
+      <a href="#blood-pressure" class="mobile-nav-item" data-tab="blood-pressure">
+        <span>❤️</span>
+        <span>BP</span>
+      </a>
+      <a href="#medications" class="mobile-nav-item" data-tab="medications">
+        <span>💊</span>
+        <span>Meds</span>
+      </a>
+      <a href="#insights" class="mobile-nav-item" data-tab="insights">
+        <span>📊</span>
+        <span>Insights</span>
+      </a>
+      <a href="#profile" class="mobile-nav-item" data-tab="profile">
+        <span>👤</span>
+        <span>Profile</span>
+      </a>
+    </div>
+  </nav>
+  
+  <script>
+    // Tab Navigation System
+    class TabManager {
+      constructor() {
+        this.currentTab = 'dashboard';
+        this.init();
+      }
+      
+      init() {
+        this.setupTabNavigation();
+        this.setupMobileNavigation();
+        this.handleHashChanges();
+      }
+      
+      setupTabNavigation() {
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        tabButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const tabName = btn.getAttribute('data-tab');
+            this.switchTab(tabName);
+          });
+        });
+      }
+      
+      setupMobileNavigation() {
+        const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+        mobileNavItems.forEach(item => {
+          item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const tabName = item.getAttribute('data-tab');
+            this.switchTab(tabName);
+          });
+        });
+      }
+      
+      handleHashChanges() {
+        window.addEventListener('hashchange', () => {
+          const hash = window.location.hash.slice(1);
+          if (hash) {
+            this.switchTab(hash);
+          }
+        });
+        
+        // Set initial tab from hash
+        const hash = window.location.hash.slice(1);
+        if (hash) {
+          this.switchTab(hash);
+        }
+      }
+      
+      switchTab(tabName) {
+        // Hide all tab contents
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabContents.forEach(content => {
+          content.classList.remove('active');
+        });
+        
+        // Remove active class from all nav buttons
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        tabButtons.forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        // Remove active class from mobile nav items
+        const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+        mobileNavItems.forEach(item => {
+          item.classList.remove('active');
+        });
+        
+        // Show selected tab content
+        const targetContent = document.getElementById(tabName);
+        if (targetContent) {
+          targetContent.classList.add('active');
+        }
+        
+        // Add active class to nav buttons
+        const activeButtons = document.querySelectorAll(`[data-tab="${tabName}"]`);
+        activeButtons.forEach(btn => {
+          btn.classList.add('active');
+        });
+        
+        // Update URL hash
+        window.location.hash = tabName;
+        this.currentTab = tabName;
+        
+        console.log(`Switched to tab: ${tabName}`);
+      }
+    }
+    
+    // Initialize the tab manager
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabManager = new TabManager();
+    });
+  </script>
+</body>
+</html> 

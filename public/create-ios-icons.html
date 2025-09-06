@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS Icon Generator - Bradley Health</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .icon-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .icon-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        .icon-item canvas {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+        }
+        .icon-item h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 16px;
+        }
+        .icon-item p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        .download-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-size: 14px;
+        }
+        .download-btn:hover {
+            background: #dc2626;
+        }
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+        .instructions h3 {
+            margin-top: 0;
+        }
+        .instructions ol {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 iOS Icon Generator - Bradley Health</h1>
+        
+        <div class="instructions">
+            <h3>🍎 iOS Home Screen Icon Requirements:</h3>
+            <ol>
+                <li><strong>Size:</strong> 180x180 pixels (required for iOS)</li>
+                <li><strong>Format:</strong> PNG with no transparency</li>
+                <li><strong>Design:</strong> No rounded corners (iOS adds them automatically)</li>
+                <li><strong>Content:</strong> Should fill most of the canvas</li>
+                <li><strong>Colors:</strong> High contrast for visibility</li>
+            </ol>
+        </div>
+        
+        <div class="icon-preview" id="iconPreview">
+            <!-- Icons will be generated here -->
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <button class="download-btn" onclick="downloadAllIcons()">📥 Download All Icons</button>
+            <button class="download-btn" onclick="window.location.href='/'">🏠 Back to App</button>
+        </div>
+    </div>
+
+    <script>
+        // iOS icon sizes
+        const iosSizes = [
+            { size: 57, name: 'iPhone 3GS' },
+            { size: 60, name: 'iPhone 4' },
+            { size: 72, name: 'iPad' },
+            { size: 76, name: 'iPad 2' },
+            { size: 114, name: 'iPhone 4 Retina' },
+            { size: 120, name: 'iPhone 5' },
+            { size: 144, name: 'iPad Retina' },
+            { size: 152, name: 'iPad Air' },
+            { size: 180, name: 'iPhone 6 Plus' }
+        ];
+
+        function createHeartIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas with white background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Draw red heart
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const heartSize = size * 0.6;
+            
+            ctx.fillStyle = '#ef4444';
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = Math.max(1, size / 50);
+            
+            // Heart shape
+            ctx.beginPath();
+            const topCurveHeight = heartSize * 0.3;
+            ctx.moveTo(centerX, centerY + topCurveHeight);
+            
+            // Left curve
+            ctx.bezierCurveTo(
+                centerX, centerY + topCurveHeight - heartSize * 0.3,
+                centerX - heartSize * 0.5, centerY + topCurveHeight - heartSize * 0.3,
+                centerX - heartSize * 0.5, centerY + topCurveHeight
+            );
+            ctx.bezierCurveTo(
+                centerX - heartSize * 0.5, centerY + topCurveHeight + heartSize * 0.1,
+                centerX - heartSize * 0.25, centerY + topCurveHeight + heartSize * 0.1,
+                centerX, centerY + topCurveHeight + heartSize * 0.3
+            );
+            
+            // Right curve
+            ctx.bezierCurveTo(
+                centerX + heartSize * 0.25, centerY + topCurveHeight + heartSize * 0.1,
+                centerX + heartSize * 0.5, centerY + topCurveHeight + heartSize * 0.1,
+                centerX + heartSize * 0.5, centerY + topCurveHeight
+            );
+            ctx.bezierCurveTo(
+                centerX + heartSize * 0.5, centerY + topCurveHeight - heartSize * 0.3,
+                centerX, centerY + topCurveHeight - heartSize * 0.3,
+                centerX, centerY + topCurveHeight
+            );
+            
+            ctx.fill();
+            ctx.stroke();
+            
+            // Draw ECG line through heart
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = Math.max(2, size / 25);
+            ctx.lineCap = 'round';
+            
+            ctx.beginPath();
+            const lineY = centerY;
+            const lineStart = size * 0.1;
+            const lineEnd = size * 0.9;
+            
+            // Main line
+            ctx.moveTo(lineStart, lineY);
+            ctx.lineTo(lineEnd, lineY);
+            
+            // ECG spikes
+            const spikeHeight = size * 0.08;
+            const spikePositions = [0.2, 0.4, 0.6, 0.8];
+            
+            spikePositions.forEach(pos => {
+                const x = lineStart + (lineEnd - lineStart) * pos;
+                ctx.moveTo(x, lineY);
+                ctx.lineTo(x, lineY - spikeHeight);
+            });
+            
+            ctx.stroke();
+            
+            return canvas;
+        }
+
+        function generateIcons() {
+            const preview = document.getElementById('iconPreview');
+            preview.innerHTML = '';
+            
+            iosSizes.forEach(({ size, name }) => {
+                const canvas = createHeartIcon(size);
+                const iconItem = document.createElement('div');
+                iconItem.className = 'icon-item';
+                
+                iconItem.innerHTML = `
+                    <canvas width="${size}" height="${size}"></canvas>
+                    <h3>${size}x${size}</h3>
+                    <p>${name}</p>
+                    <button class="download-btn" onclick="downloadIcon(${size})">Download</button>
+                `;
+                
+                // Copy the canvas content
+                const newCanvas = iconItem.querySelector('canvas');
+                const newCtx = newCanvas.getContext('2d');
+                newCtx.drawImage(canvas, 0, 0);
+                
+                preview.appendChild(iconItem);
+            });
+        }
+
+        function downloadIcon(size) {
+            const canvas = createHeartIcon(size);
+            const link = document.createElement('a');
+            link.download = `icon-${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function downloadAllIcons() {
+            iosSizes.forEach(({ size }) => {
+                setTimeout(() => downloadIcon(size), size * 10); // Stagger downloads
+            });
+        }
+
+        // Generate icons when page loads
+        window.addEventListener('load', generateIcons);
+    </script>
+</body>
+</html>
