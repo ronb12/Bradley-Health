@@ -73,6 +73,23 @@ class AuthManager {
       logoutBtn.addEventListener('click', () => this.logout());
     }
 
+    // Forgot password link
+    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    if (forgotPasswordLink) {
+      forgotPasswordLink.addEventListener('click', (e) => this.showForgotPasswordForm(e));
+    }
+
+    // Forgot password form
+    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+    if (forgotPasswordForm) {
+      forgotPasswordForm.addEventListener('submit', (e) => this.handleForgotPassword(e));
+    }
+
+    // Back to login button
+    const backToLoginBtn = document.getElementById('backToLogin');
+    if (backToLoginBtn) {
+      backToLoginBtn.addEventListener('click', () => this.showLoginForm());
+    }
 
   }
 
@@ -382,6 +399,81 @@ class AuthManager {
   // Get user ID
   getUserId() {
     return this.currentUser ? this.currentUser.uid : null;
+  }
+
+  // Show forgot password form
+  showForgotPasswordForm(e) {
+    e.preventDefault();
+    
+    // Hide login form and show forgot password form
+    const loginForm = document.getElementById('loginForm');
+    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+    
+    if (loginForm && forgotPasswordForm) {
+      loginForm.classList.remove('active');
+      forgotPasswordForm.classList.add('active');
+      forgotPasswordForm.style.display = 'block';
+    }
+  }
+
+  // Show login form
+  showLoginForm() {
+    const loginForm = document.getElementById('loginForm');
+    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+    
+    if (loginForm && forgotPasswordForm) {
+      forgotPasswordForm.classList.remove('active');
+      forgotPasswordForm.style.display = 'none';
+      loginForm.classList.add('active');
+    }
+  }
+
+  // Handle forgot password
+  async handleForgotPassword(e) {
+    e.preventDefault();
+    
+    if (!this.auth) {
+      this.showMessage('Authentication not available', 'error');
+      return;
+    }
+
+    const formData = new FormData(e.target);
+    const email = formData.get('email');
+
+    if (!email) {
+      this.showMessage('Please enter your email address', 'error');
+      return;
+    }
+
+    try {
+      // Show loading state
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Sending...';
+      submitBtn.disabled = true;
+
+      // Send password reset email
+      await this.auth.sendPasswordResetEmail(email);
+      
+      this.showMessage('Password reset email sent! Check your inbox and follow the instructions to reset your password.', 'success');
+      
+      // Clear the form
+      e.target.reset();
+      
+      // Return to login form after a delay
+      setTimeout(() => {
+        this.showLoginForm();
+      }, 3000);
+
+    } catch (error) {
+      console.error('Password reset error:', error);
+      this.showMessage(this.getErrorMessage(error), 'error');
+    } finally {
+      // Reset button state
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    }
   }
 }
 

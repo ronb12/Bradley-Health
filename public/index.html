@@ -125,6 +125,9 @@
           <label for="loginPassword">Password</label>
           <input type="password" id="loginPassword" name="password" autocomplete="current-password" required>
         </div>
+        <div class="form-group">
+          <a href="#" id="forgotPasswordLink" class="forgot-password-link">Forgot Password?</a>
+        </div>
         <button type="submit" class="btn btn-primary">Sign In</button>
       </form>
       
@@ -147,6 +150,22 @@
           <input type="password" id="confirmPassword" name="confirmPassword" autocomplete="new-password" required>
         </div>
         <button type="submit" class="btn btn-primary">Create Account</button>
+      </form>
+      
+      <!-- Forgot Password Form -->
+      <form id="forgotPasswordForm" class="auth-form" style="display: none;">
+        <div class="form-group">
+          <h3>Reset Password</h3>
+          <p>Enter your email address and we'll send you a link to reset your password.</p>
+        </div>
+        <div class="form-group">
+          <label for="forgotEmail">Email</label>
+          <input type="email" id="forgotEmail" name="email" autocomplete="email" required>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Send Reset Link</button>
+          <button type="button" id="backToLogin" class="btn btn-secondary">Back to Login</button>
+        </div>
       </form>
     </div>
   </div>

@@ -524,6 +524,58 @@ body {
   display: block;
 }
 
+/* ===== FORGOT PASSWORD STYLES ===== */
+.forgot-password-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.forgot-password-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+#forgotPasswordForm h3 {
+  color: #1f2937;
+  margin-bottom: 8px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+#forgotPasswordForm p {
+  color: #6b7280;
+  margin-bottom: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-secondary {
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #4b5563;
+}
+
 /* ===== APP CONTAINER ===== */
 .app-container {
   min-height: 100vh;
