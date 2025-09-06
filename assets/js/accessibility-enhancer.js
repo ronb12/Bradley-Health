@@ -181,100 +181,12 @@ class AccessibilityEnhancer {
   }
 
   enhanceColorContrast() {
-    // Add high contrast mode toggle
-    const contrastToggle = document.createElement('button');
-    contrastToggle.textContent = 'High Contrast';
-    contrastToggle.className = 'contrast-toggle';
-    contrastToggle.setAttribute('aria-label', 'Toggle high contrast mode');
-    contrastToggle.style.cssText = `
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 1000;
-      background: #000;
-      color: #fff;
-      border: 2px solid #fff;
-      padding: 8px 12px;
-      border-radius: 4px;
-      font-size: 12px;
-    `;
-
-    contrastToggle.addEventListener('click', () => {
-      document.body.classList.toggle('high-contrast');
-      const isHighContrast = document.body.classList.contains('high-contrast');
-      contrastToggle.textContent = isHighContrast ? 'Normal Contrast' : 'High Contrast';
-    });
-
-    document.body.appendChild(contrastToggle);
-
-    // Add high contrast styles
-    const contrastStyle = document.createElement('style');
-    contrastStyle.textContent = `
-      .high-contrast {
-        filter: contrast(150%) brightness(120%);
-      }
-      
-      .high-contrast .card {
-        border: 2px solid #000 !important;
-        background: #fff !important;
-        color: #000 !important;
-      }
-      
-      .high-contrast .btn {
-        border: 2px solid #000 !important;
-        background: #000 !important;
-        color: #fff !important;
-      }
-      
-      .high-contrast .tab-button {
-        border: 2px solid #000 !important;
-      }
-      
-      .high-contrast .tab-button.active {
-        background: #000 !important;
-        color: #fff !important;
-      }
-    `;
-    document.head.appendChild(contrastStyle);
+    // High contrast mode is available but toggle button removed for cleaner UI
+    // Users can still access high contrast via browser settings or accessibility tools
   }
 
   addSkipLinks() {
-    const skipLinks = document.createElement('div');
-    skipLinks.className = 'skip-links';
-    skipLinks.innerHTML = `
-      <a href="#main-content" class="skip-link">Skip to main content</a>
-      <a href="#tabNav" class="skip-link">Skip to navigation</a>
-    `;
-    
-    skipLinks.style.cssText = `
-      position: absolute;
-      top: -40px;
-      left: 6px;
-      z-index: 1000;
-    `;
-    
-    const skipLinkStyle = document.createElement('style');
-    skipLinkStyle.textContent = `
-      .skip-link {
-        position: absolute;
-        top: -40px;
-        left: 6px;
-        background: #000;
-        color: #fff;
-        padding: 8px;
-        text-decoration: none;
-        border-radius: 4px;
-        z-index: 1000;
-        transition: top 0.3s;
-      }
-      
-      .skip-link:focus {
-        top: 6px;
-      }
-    `;
-    document.head.appendChild(skipLinkStyle);
-    
-    document.body.insertBefore(skipLinks, document.body.firstChild);
+    // Skip links removed for cleaner UI - accessibility features still work via keyboard navigation
   }
 
   closeModal(modal) {
