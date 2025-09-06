@@ -1,4 +1,5 @@
 // Enhanced Notification Manager for Bradley Health
+if (typeof NotificationManager === 'undefined') {
 class NotificationManager {
   constructor() {
     this.permission = 'default';
@@ -272,3 +273,4 @@ class NotificationManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.notificationManager = new NotificationManager();
 });
+}

@@ -2152,10 +2152,8 @@
   <script src="assets/js/medical-report.js"></script>
   <script src="assets/js/charts.js"></script>
   <script src="assets/js/export.js"></script>
-  <script src="assets/js/notifications.js"></script>
   <script src="assets/js/legal.js"></script>
   <script src="assets/js/pwa-install.js"></script>
-  <script src="assets/js/pwa-update.js"></script>
   <script src="assets/js/pull-to-refresh.js"></script>
   <script src="assets/js/nutrition-tracker.js"></script>
   <script src="assets/js/weight-loss.js"></script>
@@ -2165,6 +2163,9 @@
   <script src="assets/js/notification-manager.js"></script>
   <script src="assets/js/mobile-enhancer.js"></script>
   <script>
+    // Prevent duplicate class declarations
+    window.scriptLoadGuard = window.scriptLoadGuard || {};
+    
     // Register Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {

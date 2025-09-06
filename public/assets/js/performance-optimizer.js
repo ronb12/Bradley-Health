@@ -1,4 +1,5 @@
 // Performance Optimizer for Bradley Health
+if (typeof PerformanceOptimizer === 'undefined') {
 class PerformanceOptimizer {
   constructor() {
     this.init();
@@ -276,3 +277,4 @@ class PerformanceOptimizer {
 document.addEventListener('DOMContentLoaded', () => {
   window.performanceOptimizer = new PerformanceOptimizer();
 });
+}

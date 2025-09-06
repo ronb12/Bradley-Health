@@ -1,4 +1,5 @@
 // Mobile Enhancement for Bradley Health
+if (typeof MobileEnhancer === 'undefined') {
 class MobileEnhancer {
   constructor() {
     this.touchStartY = 0;
@@ -367,3 +368,4 @@ class MobileEnhancer {
 document.addEventListener('DOMContentLoaded', () => {
   window.mobileEnhancer = new MobileEnhancer();
 });
+}

@@ -1,4 +1,5 @@
 // Accessibility Enhancer for Bradley Health
+if (typeof AccessibilityEnhancer === 'undefined') {
 class AccessibilityEnhancer {
   constructor() {
     this.init();
@@ -289,3 +290,4 @@ class AccessibilityEnhancer {
 document.addEventListener('DOMContentLoaded', () => {
   window.accessibilityEnhancer = new AccessibilityEnhancer();
 });
+}
