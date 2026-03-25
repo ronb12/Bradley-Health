@@ -239,8 +239,8 @@ class AuthManager {
     
     try {
       await this.auth.signOut();
-      this.showToast('Logged out successfully', 'success');
-      this.redirectToLogin();
+      // onAuthStateChanged(null) fires automatically and calls updateUI(null)
+      // which hides the app and shows the login form
     } catch (error) {
       this.showToast('Error logging out', 'error');
     }
