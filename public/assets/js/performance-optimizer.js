@@ -14,7 +14,7 @@ class PerformanceOptimizer {
   }
 
   implementLazyLoading() {
-    // Lazy load images
+    // Lazy load images only — JS modules are already loaded by index.html
     const images = document.querySelectorAll('img[data-src]');
     const imageObserver = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {
@@ -29,72 +29,6 @@ class PerformanceOptimizer {
     });
 
     images.forEach(img => imageObserver.observe(img));
-
-    // Lazy load tab content
-    const tabContents = document.querySelectorAll('.tab-content');
-    const contentObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          this.loadTabContent(entry.target);
-          observer.unobserve(entry.target);
-        }
-      });
-    });
-
-    tabContents.forEach(content => contentObserver.observe(content));
-  }
-
-  loadTabContent(tabContent) {
-    const tabId = tabContent.id;
-    
-    // Load JavaScript modules on demand
-    switch(tabId) {
-      case 'blood-pressure':
-        this.loadModule('blood-pressure.js');
-        break;
-      case 'medications':
-        this.loadModule('medication-manager.js');
-        break;
-      case 'mood':
-        this.loadModule('mood-tracker.js');
-        break;
-      case 'womens-health':
-        this.loadModule('womens-health.js');
-        break;
-      case 'goals':
-        this.loadModule('goals-manager.js');
-        break;
-      case 'limb-care':
-        this.loadModule('limb-care.js');
-        break;
-      case 'dme':
-        this.loadModule('dme-manager.js');
-        break;
-      case 'health-insights':
-        this.loadModule('health-insights.js');
-        break;
-      case 'nutrition':
-        this.loadModule('nutrition-tracker.js');
-        break;
-      case 'weight-loss':
-        this.loadModule('weight-loss.js');
-        break;
-      case 'profile':
-        this.loadModule('profile-manager.js');
-        break;
-    }
-  }
-
-  loadModule(moduleName) {
-    if (window[`${moduleName.replace('.js', '')}Loaded`]) return;
-    
-    const script = document.createElement('script');
-    script.src = `assets/js/${moduleName}`;
-    script.async = true;
-    script.onload = () => {
-      window[`${moduleName.replace('.js', '')}Loaded`] = true;
-    };
-    document.head.appendChild(script);
   }
 
   optimizeImages() {
