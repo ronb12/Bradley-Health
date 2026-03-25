@@ -1,4 +1,5 @@
 // Comprehensive Medical Report Generator
+if (typeof MedicalReportGenerator === 'undefined') {
 class MedicalReportGenerator {
   constructor() {
     this.db = firebase.firestore();
@@ -1695,3 +1696,4 @@ class MedicalReportGenerator {
 
 // Initialize Medical Report Generator
 window.medicalReportGenerator = new MedicalReportGenerator(); 
+}

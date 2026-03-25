@@ -1,4 +1,5 @@
 // Data Export System
+if (typeof ExportManager === 'undefined') {
 class ExportManager {
   constructor() {
     this.db = firebase.firestore();
@@ -299,3 +300,4 @@ class ExportManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.exportManager = new ExportManager();
 }); 
+}

@@ -1,4 +1,5 @@
 // Dashboard and Tab Management for Bradley Health
+if (typeof DashboardManager === 'undefined') {
 class DashboardManager {
   constructor() {
     // Wait for Firebase to be ready
@@ -434,3 +435,4 @@ document.addEventListener('DOMContentLoaded', () => {
 window.switchToTab = function(tabName) {
   DashboardManager.switchToTab(tabName);
 }; 
+}

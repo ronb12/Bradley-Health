@@ -373,7 +373,7 @@ select:focus {
   color: var(--primary-color);
 }
 
-.input-icon-wrap input,
+.input-icon-wrap input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
 .input-icon-wrap select {
   padding-left: 2.5rem;
 }

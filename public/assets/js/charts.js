@@ -1,4 +1,5 @@
 // Chart Manager for Bradley Health
+if (typeof ChartManager === 'undefined') {
 class ChartManager {
   constructor() {
     this.charts = new Map();
@@ -1026,3 +1027,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Export for global access
 window.ChartManager = ChartManager; 
+}

@@ -1,4 +1,5 @@
 // Authentication System for Bradley Health
+if (typeof AuthManager === 'undefined') {
 class AuthManager {
   constructor() {
     // Check if Firebase services are available
@@ -489,3 +490,4 @@ class AuthManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.authManager = new AuthManager();
 }); 
+}

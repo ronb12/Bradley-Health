@@ -1,4 +1,5 @@
 // Notification Management System
+if (typeof NotificationManager === 'undefined') {
 class NotificationManager {
   constructor() {
     // Wait for Firebase to be ready
@@ -490,3 +491,4 @@ window.showToast = function(message, type = 'info') {
     console.log(`${type.toUpperCase()}: ${message}`);
   }
 }; 
+}

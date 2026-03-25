@@ -1,4 +1,5 @@
 // Mood Tracking System
+if (typeof MoodTracker === 'undefined') {
 class MoodTracker {
   constructor() {
     // Wait for Firebase to be ready
@@ -744,3 +745,4 @@ class MoodTracker {
 document.addEventListener('DOMContentLoaded', () => {
   window.moodTracker = new MoodTracker();
 }); 
+}

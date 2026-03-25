@@ -1,4 +1,5 @@
 // PWA Update Manager for Bradley Health
+if (typeof PWAUpdateManager === 'undefined') {
 class PWAUpdateManager {
   constructor() {
     this.registration = null;
@@ -310,3 +311,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Export for global access
 window.PWAUpdateManager = PWAUpdateManager;
+}

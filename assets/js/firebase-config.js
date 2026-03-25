@@ -100,27 +100,11 @@ if (auth) {
   });
 }
 
-// Add Firestore connection error handling
+// Enable Firestore network
 if (db) {
-  // Handle Firestore connection errors
   db.enableNetwork().catch(error => {
     console.log('Firestore network enable error (non-critical):', error.message);
   });
-  
-  // Add connection state listener with proper error handling
-  try {
-    const unsubscribe = db.collection('test').onSnapshot(() => {}, (error) => {
-      if (error.code === 'unavailable') {
-        console.log('Firestore temporarily unavailable - will retry automatically');
-      } else if (error.code === 'permission-denied') {
-        console.log('Firestore permission denied - user may need to sign in');
-      } else {
-        console.log('Firestore error (non-critical):', error.message);
-      }
-    });
-  } catch (error) {
-    console.log('Firestore snapshot setup error (non-critical):', error.message);
-  }
 }
 
 // Add network status monitoring

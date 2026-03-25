@@ -1,4 +1,5 @@
 // Medication Management System
+if (typeof MedicationManager === 'undefined') {
 class MedicationManager {
   constructor() {
       this.currentUser = null;
@@ -591,3 +592,4 @@ class MedicationManager {
 
 // Initialize medication manager
   window.medicationManager = new MedicationManager();
+}

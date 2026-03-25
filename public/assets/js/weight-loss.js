@@ -1,4 +1,5 @@
 // AI-Powered Weight Loss System
+if (typeof WeightLossManager === 'undefined') {
 class WeightLossManager {
   constructor() {
     this.db = null;
@@ -3093,3 +3094,4 @@ class WeightLossManager {
 
 // Initialize Weight Loss Manager
 window.weightLossManager = new WeightLossManager();
+}

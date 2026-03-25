@@ -1,4 +1,5 @@
 // Legal and Policy Functions for Bradley Health
+if (typeof LegalManager === 'undefined') {
 class LegalManager {
   constructor() {
     this.init();
@@ -329,3 +330,4 @@ class LegalManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.legalManager = new LegalManager();
 }); 
+}

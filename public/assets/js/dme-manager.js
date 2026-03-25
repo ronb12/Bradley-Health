@@ -1,4 +1,5 @@
 class DMEManager {
+if (typeof DMEManager === 'undefined') {
   constructor() {
     // Wait for Firebase to be ready
     if (window.firebaseServices && window.firebaseServices.db) {
@@ -484,3 +485,4 @@ function contactProvider(type) {
   // In a real app, this would open a contact form or messaging system
   alert(`Contact your provider\n\nType: ${type.charAt(0).toUpperCase() + type.slice(1)}\nMessage: ${message}\n\nThis would open your provider's contact form in a real app.`);
 } 
+}

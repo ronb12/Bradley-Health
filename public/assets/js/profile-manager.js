@@ -1,4 +1,5 @@
 // Profile Management System
+if (typeof ProfileManager === 'undefined') {
 class ProfileManager {
   constructor() {
     // Wait for Firebase to be ready
@@ -337,3 +338,4 @@ class ProfileManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.profileManager = new ProfileManager();
 }); 
+}

@@ -1,4 +1,5 @@
 // Health Insights & AI Recommendations System
+if (typeof HealthInsights === 'undefined') {
 class HealthInsights {
   constructor() {
     // Wait for Firebase to be ready
@@ -1779,3 +1780,4 @@ class HealthInsights {
 
 // Initialize Health Insights
 window.healthInsights = new HealthInsights(); 
+}

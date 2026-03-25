@@ -1,4 +1,5 @@
 // Goals Management System
+if (typeof GoalsManager === 'undefined') {
 class GoalsManager {
   constructor() {
     // Wait for Firebase to be ready
@@ -348,3 +349,4 @@ class GoalsManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.goalsManager = new GoalsManager();
 }); 
+}

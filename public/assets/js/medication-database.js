@@ -1,4 +1,5 @@
 // Medication Database with Auto-Complete
+if (typeof MedicationDatabase === 'undefined') {
 class MedicationDatabase {
   constructor() {
     this.medications = [
@@ -60,3 +61,4 @@ if (document.readyState === 'loading') {
   window.medicationDatabase = new MedicationDatabase();
   console.log('Medication Database: Initialized immediately (DOM already loaded)');
 } 
+}

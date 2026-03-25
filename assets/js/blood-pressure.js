@@ -1,4 +1,5 @@
 // Blood Pressure Management System
+if (typeof BloodPressureManager === 'undefined') {
 class BloodPressureManager {
   constructor() {
     // Wait for Firebase to be ready
@@ -384,3 +385,4 @@ class BloodPressureManager {
 document.addEventListener('DOMContentLoaded', () => {
   window.bpManager = new BloodPressureManager();
 }); 
+}
