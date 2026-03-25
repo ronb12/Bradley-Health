@@ -1,5 +1,6 @@
-class DMEManager {
+// DME Manager for Bradley Health
 if (typeof DMEManager === 'undefined') {
+class DMEManager {
   constructor() {
     // Wait for Firebase to be ready
     if (window.firebaseServices && window.firebaseServices.db) {
