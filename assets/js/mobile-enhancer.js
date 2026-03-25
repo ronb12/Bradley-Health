@@ -9,92 +9,10 @@ class MobileEnhancer {
   }
 
   init() {
-    this.addTouchGestures();
     this.optimizeTouchTargets();
     this.addHapticFeedback();
     this.implementPullToRefresh();
     this.optimizeViewport();
-    this.addSwipeNavigation();
-  }
-
-  addTouchGestures() {
-    // Add touch event listeners for better mobile interaction
-    document.addEventListener('touchstart', (e) => {
-      this.touchStartY = e.touches[0].clientY;
-      this.touchStartX = e.touches[0].clientX;
-      this.isScrolling = false;
-    }, { passive: true });
-
-    document.addEventListener('touchmove', (e) => {
-      if (!this.touchStartY || !this.touchStartX) return;
-      
-      const touchY = e.touches[0].clientY;
-      const touchX = e.touches[0].clientX;
-      const diffY = this.touchStartY - touchY;
-      const diffX = this.touchStartX - touchX;
-      
-      if (Math.abs(diffX) > Math.abs(diffY)) {
-        this.isScrolling = true;
-      }
-    }, { passive: true });
-
-    document.addEventListener('touchend', (e) => {
-      if (!this.touchStartY || !this.touchStartX) return;
-      
-      const touchEndY = e.changedTouches[0].clientY;
-      const touchEndX = e.changedTouches[0].clientX;
-      const diffY = this.touchStartY - touchEndY;
-      const diffX = this.touchStartX - touchEndX;
-      
-      if (!this.isScrolling) {
-        if (Math.abs(diffY) > 50) {
-          if (diffY > 0) {
-            this.handleSwipeUp();
-          } else {
-            this.handleSwipeDown();
-          }
-        }
-        
-        if (Math.abs(diffX) > 50) {
-          if (diffX > 0) {
-            this.handleSwipeLeft();
-          } else {
-            this.handleSwipeRight();
-          }
-        }
-      }
-      
-      this.touchStartY = 0;
-      this.touchStartX = 0;
-    }, { passive: true });
-  }
-
-  handleSwipeUp() {
-    // Navigate to next tab
-    const currentTab = document.querySelector('.tab-button.active');
-    const nextTab = currentTab?.nextElementSibling;
-    if (nextTab && nextTab.classList.contains('tab-button')) {
-      nextTab.click();
-    }
-  }
-
-  handleSwipeDown() {
-    // Navigate to previous tab
-    const currentTab = document.querySelector('.tab-button.active');
-    const prevTab = currentTab?.previousElementSibling;
-    if (prevTab && prevTab.classList.contains('tab-button')) {
-      prevTab.click();
-    }
-  }
-
-  handleSwipeLeft() {
-    // Navigate to next tab
-    this.handleSwipeUp();
-  }
-
-  handleSwipeRight() {
-    // Navigate to previous tab
-    this.handleSwipeDown();
   }
 
   optimizeTouchTargets() {
@@ -220,76 +138,9 @@ class MobileEnhancer {
     if (!document.querySelector('meta[name="viewport"]')) {
       const viewport = document.createElement('meta');
       viewport.name = 'viewport';
-      viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+      viewport.content = 'width=device-width, initial-scale=1.0';
       document.head.appendChild(viewport);
     }
-
-    // Prevent zoom on double tap
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', (e) => {
-      const now = (new Date()).getTime();
-      if (now - lastTouchEnd <= 300) {
-        e.preventDefault();
-      }
-      lastTouchEnd = now;
-    }, false);
-  }
-
-  addSwipeNavigation() {
-    // Add swipe navigation for tab switching
-    const tabContainer = document.querySelector('.tab-container');
-    if (!tabContainer) return;
-
-    let startX = 0;
-    let startY = 0;
-    let isHorizontalSwipe = false;
-
-    tabContainer.addEventListener('touchstart', (e) => {
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-      isHorizontalSwipe = false;
-    }, { passive: true });
-
-    tabContainer.addEventListener('touchmove', (e) => {
-      if (!startX || !startY) return;
-      
-      const currentX = e.touches[0].clientX;
-      const currentY = e.touches[0].clientY;
-      const diffX = Math.abs(currentX - startX);
-      const diffY = Math.abs(currentY - startY);
-      
-      if (diffX > diffY && diffX > 10) {
-        isHorizontalSwipe = true;
-      }
-    }, { passive: true });
-
-    tabContainer.addEventListener('touchend', (e) => {
-      if (!isHorizontalSwipe) return;
-      
-      const endX = e.changedTouches[0].clientX;
-      const diffX = startX - endX;
-      
-      if (Math.abs(diffX) > 50) {
-        const currentTab = document.querySelector('.tab-button.active');
-        if (diffX > 0) {
-          // Swipe left - next tab
-          const nextTab = currentTab?.nextElementSibling;
-          if (nextTab && nextTab.classList.contains('tab-button')) {
-            nextTab.click();
-          }
-        } else {
-          // Swipe right - previous tab
-          const prevTab = currentTab?.previousElementSibling;
-          if (prevTab && prevTab.classList.contains('tab-button')) {
-            prevTab.click();
-          }
-        }
-      }
-      
-      startX = 0;
-      startY = 0;
-      isHorizontalSwipe = false;
-    }, { passive: true });
   }
 
   // Add mobile-specific CSS

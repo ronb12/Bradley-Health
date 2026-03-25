@@ -635,7 +635,7 @@
     white-space: nowrap;
   }
 
-  /* Tab navigation - horizontal scroll */
+  /* Tab navigation - horizontal scroll, compact */
   .tab-navigation {
     overflow-x: auto;
     overflow-y: hidden;
@@ -643,22 +643,42 @@
     justify-content: flex-start;
     padding: 0;
     -webkit-overflow-scrolling: touch;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
   }
 
   .tab-button {
     padding: var(--spacing-2) var(--spacing-3) !important;
     flex-shrink: 0 !important;
-    min-height: 52px !important;
+    min-height: 44px !important;
+    gap: 2px !important;
     white-space: nowrap !important;
   }
 
   .tab-icon {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 
+  /* Hide text on tablet — icon only */
   .tab-text {
-    font-size: 0.65rem !important;
-    white-space: nowrap !important;
+    display: none !important;
+  }
+
+  /* Active indicator: dot below icon instead of full underline */
+  .tab-button.active::after {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    margin: 2px auto 0;
+  }
+
+  .tab-button {
+    border-bottom: none !important;
+    margin-bottom: 0 !important;
+    padding-bottom: var(--spacing-2) !important;
   }
 
   /* Tab content */
@@ -754,18 +774,14 @@
     font-size: var(--font-size-xl);
   }
 
-  /* Tab nav */
+  /* Tab nav - even more compact on small phones */
   .tab-button {
     padding: var(--spacing-2) var(--spacing-2) !important;
-    min-height: 48px !important;
+    min-height: 40px !important;
   }
 
   .tab-icon {
-    font-size: 0.9rem;
-  }
-
-  .tab-text {
-    font-size: 0.6rem !important;
+    font-size: 1rem;
   }
 
   /* Tab content */
