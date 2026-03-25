@@ -830,36 +830,34 @@ body {
 }
 
 .form-group label {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   margin-bottom: 8px;
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-.form-group input,
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  padding: 0.625rem 1rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-lg, 8px);
   font-size: 1rem;
-  transition: border-color 0.3s ease;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgb(79 70 229 / 0.12);
 }
 
-.form-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  margin-top: 20px;
-}
+/* .form-actions is fully defined in theme.css — no override needed */
 
 /* ===== BUTTON STYLES ===== */
 .btn {
@@ -877,25 +875,7 @@ body {
   gap: 8px;
 }
 
-.btn-primary {
-  background: #667eea;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #5a67d8;
-  transform: translateY(-1px);
-}
-
-.btn-secondary {
-  background: #f8f9fa;
-  color: #333;
-  border: 2px solid #e0e0e0;
-}
-
-.btn-secondary:hover {
-  background: #e9ecef;
-}
+/* .btn-primary, .btn-secondary are defined with CSS variables in theme.css */
 
 .btn-danger {
   background: #ef4444;
@@ -925,10 +905,10 @@ body {
 }
 
 .medication-item {
-  background: #f8f9fa;
+  background: var(--bg-secondary);
   border-radius: 10px;
   padding: 20px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid var(--primary-color);
 }
 
 .med-header {
@@ -939,7 +919,7 @@ body {
 }
 
 .med-header h3 {
-  color: #333;
+  color: var(--text-primary);
   font-size: 1.2rem;
 }
 
@@ -954,7 +934,7 @@ body {
 
 .med-details p {
   margin-bottom: 8px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .med-status {

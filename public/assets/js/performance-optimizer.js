@@ -8,7 +8,6 @@ class PerformanceOptimizer {
   init() {
     this.implementLazyLoading();
     this.optimizeImages();
-    this.implementCodeSplitting();
     this.optimizeCharts();
     this.implementVirtualScrolling();
     this.optimizeFirebaseQueries();
