@@ -825,8 +825,8 @@ body {
 
 .form-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 12px;
 }
 
 .form-group label {
@@ -1300,7 +1300,7 @@ input[type="range"]::-moz-range-thumb {
 /* ===== PROFILE STYLES ===== */
 .profile-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
   gap: 20px;
 }
 
@@ -1308,27 +1308,27 @@ input[type="range"]::-moz-range-thumb {
 .emergency-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .setting-group {
-  margin-bottom: 30px;
+  margin-bottom: 24px;
 }
 
 .setting-group h3 {
-  color: #333;
-  font-size: 1.2rem;
-  margin-bottom: 15px;
-  border-bottom: 2px solid #e0e0e0;
-  padding-bottom: 10px;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  border-bottom: 1.5px solid var(--border-color);
+  padding-bottom: 8px;
 }
 
 .setting-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .setting-item:last-child {
@@ -1338,46 +1338,41 @@ input[type="range"]::-moz-range-thumb {
 /* Height Input Group Styles */
 .height-input-group {
   display: flex;
-  gap: 10px;
-  align-items: center;
+  gap: 12px;
+  align-items: flex-end;
 }
 
 .height-field {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 5px;
+  gap: 4px;
+  flex: 1;
 }
 
 .height-field input {
-  width: 60px;
+  width: 100%;
   text-align: center;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 14px;
+  padding: 0.625rem 0.5rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-lg, 8px);
+  font-size: 1rem;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.height-field input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgb(79 70 229 / 0.12);
 }
 
 .height-field label {
-  font-size: 12px;
-  color: #666;
-  font-weight: 500;
-}
-
-/* Responsive height input */
-@media (max-width: 480px) {
-  .height-input-group {
-    gap: 5px;
-  }
-  
-  .height-field input {
-    width: 50px;
-    font-size: 12px;
-  }
-  
-  .height-field label {
-    font-size: 11px;
-  }
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 0;
 }
 
 /* ===== TOAST NOTIFICATIONS ===== */
