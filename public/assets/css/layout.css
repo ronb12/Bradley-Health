@@ -309,6 +309,39 @@
   justify-content: center;
 }
 
+/* ===== COLORED TAB ICONS ===== */
+[data-tab="dashboard"]    .tab-icon { color: #4f46e5; }
+[data-tab="blood-pressure"] .tab-icon { color: #ef4444; }
+[data-tab="medications"]  .tab-icon { color: #10b981; }
+[data-tab="mood"]         .tab-icon { color: #f59e0b; }
+[data-tab="womens-health"] .tab-icon { color: #ec4899; }
+[data-tab="goals"]        .tab-icon { color: #8b5cf6; }
+[data-tab="limb-care"]    .tab-icon { color: #06b6d4; }
+[data-tab="dme"]          .tab-icon { color: #64748b; }
+[data-tab="health-insights"] .tab-icon { color: #3b82f6; }
+[data-tab="nutrition"]    .tab-icon { color: #84cc16; }
+[data-tab="weight-loss"]  .tab-icon { color: #f97316; }
+[data-tab="profile"]      .tab-icon { color: #6366f1; }
+
+/* Active state overrides to primary */
+.tab-button.active .tab-icon { color: var(--primary-color); }
+
+/* ===== MOBILE TAB SCROLL FADE INDICATORS ===== */
+.tab-navigation-wrap {
+  position: relative;
+}
+.tab-navigation-wrap::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 32px;
+  background: linear-gradient(to right, transparent, var(--bg-secondary));
+  pointer-events: none;
+  z-index: 10;
+}
+
 .tab-text {
   font-size: 0.7rem;
   font-weight: 500;

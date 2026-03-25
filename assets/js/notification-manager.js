@@ -91,20 +91,22 @@ class NotificationManager {
   }
 
   scheduleMedicationReminders() {
-    // Get user's medication schedule from Firebase
-    if (window.firebaseServices && window.firebaseServices.db) {
-      window.firebaseServices.db.collection('medications')
-        .where('userId', '==', window.authManager?.getUserId())
-        .get()
-        .then(snapshot => {
-          snapshot.forEach(doc => {
-            const medication = doc.data();
-            if (medication.timeOfDay) {
-              this.scheduleMedicationNotification(medication);
-            }
-          });
+    // Only query Firebase if the user is authenticated
+    const userId = window.authManager?.getUserId();
+    if (!userId || !window.firebaseServices?.db) return;
+
+    window.firebaseServices.db.collection('medications')
+      .where('userId', '==', userId)
+      .get()
+      .then(snapshot => {
+        snapshot.forEach(doc => {
+          const medication = doc.data();
+          if (medication.timeOfDay) {
+            this.scheduleMedicationNotification(medication);
+          }
         });
-    }
+      })
+      .catch(err => console.log('Medication reminders:', err.message));
   }
 
   scheduleMedicationNotification(medication) {
