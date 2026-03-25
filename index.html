@@ -89,6 +89,11 @@
   
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <!-- Pull-to-Refresh Indicator -->
@@ -98,14 +103,26 @@
 
   <!-- Loading Screen -->
   <div id="loading" class="loading-screen" style="display: none;">
-    <div class="loading-spinner"></div>
-    <p id="loadingMessage">Loading...</p>
+    <div class="loading-brand">
+      <div class="loading-logo-icon">
+        <i class="fas fa-heart-pulse"></i>
+      </div>
+      <p class="loading-brand-name">Bradley Health</p>
+      <p class="loading-brand-sub">Comprehensive Health Monitoring</p>
+    </div>
+    <div class="loading-spinner-wrap">
+      <div class="loading-spinner"></div>
+      <p id="loadingMessage">Loading...</p>
+    </div>
   </div>
 
   <!-- Authentication Section -->
   <div id="authSection" class="auth-section">
     <div class="auth-container">
       <div class="auth-header">
+        <div class="auth-logo-icon">
+          <i class="fas fa-heart-pulse"></i>
+        </div>
         <h1>Bradley Health</h1>
         <p class="tagline">Your Health, Our Priority</p>
         <p>Sign in to access your health dashboard</p>
@@ -177,8 +194,13 @@
     <header class="app-header">
       <div class="header-content">
         <div class="header-left">
-          <h1>Bradley Health</h1>
-          <p>Comprehensive Health Monitoring</p>
+          <div class="header-logo-icon">
+            <i class="fas fa-heart-pulse"></i>
+          </div>
+          <div class="header-title-group">
+            <h1>Bradley Health</h1>
+            <p>Comprehensive Health Monitoring</p>
+          </div>
         </div>
         <div id="userInfo" class="user-info">
           <!-- User info will be populated by auth manager -->
@@ -190,51 +212,51 @@
     <div class="tab-container">
       <nav class="tab-navigation" id="tabNav" role="tablist" aria-label="Main navigation">
         <button class="tab-button active" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="dashboard" tabindex="0">
-          <span class="tab-icon" aria-hidden="true">📊</span>
+          <span class="tab-icon" aria-hidden="true"><i class="fas fa-chart-line"></i></span>
           <span class="tab-text">Dashboard</span>
         </button>
         <button class="tab-button" data-tab="blood-pressure">
-          <span class="tab-icon">❤️</span>
+          <span class="tab-icon"><i class="fas fa-heart-pulse"></i></span>
           <span class="tab-text">Blood Pressure</span>
         </button>
         <button class="tab-button" data-tab="medications">
-          <span class="tab-icon">💊</span>
+          <span class="tab-icon"><i class="fas fa-pills"></i></span>
           <span class="tab-text">Medications</span>
         </button>
         <button class="tab-button" data-tab="mood">
-          <span class="tab-icon">😊</span>
+          <span class="tab-icon"><i class="fas fa-face-smile"></i></span>
           <span class="tab-text">Mood</span>
         </button>
         <button class="tab-button" data-tab="womens-health">
-          <span class="tab-icon">👩</span>
+          <span class="tab-icon"><i class="fas fa-venus"></i></span>
           <span class="tab-text">Women's Health</span>
         </button>
         <button class="tab-button" data-tab="goals">
-          <span class="tab-icon">🎯</span>
+          <span class="tab-icon"><i class="fas fa-bullseye"></i></span>
           <span class="tab-text">Goals</span>
         </button>
         <button class="tab-button" data-tab="limb-care">
-          <span class="tab-icon">🦵</span>
+          <span class="tab-icon"><i class="fas fa-person-walking"></i></span>
           <span class="tab-text">Limb Care</span>
         </button>
         <button class="tab-button" data-tab="dme">
-          <span class="tab-icon">🦽</span>
+          <span class="tab-icon"><i class="fas fa-wheelchair"></i></span>
           <span class="tab-text">DME</span>
         </button>
         <button class="tab-button" data-tab="health-insights">
-          <span class="tab-icon">🧠</span>
+          <span class="tab-icon"><i class="fas fa-brain"></i></span>
           <span class="tab-text">Health Insights</span>
         </button>
         <button class="tab-button" data-tab="nutrition">
-          <span class="tab-icon">🥗</span>
+          <span class="tab-icon"><i class="fas fa-apple-whole"></i></span>
           <span class="tab-text">Nutrition</span>
         </button>
         <button class="tab-button" data-tab="weight-loss">
-          <span class="tab-icon">⚖️</span>
+          <span class="tab-icon"><i class="fas fa-scale-balanced"></i></span>
           <span class="tab-text">Weight Loss</span>
         </button>
         <button class="tab-button" data-tab="profile">
-          <span class="tab-icon">👤</span>
+          <span class="tab-icon"><i class="fas fa-user"></i></span>
           <span class="tab-text">Profile</span>
         </button>
       </nav>
@@ -247,22 +269,22 @@
             <h2>Health Overview</h2>
             <div class="health-metrics">
               <div class="metric">
-                <span class="metric-icon">❤️</span>
+                <span class="metric-icon"><i class="fas fa-heart-pulse"></i></span>
                 <span class="metric-label">Blood Pressure</span>
                 <span class="metric-value" id="bpOverview">--/--</span>
               </div>
               <div class="metric">
-                <span class="metric-icon">💊</span>
+                <span class="metric-icon"><i class="fas fa-pills"></i></span>
                 <span class="metric-label">Medications</span>
                 <span class="metric-value" id="medOverview">0</span>
               </div>
               <div class="metric">
-                <span class="metric-icon">😊</span>
+                <span class="metric-icon"><i class="fas fa-face-smile"></i></span>
                 <span class="metric-label">Mood</span>
                 <span class="metric-value" id="moodOverview">--</span>
               </div>
               <div class="metric">
-                <span class="metric-icon">🦵</span>
+                <span class="metric-icon"><i class="fas fa-person-walking"></i></span>
                 <span class="metric-label">Limb Health</span>
                 <span class="metric-value" id="limbOverview">--</span>
               </div>
@@ -274,31 +296,31 @@
             <h2>Quick Actions</h2>
             <div class="action-buttons">
               <button class="action-btn" onclick="switchToTab('blood-pressure')">
-                <span class="action-icon">➕</span>
+                <span class="action-icon"><i class="fas fa-heart-pulse"></i></span>
                 <span>Add BP Reading</span>
               </button>
               <button class="action-btn" onclick="switchToTab('medications')">
-                <span class="action-icon">💊</span>
+                <span class="action-icon"><i class="fas fa-pills"></i></span>
                 <span>Add Medication</span>
               </button>
               <button class="action-btn" onclick="switchToTab('mood')">
-                <span class="action-icon">😊</span>
+                <span class="action-icon"><i class="fas fa-face-smile"></i></span>
                 <span>Log Mood</span>
               </button>
               <button class="action-btn" onclick="switchToTab('goals')">
-                <span class="action-icon">🎯</span>
+                <span class="action-icon"><i class="fas fa-bullseye"></i></span>
                 <span>Set Goal</span>
               </button>
               <button class="action-btn" onclick="switchToTab('limb-care')">
-                <span class="action-icon">🦵</span>
+                <span class="action-icon"><i class="fas fa-person-walking"></i></span>
                 <span>Limb Assessment</span>
               </button>
               <button class="action-btn" onclick="switchToTab('dme')">
-                <span class="action-icon">🦽</span>
+                <span class="action-icon"><i class="fas fa-wheelchair"></i></span>
                 <span>Manage Equipment</span>
               </button>
               <button class="action-btn" onclick="switchToTab('health-insights')">
-                <span class="action-icon">🧠</span>
+                <span class="action-icon"><i class="fas fa-brain"></i></span>
                 <span>Health Insights</span>
               </button>
             </div>
