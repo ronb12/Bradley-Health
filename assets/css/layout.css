@@ -423,6 +423,12 @@
   color: var(--primary-color);
 }
 
+/* Health overview icon colors */
+.health-metrics .metric:nth-child(1) .metric-icon { background: #fee2e2; color: #ef4444; } /* BP - red */
+.health-metrics .metric:nth-child(2) .metric-icon { background: #d1fae5; color: #10b981; } /* Meds - green */
+.health-metrics .metric:nth-child(3) .metric-icon { background: #fef3c7; color: #f59e0b; } /* Mood - amber */
+.health-metrics .metric:nth-child(4) .metric-icon { background: #dbeafe; color: #3b82f6; } /* Limb - blue */
+
 .metric-label {
   font-size: var(--font-size-xs);
   color: var(--text-muted);
