@@ -10,21 +10,7 @@
   box-sizing: border-box;
 }
 
-/* ===== FIELDSET STYLES ===== */
-fieldset {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 12px;
-  margin: 0;
-  background: transparent;
-}
-
-legend {
-  font-weight: 500;
-  color: #374151;
-  padding: 0 8px;
-  font-size: 14px;
-}
+/* ===== FIELDSET STYLES (base in theme.css) ===== */
 
 /* ===== WOMEN'S HEALTH STYLES ===== */
 .womens-health-container {
@@ -76,25 +62,7 @@ legend {
   margin-top: 10px;
 }
 
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.checkbox-label:hover {
-  background: #e2e8f0;
-}
-
-.checkbox-label input[type="checkbox"] {
-  margin: 0;
-}
+/* .checkbox-label styles moved to theme.css */
 
 /* Cycle Calendar */
 .calendar-container {
