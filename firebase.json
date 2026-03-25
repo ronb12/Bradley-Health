@@ -4,6 +4,7 @@
     "indexes": "firestore-indexes.json"
   },
   "hosting": {
+    "site": "bradley-health",
     "public": "public",
     "ignore": [
       "firebase.json",
