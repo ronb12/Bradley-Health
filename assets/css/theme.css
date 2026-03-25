@@ -681,6 +681,60 @@ input[type="time"] {
   }
 }
 
+@media (max-width: 480px) {
+  /* Textarea - less height on small screens */
+  textarea {
+    min-height: 64px;
+  }
+
+  /* Range slider - bigger thumb for touch */
+  input[type="range"]::-webkit-slider-thumb {
+    width: 24px;
+    height: 24px;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Range value badge - slightly smaller */
+  .range-value-badge {
+    min-width: 26px;
+    height: 26px;
+    font-size: 0.75rem;
+  }
+
+  /* Buttons - tighter horizontal padding */
+  .btn {
+    padding: var(--spacing-2) var(--spacing-4);
+    font-size: var(--font-size-sm);
+  }
+
+  /* Form group spacing */
+  .form-group {
+    margin-bottom: var(--spacing-4);
+  }
+
+  /* Form actions */
+  .form-actions {
+    margin-top: var(--spacing-4);
+    padding-top: var(--spacing-3);
+    gap: var(--spacing-2);
+  }
+
+  /* Toast - full width on mobile */
+  .toast-container {
+    left: var(--spacing-3);
+    right: var(--spacing-3);
+    top: var(--spacing-3);
+  }
+
+  .toast {
+    max-width: 100%;
+  }
+}
+
 /* Cards */
 .card {
   background-color: var(--bg-secondary);

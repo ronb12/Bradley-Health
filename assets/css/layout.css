@@ -586,54 +586,56 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  /* Header - stay horizontal, compress */
   .app-header {
-    padding: var(--spacing-6) var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-4);
   }
 
   .header-content {
-    flex-direction: column;
-    gap: var(--spacing-6);
-    text-align: center;
+    flex-direction: row;
+    gap: var(--spacing-3);
     align-items: center;
   }
-  
+
   .header-left {
-    text-align: center;
+    gap: var(--spacing-2);
   }
-  
+
+  .header-logo-icon {
+    width: 34px;
+    height: 34px;
+    font-size: var(--font-size-base);
+    flex-shrink: 0;
+  }
+
   .header-left h1 {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-base);
+    font-weight: 700;
   }
-  
+
+  /* Hide subtitle on mobile */
   .header-left p {
-    font-size: var(--font-size-xs);
-    margin-top: var(--spacing-2);
+    display: none;
   }
 
   .user-info {
-    flex-direction: column;
-    gap: var(--spacing-4);
-    align-items: center;
-    width: 100%;
+    gap: var(--spacing-2);
+    flex-shrink: 0;
   }
 
+  /* Hide username text on mobile, show only button */
   .user-info span {
-    max-width: none;
-    text-align: center;
-    width: 100%;
-    padding: var(--spacing-3) var(--spacing-4);
-    font-size: var(--font-size-sm);
-    white-space: normal;
-    overflow: visible;
-    text-overflow: unset;
+    display: none;
   }
 
   .user-info .btn {
-    width: auto;
-    min-width: 140px;
-    padding: var(--spacing-3) var(--spacing-5);
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-xs);
+    min-width: unset;
+    white-space: nowrap;
   }
 
+  /* Tab navigation - horizontal scroll */
   .tab-navigation {
     overflow-x: auto;
     overflow-y: hidden;
@@ -644,8 +646,9 @@
   }
 
   .tab-button {
-    padding: var(--spacing-3) var(--spacing-3) !important;
+    padding: var(--spacing-2) var(--spacing-3) !important;
     flex-shrink: 0 !important;
+    min-height: 52px !important;
     white-space: nowrap !important;
   }
 
@@ -658,38 +661,58 @@
     white-space: nowrap !important;
   }
 
+  /* Tab content */
   .tab-content {
     padding: var(--spacing-4);
   }
 
+  /* Dashboard */
   .dashboard-grid {
     grid-template-columns: 1fr;
-    gap: var(--spacing-4);
+    gap: var(--spacing-3);
   }
 
   .health-metrics {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-3);
   }
 
   .action-buttons {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-3);
   }
 
+  /* Cards - reduce padding on mobile */
+  .card {
+    padding: var(--spacing-4);
+    border-radius: var(--radius-xl);
+  }
+
+  /* Chart height on mobile */
+  .chart-container {
+    height: 220px;
+  }
+
+  /* Forms */
   .form-row {
     grid-template-columns: 1fr;
   }
 
+  /* Mood buttons */
   .mood-buttons {
-    flex-wrap: wrap;
+    justify-content: center;
     gap: var(--spacing-2);
   }
 
   .mood-btn {
-    min-width: 60px;
+    flex: 1;
+    min-width: 52px;
+    max-width: 72px;
     padding: var(--spacing-3);
     font-size: var(--font-size-xl);
   }
 
+  /* Section containers - single column */
   .bp-container,
   .medications-container,
   .mood-container,
@@ -700,77 +723,118 @@
 }
 
 @media (max-width: 480px) {
+  /* Header */
   .app-header {
-    padding: var(--spacing-5) var(--spacing-3);
+    padding: var(--spacing-2) var(--spacing-3);
   }
 
-  .header-content {
-    gap: var(--spacing-5);
-  }
-
-  .auth-container {
-    padding: var(--spacing-6);
+  .header-logo-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
   }
 
   .header-left h1 {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-sm);
   }
 
-  .header-left p {
-    font-size: 0.7rem;
-    margin-top: var(--spacing-2);
+  /* Auth */
+  .auth-container {
+    padding: var(--spacing-5) var(--spacing-4);
+    border-radius: var(--radius-2xl);
   }
 
-  .user-info {
-    gap: var(--spacing-3);
+  .auth-logo-icon {
+    width: 52px;
+    height: 52px;
+    font-size: 1.375rem;
   }
 
-  .user-info span {
-    font-size: 0.8rem;
-    padding: var(--spacing-2) var(--spacing-3);
-    width: 100%;
-    text-align: center;
+  .auth-header h1 {
+    font-size: var(--font-size-xl);
   }
 
-  .user-info .btn {
-    padding: var(--spacing-2) var(--spacing-4);
-    font-size: 0.8rem;
-    min-width: 120px;
-  }
-
+  /* Tab nav */
   .tab-button {
-    min-width: 0 !important;
-    max-width: none !important;
-    padding: var(--spacing-1) var(--spacing-1) !important;
-    font-size: 0.6rem !important;
-    white-space: normal !important;
-    flex: 1;
+    padding: var(--spacing-2) var(--spacing-2) !important;
+    min-height: 48px !important;
   }
 
   .tab-icon {
-    font-size: var(--font-size-base);
-    margin-bottom: var(--spacing-1);
+    font-size: 0.9rem;
   }
 
   .tab-text {
-    font-size: 0.5rem !important;
-    line-height: 1.1 !important;
-    text-align: center !important;
-    word-break: break-word !important;
-    white-space: normal !important;
-    overflow-wrap: break-word !important;
-    hyphens: auto !important;
-    display: block !important;
+    font-size: 0.6rem !important;
   }
 
-  .mood-btn {
-    min-width: 50px;
-    padding: var(--spacing-2);
+  /* Tab content */
+  .tab-content {
+    padding: var(--spacing-3);
+  }
+
+  /* Cards */
+  .card {
+    padding: var(--spacing-3);
+    border-radius: var(--radius-lg);
+  }
+
+  .card h2 {
+    font-size: var(--font-size-base);
+    padding-bottom: var(--spacing-3);
+    margin-bottom: var(--spacing-3);
+  }
+
+  /* Health metrics - keep 2-col on small phones */
+  .health-metrics {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-2);
+  }
+
+  .metric {
+    padding: var(--spacing-3);
+  }
+
+  .metric-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+    margin-bottom: var(--spacing-1);
+  }
+
+  .metric-value {
     font-size: var(--font-size-lg);
   }
 
-  .tab-navigation {
-    padding: 0;
+  /* Quick actions - 2-col */
+  .action-buttons {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-2);
+  }
+
+  .action-btn {
+    padding: var(--spacing-3);
+    font-size: var(--font-size-xs);
+    gap: var(--spacing-1);
+  }
+
+  .action-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+
+  /* Chart */
+  .chart-container {
+    height: 180px;
+  }
+
+  /* Mood buttons - 5 evenly spaced */
+  .mood-btn {
+    min-width: 44px;
+    max-width: 56px;
+    padding: var(--spacing-2);
+    font-size: var(--font-size-lg);
   }
 }
 
