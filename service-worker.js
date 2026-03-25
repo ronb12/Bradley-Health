@@ -1,7 +1,7 @@
 // Bradley Health Service Worker
-const CACHE_NAME = 'bradley-health-v1.3.0';
-const STATIC_CACHE = 'bradley-health-static-v1.3.0';
-const DYNAMIC_CACHE = 'bradley-health-dynamic-v1.3.0';
+const CACHE_NAME = 'bradley-health-v1.4.0';
+const STATIC_CACHE = 'bradley-health-static-v1.4.0';
+const DYNAMIC_CACHE = 'bradley-health-dynamic-v1.4.0';
 
 // Files to cache immediately - only include files that actually exist
 // Check if we're in development (localhost) or production (GitHub Pages)
@@ -79,15 +79,16 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up ALL old caches and take control immediately
 self.addEventListener('activate', (event) => {
   console.log('Service Worker: Activating...');
-  
+
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
+            // Delete every cache that isn't the current version
             if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
               console.log('Service Worker: Deleting old cache:', cacheName);
               return caches.delete(cacheName);
@@ -96,8 +97,14 @@ self.addEventListener('activate', (event) => {
         );
       })
       .then(() => {
-        console.log('Service Worker: Old caches cleaned up');
+        console.log('Service Worker: Old caches cleaned, claiming clients');
         return self.clients.claim();
+      })
+      .then(() => {
+        // Tell all open tabs to reload so they get fresh JS/CSS
+        return self.clients.matchAll({ type: 'window' }).then(clients => {
+          clients.forEach(client => client.navigate(client.url));
+        });
       })
       .catch((error) => {
         console.error('Service Worker: Error during activation:', error);
@@ -133,8 +140,28 @@ self.addEventListener('fetch', (event) => {
 
 // Handle same-origin requests
 async function handleSameOriginRequest(request) {
+  const url = new URL(request.url);
+  const isScript = url.pathname.endsWith('.js');
+  const isStylesheet = url.pathname.endsWith('.css');
+
+  // JS and CSS: network-first so updated files are always picked up
+  if (isScript || isStylesheet) {
+    try {
+      const networkResponse = await fetch(request);
+      if (networkResponse.ok) {
+        const cache = await caches.open(STATIC_CACHE);
+        await cache.put(request, networkResponse.clone());
+      }
+      return networkResponse;
+    } catch (error) {
+      // Network failed — fall back to cache
+      const cached = await caches.match(request);
+      if (cached) return cached;
+    }
+  }
+
   try {
-    // Try cache first
+    // Everything else: cache-first
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
       return cachedResponse;
@@ -142,7 +169,7 @@ async function handleSameOriginRequest(request) {
 
     // Fallback to network
     const networkResponse = await fetch(request);
-    
+
     // Cache successful responses
     if (networkResponse.ok) {
       try {
@@ -152,7 +179,7 @@ async function handleSameOriginRequest(request) {
         console.warn('Service Worker: Failed to cache response:', cacheError.message);
       }
     }
-    
+
     return networkResponse;
   } catch (error) {
     console.warn('Service Worker: Network request failed for:', request.url, error.message);
