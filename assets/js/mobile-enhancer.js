@@ -8,8 +8,8 @@ class MobileEnhancer {
   init() {
     this.optimizeTouchTargets();
     this.addHapticFeedback();
-    this.implementPullToRefresh();
     this.optimizeViewport();
+    // Note: pull-to-refresh is handled by pull-to-refresh.js
   }
 
   optimizeTouchTargets() {
