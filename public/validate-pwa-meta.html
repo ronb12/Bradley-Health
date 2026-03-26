@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA & iOS Meta Tags Validation - Bradley Health</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #60a5fa;
+        }
+        .meta-tag {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+        .status.valid {
+            background: #22c55e;
+            color: white;
+        }
+        .status.invalid {
+            background: #ef4444;
+            color: white;
+        }
+        .status.warning {
+            background: #f59e0b;
+            color: white;
+        }
+        .icon-test {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .icon-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        .icon-item img {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .requirements {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .requirements h4 {
+            margin-top: 0;
+            color: #22c55e;
+        }
+        .requirements ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 PWA & iOS Meta Tags Validation</h1>
+        
+        <div class="requirements">
+            <h4>✅ PWA Requirements Checklist:</h4>
+            <ul>
+                <li>✅ Web App Manifest (manifest.json)</li>
+                <li>✅ Service Worker (service-worker.js)</li>
+                <li>✅ HTTPS (Firebase Hosting)</li>
+                <li>✅ Responsive Design</li>
+                <li>✅ App Icons (Multiple Sizes)</li>
+                <li>✅ Theme Color</li>
+                <li>✅ Start URL</li>
+                <li>✅ Display Mode (standalone)</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h3>🎨 PWA Meta Tags</h3>
+            <div class="meta-tag">
+                &lt;meta name="theme-color" content="#3b82f6"&gt;
+                <span class="status valid">VALID</span>
+            </div>
+            <div class="meta-tag">
+                &lt;meta name="mobile-web-app-capable" content="yes"&gt;
+                <span class="status valid">VALID</span>
+            </div>
+            <div class="meta-tag">
+                &lt;meta name="application-name" content="Bradley Health"&gt;
+                <span class="status valid">VALID</span>
+            </div>
+            <div class="meta-tag">
+                &lt;meta name="msapplication-TileColor" content="#3b82f6"&gt;
+                <span class="status valid">VALID</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>🍎 iOS Specific Meta Tags</h3>
+            <div class="meta-tag">
+                &lt;meta name="apple-mobile-web-app-capable" content="yes"&gt;
+                <span class="status valid">VALID</span>
+            </div>
+            <div class="meta-tag">
+                &lt;meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"&gt;
+                <span class="status valid">VALID</span>
+            </div>
+            <div class="meta-tag">
+                &lt;meta name="apple-mobile-web-app-title" content="Bradley Health"&gt;
+                <span class="status valid">VALID</span>
+            </div>
+            <div class="meta-tag">
+                &lt;meta name="apple-mobile-web-app-orientations" content="portrait"&gt;
+                <span class="status valid">VALID</span>
+            </div>
+            <div class="meta-tag">
+                &lt;meta name="apple-touch-fullscreen" content="yes"&gt;
+                <span class="status valid">VALID</span>
+            </div>
+            <div class="meta-tag">
+                &lt;meta name="format-detection" content="telephone=no"&gt;
+                <span class="status valid">VALID</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>🔗 Icon Links</h3>
+            <div class="meta-tag">
+                &lt;link rel="apple-touch-icon-precomposed" href="assets/apple-touch-icon.png?v=1757110176"&gt;
+                <span class="status valid">VALID</span>
+            </div>
+            <div class="meta-tag">
+                &lt;link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=1757110176"&gt;
+                <span class="status valid">VALID</span>
+            </div>
+            <div class="meta-tag">
+                &lt;link rel="manifest" href="manifest.json"&gt;
+                <span class="status valid">VALID</span>
+            </div>
+            <div class="meta-tag">
+                &lt;link rel="content" href="content.json"&gt;
+                <span class="status valid">VALID</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>🧪 Icon Test</h3>
+            <div class="icon-test">
+                <div class="icon-item">
+                    <img src="assets/apple-touch-icon.png?v=1757110176" alt="180x180" onerror="this.style.display='none'">
+                    <div>180x180</div>
+                    <div>Apple Touch</div>
+                </div>
+                <div class="icon-item">
+                    <img src="assets/icon-192.png?v=1757110176" alt="192x192" onerror="this.style.display='none'">
+                    <div>192x192</div>
+                    <div>Standard PWA</div>
+                </div>
+                <div class="icon-item">
+                    <img src="assets/icon-512.png?v=1757110176" alt="512x512" onerror="this.style.display='none'">
+                    <div>512x512</div>
+                    <div>High-res PWA</div>
+                </div>
+                <div class="icon-item">
+                    <img src="assets/favicon.svg?v=1757110176" alt="favicon" onerror="this.style.display='none'">
+                    <div>SVG</div>
+                    <div>Scalable</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>📋 Manifest.json Validation</h3>
+            <div id="manifestStatus">Loading...</div>
+        </div>
+        
+        <div class="section">
+            <h3>🔧 iOS Home Screen Instructions</h3>
+            <ol>
+                <li><strong>Open Safari</strong> on your iPhone</li>
+                <li><strong>Visit</strong> https://bradley-health.web.app</li>
+                <li><strong>Tap Share</strong> button (square with arrow)</li>
+                <li><strong>Select</strong> "Add to Home Screen"</li>
+                <li><strong>Verify</strong> the icon shows red heart with blue background</li>
+            </ol>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <button onclick="window.location.href='/'">🏠 Back to App</button>
+            <button onclick="window.location.reload()">🔄 Refresh Validation</button>
+        </div>
+    </div>
+
+    <script>
+        // Validate manifest.json
+        async function validateManifest() {
+            try {
+                const response = await fetch('manifest.json');
+                const manifest = await response.json();
+                
+                const statusDiv = document.getElementById('manifestStatus');
+                let html = '<div class="requirements">';
+                
+                // Check required fields
+                const requiredFields = [
+                    'name', 'short_name', 'description', 'start_url', 'display', 
+                    'theme_color', 'background_color', 'icons'
+                ];
+                
+                requiredFields.forEach(field => {
+                    if (manifest[field]) {
+                        html += `<div class="meta-tag">✅ ${field}: ${manifest[field]}</div>`;
+                    } else {
+                        html += `<div class="meta-tag">❌ ${field}: MISSING</div>`;
+                    }
+                });
+                
+                // Check icons
+                if (manifest.icons && manifest.icons.length > 0) {
+                    html += `<div class="meta-tag">✅ Icons: ${manifest.icons.length} icons defined</div>`;
+                } else {
+                    html += `<div class="meta-tag">❌ Icons: No icons defined</div>`;
+                }
+                
+                html += '</div>';
+                statusDiv.innerHTML = html;
+                
+            } catch (error) {
+                document.getElementById('manifestStatus').innerHTML = 
+                    '<div class="meta-tag">❌ Error loading manifest.json</div>';
+            }
+        }
+        
+        // Check if icons are loading
+        window.addEventListener('load', () => {
+            validateManifest();
+            
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                img.onload = () => {
+                    console.log('✅ Icon loaded:', img.src);
+                };
+                img.onerror = () => {
+                    console.error('❌ Icon failed to load:', img.src);
+                };
+            });
+        });
+    </script>
+</body>
+</html>

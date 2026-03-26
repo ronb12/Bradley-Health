@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS Chrome Fix - Bradley Health</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+        .warning {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .warning h4 {
+            margin-top: 0;
+            color: #ef4444;
+        }
+        .solution {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .solution h4 {
+            margin-top: 0;
+            color: #22c55e;
+        }
+        .steps {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid #3b82f6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .steps h4 {
+            margin-top: 0;
+            color: #3b82f6;
+        }
+        .steps ol {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+        .icon-test {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .icon-display {
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #3b82f6;
+            position: relative;
+            overflow: hidden;
+        }
+        .icon-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 20px;
+        }
+        .btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 0.5rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #16a34a;
+        }
+        .btn-secondary {
+            background: #6b7280;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍎 iOS Chrome Fix</h1>
+        
+        <div class="warning">
+            <h4>⚠️ Chrome on iOS Issue</h4>
+            <p>Chrome on iPhone doesn't properly support Apple Touch Icons for PWA home screen installation. This is a limitation of Chrome on iOS, not our app.</p>
+        </div>
+        
+        <div class="solution">
+            <h4>✅ Solution: Use Safari Instead</h4>
+            <p>For proper PWA installation with the correct app icon on iOS, you must use Safari, not Chrome.</p>
+        </div>
+        
+        <div class="steps">
+            <h4>📱 Correct Steps for iOS:</h4>
+            <ol>
+                <li><strong>Open Safari</strong> (not Chrome) on your iPhone</li>
+                <li><strong>Visit</strong> https://bradley-health.web.app</li>
+                <li><strong>Wait</strong> for the page to fully load</li>
+                <li><strong>Tap Share</strong> button (square with arrow up)</li>
+                <li><strong>Select</strong> "Add to Home Screen"</li>
+                <li><strong>Verify</strong> the icon shows red heart with blue background</li>
+            </ol>
+        </div>
+        
+        <div class="section">
+            <h2>🔍 Icon Test</h2>
+            <div class="icon-test">
+                <div>
+                    <div class="icon-display">
+                        <img src="assets/apple-touch-icon.png?v=1757110177" alt="Correct Icon" 
+                             onload="this.nextElementSibling.textContent='✅ Loaded'; this.nextElementSibling.style.color='#22c55e';"
+                             onerror="this.style.display='none'; this.nextElementSibling.textContent='❌ Failed'; this.nextElementSibling.style.color='#ef4444';">
+                        <div style="text-align: center; margin-top: 10px;">
+                            <div>Correct Icon</div>
+                            <div id="iconStatus">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔧 Why Chrome Doesn't Work</h2>
+            <ul>
+                <li><strong>iOS Limitation:</strong> Chrome on iOS is required to use Safari's WebKit engine</li>
+                <li><strong>PWA Support:</strong> Chrome on iOS has limited PWA functionality</li>
+                <li><strong>Icon Handling:</strong> Chrome doesn't properly process Apple Touch Icons</li>
+                <li><strong>Home Screen:</strong> Only Safari can create proper PWA home screen shortcuts</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>📋 Alternative Solutions</h2>
+            <ol>
+                <li><strong>Use Safari:</strong> This is the recommended solution for iOS</li>
+                <li><strong>Desktop Chrome:</strong> PWA installation works perfectly on desktop Chrome</li>
+                <li><strong>Android Chrome:</strong> Full PWA support with correct icons</li>
+                <li><strong>Edge on iOS:</strong> May have better PWA support than Chrome</li>
+            </ol>
+        </div>
+        
+        <div class="solution">
+            <h4>✅ Expected Result in Safari</h4>
+            <p>When you use Safari and follow the correct steps, you should see:</p>
+            <ul>
+                <li>🔴 Red heart shape</li>
+                <li>🔵 Blue background (#3b82f6)</li>
+                <li>⚪ White ECG line through the heart</li>
+                <li>📝 "Bradley Health" text in white</li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="/" class="btn">🏠 Back to App</a>
+            <a href="https://bradley-health.web.app" class="btn btn-secondary">🌐 Open in Safari</a>
+        </div>
+    </div>
+
+    <script>
+        // Check icon loading
+        window.addEventListener('load', function() {
+            const img = document.querySelector('img[src*="apple-touch-icon"]');
+            if (img) {
+                img.onload = function() {
+                    document.getElementById('iconStatus').textContent = '✅ Loaded Successfully';
+                    document.getElementById('iconStatus').style.color = '#22c55e';
+                };
+                img.onerror = function() {
+                    document.getElementById('iconStatus').textContent = '❌ Failed to Load';
+                    document.getElementById('iconStatus').style.color = '#ef4444';
+                };
+            }
+        });
+    </script>
+</body>
+</html>

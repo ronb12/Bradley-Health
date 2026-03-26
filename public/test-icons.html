@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bradley Health - Icon Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .icon-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        .icon-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+        }
+        .icon-item h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 16px;
+        }
+        .icon-item p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        .status {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+        .instructions h3 {
+            margin-top: 0;
+        }
+        .instructions ol {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>❤️ Bradley Health - Icon Test</h1>
+        
+        <div class="status">
+            <h3>✅ New Heart Icons Generated!</h3>
+            <p>All PWA icons now show a red heart with ECG lifeline instead of the generic "W"</p>
+        </div>
+        
+        <div class="icon-grid">
+            <div class="icon-item">
+                <img src="assets/icon-72.png" alt="72x72" onerror="this.style.display='none'">
+                <h3>72x72</h3>
+                <p>Small Android</p>
+            </div>
+            <div class="icon-item">
+                <img src="assets/icon-96.png" alt="96x96" onerror="this.style.display='none'">
+                <h3>96x96</h3>
+                <p>Medium Android</p>
+            </div>
+            <div class="icon-item">
+                <img src="assets/icon-144.png" alt="144x144" onerror="this.style.display='none'">
+                <h3>144x144</h3>
+                <p>Large Android</p>
+            </div>
+            <div class="icon-item">
+                <img src="assets/icon-192.png" alt="192x192" onerror="this.style.display='none'">
+                <h3>192x192</h3>
+                <p>Standard PWA</p>
+            </div>
+            <div class="icon-item">
+                <img src="assets/icon-512.png" alt="512x512" onerror="this.style.display='none'">
+                <h3>512x512</h3>
+                <p>High-res PWA</p>
+            </div>
+            <div class="icon-item">
+                <img src="assets/apple-touch-icon.png" alt="180x180" onerror="this.style.display='none'">
+                <h3>180x180</h3>
+                <p>Apple Touch</p>
+            </div>
+            <div class="icon-item">
+                <img src="assets/favicon.ico" alt="favicon" onerror="this.style.display='none'">
+                <h3>Favicon</h3>
+                <p>Browser Tab</p>
+            </div>
+            <div class="icon-item">
+                <img src="assets/favicon.svg" alt="favicon svg" onerror="this.style.display='none'">
+                <h3>SVG</h3>
+                <p>Scalable Vector</p>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>📱 PWA Installation Test</h3>
+            <ol>
+                <li><strong>Desktop:</strong> Look for the install button (⊕) in your browser's address bar</li>
+                <li><strong>Mobile:</strong> Tap the share button → "Add to Home Screen"</li>
+                <li><strong>Check:</strong> The installed app should show the red heart icon instead of "W"</li>
+                <li><strong>Refresh:</strong> If you still see "W", try clearing your browser cache</li>
+            </ol>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <button onclick="window.location.href='/'">🏠 Back to Main App</button>
+            <button onclick="window.location.reload()">🔄 Refresh Icons</button>
+        </div>
+    </div>
+
+    <script>
+        // Check if icons are loading properly
+        window.addEventListener('load', () => {
+            const images = document.querySelectorAll('img');
+            let loadedCount = 0;
+            let totalCount = images.length;
+            
+            images.forEach(img => {
+                img.onload = () => {
+                    loadedCount++;
+                    if (loadedCount === totalCount) {
+                        console.log('✅ All icons loaded successfully!');
+                    }
+                };
+                img.onerror = () => {
+                    console.error('❌ Failed to load icon:', img.src);
+                };
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Icon Test - Bradley Health</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+        .icon-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .icon-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+        .icon-item h3 {
+            margin-top: 0;
+            color: #60a5fa;
+        }
+        .icon-display {
+            width: 80px;
+            height: 80px;
+            margin: 1rem auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        .actual-icon {
+            background: #3b82f6;
+        }
+        .pwa-prompt-icon {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .pwa-prompt-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 2px;
+            background: white;
+            border-radius: 1px;
+            box-shadow: 
+                -8px -8px 0 0 white,
+                8px -8px 0 0 white,
+                -4px -4px 0 0 white,
+                4px -4px 0 0 white;
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .icon-size {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        .icon-size img {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .issue {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .issue h4 {
+            margin-top: 0;
+            color: #ef4444;
+        }
+        .solution {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .solution h4 {
+            margin-top: 0;
+            color: #22c55e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 App Icon Analysis</h1>
+        
+        <div class="section">
+            <h2>📱 PWA Install Prompt Icon</h2>
+            <div class="icon-comparison">
+                <div class="icon-item">
+                    <h3>Current PWA Prompt Icon</h3>
+                    <div class="icon-display pwa-prompt-icon">
+                        ❤️
+                    </div>
+                    <p>Uses CSS-styled emoji with red gradient background and white ECG line</p>
+                </div>
+                <div class="icon-item">
+                    <h3>Actual App Icon</h3>
+                    <div class="icon-display actual-icon">
+                        <img src="assets/apple-touch-icon.png?v=1757110176" alt="App Icon" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                    <p>Red heart with blue background and white ECG lifeline</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="issue">
+            <h4>⚠️ Issue Identified</h4>
+            <p>The PWA install prompt is using a CSS-styled emoji (❤️) instead of the actual app icon. This creates inconsistency between:</p>
+            <ul>
+                <li><strong>PWA Install Prompt:</strong> Red gradient background with emoji</li>
+                <li><strong>Actual App Icon:</strong> Blue background with red heart and white ECG line</li>
+                <li><strong>Home Screen Icon:</strong> Should match the actual app icon</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>🎨 Available App Icons</h2>
+            <div class="icon-grid">
+                <div class="icon-size">
+                    <img src="assets/apple-touch-icon.png?v=1757110176" alt="180x180">
+                    <div>180x180</div>
+                    <div>Apple Touch</div>
+                </div>
+                <div class="icon-size">
+                    <img src="assets/icon-192.png?v=1757110176" alt="192x192">
+                    <div>192x192</div>
+                    <div>Standard PWA</div>
+                </div>
+                <div class="icon-size">
+                    <img src="assets/icon-512.png?v=1757110176" alt="512x512">
+                    <div>512x512</div>
+                    <div>High-res PWA</div>
+                </div>
+                <div class="icon-size">
+                    <img src="assets/favicon.svg?v=1757110176" alt="SVG">
+                    <div>SVG</div>
+                    <div>Scalable</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="solution">
+            <h4>✅ Solution</h4>
+            <p>Update the PWA install prompt to use the actual app icon instead of the CSS-styled emoji. This will ensure consistency across all app representations.</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <button onclick="window.location.href='/'">🏠 Back to App</button>
+            <button onclick="window.location.reload()">🔄 Refresh Test</button>
+        </div>
+    </div>
+</body>
+</html>

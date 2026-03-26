@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bradley Health - Test Fixes</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .test-section {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        .test-result {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .success {
+            background: rgba(34, 197, 94, 0.2);
+            border-left: 4px solid #22c55e;
+        }
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 4px solid #ef4444;
+        }
+        .info {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 4px solid #3b82f6;
+        }
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Bradley Health - Fix Test Results</h1>
+        
+        <div class="test-section">
+            <h3>🌐 Service Worker Status</h3>
+            <div id="sw-status" class="test-result info">Checking...</div>
+            <button onclick="testServiceWorker()">Test Service Worker</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔥 Firebase Connection</h3>
+            <div id="firebase-status" class="test-result info">Checking...</div>
+            <button onclick="testFirebase()">Test Firebase</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>📱 PWA Features</h3>
+            <div id="pwa-status" class="test-result info">Checking...</div>
+            <button onclick="testPWA()">Test PWA</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔐 Authentication</h3>
+            <div id="auth-status" class="test-result info">Checking...</div>
+            <button onclick="testAuth()">Test Auth</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 Console Logs</h3>
+            <div id="console-logs" class="test-result info">No logs yet</div>
+            <button onclick="clearLogs()">Clear Logs</button>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="/" style="color: white; text-decoration: none; font-weight: bold;">← Back to Main App</a>
+        </div>
+    </div>
+
+    <!-- Include Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Include Firebase Config -->
+    <script src="/assets/js/firebase-config.js"></script>
+    
+    <script>
+        let logs = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push(`[${timestamp}] ${message}`);
+            updateConsoleLogs();
+            console.log(message);
+        }
+        
+        function updateConsoleLogs() {
+            const consoleDiv = document.getElementById('console-logs');
+            consoleDiv.innerHTML = logs.slice(-10).join('<br>');
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `test-result ${type}`;
+        }
+        
+        function testServiceWorker() {
+            log('Testing Service Worker...');
+            
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then(registration => {
+                    if (registration.active) {
+                        updateStatus('sw-status', '✅ Service Worker is active and running', 'success');
+                        log('Service Worker: Active and running');
+                    } else {
+                        updateStatus('sw-status', '⚠️ Service Worker registered but not active', 'error');
+                        log('Service Worker: Registered but not active');
+                    }
+                }).catch(error => {
+                    updateStatus('sw-status', '❌ Service Worker error: ' + error.message, 'error');
+                    log('Service Worker Error: ' + error.message);
+                });
+            } else {
+                updateStatus('sw-status', '❌ Service Worker not supported', 'error');
+                log('Service Worker: Not supported in this browser');
+            }
+        }
+        
+        function testFirebase() {
+            log('Testing Firebase connection...');
+            
+            if (window.firebaseServices && window.firebaseServices.db) {
+                updateStatus('firebase-status', '✅ Firebase connected successfully', 'success');
+                log('Firebase: Connected successfully');
+                
+                // Test Firestore connection
+                window.firebaseServices.db.collection('test').doc('test').get()
+                    .then(doc => {
+                        log('Firestore: Test read successful');
+                    })
+                    .catch(error => {
+                        log('Firestore: Test read failed - ' + error.message);
+                        if (error.code === 'permission-denied') {
+                            updateStatus('firebase-status', '⚠️ Firebase connected but permissions denied (user needs to sign in)', 'error');
+                        }
+                    });
+            } else {
+                updateStatus('firebase-status', '❌ Firebase not initialized', 'error');
+                log('Firebase: Not initialized');
+            }
+        }
+        
+        function testPWA() {
+            log('Testing PWA features...');
+            
+            const features = [];
+            
+            // Check service worker
+            if ('serviceWorker' in navigator) {
+                features.push('✅ Service Worker');
+            } else {
+                features.push('❌ Service Worker');
+            }
+            
+            // Check manifest
+            if (document.querySelector('link[rel="manifest"]')) {
+                features.push('✅ Web App Manifest');
+            } else {
+                features.push('❌ Web App Manifest');
+            }
+            
+            // Check HTTPS
+            if (location.protocol === 'https:' || location.hostname === 'localhost') {
+                features.push('✅ Secure Context');
+            } else {
+                features.push('❌ Secure Context');
+            }
+            
+            // Check installability
+            if ('BeforeInstallPromptEvent' in window) {
+                features.push('✅ Installable');
+            } else {
+                features.push('⚠️ Installable (may need user interaction)');
+            }
+            
+            updateStatus('pwa-status', features.join('<br>'), 'info');
+            log('PWA Features: ' + features.join(', '));
+        }
+        
+        function testAuth() {
+            log('Testing Authentication...');
+            
+            if (window.firebaseServices && window.firebaseServices.auth) {
+                const user = window.firebaseServices.auth.currentUser;
+                if (user) {
+                    updateStatus('auth-status', '✅ User authenticated: ' + user.email, 'success');
+                    log('Auth: User authenticated - ' + user.email);
+                } else {
+                    updateStatus('auth-status', '⚠️ No user authenticated (this is normal for first visit)', 'info');
+                    log('Auth: No user authenticated');
+                }
+            } else {
+                updateStatus('auth-status', '❌ Firebase Auth not available', 'error');
+                log('Auth: Firebase Auth not available');
+            }
+        }
+        
+        function clearLogs() {
+            logs = [];
+            updateConsoleLogs();
+        }
+        
+        // Run initial tests
+        window.addEventListener('load', () => {
+            log('Page loaded, running initial tests...');
+            testServiceWorker();
+            testFirebase();
+            testPWA();
+            testAuth();
+        });
+        
+        // Monitor console for errors
+        const originalError = console.error;
+        console.error = function(...args) {
+            log('ERROR: ' + args.join(' '), 'error');
+            originalError.apply(console, args);
+        };
+    </script>
+</body>
+</html>
