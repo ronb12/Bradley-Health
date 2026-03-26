@@ -37,6 +37,9 @@ class AuthManager {
             window.dashboardManager.loadDashboardData();
             window.dashboardManager.dataLoaded = true;
           }
+          if (window.notificationManager) {
+            window.notificationManager.checkUnreadCount();
+          }
         }, 1000);
       } else {
         console.log('User signed out, resetting dashboard state');
@@ -247,10 +250,9 @@ class AuthManager {
 
   requestNotificationPermission() {
     if (window.notificationManager) {
-      window.notificationManager.requestPermissionFromUserGesture();
+      window.notificationManager.openPanel();
     } else {
       console.log('Notification manager not available');
-      this.showToast('Notification system not available', 'error');
     }
   }
 

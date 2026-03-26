@@ -282,6 +282,217 @@ class NotificationManager {
     }
   }
 
+  // ===== NOTIFICATIONS PANEL =====
+
+  openPanel() {
+    if (!document.getElementById('notificationsPanel')) {
+      this.createPanel();
+    }
+    const panel = document.getElementById('notificationsPanel');
+    if (panel.classList.contains('open')) {
+      this.closePanel();
+    } else {
+      panel.classList.add('open');
+      this.loadNotifications();
+    }
+  }
+
+  closePanel() {
+    const panel = document.getElementById('notificationsPanel');
+    if (panel) panel.classList.remove('open');
+  }
+
+  createPanel() {
+    const panel = document.createElement('div');
+    panel.id = 'notificationsPanel';
+    panel.className = 'notifications-panel';
+    panel.innerHTML = `
+      <div class="notifications-panel-header">
+        <h3><i class="fas fa-bell"></i> Notifications</h3>
+        <button class="notifications-close-btn" aria-label="Close"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="notificationsList" class="notifications-list"></div>
+      <div class="notifications-panel-footer">
+        <button class="btn-link" id="markAllReadBtn">Mark all as read</button>
+      </div>
+    `;
+    document.body.appendChild(panel);
+
+    panel.querySelector('.notifications-close-btn').addEventListener('click', () => this.closePanel());
+    panel.querySelector('#markAllReadBtn').addEventListener('click', () => this.markAllRead());
+
+    document.addEventListener('click', (e) => {
+      const p = document.getElementById('notificationsPanel');
+      const bell = document.getElementById('notificationBtn');
+      if (p && p.classList.contains('open') && !p.contains(e.target) && (!bell || !bell.contains(e.target))) {
+        this.closePanel();
+      }
+    });
+  }
+
+  async loadNotifications() {
+    const userId = window.authManager?.getUserId();
+    const listEl = document.getElementById('notificationsList');
+    if (!listEl) return;
+
+    listEl.innerHTML = '<div class="notifications-loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+
+    if (!userId || !window.firebaseServices?.db) {
+      this.renderNotifications([]);
+      return;
+    }
+
+    try {
+      const snapshot = await window.firebaseServices.db
+        .collection('notifications')
+        .where('userId', '==', userId)
+        .orderBy('createdAt', 'desc')
+        .limit(30)
+        .get();
+
+      const items = [];
+      snapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+      this.renderNotifications(items);
+      this._markOpenedAsRead(snapshot);
+    } catch (err) {
+      console.log('Load notifications:', err.message);
+      this.renderNotifications([]);
+    }
+  }
+
+  renderNotifications(items) {
+    const listEl = document.getElementById('notificationsList');
+    if (!listEl) return;
+
+    if (items.length === 0) {
+      listEl.innerHTML = `
+        <div class="notifications-empty">
+          <i class="fas fa-bell-slash"></i>
+          <p>No notifications yet</p>
+          <p class="notifications-empty-sub">Medication reminders and health alerts will appear here</p>
+        </div>`;
+      return;
+    }
+
+    const typeIcons = {
+      medication: 'fa-pills', 'blood-pressure': 'fa-heart-pulse',
+      mood: 'fa-face-smile', health: 'fa-stethoscope',
+      goal: 'fa-bullseye', general: 'fa-bell'
+    };
+    const typeColors = {
+      medication: 'green', 'blood-pressure': 'red',
+      mood: 'amber', health: 'blue', goal: 'purple', general: 'blue'
+    };
+
+    listEl.innerHTML = items.map(n => {
+      const icon = typeIcons[n.type] || 'fa-bell';
+      const color = typeColors[n.type] || 'blue';
+      return `
+        <div class="notification-item${n.read ? '' : ' unread'}">
+          <div class="notification-icon notification-icon--${color}">
+            <i class="fas ${icon}"></i>
+          </div>
+          <div class="notification-content">
+            <p class="notification-title">${n.title}</p>
+            <p class="notification-body">${n.body}</p>
+            <p class="notification-time">${this._formatTime(n.createdAt)}</p>
+          </div>
+          ${!n.read ? '<span class="notification-dot"></span>' : ''}
+        </div>`;
+    }).join('');
+  }
+
+  _formatTime(timestamp) {
+    if (!timestamp) return '';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const diff = Date.now() - date.getTime();
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days === 1) return 'Yesterday';
+    return `${days}d ago`;
+  }
+
+  async _markOpenedAsRead(snapshot) {
+    try {
+      const unread = snapshot.docs.filter(d => !d.data().read);
+      if (!unread.length) return;
+      const batch = window.firebaseServices.db.batch();
+      unread.forEach(doc => batch.update(doc.ref, { read: true }));
+      await batch.commit();
+      this.updateBadge(0);
+    } catch (err) {
+      console.log('Auto mark read:', err.message);
+    }
+  }
+
+  async markAllRead() {
+    const userId = window.authManager?.getUserId();
+    if (!userId || !window.firebaseServices?.db) return;
+    try {
+      const snapshot = await window.firebaseServices.db
+        .collection('notifications')
+        .where('userId', '==', userId)
+        .where('read', '==', false)
+        .get();
+      if (snapshot.empty) return;
+      const batch = window.firebaseServices.db.batch();
+      snapshot.forEach(doc => batch.update(doc.ref, { read: true }));
+      await batch.commit();
+      this.loadNotifications();
+      this.updateBadge(0);
+    } catch (err) {
+      console.log('Mark all read:', err.message);
+    }
+  }
+
+  updateBadge(count) {
+    const bell = document.getElementById('notificationBtn');
+    if (!bell) return;
+    let badge = bell.querySelector('.notification-badge');
+    if (count > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'notification-badge';
+        bell.appendChild(badge);
+      }
+      badge.textContent = count > 9 ? '9+' : count;
+    } else if (badge) {
+      badge.remove();
+    }
+  }
+
+  async checkUnreadCount() {
+    const userId = window.authManager?.getUserId();
+    if (!userId || !window.firebaseServices?.db) return;
+    try {
+      const snapshot = await window.firebaseServices.db
+        .collection('notifications')
+        .where('userId', '==', userId)
+        .where('read', '==', false)
+        .get();
+      this.updateBadge(snapshot.size);
+    } catch (err) {
+      console.log('Badge count:', err.message);
+    }
+  }
+
+  async saveNotification(title, body, type = 'general') {
+    const userId = window.authManager?.getUserId();
+    if (!userId || !window.firebaseServices?.db) return;
+    try {
+      await window.firebaseServices.db.collection('notifications').add({
+        userId, title, body, type, read: false, createdAt: new Date()
+      });
+      this.checkUnreadCount();
+    } catch (err) {
+      console.log('Save notification:', err.message);
+    }
+  }
+
   // Get notification settings
   getNotificationSettings() {
     const defaultSettings = {
