@@ -252,6 +252,36 @@ class NotificationManager {
     this.scheduleNotifications(); // Reschedule with new settings
   }
 
+  // Called from a user gesture (bell button) — requests permission and gives feedback
+  async requestPermissionFromUserGesture() {
+    if (!('Notification' in window)) {
+      window.authManager?.showToast('Notifications are not supported in this browser', 'error');
+      return;
+    }
+
+    if (this.permission === 'granted') {
+      window.authManager?.showToast('Notifications are already enabled', 'success');
+      return;
+    }
+
+    if (this.permission === 'denied') {
+      window.authManager?.showToast('Notifications are blocked. Please enable them in your browser settings.', 'error');
+      return;
+    }
+
+    try {
+      this.permission = await Notification.requestPermission();
+      if (this.permission === 'granted') {
+        window.authManager?.showToast('Notifications enabled!', 'success');
+        this.scheduleNotifications();
+      } else {
+        window.authManager?.showToast('Notification permission denied', 'error');
+      }
+    } catch (error) {
+      window.authManager?.showToast('Could not enable notifications', 'error');
+    }
+  }
+
   // Get notification settings
   getNotificationSettings() {
     const defaultSettings = {
